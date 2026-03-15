@@ -30,7 +30,7 @@ def ConfigureServer(DBNAME):
     SetDBConnection(getSQLiteURL('/%s'%dbpath))
 
 def LoadConfiguration(config): 
-    from configparser import SafeConfigParser 
+    from configparser import ConfigParser
     
     #Patch Server 
     s = SERVER_PATCH_PREMIUM 

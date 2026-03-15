@@ -6,13 +6,13 @@ override_ip_addresses()
 
 #world update script
 
-import imp, os, sys
+import os, sys
 from mud.gamesettings import *
 
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
            
 if main_is_frozen():
     #maindir = get_main_dir()

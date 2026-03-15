@@ -12,7 +12,7 @@ from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
-import os,sys,imp
+import os,sys
 from twisted.python import components, failure, log
 
 import math
@@ -27,7 +27,7 @@ import time,traceback
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 
 #Server Side

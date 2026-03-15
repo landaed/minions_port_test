@@ -11,7 +11,7 @@ from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
-import os,imp
+import os
 from twisted.python import components, failure, log
 
 import math

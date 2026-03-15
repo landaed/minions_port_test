@@ -2,7 +2,7 @@
 # Please see LICENSE.TXT for details
 
 from mud.world.genesistime import GENESISTIME
-import sys, os, traceback, imp
+import sys, os, traceback
 from datetime import datetime
 import re
 import shutil
@@ -51,7 +51,7 @@ FORCE = False
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 
 def CheckWorld(worldPath,baselinePath):

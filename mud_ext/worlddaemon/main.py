@@ -6,7 +6,6 @@
 #world kills all zones
 
 
-import imp
 import os
 import sys
 

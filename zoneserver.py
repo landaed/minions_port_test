@@ -4,7 +4,6 @@
 from mud_ext.gamesettings import override_ip_addresses
 override_ip_addresses()
 
-import imp
 import os
 import sys
 from traceback import format_exc,print_exc,print_stack
@@ -18,7 +17,7 @@ try:
     def main_is_frozen():
         return (hasattr(sys, "frozen") or # new py2exe
             hasattr(sys, "importers") # old py2exe
-            or imp.is_frozen("__main__")) # tools/freeze
+            or getattr(sys, 'frozen', False)) # tools/freeze
     
     
     if main_is_frozen():

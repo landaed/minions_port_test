@@ -7,7 +7,7 @@
 #from twisted.internet.iocpreactor import install
 #install()
 
-import imp, os, sys,time,shutil,traceback
+import os, sys,time,shutil,traceback
 from mud.gamesettings import *
 
 DISPLAY_SPLASH = True
@@ -151,7 +151,7 @@ if sys.platform[:6] != 'darwin':
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 def get_main_dir():
    if main_is_frozen():
