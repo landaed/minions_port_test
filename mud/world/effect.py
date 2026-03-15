@@ -9,7 +9,7 @@ from mud.common.persistent import Persistent
 from mud.world.core import *
 from mud.world.damage import Damage,Heal
 from mud.world.defines import *
-import spell
+from mud.world import spell
 
 from collections import defaultdict
 from math import ceil,floor
