@@ -6,7 +6,7 @@ from mud.world.core import *
 
 from random import randint
 from math import floor,ceil,sqrt
-from damage import Damage
+from mud.world.damage import Damage
 from mud.world.defines import *
 import traceback
 from mud.worlddocs.utils import GetTWikiName

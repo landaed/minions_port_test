@@ -7,7 +7,7 @@
 # specified in the file license.txt.
 ####################################################################
 
-import types, math
+import math
 
 
 # vec4
@@ -42,15 +42,14 @@ class vec4:
             self.x, self.y, self.z, self.w = (0.0, 0.0, 0.0, 0.0)
 
         elif len(args)==1:
-            T = type(args[0])
             # scalar
-            if T==types.FloatType or T==types.IntType or T==types.LongType:
+            if isinstance(args[0], (float, int)):
                 self.x, self.y, self.z, self.w = (args[0], args[0], args[0], args[0])
             # vec4
             elif isinstance(args[0], vec4):
                 self.x, self.y, self.z, self.w = args[0]
             # Tuple/List
-            elif T==types.TupleType or T==types.ListType:
+            elif isinstance(args[0], (tuple, list)):
                 if len(args[0])==0:
                     self.x = self.y = self.z = self.w = 0.0
                 elif len(args[0])==1:
@@ -68,11 +67,11 @@ class vec4:
                 else:
                     raise TypeError("vec4() takes at most 4 arguments")
             # String
-            elif T==types.StringType:
+            elif isinstance(args[0], str):
                 s=args[0].replace(","," ").replace("  "," ").strip().split(" ")
                 if s==[""]:
                     s=[]
-                f=map(lambda x: float(x), s)
+                f=list(map(lambda x: float(x), s))
                 dummy = vec4(f)
                 self.x, self.y, self.z, self.w = dummy
             # error
@@ -95,7 +94,7 @@ class vec4:
 
 
     def __repr__(self):
-        return 'vec4('+`self.x`+', '+`self.y`+', '+`self.z`+', '+`self.w`+')'
+        return 'vec4('+repr(self.x)+', '+repr(self.y)+', '+repr(self.z)+', '+repr(self.w)+')'
 
     def __str__(self):
         fmt="%1.4f"
@@ -178,9 +177,8 @@ class vec4:
         -0.765
         """
 
-        T = type(other)
         # vec4*scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec4(self.x*other, self.y*other, self.z*other, self.w*other)
         # vec4*vec4
         if isinstance(other, vec4):
@@ -195,16 +193,15 @@ class vec4:
 
     __rmul__ = __mul__
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         """Division by scalar
 
         >>> a=vec4(1.0, 0.5, -1.8, 0.2)
         >>> print a/2.0
         (0.5000, 0.2500, -0.9000, 0.1000)
         """
-        T = type(other)
         # vec4/scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec4(self.x/other, self.y/other, self.z/other, self.w/other)
         # unsupported
         else:
@@ -217,9 +214,8 @@ class vec4:
         >>> print a%2.0
         (1.0000, 0.5000, 0.2000, 0.2000)
         """
-        T = type(other)
         # vec4%scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec4(self.x%other, self.y%other, self.z%other, self.w%other)
         # unsupported
         else:
@@ -269,9 +265,8 @@ class vec4:
         >>> print a
         (2.0000, 1.0000, -3.6000, 0.4000)
         """
-        T = type(other)
         # vec4*=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x*=other
             self.y*=other
             self.z*=other
@@ -280,7 +275,7 @@ class vec4:
         else:
             raise TypeError("unsupported operand type for *=")
 
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         """Inline division with scalar
 
         >>> a=vec4(1.0, 0.5, -1.8, 0.2)
@@ -288,9 +283,8 @@ class vec4:
         >>> print a
         (0.5000, 0.2500, -0.9000, 0.1000)
         """
-        T = type(other)
         # vec4/=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x/=other
             self.y/=other
             self.z/=other
@@ -307,9 +301,8 @@ class vec4:
         >>> print a
         (1.0000, 0.5000, 0.2000, 0.2000)
         """
-        T = type(other)
         # vec4%=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x%=other
             self.y%=other
             self.z%=other
@@ -364,8 +357,7 @@ class vec4:
         >>> print a[3]
         0.2
         """
-        T=type(key)
-        if T!=types.IntType and T!=types.LongType:
+        if not isinstance(key, int):
             raise TypeError("index must be integer")
 
         if   key==0: return self.x
@@ -383,8 +375,7 @@ class vec4:
         >>> print a
         (1.5000, 0.7000, -0.3000, 0.2000)
         """
-        T=type(key)
-        if T!=types.IntType and T!=types.LongType:
+        if not isinstance(key, int):
             raise TypeError("index must be integer")
 
         if   key==0: self.x = value

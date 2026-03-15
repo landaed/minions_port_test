@@ -3,12 +3,12 @@
 
 import math
 from mud.world.defines import *
-from zone import Zone
+from mud.world.zone import Zone
 from mud.world.spawn import Spawn
 from mud.world.core import *
 import sys
 from mud.common.permission import User
-from damage import XPDamage
+from mud.world.damage import XPDamage
 
 
 

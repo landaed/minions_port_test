@@ -7,7 +7,7 @@
 # specified in the file license.txt.
 ####################################################################
 
-import types, math
+import math
 
 # vec3
 class vec3:
@@ -44,13 +44,13 @@ class vec3:
         elif len(args)==1:
             T = type(args[0])
             # scalar
-            if T==types.FloatType or T==types.IntType or T==types.LongType:
+            if isinstance(args[0], (float, int)):
                 self.x, self.y, self.z = (args[0], args[0], args[0])
             # vec3  
             elif isinstance(args[0], vec3):
                 self.x, self.y, self.z = args[0]
             # Tuple/List
-            elif T==types.TupleType or T==types.ListType:
+            elif isinstance(args[0], (tuple, list)):
                 if len(args[0])==0:
                     self.x = self.y = self.z = 0.0
                 elif len(args[0])==1:
@@ -63,11 +63,11 @@ class vec3:
                 else:
                     raise TypeError("vec3() takes at most 3 arguments")
             # String
-            elif T==types.StringType:
+            elif isinstance(args[0], str):
                 s=args[0].replace(","," ").replace("  "," ").strip().split(" ")
                 if s==[""]:
                     s=[]
-                f=map(lambda x: float(x), s)
+                f=list(map(lambda x: float(x), s))
                 dummy = vec3(f)
                 self.x, self.y, self.z = dummy
             # error
@@ -85,7 +85,7 @@ class vec3:
 
 
     def __repr__(self):
-        return 'vec3('+`self.x`+', '+`self.y`+', '+`self.z`+')'
+        return 'vec3('+repr(self.x)+', '+repr(self.y)+', '+repr(self.z)+')'
 
     def __str__(self):
         fmt="%1.4f"
@@ -168,9 +168,8 @@ class vec3:
         -0.825
         """
 
-        T = type(other)
         # vec3*scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec3(self.x*other, self.y*other, self.z*other)
         # vec3*vec3
         if isinstance(other, vec3):
@@ -185,16 +184,15 @@ class vec3:
 
     __rmul__ = __mul__
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         """Division by scalar
 
         >>> a=vec3(1.0, 0.5, -1.8)
         >>> print a/2.0
         (0.5000, 0.2500, -0.9000)
         """
-        T = type(other)
         # vec3/scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec3(self.x/other, self.y/other, self.z/other)
         # unsupported
         else:
@@ -207,9 +205,8 @@ class vec3:
         >>> print a%2.0
         (1.0000, 0.5000, 0.2000)
         """
-        T = type(other)
         # vec3%scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return vec3(self.x%other, self.y%other, self.z%other)
         # unsupported
         else:
@@ -257,9 +254,8 @@ class vec3:
         >>> print a
         (2.0000, 1.0000, -3.6000)
         """
-        T = type(other)
         # vec3*=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x*=other
             self.y*=other
             self.z*=other
@@ -267,7 +263,7 @@ class vec3:
         else:
             raise TypeError("unsupported operand type for *=")
 
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         """Inline division with scalar
 
         >>> a=vec3(1.0, 0.5, -1.8)
@@ -275,9 +271,8 @@ class vec3:
         >>> print a
         (0.5000, 0.2500, -0.9000)
         """
-        T = type(other)
         # vec3/=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x/=other
             self.y/=other
             self.z/=other
@@ -293,9 +288,8 @@ class vec3:
         >>> print a
         (1.0000, 0.5000, 0.2000)
         """
-        T = type(other)
         # vec3%=scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             self.x%=other
             self.y%=other
             self.z%=other
@@ -347,8 +341,7 @@ class vec3:
         >>> print a[2]
         -1.8
         """
-        T=type(key)
-        if T!=types.IntType and T!=types.LongType:
+        if not isinstance(key, int):
             raise TypeError("index must be integer")
 
         if   key==0: return self.x
@@ -365,8 +358,7 @@ class vec3:
         >>> print a
         (1.5000, 0.7000, -0.3000)
         """
-        T=type(key)
-        if T!=types.IntType and T!=types.LongType:
+        if not isinstance(key, int):
             raise TypeError("index must be integer")
 
         if   key==0: self.x = value

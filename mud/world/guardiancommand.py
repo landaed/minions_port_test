@@ -3,7 +3,7 @@
 
 import math
 from mud.world.defines import *
-from zone import Zone
+from mud.world.zone import Zone
 from mud.world.core import *
 import sys
 

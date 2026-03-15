@@ -7,7 +7,7 @@
 # specified in the file license.txt.
 ####################################################################
 
-import types, math, copy
+import math, copy
 from mud.simulation.vec3 import vec3 as _vec3
 
 # [  0   1   2 ]
@@ -46,9 +46,8 @@ class mat3:
 
         # 1 argument (list, scalar or mat3)
         elif len(args)==1:
-            T = type(args[0])
             # Scalar
-            if T==types.FloatType or T==types.IntType or T==types.LongType:
+            if isinstance(args[0], (float, int)):
                 self.mlist = [args[0],0.0,0.0,
                               0.0,args[0],0.0,
                               0.0,0.0,args[0]]
@@ -56,9 +55,9 @@ class mat3:
             elif isinstance(args[0], mat3):
                 self.mlist = copy.copy(args[0].mlist)
             # String
-            elif T==types.StringType:
+            elif isinstance(args[0], str):
                 s=args[0].replace(","," ").replace("  "," ").strip().split(" ")
-                self.mlist=map(lambda x: float(x), s)
+                self.mlist=list(map(lambda x: float(x), s))
             else:
                 self.mlist = list(args[0])
 
@@ -78,11 +77,11 @@ class mat3:
 
         # Check if there are really 9 elements in the list
         if len(self.mlist)!=9:
-            raise TypeError("mat4(): Wrong number of matrix elements ("+`len(self.mlist)`+" instead of 9)")
+            raise TypeError("mat4(): Wrong number of matrix elements ("+repr(len(self.mlist))+" instead of 9)")
 
 
     def __repr__(self):
-        return 'mat3('+`self.mlist`[1:-1]+')'
+        return 'mat3('+repr(self.mlist)[1:-1]+')'
 
     def __str__(self):
         fmt="%9.4f"
@@ -119,9 +118,8 @@ class mat3:
             raise TypeError("unsupported operand type for -")
 
     def __mul__(self, other):
-        T = type(other)
         # mat3*scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return mat3(map(lambda x,other=other: x*other, self.mlist))
         # mat3*vec3
         if isinstance(other, _vec3):
@@ -149,9 +147,8 @@ class mat3:
             raise TypeError("unsupported operand type for *")
 
     def __rmul__(self, other):
-        T = type(other)
         # scalar*mat3
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return mat3(map(lambda x,other=other: other*x, self.mlist))
         # vec3*mat3
         if isinstance(other, _vec3):
@@ -167,19 +164,17 @@ class mat3:
             raise TypeError("unsupported operand type for *")
 
 
-    def __div__(self, other):
-        T = type(other)
+    def __truediv__(self, other):
         # mat3/scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return mat3(map(lambda x,other=other: x/other, self.mlist))
         # unsupported
         else:
             raise TypeError("unsupported operand type for /")
 
     def __mod__(self, other):
-        T = type(other)
         # mat3%scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return mat3(map(lambda x,other=other: x%other, self.mlist))
         # unsupported
         else:
@@ -201,7 +196,7 @@ class mat3:
         if   key==0: return _vec3(self.mlist[0],self.mlist[3],self.mlist[6])
         elif key==1: return _vec3(self.mlist[1],self.mlist[4],self.mlist[7])
         elif key==2: return _vec3(self.mlist[2],self.mlist[5],self.mlist[8])
-        elif type(key)==types.TupleType:
+        elif isinstance(key, tuple):
             i,j=key
             if i<0 or i>2 or j<0 or j>2:
                 raise IndexError("index out of range")
@@ -214,7 +209,7 @@ class mat3:
         if   key==0: self.mlist[0],self.mlist[3],self.mlist[6] = value
         elif key==1: self.mlist[1],self.mlist[4],self.mlist[7] = value
         elif key==2: self.mlist[2],self.mlist[5],self.mlist[8] = value
-        elif type(key)==types.TupleType:
+        elif isinstance(key, tuple):
             i,j=key
             if i<0 or i>2 or j<0 or j>2:
                 raise IndexError("index out of range")
