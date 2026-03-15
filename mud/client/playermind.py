@@ -239,7 +239,7 @@ class PlayerMind(pb.Root):
                 TGESetGlobal("$pref::GM_LOGIN_ROLE","Immortal")
                 role = "Immortal"
         
-        password = md5(wpassword).digest()
+        password = md5(wpassword.encode()).digest()
 
         d = factory.login(UsernamePassword("%s-%s"%(TGEGetGlobal("$pref::PublicName"),role), password),mind)
         d.addCallbacks(mind.gotJumpServerResult, mind.gotJumpServerFailure)

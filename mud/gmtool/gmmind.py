@@ -115,7 +115,7 @@ class GMConnection(pb.Root):
         self.alive = False
         
         self.username = username
-        self.password = md5(password).digest()
+        self.password = md5(password.encode()).digest()
         self.role = role
         
         if not self.factory:

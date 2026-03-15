@@ -372,7 +372,7 @@ try:
         reactor.connectTCP(MASTERIP,MASTERPORT,factory)
         #the pb.Root() is a bit of a hack, I don't know how to get host address on server without
         #sending it, and I don't want to take the time to figure it out at the moment
-        password = md5(password).digest()
+        password = md5(password.encode()).digest()
         factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(AnnounceConnected, AnnounceFailure)
 
     #XXX Fix this, there must be a way to get the WAN address?
@@ -638,7 +638,7 @@ try:
         print("Connecting to Auction House Server at: %s"%AHSERVER_IP)
         factory = pb.PBClientFactory()
         reactor.connectTCP(AHSERVER_IP,AHSERVER_PORT,factory)
-        password = md5("AH").digest()
+        password = md5(b"AH").digest()
         
         factory.login(UsernamePassword("AH-AH", password),pb.Root()).addCallbacks(AHConnected, AHFailure)
         
@@ -653,7 +653,7 @@ try:
         print("Connecting to Mail Server at: %s"%MAILSERVER_IP)
         factory = pb.PBClientFactory()
         reactor.connectTCP(MAILSERVER_IP,MAILSERVER_PORT,factory)
-        password = md5("MS").digest()
+        password = md5(b"MS").digest()
         
         factory.login(UsernamePassword("MS-MS", password),pb.Root()).addCallbacks(MSConnected, MSFailure)        
 
@@ -664,7 +664,7 @@ try:
         factory = pb.PBClientFactory()
         reactor.connectTCP(DAEMONIP,7000,factory)
         world.daemonMind = mind = DaemonMind(world)
-        password = md5("daemon").digest()
+        password = md5(b"daemon").digest()
         factory.login(UsernamePassword(str(CLUSTER),password),mind).addCallbacks(DaemonConnected, DaemonFailure)
 
 
@@ -697,7 +697,7 @@ try:
         if not CoreSettings.PGSERVER:
             username=PUBLICNAME+"-"+"World"
             password=PASSWORD
-            password = md5(password).digest()
+            password = md5(password.encode()).digest()
 
             factory = pb.PBClientFactory()
             reactor.connectTCP(MASTERIP,MASTERPORT,factory)

@@ -1261,7 +1261,7 @@ class Patcher(object):
         
         factory = pb.PBClientFactory()
         reactor.connectTCP(masterIP,masterPort,factory)
-        password = md5(password).digest()
+        password = md5(password.encode()).digest()
         
         d = factory.login(UsernamePassword("%s-Player"%regkey,password),pb.Root())
         d.addCallbacks(self.patchLoginConnected,self.patchLoginErrback)

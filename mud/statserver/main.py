@@ -69,7 +69,7 @@ def GetWorldStats():
     #the pb.Root() is a bit of a hack, I don't know how to get host address on server without
     #sending it, and I don't want to take the time to figure it out at the moment
     from hashlib import md5
-    password = md5(password).digest()
+    password = md5(password.encode()).digest()
 
     factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(GetWorldStatsConnected, GetWorldStatsFailure)
     

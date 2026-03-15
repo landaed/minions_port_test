@@ -393,7 +393,7 @@ def StartServices():
     portal = Portal(SimpleRealm())
     checker = InMemoryUsernamePasswordDatabaseDontUse()
     from hashlib import md5
-    password = md5("daemon").digest()
+    password = md5(b"daemon").digest()
     for x in range(0,100):
         checker.addUser(str(x), password)
     portal.registerChecker(checker)

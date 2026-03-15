@@ -240,7 +240,7 @@ class WorldConnection(pb.Root):
     def connect(self):
         factory = pb.PBClientFactory()
         reactor.connectTCP(self.worldIP,7001,factory)
-        password = md5(CONFIG["World Password"]).digest()
+        password = md5(CONFIG["World Password"].encode()).digest()
 
         factory.login(UsernamePassword(CONFIG["World Username"], password),self).addCallbacks(self.connected, self.failure)
         
@@ -388,7 +388,7 @@ class MasterConnection(pb.Root):
     
     
     def connect(self):
-        password = md5(MASTER_PASSWORD).digest()
+        password = md5(MASTER_PASSWORD.encode()).digest()
         factory = pb.PBClientFactory()
         reactor.connectTCP(MASTER_IP,MASTER_PORT,factory)
         factory.login(UsernamePassword("CharacterServer-CharacterServer", password),self).addCallbacks(self.connected, self.failure)
@@ -411,7 +411,7 @@ class GMConnection(pb.Root):
     def connect(self):
         factory = pb.PBClientFactory()
         reactor.connectTCP(GMSERVER_IP,GMSERVER_PORT,factory)
-        password = md5(GMSERVER_PASSWORD).digest()
+        password = md5(GMSERVER_PASSWORD.encode()).digest()
         factory.login(UsernamePassword("CharacterServer-CharacterServer", password),self).addCallbacks(self.connected, self.failure)
        
     def remote_gmRenameCharacter(self,oldname):
