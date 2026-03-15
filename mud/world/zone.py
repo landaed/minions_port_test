@@ -22,8 +22,8 @@ import traceback
 
 
 
-def GenPasswd(length=8, chars=string.letters + string.digits):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=8, chars=string.ascii_letters + string.digits):
+    return ''.join([choice(chars) for i in range(length)])
 
 
 #--- Updated 9/19/07 by BellyFish
@@ -103,14 +103,14 @@ class ZoneInstance:
     
     
     def failure(self,error):
-        print error
+        print(error)
     
     
     #THE PLAYER IS OFFICIALLY IN THE ZONE AT THIS POINT... whew
     def playerEnterZone(self,player):
         
         if not player.world:
-            print "WARNING: Player Entering Zone not attached to world... probably lost connection to world while zoning in"
+            print("WARNING: Player Entering Zone not attached to world... probably lost connection to world while zoning in")
             return
         
         player.zone.simAvatar.setDisplayName(player)
@@ -190,7 +190,7 @@ class ZoneInstance:
     
     
     def connectQueuedPlayers(self, result):
-        for p,z in self.playerQueue.iteritems():
+        for p,z in self.playerQueue.items():
             self.connectPlayer(None,p,z)
         self.playerQueue.clear()
     
@@ -216,7 +216,7 @@ class ZoneInstance:
     def start(self):
         if not self.simAvatar:
             traceback.print_stack()
-            print "AssertionError: simAvatar doesn't exist!"
+            print("AssertionError: simAvatar doesn't exist!")
             return
         self.live = True
         d = self.simAvatar.setPlayerPasswords(self.playerPasswords)
@@ -228,7 +228,7 @@ class ZoneInstance:
             return
         self.stopped = True
         
-        print "Stopping Zone"
+        print("Stopping Zone")
         self.weather.cancel()
         
         try:
@@ -319,7 +319,7 @@ class ZoneInstance:
                         if start == self.spawnIndex:
                             break
             
-            for mob in self.mobLookup.itervalues():
+            for mob in self.mobLookup.values():
                 if mob.detached and mob.kingTimer > 0:
                     mob.kingTimer -= 3
             
@@ -462,7 +462,7 @@ class ZoneInstance:
         player = mob.player
         if not player:
             traceback.print_stack()
-            print "AssertionError: mob is no player mob!"
+            print("AssertionError: mob is no player mob!")
             return
         mob = player.party.members[charIndex].mob
         
@@ -560,7 +560,7 @@ class ZoneInstance:
     def reattachMob(self,mob):
         if not mob.detached:
             traceback.print_stack()
-            print "AssertionError: mob is not detached!"
+            print("AssertionError: mob is not detached!")
             return
         mob.detached = False
         if mob.character:
@@ -689,7 +689,7 @@ class ZoneInstance:
     
     
     def projectileCollision(self,pid,hitObj,hitPos):
-        if self.mobLookup.has_key(hitObj):
+        if hitObj in self.mobLookup:
             proj = self.projectiles[pid]
             proj.dst = self.mobLookup[hitObj]
             proj.onCollision(hitPos)

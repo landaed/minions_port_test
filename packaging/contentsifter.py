@@ -6,7 +6,7 @@
 #getting imported by missionsifter, argh
 
 if __name__ == '__main__':
-    raise "Cannot import this module as __main__!"
+    raise Exception("Cannot import this module as __main__!")
 
 import os,shutil
 import os.path

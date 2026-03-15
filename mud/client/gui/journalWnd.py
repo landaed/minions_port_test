@@ -62,7 +62,7 @@ class JournalWnd:
             tTL.clear()
             
             topicIndex = 0
-            for topic,topicData in sorted(journal.iteritems()):
+            for topic,topicData in sorted(journal.items()):
                 if int(self.showHidden.getValue()) or not topicData[1]:
                     tTL.addRow(topicIndex,topic)
                     topicIndex += 1
@@ -83,7 +83,7 @@ class JournalWnd:
         
         # See if topic is valid.
         if topic:
-            for x in xrange(0,int(tTL.rowCount())):
+            for x in range(0,int(tTL.rowCount())):
                 if tTL.getRowText(x) == topic:
                     tTL.setSelectedRow(x)
                     tTL.scrollVisible(x)
@@ -94,7 +94,7 @@ class JournalWnd:
                         self.hideTopic.setText("Hide Topic")
                     # See if entry is valid.
                     if entry:
-                        for x in xrange(0,int(eTL.rowCount())):
+                        for x in range(0,int(eTL.rowCount())):
                             if eTL.getRowText(x) == entry:
                                 eTL.setSelectedRow(x)
                                 eTL.scrollVisible(x)
@@ -155,7 +155,7 @@ class JournalWnd:
         eTL.clear()
         
         entryIndex = 0
-        for entry,entryData in sorted(self.journal[topic][0].iteritems()):
+        for entry,entryData in sorted(self.journal[topic][0].items()):
             if int(self.showHidden.getValue()) or not entryData[1]:
                 eTL.addRow(entryIndex,entry)
                 entryIndex += 1

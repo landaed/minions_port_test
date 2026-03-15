@@ -6,9 +6,8 @@ sys.path.append(os.getcwd())
 
 if sys.platform == "win32":
     from twisted.internet.iocpreactor import install
-else:
-    from twisted.internet.threadedselectreactor import install
-install()
+    install()
+# else: use default reactor on Linux
 
 from twisted.internet import reactor
 from mud.server.app import Server
@@ -19,7 +18,7 @@ from mud.common.avatar import Avatar,RoleAvatar
 from gmcommands import DoGMCommand
 from mud.gamesettings import *
 
-from md5 import md5
+from hashlib import md5
 from time import strftime
 
 CONFIG = {}
@@ -49,7 +48,7 @@ class CharacterAvatar(Avatar):
         SetCharServerMind(CHARSERVER_MIND)
 
     def perspective_sayHi(self):
-        print "yup"
+        print("yup")
                 
     def logout(self):
         global CHARSERVER_MIND
@@ -143,7 +142,7 @@ def ConfigureUsers():
     wdaemon.addRole(Role.byName("WorldDaemon"))
     
     from userpasswords import USERS
-    for name,info in USERS.iteritems():
+    for name,info in USERS.items():
         password,roles = info
         user = User(name=name,password=password)
         for role in roles:
@@ -151,8 +150,8 @@ def ConfigureUsers():
 
 
 def main():
-    print "GM Server"
-    print "->Initializing"
+    print("GM Server")
+    print("->Initializing")
 
     ConfigureRoles()
     ConfigureUsers()
@@ -160,7 +159,7 @@ def main():
     server = Server(CONFIG["Default World Port"])    # True to use md5 hashing for passwords
     server.startServices()
 
-    print "->GM Server is up"
+    print("->GM Server is up")
     reactor.run()
 
 

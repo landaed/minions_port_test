@@ -30,22 +30,22 @@ class AuctionGui:
         self.itemButtonId = {}
         self.scrollWnd = TGEObject("AuctionGui_Scroll")
         #10 items in a window, change these if you decide to do more than 10
-        self.itemButton = dict((x,TGEObject("AuctionGui_item_B%i"%x)) for x in xrange(1,11)) #1-10
+        self.itemButton = dict((x,TGEObject("AuctionGui_item_B%i"%x)) for x in range(1,11)) #1-10
         self.itemNameColor = {}
-        self.itemName = dict((x,TGEObject("AuctionGui_item_Name%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemLevel = dict((x,TGEObject("AuctionGui_item_Level%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemTimeLeft = dict((x,TGEObject("AuctionGui_item_Time%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBidP = dict((x,TGEObject("AuctionGui_item_BIDP%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBidG = dict((x,TGEObject("AuctionGui_item_BIDG%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBidS = dict((x,TGEObject("AuctionGui_item_BIDS%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBidC = dict((x,TGEObject("AuctionGui_item_BIDC%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBuyP = dict((x,TGEObject("AuctionGui_item_BUYP%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBuyG = dict((x,TGEObject("AuctionGui_item_BUYG%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBuyS = dict((x,TGEObject("AuctionGui_item_BUYS%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBuyC = dict((x,TGEObject("AuctionGui_item_BUYC%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemShowBuy = dict((x,TGEObject("AuctionGui_item_SBUY%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemBidInfo = dict((x,TGEObject("AuctionGui_item_BIDBUY%i"%x)) for x in xrange(1,11)) #1-10
-        self.itemGuiBG = dict((x,TGEObject("AuctionGui_BG%i"%x)) for x in xrange(1,11)) #1-10
+        self.itemName = dict((x,TGEObject("AuctionGui_item_Name%i"%x)) for x in range(1,11)) #1-10
+        self.itemLevel = dict((x,TGEObject("AuctionGui_item_Level%i"%x)) for x in range(1,11)) #1-10
+        self.itemTimeLeft = dict((x,TGEObject("AuctionGui_item_Time%i"%x)) for x in range(1,11)) #1-10
+        self.itemBidP = dict((x,TGEObject("AuctionGui_item_BIDP%i"%x)) for x in range(1,11)) #1-10
+        self.itemBidG = dict((x,TGEObject("AuctionGui_item_BIDG%i"%x)) for x in range(1,11)) #1-10
+        self.itemBidS = dict((x,TGEObject("AuctionGui_item_BIDS%i"%x)) for x in range(1,11)) #1-10
+        self.itemBidC = dict((x,TGEObject("AuctionGui_item_BIDC%i"%x)) for x in range(1,11)) #1-10
+        self.itemBuyP = dict((x,TGEObject("AuctionGui_item_BUYP%i"%x)) for x in range(1,11)) #1-10
+        self.itemBuyG = dict((x,TGEObject("AuctionGui_item_BUYG%i"%x)) for x in range(1,11)) #1-10
+        self.itemBuyS = dict((x,TGEObject("AuctionGui_item_BUYS%i"%x)) for x in range(1,11)) #1-10
+        self.itemBuyC = dict((x,TGEObject("AuctionGui_item_BUYC%i"%x)) for x in range(1,11)) #1-10
+        self.itemShowBuy = dict((x,TGEObject("AuctionGui_item_SBUY%i"%x)) for x in range(1,11)) #1-10
+        self.itemBidInfo = dict((x,TGEObject("AuctionGui_item_BIDBUY%i"%x)) for x in range(1,11)) #1-10
+        self.itemGuiBG = dict((x,TGEObject("AuctionGui_BG%i"%x)) for x in range(1,11)) #1-10
         self.searchName = TGEObject("AuctionGui_Name_Search")
         self.levelLow = TGEObject("AuctionGui_Level_Low")
         self.levelHigh = TGEObject("AuctionGui_Level_High")
@@ -115,7 +115,7 @@ class AuctionGui:
     def clearresults(self):
         self.clearresultslite()
         
-        for x in xrange(1,11):
+        for x in range(1,11):
             self.itemButton[x].pulseGreen = False
             self.itemButtonId[x] = -1
 
@@ -142,7 +142,7 @@ class AuctionGui:
         
     #Clears out the contents of the panes so things are clean - Lite version
     def clearresultslite(self):
-        for x in xrange(1,11):
+        for x in range(1,11):
             self.itemName[x].setText("")
             self.itemNameColor[x] = ""
             self.itemLevel[x].setText("")
@@ -179,7 +179,7 @@ class AuctionGui:
             TGECall("MessageBoxOK","Invalid Item","You can only use items in your inventory.  The item MUST be unequiped.")
             return
             
-        for slot,ghost in cinfo.ITEMS.iteritems():
+        for slot,ghost in cinfo.ITEMS.items():
             if slot != RPG_SLOT_CURSOR:
                 continue
             
@@ -274,7 +274,7 @@ class AuctionGui:
             return          
         
         #Validate it to make sure it is actually in an inventory slot
-        for slot,ghost in cinfo.ITEMS.iteritems():
+        for slot,ghost in cinfo.ITEMS.items():
             if ghost == self.auctionItemGhost:
                 if RPG_SLOT_CARRY_END > slot >= RPG_SLOT_CARRY_BEGIN:
                     slotfound = 1
@@ -428,7 +428,7 @@ class AuctionGui:
                 #Set auction ID on button for reference later
                 self.itemButtonId[count] = id
                 #Item is not in the ghost Cache...add it
-                if not self.itemCache.has_key(id):
+                if id not in self.itemCache:
                     ida[id] = iid
                 else:
                     if self.itemCache[id].STACKMAX > 1:
@@ -448,7 +448,7 @@ class AuctionGui:
         from mud.client.playermind import PLAYERMIND
         revokeID = -1
         #Search item Buttons to see if one is selected
-        for x in xrange(1,11):
+        for x in range(1,11):
             if (self.itemButton[x].pulseGreen == True):
                 revokeID = self.itemButtonId[x]
                 break
@@ -522,7 +522,7 @@ class AuctionGui:
         from mud.client.playermind import PLAYERMIND
         buyid = -1
         #Search item Buttons to see if one is selected
-        for x in xrange(1,11):
+        for x in range(1,11):
             if (self.itemButton[x].pulseGreen == True):
                 buyid = self.itemButtonId[x]
                 break
@@ -573,7 +573,7 @@ class AuctionGui:
         from mud.client.playermind import PLAYERMIND
         buyid = -1
         #Search item Buttons to see if one is selected
-        for x in xrange(1,11):
+        for x in range(1,11):
             if (self.itemButton[x].pulseGreen == True):
                 buyid = self.itemButtonId[x]
                 break
@@ -619,7 +619,7 @@ class AuctionGui:
     #Called from Gui.  Makes the button pulse green
     def doBuyClick(self, args):
         button = int(args[1])
-        for x in xrange(1,11):
+        for x in range(1,11):
             self.itemButton[x].pulseGreen = False
 
         self.itemButton[button].pulseGreen = True
@@ -637,7 +637,7 @@ class AuctionGui:
     def updateDB(self, updatedDB, type):
         from time import time
         buffer = pylzma.decompress(updatedDB)
-        f = file("./%s/data/%s"%(GAMEROOT,self.auctionDB),"wb")
+        f = open("./%s/data/%s"%(GAMEROOT,self.auctionDB),"wb")
         f.write(buffer)
         f.close()
         self.lastUpdate = time()
@@ -651,7 +651,7 @@ class AuctionGui:
     def doSearch(self, pageSearch):
         page = int(pageSearch[1])
         self.scrollWnd.scrollToTop()
-        for x in xrange(1,11):
+        for x in range(1,11):
             self.itemButton[x].pulseGreen = False
             self.itemButtonId[x] = -1
         if (self.sellPane.visible == True):
@@ -889,7 +889,7 @@ class AuctionGui:
                 #Set auction ID on button for reference later
                 self.itemButtonId[count] = id
                 #Item is not in the ghost Cache...add it
-                if not self.itemCache.has_key(id):
+                if id not in self.itemCache:
                     ida[id] = iid
                 else:
                     if self.itemCache[id].STACKMAX > 1:
@@ -907,9 +907,9 @@ class AuctionGui:
         
     #Ghost information from the server.  Set it in the cache so we know not to request it again
     def setItemInfo(self, item):
-        if not self.itemCache.has_key(item.AUCTIONID):
+        if item.AUCTIONID not in self.itemCache:
             self.itemCache[item.AUCTIONID] = item
-            for x in xrange(1,11):
+            for x in range(1,11):
                 if self.itemButtonId[x] == item.AUCTIONID:
                     #Set the stack value if there is one
                     if item.STACKMAX > 1:

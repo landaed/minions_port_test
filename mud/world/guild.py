@@ -14,9 +14,9 @@ def SendCharacterInfo(player):
     s = c.spawn
     prefix = ""
     if player.avatar and player.avatar.masterPerspective:
-        if player.avatar.masterPerspective.avatars.has_key("GuardianAvatar"):
+        if "GuardianAvatar" in player.avatar.masterPerspective.avatars:
             prefix = "(Guardian) "
-        if player.avatar.masterPerspective.avatars.has_key("ImmortalAvatar"):
+        if "ImmortalAvatar" in player.avatar.masterPerspective.avatars:
             prefix = "(Immortal) "
 
     cinfo = (prefix,c.name,s.realm,s.pclassInternal,s.sclassInternal,s.tclassInternal,s.plevel,s.slevel,s.tlevel,player.zone.zone.niceName,player.guildName)

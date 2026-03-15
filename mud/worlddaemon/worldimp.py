@@ -66,7 +66,7 @@ def StartServices(callback):
     #fire up the World Stuff
     portal = Portal(SimpleRealm())
     checker = InMemoryUsernamePasswordDatabaseDontUse()
-    from md5 import md5
+    from hashlib import md5
     password = md5("imp").digest()
     for x in range(0,100):
         checker.addUser(str(x), password)
@@ -93,7 +93,7 @@ class ImpMind(pb.Root):
         if sys.platform[:6] != 'darwin':
             s = 'start "%s" %s %s'%(cwd,cmd,args)
             s = os.path.normpath(s)
-            print s
+            print(s)
             os.system(s)
         else:
             cmd = sys.executable
@@ -101,12 +101,12 @@ class ImpMind(pb.Root):
             args.insert(0,cmd)
             
             s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print s
+            print(s)
             os.system(s)
     
     
     def killProcess(self,pid):
-        print "Killing Process",pid
+        print("Killing Process",pid)
         try:
             if win32api:
                 handle = win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_TERMINATE, 0, pid)
@@ -120,7 +120,7 @@ class ImpMind(pb.Root):
             traceback.print_exc()
                 
     def remote_killWorldNow(self,worldPID,zonePID):
-        print "Killing World"
+        print("Killing World")
         for p in zonePID:
             self.killProcess(p)
         self.killProcess(worldPID)
@@ -133,7 +133,7 @@ class ImpMind(pb.Root):
         self.perspective = perspective
         
     def failure(self,reason):
-        print reason
+        print(reason)
     
 def main():
     IP,PORT = None,None
@@ -144,12 +144,12 @@ def main():
             PORT = int(arg[12:])
             
     if not IP or not PORT:
-        print "Usage:  WorldImp.exe -daemonip=x.x.x.x -daemonport=x"
+        print("Usage:  WorldImp.exe -daemonip=x.x.x.x -daemonport=x")
         return
 
     factory = pb.PBClientFactory()
     reactor.connectTCP(IP,PORT,factory)
-    from md5 import md5
+    from hashlib import md5
     password = md5("imp").digest()
     mind = ImpMind()
     mind.daemonIP = IP

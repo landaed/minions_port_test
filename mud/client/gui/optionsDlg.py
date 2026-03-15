@@ -52,7 +52,7 @@ def getSystemFonts():
 
 def getFonts_win32():
     ''' getFonts_win32: Gets and returns a list of installed fonts. '''
-    import _winreg
+    import winreg
     
     fonts = []
     fontdir = os.path.join(os.environ['WINDIR'], "Fonts")
@@ -69,16 +69,16 @@ def getFonts_win32():
 
     for key_name in possible_keys:
         try:
-            key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key_name)
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_name)
             keys.append(key)
         except WindowsError:
             pass
 
     for key in keys:
         fontdict = {}
-        for i in range(_winreg.QueryInfoKey(key)[1]):
+        for i in range(winreg.QueryInfoKey(key)[1]):
             try:
-                name, font, t = _winreg.EnumValue(key,i)
+                name, font, t = winreg.EnumValue(key,i)
             except EnvironmentError:
                 break
 

@@ -8,7 +8,7 @@ from mud.tgepython.console import TGEExport
 
 def DisplayPatchInfo():
     try:
-        f = file('./readme.txt','r')
+        f = open('./readme.txt','r')
         text = f.read()
         
         text = text.replace('\r',"\\r")

@@ -12,10 +12,10 @@ def ConfigureServer(DBNAME):
     
     # String options
     for option in ['database']:
-        for x in xrange(len(sys.argv)):
+        for x in range(len(sys.argv)):
             if sys.argv[x].find(option) == 0:
                 pos = sys.argv[x].find('=') + 1
-                if pos > 0 and options.has_key(option):
+                if pos > 0 and option in options:
                     options[option]=sys.argv[x][pos:]
                     sys.argv[x] = ''
     
@@ -28,7 +28,7 @@ def ConfigureServer(DBNAME):
     SetDBConnection('sqlite:/%s/%s'%(DATABASE,DBNAME))
 
 def LoadConfiguration(config): 
-    from ConfigParser import SafeConfigParser 
+    from configparser import SafeConfigParser 
     
     #Patch Server 
     s = SERVER_PATCH_PREMIUM 

@@ -106,7 +106,7 @@ def GetFactionRelationDesc(playermob,mob):
     else:
         kos = IsKOS(mob,playermob)
         if not kos:
-            worstfaction = 999999999L
+            worstfaction = 999999999
             sfactions = mob.spawn.factions
             for f in playermob.character.characterFactions:
                 for of in sfactions:
@@ -124,7 +124,7 @@ def GetFactionRelationDesc(playermob,mob):
         if kos:
             standing = (RPG_FACTION_HATED,"%s stares at %s with utter contempt.  "%(mob.name,playermob.name))
         else:
-            if worstfaction == 999999999L:
+            if worstfaction == 999999999:
                 worstfaction = 0
             if worstfaction >= RPG_FACTION_ADORED:
                 standing = (RPG_FACTION_ADORED,"%s gazes at %s adoringly.  "%(mob.name,playermob.name))
@@ -252,18 +252,18 @@ def GetPlayerHealingTarget(src,tgt,spellProto=None):
 
 #Expands the money - Not sure why this isn't anywhere, but it was added for the AH system
 def ExpandMoney(tin, copper, silver, gold, platinum):
-    rtin = long(tin)
-    rtin += long(copper) * 100L
-    rtin += long(silver) * 10000L
-    rtin += long(gold) * 1000000L
-    rtin += long(platinum) * 100000000L
+    rtin = int(tin)
+    rtin += int(copper) * 100
+    rtin += int(silver) * 10000
+    rtin += int(gold) * 1000000
+    rtin += int(platinum) * 100000000
     return rtin
 
 def GenMoneyText(tin):
-    platinum, tin = divmod(tin,100000000L)
-    gold, tin = divmod(tin,1000000L)
-    silver, tin = divmod(tin,10000L)
-    copper, tin = divmod(tin,100L)
+    platinum, tin = divmod(tin,100000000)
+    gold, tin = divmod(tin,1000000)
+    silver, tin = divmod(tin,10000)
+    copper, tin = divmod(tin,100)
     
     ext = ('pp','gp','sp','cp','tp')
     worth = (platinum,gold,silver,copper,tin)
@@ -273,10 +273,10 @@ def CollapseMoney(money,multiplier=0):
     if multiplier:
         money = int(money * multiplier)
     
-    platinum, tin = divmod(money,100000000L)
-    gold, tin = divmod(tin,1000000L)
-    silver, tin = divmod(tin,10000L)
-    copper, tin = divmod(tin,100L)
+    platinum, tin = divmod(money,100000000)
+    gold, tin = divmod(tin,1000000)
+    silver, tin = divmod(tin,10000)
+    copper, tin = divmod(tin,100)
     
     return (tin,copper,silver,gold,platinum)
 

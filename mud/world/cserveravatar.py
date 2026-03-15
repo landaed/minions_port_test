@@ -13,7 +13,7 @@ from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer, \
     InstallPlayerBuffer
 
 from base64 import decodestring,encodestring
-from cPickle import dumps,loads
+from pickle import dumps,loads
 from random import choice
 from string import letters
 from time import time as sysTime
@@ -22,7 +22,7 @@ import traceback
 
 
 def GenPasswd(length=8, chars=letters):
-    return ''.join([choice(chars) for i in xrange(length)])
+    return ''.join([choice(chars) for i in range(length)])
 
 AVATAR = None
 #public name -> time of last extraction
@@ -114,7 +114,7 @@ class CharacterServerAvatar(pb.Root):
                     if cbuffer:
                         cbuf = encodestring(dumps(cbuffer, 2))
 
-                    print "Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuf)/1024,len(cbuf)/1024)
+                    print("Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuf)/1024,len(cbuf)/1024))
                     AVATAR.mind.callRemote("savePlayerBuffer",pname,pbuf,cbuf,cvalues) #xxx add callback/errback
                     EXTRACT_TIMES[pname]=now
                     #should be removing these upon success
@@ -150,7 +150,7 @@ class CharacterServerAvatar(pb.Root):
                     extractTarget = pname
             
             remove = []
-            for k in EXTRACT_TIMES.iterkeys():
+            for k in EXTRACT_TIMES.keys():
                 if k not in pnames:
                     remove.append(k)
             map(EXTRACT_TIMES.__delitem__,remove)

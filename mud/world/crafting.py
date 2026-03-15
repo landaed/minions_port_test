@@ -163,7 +163,7 @@ class Recipe(Persistent):
     filterLevelMin = IntCol(default=0)
     filterLevelMax = IntCol(default=1000)
     
-    costTP = IntCol(default=0L)
+    costTP = IntCol(default=0)
     
     ingredients = MultipleJoin('RecipeIngredient')
 
@@ -361,11 +361,11 @@ def EnchantCmd(mob,enchName):
     player = mob.player
     char = mob.character
     # List of all items that aid in enchanting, sorted by level
-    enchFoci = [[] for i in xrange(ENCHANT_QualityCount)]
+    enchFoci = [[] for i in range(ENCHANT_QualityCount)]
     # List of all enchantable items in crafting window (should be only one!)
     enchTarget = []
     # Holds all empty slots in crafting window
-    emptySlots = range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END)
+    emptySlots = list(range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END))
     # If enchanted is true we merged or enchanted something
     enchanted = False
     # Enchanting eventually uses health, this variable holds the costs
@@ -588,7 +588,7 @@ def EnchantCmd(mob,enchName):
             if charms or cspell.affectsStat("stun") or cspell.affectsStat("sleep") or cspell.affectsStat("fear"):
                 player.sendGameText(RPG_MSG_GAME_DENIED,"Stun, sleep, fear and charm spells aren't allowed for weapon enchantments.\\n")
                 return
-            if mob.recastTimers.has_key(cspell):
+            if cspell in mob.recastTimers:
                 player.sendGameText(RPG_MSG_GAME_DENIED,"%s has to wait another %i seconds before attempting to cast this spell again.\\n"%(char.name,int(mob.recastTimers[cspell]/6)))
                 return
             
@@ -615,7 +615,7 @@ def EnchantCmd(mob,enchName):
                 # Check if the player has the required components and give
                 #  feedback if not.
                 if not player.checkItems(components.copy(),True):
-                    player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components for this enchantment,\\n$srche needs: %s\\n"%', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in components.iteritems()),mob)
+                    player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components for this enchantment,\\n$srche needs: %s\\n"%', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in components.items()),mob)
                     return
             
             # from now on, count the spell as casted
@@ -807,7 +807,7 @@ def EnchantCmd(mob,enchName):
             
             
             # check if this enchantment is allowed relative to max enchantments, store focus accordingly
-            if desiredEnchantments.has_key(focusType[0]):
+            if focusType[0] in desiredEnchantments:
                 # It's more difficult to modify an already existing enchantment than to create a new one, because the existing forces have to be altered
                 manaCost += 2*focusType[2]*foc.stackCount
                 desiredEnchantments[focusType[0]][0] += focusEnchantValue
@@ -936,7 +936,7 @@ def EnchantCmd(mob,enchName):
     else:
         # Ignore raw and exquisite items, since they can't be merged.
         # qualityIndex actually stores the index of the higher focus.
-        for qualityIndex,partialFociList in zip(range(2,ENCHANT_QualityCount),enchFoci[1:-1]):
+        for qualityIndex,partialFociList in zip(list(range(2,ENCHANT_QualityCount)),enchFoci[1:-1]):
             # no focus at this level, skip
             if not len(partialFociList):
                 continue
@@ -960,7 +960,7 @@ def EnchantCmd(mob,enchName):
             # stackCount = 0 is the same as = 1, but 1 is easier for calculation and tests
             if not focusCount:
                 focusCount = 1
-            for counter in xrange(1,len(partialFociList)):
+            for counter in range(1,len(partialFociList)):
                 foc = partialFociList[counter]
                 if foc.name == focusName:
                     if not foc.stackCount:
@@ -1196,7 +1196,7 @@ def DisenchantCmd(mob,attribs):
                 disenchItemLevel = cl.level
     
     # create a list of all free crafting slots
-    freeslots = range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END)
+    freeslots = list(range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END))
     freeslots.remove(disenchTarget.slot)
     
     
@@ -1362,7 +1362,7 @@ def DisenchantCmd(mob,attribs):
             numEnchItems = randint(1,int(slevel/225)+1)
             if numEnchItems > numEnchantments:
                 numEnchItems = numEnchantments
-            for i in xrange(numEnchItems):
+            for i in range(numEnchItems):
                 enchItem = ItemProto.byName(ENCHANT_RawItems[randint(0,len(ENCHANT_RawItems)-1)])
                 item = enchItem.createInstance()
                 if len(freeslots):
@@ -1482,7 +1482,7 @@ def Craft(mob,recipeID,useCraftWindow):
         recipe = Recipe.get(recipeID)
     except:
         player.sendGameText(RPG_MSG_GAME_DENIED,"Server received invalid recipe id. Crafting had to be aborted.\\n")
-        print "WARNING: %s used invalid recipe id %i."%(mob.name,recipeID)
+        print("WARNING: %s used invalid recipe id %i."%(mob.name,recipeID))
         return
     
     # Check skill requirements
@@ -1508,7 +1508,7 @@ def Craft(mob,recipeID,useCraftWindow):
         moneyMod,craftStackCount,craftCharges = (1.0,craftStackDefault,craftUseMax)
     
     # Check money requirements.
-    cost = long(moneyMod * recipe.costTP)
+    cost = int(moneyMod * recipe.costTP)
     if not player.checkMoney(cost):
         player.sendGameText(RPG_MSG_GAME_DENIED, \
             "This <a:Skill%s>%s</a> requires %s.\\n"% \
@@ -1531,7 +1531,7 @@ def Craft(mob,recipeID,useCraftWindow):
         ingredients[i.itemProto] += i.count
     
     # Get a list of all crafting slots.
-    emptySlots = range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END)
+    emptySlots = list(range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END))
     
     consumed = {}
     stackItems = []
@@ -1676,11 +1676,11 @@ def Craft(mob,recipeID,useCraftWindow):
     
     # If there are still need ingredients, the player is missing some items.
     if len(ingredients):
-        player.sendGameText(RPG_MSG_GAME_DENIED,"%s lacks %s for this craft.\\n"%(char.name,', '.join("%i <a:Item%s>%s</a>"%(count,GetTWikiName(item.name),item.name) for item,count in ingredients.iteritems())))
+        player.sendGameText(RPG_MSG_GAME_DENIED,"%s lacks %s for this craft.\\n"%(char.name,', '.join("%i <a:Item%s>%s</a>"%(count,GetTWikiName(item.name),item.name) for item,count in ingredients.items())))
         return
     
     # All crafting requirements fulfilled, take away consumed ingredients.
-    for item,count in consumed.items():
+    for item,count in list(consumed.items()):
         proto = item.itemProto
         
         # If item uses charges, reduce a charge.

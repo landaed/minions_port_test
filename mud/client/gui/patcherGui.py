@@ -18,12 +18,12 @@ from twisted.cred.credentials import UsernamePassword
 import sys,imp,os
 import traceback
 from base64 import encodestring
-from sha import new as newSHA
-from cPickle import loads,load,dump
+from hashlib import sha1 as newSHA
+from pickle import loads,load,dump
 from zipfile import ZipFile,ZIP_DEFLATED
 from shutil import copyfile,rmtree,copytree,copy2 as shutilCopy
 from time import time,sleep
-from md5 import md5
+from hashlib import md5
 
 from masterLoginDlg import DoMasterLogin
 
@@ -79,7 +79,7 @@ def dirwalk(directory, ignore, errback=None):
         if errback:
             errback(errorString)
         else:
-            print errorString
+            print(errorString)
         return
     
     if os.path.islink(directory):
@@ -87,7 +87,7 @@ def dirwalk(directory, ignore, errback=None):
         if errback:
             errback(errorString)
         else:
-            print errorString
+            print(errorString)
         return
     
     try:
@@ -100,7 +100,7 @@ def dirwalk(directory, ignore, errback=None):
         if errback:
             errback(exception)
         else:
-            print exception
+            print(exception)
         return
     
     for path in dirlist:
@@ -132,7 +132,7 @@ def countFiles(path, ignore, errback=None):
         if errback:
             errback(errorString)
         else:
-            print errorString
+            print(errorString)
         return 0
     
     if os.path.islink(path):
@@ -140,7 +140,7 @@ def countFiles(path, ignore, errback=None):
         if errback:
             errback(errorString)
         else:
-            print errorString
+            print(errorString)
         return 0
     
     for elem in dirwalk(path,ignore,errback):
@@ -171,7 +171,7 @@ class MyHTTPDownloader(HTTPDownloader):
                 self.protocol.transport.loseConnection()
         
         else:
-            if headers.has_key('content-length'):
+            if 'content-length' in headers:
                 self.targetSize = int(headers['content-length'][0])
                 if self.statusCallback:
                     self.statusCallback("0/%i kB"%(self.targetSize / 1024))
@@ -258,7 +258,7 @@ class LocalManifest:
     
     def load(self):
         try:
-            f = file("./cache/%s_manifest.cache"%self.base,'rb')
+            f = open("./cache/%s_manifest.cache"%self.base,'rb')
             cache = load(f)
             f.close()
         except:
@@ -269,12 +269,12 @@ class LocalManifest:
     
     def save(self, cache):
         try:
-            f = file("./cache/%s_manifest.cache"%self.base,'wb')
+            f = open("./cache/%s_manifest.cache"%self.base,'wb')
             dump(cache,f)
             f.close()
         except:
             traceback.print_exc()
-            print "WARNING in LocalManifest.save: couldn't save manifest cache."
+            print("WARNING in LocalManifest.save: couldn't save manifest cache.")
     
     
     def generationError(self, text):
@@ -326,7 +326,7 @@ class LocalManifest:
             mtime = os.path.getmtime(elem)
             curFileVersion = (fsize,ctime,mtime)
             
-            if cache.has_key(elem):
+            if elem in cache:
                 # File present in cache, so check if the version matches.
                 fileVersion,fileCache = cache[elem]
                 if curFileVersion != fileVersion:
@@ -360,7 +360,7 @@ class LocalManifest:
             return
         
         try:
-            generator.next()
+            next(generator)
             if ABORT:
                 return
             reactor.callLater(0.01,self.generatorTick,generator)
@@ -375,7 +375,7 @@ class LocalManifest:
             if self.errback:
                 self.errback(exception)
             else:
-                print exception
+                print(exception)
     
     
     # Generate local manifests of files.
@@ -389,7 +389,7 @@ class LocalManifest:
         components = {"./": ("base","Platform Manifest",["./COMMON"]),
                       "common": ("common","Content Manifest",["COMMON/CONSOLE.LOG"])}
         
-        for component,args in components.iteritems():
+        for component,args in components.items():
             self.base,self.baseDesc,ignore = args
             
             cache = self.load()
@@ -402,7 +402,7 @@ class LocalManifest:
                 newCache = None
                 while 1:
                     try:
-                        newCache = generator.next()
+                        newCache = next(generator)
                         if ABORT:
                             return
                         yield True
@@ -420,7 +420,7 @@ class LocalManifest:
                 if self.errback:
                     self.errback(exception)
                 else:
-                    print exception
+                    print(exception)
 
 
 
@@ -643,7 +643,7 @@ class Patcher(object):
         
         errorString = 'There was an error cleaning up the patch_files directory:\n%s'% \
                       errorString
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
     
     
@@ -713,7 +713,7 @@ class Patcher(object):
     
     
     def fileDownloadGenerator(self):
-        for file,version in self.patchFiles.iteritems():
+        for file,version in self.patchFiles.items():
             yield file,version
     
     
@@ -723,7 +723,7 @@ class Patcher(object):
         
         errorString = 'An error occurred while downloading patch file "%s":\n%s'% \
                       (filename,reason.getErrorMessage())
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
     
     
@@ -760,7 +760,7 @@ class Patcher(object):
                 ABORT = True
                 errorString = 'Error removing faulty patch download "%s":\n%s'% \
                               (patchFileName,traceback.format_exc())
-                print errorString
+                print(errorString)
                 TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
                 return
             
@@ -770,7 +770,7 @@ class Patcher(object):
             else:
                 ABORT = True
                 errorString = 'Error: downloaded patch file "%s" still faulty after second download attempt. Aborting patch process.'%patchFileName
-                print errorString
+                print(errorString)
                 TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
             
             # Downloaded file was faulty, so return early.
@@ -786,7 +786,7 @@ class Patcher(object):
         
         # Download the next file if there are files remaining to be downloaded.
         try:
-            currFile,currVersion = self.downloadGenerator.next()
+            currFile,currVersion = next(self.downloadGenerator)
             self.downloadFile(currFile,currVersion,slot)
         except StopIteration:
             # Just reset the patchfileinfo for process sychronization,
@@ -802,7 +802,7 @@ class Patcher(object):
             ABORT = True
             errorString = 'Error scheduling download of patch file "%s":\n%s'% \
                           (currFile,traceback.format_exc())
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
             return
     
@@ -841,7 +841,7 @@ class Patcher(object):
             ABORT = True
             errorString = 'Could not create required directories for "%s":\n%s'% \
                           (patchFileName,traceback.format_exc())
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
             return
         
@@ -902,7 +902,7 @@ class Patcher(object):
         try:
             patchFilesUsed = []
             
-            for file in sorted(self.remoteManifest.iterkeys()):
+            for file in sorted(self.remoteManifest.keys()):
                 if file in IGNORE:
                     continue
                 
@@ -938,7 +938,7 @@ class Patcher(object):
                             ABORT = True
                             errorString = 'Error removing patch file "%s":\n%s'% \
                                           (file,traceback.format_exc())
-                            print errorString
+                            print(errorString)
                             TGECall("MessageBoxOK","Patcher Error",errorString, \
                                     "Py::OnPatchError();")
                             return
@@ -959,7 +959,7 @@ class Patcher(object):
                         ABORT = True
                         errorString = 'Error removing patch file "%s":\n%s'% \
                                       (elem,traceback.format_exc())
-                        print errorString
+                        print(errorString)
                         TGECall("MessageBoxOK","Patcher Error",errorString, \
                                 "Py::OnPatchError();")
                         return
@@ -975,14 +975,14 @@ class Patcher(object):
                 self.downloadGenerator = self.fileDownloadGenerator()
                 
                 # Start downloading the first file.
-                currFile,currVersion = self.downloadGenerator.next()
+                currFile,currVersion = next(self.downloadGenerator)
                 self.tgeFirstProgress.visible = True
                 self.downloadFile(currFile,currVersion,1)
                 
                 # If there is more than one file, start downloading the second
                 #  one as well.
                 if len(self.patchFiles) > 1:
-                    currFile,currVersion = self.downloadGenerator.next()
+                    currFile,currVersion = next(self.downloadGenerator)
                     self.tgeSecondProgress.visible = True
                     self.downloadFile(currFile,currVersion,2)
             
@@ -1002,7 +1002,7 @@ class Patcher(object):
             ABORT = True
             errorString = 'An error occurred while comparing manifests:\n%s'% \
                           traceback.format_exc()
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
             return
     
@@ -1013,7 +1013,7 @@ class Patcher(object):
         
         errorString = 'Unable to retrieve remote manifests:\n%s'% \
                       reason.getErrorMessage()
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
     
     
@@ -1032,7 +1032,7 @@ class Patcher(object):
             ABORT = True
             errorString = 'Error while analysing remote manifest %s:\n%s'% \
                           (page,traceback.format_exc())
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
             return
         
@@ -1048,7 +1048,7 @@ class Patcher(object):
         
         errorString = 'There was an error building the local manifest:\n%s'% \
                       errorString
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
     
     
@@ -1179,7 +1179,7 @@ class Patcher(object):
             ABORT = True
             errorString = 'There was an error during the patching process:\n%s'% \
                           traceback.format_exc()
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString,"Py::OnPatchError();")
     
     
@@ -1187,7 +1187,7 @@ class Patcher(object):
         TGECall("CloseMessagePopup")
         
         errorString = 'An error occurred while retrieving patch server information:\n%s'%reason.getErrorMessage()
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString)
     
     
@@ -1199,7 +1199,7 @@ class Patcher(object):
         
         if args[0]:
             errorString = 'An error occurred while retrieving patch server information:\n%s'%args[1]
-            print errorString
+            print(errorString)
             TGECall("MessageBoxOK","Patcher Error",errorString)
             return
         
@@ -1219,7 +1219,7 @@ class Patcher(object):
         TGECall("CloseMessagePopup")
         
         errorString = 'An error occurred while logging in to master server:\n%s'%reason.getErrorMessage()
-        print errorString
+        print(errorString)
         TGECall("MessageBoxOK","Patcher Error",errorString)
     
     
@@ -1339,7 +1339,7 @@ Patcher()
 
 def DisplayPatchInfo():
     try:
-        f = file('./patchlist.txt','r')
+        f = open('./patchlist.txt','r')
         text = f.read()[:4000]
         f.close()
         

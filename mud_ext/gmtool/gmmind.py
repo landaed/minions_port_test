@@ -5,13 +5,13 @@ from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.credentials import UsernamePassword
 import traceback
-from md5 import md5
+from hashlib import md5
 from mud.gamesettings import GMSERVERIP,GMSERVERPORT
 
 
 
 def SimpleLog(text):
-    print text
+    print(text)
 
 
 LOGFUNCTION = SimpleLog

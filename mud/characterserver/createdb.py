@@ -7,7 +7,7 @@ from sqlite3 import dbapi2 as sqlite
 import shutil
 from twisted.internet import reactor
 import traceback
-import sha
+import hashlib
 import sys
 import os
 
@@ -40,6 +40,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print "Creating Character Database..."
+    print("Creating Character Database...")
     main()
-    print "Done!"
+    print("Done!")

@@ -9,7 +9,7 @@ sys.path.append(os.getcwd())
 from mud.gamesettings import GAMEROOT
 
 if sys.platform[:6] == 'darwin':
-    raise "no longer used by OSX, use minions2app exclusively"
+    raise Exception("no longer used by OSX, use minions2app exclusively")
     print "Creating OSX Manifest"
     ignore = ["../ALPHA/MAC/COMMON","../ALPHA/MAC/CACHE","../ALPHA/MAC/.DS_STORE","../ALPHA/MAC/MANIFEST.ZIP","../ALPHA/MAC/MANIFEST.SHA"]
     wm = CreateManifest("../alpha/mac","../alpha/mac/",ignore)

@@ -39,16 +39,16 @@ tcursor = TOCONN.cursor()
 
 tcursor.execute("SELECT public_name FROM character_buffer WHERE character_name ='%s';"%CHARACTERNAME)
 results = tcursor.fetchall()
-print results
+print(results)
 if len(results):
-    raise "There is already a character buffer in destination",results
+    raise Exception("There is already a character buffer in destination: %s" % str(results))
 
 fcursor.execute("SELECT public_name,character_name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename,buffer FROM character_buffer WHERE public_name='%s' AND character_name ='%s';"%(PUBLICNAME,CHARACTERNAME))
 
 results = fcursor.fetchall()
 assert len(results)==1
 r = results[0]
-print r
+print(r)
 
 
 buffer = sqlite.Binary(r[11])

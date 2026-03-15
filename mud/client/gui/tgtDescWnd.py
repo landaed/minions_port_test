@@ -64,7 +64,7 @@ class TgtDescWnd:
         # Set target bitmap
         if infoDict['DEADTGT']:
             self.bitmap.SetBitmap("~/data/ui/charportraits/death")
-        elif infoDict.has_key('PORTRAIT'):
+        elif 'PORTRAIT' in infoDict:
             self.bitmap.SetBitmap("~/data/ui/charportraits/%s"%infoDict['PORTRAIT'])
         else:
             self.bitmap.SetBitmap("")

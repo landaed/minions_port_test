@@ -14,7 +14,7 @@ BUFFWND = None
 class SingleBuffPane:
     def __init__(self):
         self.nameCtrl = TGEObject("BUFFWND_SINGLE_NAME")
-        self.effectCtrls = dict((x,TGEObject("BUFFWND_SINGLE_EFFECT%i"%x)) for x in xrange(0,24))
+        self.effectCtrls = dict((x,TGEObject("BUFFWND_SINGLE_EFFECT%i"%x)) for x in range(0,24))
             
         self.lastTime = time.time()
         self.lastPID = 0
@@ -128,7 +128,7 @@ class SingleBuffPane:
                 if x == 24:
                     break
                     
-        for y in xrange(x,24):
+        for y in range(x,24):
             ctrl = self.effectCtrls[y]
             ctrl.toolTip = ""
             ctrl.visible=False
@@ -139,7 +139,7 @@ class CharBuffPane:
     def __init__(self, index):
         self.paneCtrl = TGEObject("BUFFWND_CHAR%i_PANE"%index)
         self.nameCtrl = TGEObject("BUFFWND_CHAR%i_NAME"%index)
-        self.effectCtrls = dict((x,TGEObject("BUFFWND_CHAR%i_EFFECT%i"%(index,x))) for x in xrange(0,12))
+        self.effectCtrls = dict((x,TGEObject("BUFFWND_CHAR%i_EFFECT%i"%(index,x))) for x in range(0,12))
             
         self.lastTime = time.time()
         self.lastPID = 0
@@ -251,7 +251,7 @@ class CharBuffPane:
                 if x == 12:
                     break
                     
-        for y in xrange(x,12):
+        for y in range(x,12):
             ctrl = self.effectCtrls[y]
             ctrl.toolTip = ""
             ctrl.visible=False
@@ -273,7 +273,7 @@ class BuffWnd:
             
         self.charInfos = None
         
-        self.panes = [CharBuffPane(x) for x in xrange(0,6)]
+        self.panes = [CharBuffPane(x) for x in range(0,6)]
         for pane in self.panes:
             pane.paneCtrl.visible = False
             
@@ -290,7 +290,7 @@ class BuffWnd:
         
         #MoMWndProfile
         if len(self.charInfos) > 1:
-            for index,cinfo in self.charInfos.iteritems():
+            for index,cinfo in self.charInfos.items():
                 pane = self.panes[index]
                 if index == PARTYWND.curIndex:
                     pane.paneCtrl.setProfile("MoMSelectedWndProfile")
@@ -303,7 +303,7 @@ class BuffWnd:
         
     def setCharInfos(self,cinfos):
         
-        for x in xrange(0,6):
+        for x in range(0,6):
             self.panes[x].paneCtrl.visible = False
             
         
@@ -323,7 +323,7 @@ class BuffWnd:
             self.partyPane.visible = True
             extent = '121 %i'%int(121 + 92*(num-1))
             
-            for x in xrange(0,num):
+            for x in range(0,num):
                 self.panes[x].paneCtrl.visible = True
             
         self.window.extent = extent

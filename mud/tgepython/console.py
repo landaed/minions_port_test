@@ -39,9 +39,9 @@ class TGEManager:
         del self.objectLookup[objectid]
         
     def cleanup(self):
-        for x in self.simObjects.itervalues():
+        for x in self.simObjects.values():
             x._tge.delete()
-        for x in self.simDataBlocks.itervalues():
+        for x in self.simDataBlocks.values():
             x._tge.delete()
     
         self.objectLookup.clear()
@@ -55,7 +55,7 @@ class TGEManager:
         else:        
             TGENativeExport(namespace,fname,usage,minarg,maxarg)
             
-        if not self.functionBindings.has_key(namespace):
+        if namespace not in self.functionBindings:
             self.functionBindings[namespace]={}
                 
         self.functionBindings[namespace][fname]=function
@@ -69,8 +69,8 @@ class TGEManager:
                 simo=None#TGEObject(selfid)
         
                 
-        if not self.functionBindings[namespace].has_key(functionname):
-            raise TypeError,("TGECall: Function doesn't exist",namespace,functionname)
+        if functionname not in self.functionBindings[namespace]:
+            raise TypeError("TGECall: Function doesn't exist",namespace,functionname)
             return None
         try:
             if simo != None:

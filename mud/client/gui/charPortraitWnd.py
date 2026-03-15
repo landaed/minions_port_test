@@ -15,7 +15,7 @@ class CharPortraitWnd:
         self.nextButton = TGEObject("CharPortraitWnd_NextButton")
         self.prevButton = TGEObject("CharPortraitWnd_PrevButton")
         
-        self.pbuttons = dict((x,TGEObject("charportraitwnd_pbutton%i"%x)) for x in xrange(0,18))
+        self.pbuttons = dict((x,TGEObject("charportraitwnd_pbutton%i"%x)) for x in range(0,18))
         
         self.pics = []
         
@@ -41,7 +41,7 @@ class CharPortraitWnd:
     #-1 clears, which should be done as it frees up the bitmaps
     def setButtonPage(self,index):
         if index == -1:
-            for butt in self.pbuttons.itervalues():
+            for butt in self.pbuttons.values():
                 butt.setBitmap("")
             self.portraitPic.setBitmap("")
             
@@ -53,7 +53,7 @@ class CharPortraitWnd:
         
         pindex = index*18
         
-        for butt in self.pbuttons.itervalues():
+        for butt in self.pbuttons.values():
             butt.visible = False
             
         num = 18
@@ -70,7 +70,7 @@ class CharPortraitWnd:
             self.prevButton.visible = True
             
             
-        for x in xrange(0,num):
+        for x in range(0,num):
             self.pbuttons[x].visible = True
             self.pbuttons[x].setBitmap("~/data/ui/charportraits/%s"%self.pics[pindex+x])
             

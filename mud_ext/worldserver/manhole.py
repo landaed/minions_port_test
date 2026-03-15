@@ -53,7 +53,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
     def buildProtocol(self, addr):
         
         if addr.host not in self.allowedIP:
-            raise "Unauthorized"
+            raise Exception("Unauthorized")
         
         
         return factory.SSHFactory.buildProtocol(self,addr)

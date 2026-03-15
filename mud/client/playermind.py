@@ -34,7 +34,7 @@ from mud.world.core import CoreSettings
 from mud.world.defines import *
 from mud.world.shared.vocals import *
 
-from md5 import md5
+from hashlib import md5
 import re
 from sqlite3 import dbapi2 as sqlite
 import sys
@@ -187,7 +187,7 @@ class PlayerMind(pb.Root):
         perspective.callRemote("PlayerAvatar","jumpIntoWorld",self.party[0])
     
     def gotJumpServerFailure(self,reason):
-        print "jump failure",reason
+        print("jump failure",reason)
     
     
     def remote_jumpServer(self, wip, wport, wpassword, zport, zpassword, party):
@@ -200,7 +200,7 @@ class PlayerMind(pb.Root):
         if ip == None:
             ip = self.worldIP
             
-        print "JumpServer",ip,wport
+        print("JumpServer",ip,wport)
             
         mind = PlayerMind()
         mind.freeWorld = self.freeWorld
@@ -327,10 +327,10 @@ class PlayerMind(pb.Root):
         
             #character link targets
             if False:
-                for x,c in self.charInfos.iteritems():
+                for x,c in self.charInfos.items():
                     linktarget = c.clientSettings['LINKTARGET']
                     if linktarget:
-                        for y,lt in self.charInfos.iteritems():
+                        for y,lt in self.charInfos.items():
                             if lt.NAME == linktarget:
                                 assert c != lt #make sure we aren't linked to ourself
                                 if lt.RAPIDMOBINFO.TGTID:
@@ -339,7 +339,7 @@ class PlayerMind(pb.Root):
                                         break
                     defaulttarget = c.clientSettings['DEFAULTTARGET']
                     if defaulttarget and not c.RAPIDMOBINFO.TGTID:
-                        for y,lt in self.charInfos.iteritems():
+                        for y,lt in self.charInfos.items():
                             if lt.NAME == defaulttarget:
                                 self.perspective.callRemote("PlayerAvatar","doCommand","TARGETID",[x,lt.MOBID,0])    
                                 break
@@ -512,11 +512,11 @@ class PlayerMind(pb.Root):
                 PLAYERSETTINGS.charInfos = None
                 from gui.worldGui import CHARINFOS
                 CHARINFOS = None
-                for cinfo in self.charInfos.itervalues():
-                    for item in cinfo.ITEMS.itervalues():
+                for cinfo in self.charInfos.values():
+                    for item in cinfo.ITEMS.values():
                         item.broker.transport.loseConnection()
                     cinfo.ITEMS.clear()
-                    for spell in cinfo.SPELLS.itervalues():
+                    for spell in cinfo.SPELLS.values():
                         spell.broker.transport.loseConnection()
                     cinfo.SPELLS.clear()
                     cinfo.SPELLEFFECTS = []
@@ -527,7 +527,7 @@ class PlayerMind(pb.Root):
                 self.clearAllianceInfo()
                 from gui.npcWnd import NPCWND
                 NPCWND.bankPane.set({})
-                for bankItem in self.rootInfo.BANK.itervalues():
+                for bankItem in self.rootInfo.BANK.values():
                     bankItem.broker.transport.loseConnection()
                 self.rootInfo.BANK.clear()
                 self.rootInfo.CHARINFOS = None
@@ -623,13 +623,13 @@ class PlayerMind(pb.Root):
     def remote_setItemSlot(self,charId,itemInfo,slot):
         from gui.partyWnd import PARTYWND
         
-        for index,cinfo in self.charInfos.iteritems():
+        for index,cinfo in self.charInfos.items():
             if cinfo.CHARID == charId:
                 if itemInfo:
                     itemInfo.SLOT = slot
                     cinfo.ITEMS[slot]=itemInfo
                 else:
-                    if cinfo.ITEMS.has_key(slot):
+                    if slot in cinfo.ITEMS:
                         del cinfo.ITEMS[slot]
                 if index == PARTYWND.curIndex:
                     PARTYWND.invPane.setFromCharacterInfo(cinfo)
@@ -746,7 +746,7 @@ class PlayerMind(pb.Root):
     def remote_deleteMail(self, deleteList):
         from gui.mailGui import MAILGUI
         
-        for mailID,x in deleteList.iteritems():
+        for mailID,x in deleteList.items():
             MAILGUI.deleteMail(mailID,True)
         
     #Clears the Mail Server window of values    
@@ -803,7 +803,7 @@ class PlayerMind(pb.Root):
     
     #connection stuff
     def remote_createServer(self,zconnect):
-        print "CreateServer"
+        print("CreateServer")
         if self.simMind:
             self.simMind.destroyServer()
         
@@ -846,10 +846,10 @@ class PlayerMind(pb.Root):
             zconnect.ip = SimMind.directConnect
         
         if int(TGEGetGlobal("$Py::ISSINGLEPLAYER")):
-            print "CONNECT",zconnect.ip
+            print("CONNECT",zconnect.ip)
             TGEEval('ConnectLocalMission();')
         else:
-            print "CONNECT",zconnect.ip
+            print("CONNECT",zconnect.ip)
             connectstring = "%s:%i"%(zconnect.ip,zconnect.port)
             TGEEval('ConnectRemoteMission("%s","%s");'%(connectstring,""))
     
@@ -880,11 +880,11 @@ class PlayerMind(pb.Root):
         MacroWnd.setFromCharacterInfos(self.charInfos)
 
         
-        for x in xrange(0,6):
+        for x in range(0,6):
             TGEObject("PARTYWND_CHAR%i"%x).visible = False
         
         if len(self.charInfos) > 1:    
-            for x in xrange(0,len(self.charInfos)):
+            for x in range(0,len(self.charInfos)):
                 TGEObject("PARTYWND_CHAR%i"%x).visible = True
         
         from gui.allianceWnd import ALLIANCEWND
@@ -914,7 +914,7 @@ class PlayerMind(pb.Root):
         
         
     def remote_mouseSelect(self,charIndex,mobId):
-        for x,cinfo in self.charInfos.iteritems():
+        for x,cinfo in self.charInfos.items():
             if x == charIndex:
                 
                 if cinfo.clientSettings['LINKTARGET']:
@@ -961,7 +961,7 @@ class PlayerMind(pb.Root):
     def remote_setZoneOptions(self,zoptions):
         from gui.playerSettings import PLAYERSETTINGS
         
-        print zoptions
+        print(zoptions)
         PLAYERSETTINGS.storeWindowSettings()
         
         
@@ -1234,7 +1234,7 @@ def OnGameOptionsCamp():
 
 
 # Enums for substitution indexes.
-(SUB_MALE, SUB_FEMALE, SUB_OTHER) = range(3)
+(SUB_MALE, SUB_FEMALE, SUB_OTHER) = list(range(3))
 
 # Sex-based substitution values.
 SUBSTITUTION_SUBJECTIVE = ("he" , "she", "it" )
@@ -1267,7 +1267,7 @@ def substituteContext(characterInfo, str):
     # %s = target in third-person pronoun subjective
     # %o = target in third-person pronoun objective
     # %p = target in third-person pronoun possessive
-    for index in xrange(len(words)):
+    for index in range(len(words)):
         
         # Prevent backslashes from being used as escape characters.
         words[index] = words[index].replace("\\", "\\\\")

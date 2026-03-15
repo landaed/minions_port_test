@@ -2,7 +2,7 @@
 # Please see LICENSE.TXT for details
 
 import os,sys,imp
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 
 #Game Defaults...Change these only if you are instructed to via the instructions
 GAMENAME = "Testgame MMO"
@@ -114,7 +114,7 @@ def LoadGameConfiguration():
     MASTERPORT = DEFAULT_MASTERPORT
     GMSERVER_IP = DEFAULT_GMSERVER_IP
     GMSERVER_PORT = DEFAULT_GMSERVER_PORT
-    print "Using Defaults, to specify an alternative config: gameconfig=myconfig.cfg"
+    print("Using Defaults, to specify an alternative config: gameconfig=myconfig.cfg")
             
 
 LoadGameConfiguration()

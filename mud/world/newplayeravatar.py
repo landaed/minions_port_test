@@ -13,8 +13,8 @@ import string
 
 
 
-def GenPasswd(length=8, chars=string.letters):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=8, chars=string.ascii_letters):
+    return ''.join([choice(chars) for i in range(length)])
 
 #also query
 class NewPlayerAvatar(Avatar):

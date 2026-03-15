@@ -24,8 +24,8 @@ class MyFactory(protocol.ServerFactory):
         
         
         if addr.host != "127.0.0.1":
-            print "WARNING: Unauthorized manhole attempt from: %s"%addr.host
-            raise "Unauthorized"
+            print("WARNING: Unauthorized manhole attempt from: %s"%addr.host)
+            raise Exception("Unauthorized")
         
         
         return protocol.ServerFactory.buildProtocol(self,addr)

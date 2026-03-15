@@ -87,7 +87,7 @@ def OnRequestLostPassword():
     
     factory = pb.PBClientFactory()
     reactor.connectTCP(masterIP,masterPort,factory)
-    from md5 import md5
+    from hashlib import md5
     password = md5("Registration").digest()
 
     factory.login(UsernamePassword("Registration-Registration", password),pb.Root()).addCallbacks(Connected, Failure)

@@ -80,7 +80,7 @@ class MailInfoGui:
         from mud.client.playermind import PLAYERMIND
         
         self.clearresults()
-        if (MAILGUI.mailCache.has_key(mailID)):
+        if (mailID in MAILGUI.mailCache):
             mail = MAILGUI.mailCache[mailID]
             self.mailID = mailID
             self.mailFrom.setValue(mail.MAILFROM)
@@ -113,7 +113,7 @@ class MailInfoGui:
     def tick(self):
         from mailGui import MAILGUI
         if self.getDescription:
-            if (MAILGUI.mailCache.has_key(self.getDescription)):
+            if (self.getDescription in MAILGUI.mailCache):
                 mail = MAILGUI.mailCache[self.getDescription]
                 if mail.MESSAGE != "":
                     if mail.ITEMPROTOID:

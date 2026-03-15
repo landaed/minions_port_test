@@ -76,7 +76,7 @@ def CreateSpawnIndexByLevel():
             level = spawn.level
         page += "\t* [[Spawn%s][%s]]\n"%(GetTWikiName(spawn.name),spawn.name)
     
-    f = file("./distrib/twiki/data/MoMWorld/SpawnIndexByLevel.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpawnIndexByLevel.txt","w")
     f.write(page)
     f.close()
 
@@ -311,7 +311,7 @@ def CreateSpawnPages():
                 pass
             else:
                 if "QUARANTINE" not in image:
-                    print image+'.jpg'
+                    print(image+'.jpg')
                 image = "UNKNOWN.jpg"
             
             IMAGELINK = r'<a href="http://www.prairiegames.com/twiki/pub/MoMWorld/%s.jpg"><img src="http://www.prairiegames.com/twiki/pub/MoMWorld/%s.jpg" width="192" height="192" align="right"  /></a>'%(image,image)
@@ -329,11 +329,11 @@ def CreateSpawnPages():
         page = page.replace("^^IMAGELINK^^",IMAGELINK)
         page = page.replace("^^REALMTEXT^^",realmtext)
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/SpawnIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpawnIndex.txt","w")
     f.write(indexPage)
     f.close()
     

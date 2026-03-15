@@ -55,34 +55,34 @@ from itemsetpages import CreateItemSetPages
 from factionpages import CreateFactionPages
 
 
-print "Creating Spawn Pages..."
+print("Creating Spawn Pages...")
 spawnQuests,spawnSpells,spawnFactions = CreateSpawnPages()
-print "Creating Zone Pages..."
+print("Creating Zone Pages...")
 CreateZonePages()
-print "Creating Quest Pages..."
+print("Creating Quest Pages...")
 questItems, questFactions = CreateQuestPages(spawnQuests)
 del spawnQuests
-print "Creating Faction Pages..."
+print("Creating Faction Pages...")
 CreateFactionPages(spawnFactions,questFactions)
 del spawnFactions
 del questFactions
-print "Creating Spell Pages..."
+print("Creating Spell Pages...")
 spellSummonItems,spellClasses = CreateSpellPages(spawnSpells)
 del spawnSpells
-print "Creating Class Pages..."
+print("Creating Class Pages...")
 classSkills = CreateClassPages(spellClasses)
 del spellClasses
-print "Creating Skill Pages..."
+print("Creating Skill Pages...")
 CreateSkillPages(classSkills)
 del classSkills
-print "Creating Item Pages..."
+print("Creating Item Pages...")
 itemSetDict = CreateItemPages(spellSummonItems,questItems)
 del spellSummonItems
 del questItems
-print "Creating Item Set Pages..."
+print("Creating Item Set Pages...")
 CreateItemSetPages(itemSetDict)
 del itemSetDict
-print "Creating Recipe Pages..."
+print("Creating Recipe Pages...")
 CreateRecipePages()
 #tar it
 
@@ -112,7 +112,7 @@ def dirwalk(dir,ignore=[]):
             yield fullpath
 
 
-print "Creating ./distrib/momworld.tar.gz"
+print("Creating ./distrib/momworld.tar.gz")
 import tarfile
 
 files = dirwalk("./distrib/twiki/")
@@ -121,8 +121,8 @@ tar = tarfile.open("./distrib/momworld.tar.gz",'w:gz')
 for name in files:
     pname = "./%s"%name[10:]
     tarinfo = tar.gettarinfo(name, pname)
-    tar.addfile(tarinfo, file(name,"rb"))
+    tar.addfile(tarinfo, open(name,"rb"))
 tar.close()
-print "Encyclopedia compiled and packed up nicely in %i Seconds."%int(time.time()-beginTime)
-print '\a'
+print("Encyclopedia compiled and packed up nicely in %i Seconds."%int(time.time()-beginTime))
+print('\a')
  

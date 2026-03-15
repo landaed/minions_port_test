@@ -61,10 +61,10 @@ class TacticalGui:
             
         
 def OnEnemiesList():
-    print "Enemies List"
+    print("Enemies List")
             
 def OnThreatsList():
-    print "Threats List"
+    print("Threats List")
         
 
 def PyExec():

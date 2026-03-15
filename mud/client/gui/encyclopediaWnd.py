@@ -176,25 +176,25 @@ def encyclopediaSearch(searchvalue):
         PyExec()
     formatted = GetTWikiName(searchvalue)
     page = None
-    if ENCYC.has_key("Item%s"%formatted):
+    if "Item%s"%formatted in ENCYC:
         page = "Item%s"%formatted
-    elif ENCYC.has_key("ItemSet%s"%formatted):
+    elif "ItemSet%s"%formatted in ENCYC:
         page = "ItemSet%s"%formatted
-    elif ENCYC.has_key("Spell%s"%formatted):
+    elif "Spell%s"%formatted in ENCYC:
         page = "Spell%s"%formatted
-    elif ENCYC.has_key("Recipe%s"%formatted):
+    elif "Recipe%s"%formatted in ENCYC:
         page = "Recipe%s"%formatted
-    elif ENCYC.has_key("Skill%s"%formatted):
+    elif "Skill%s"%formatted in ENCYC:
         page = "Skill%s"%formatted
-    elif ENCYC.has_key("Class%s"%formatted):
+    elif "Class%s"%formatted in ENCYC:
         page = "Class%s"%formatted
-    elif ENCYC.has_key("Spawn%s"%formatted):
+    elif "Spawn%s"%formatted in ENCYC:
         page = "Spawn%s"%formatted
-    elif ENCYC.has_key("Quest%s"%formatted):
+    elif "Quest%s"%formatted in ENCYC:
         page = "Quest%s"%formatted
-    elif ENCYC.has_key("Zone%s"%formatted):
+    elif "Zone%s"%formatted in ENCYC:
         page = "Zone%s"%formatted
-    elif ENCYC.has_key("Faction%s"%formatted):
+    elif "Faction%s"%formatted in ENCYC:
         page = "Faction%s"%formatted
     
     if page:
@@ -212,27 +212,27 @@ def encyclopediaGetLink(searchvalue):
         PyExec()
     formatted = GetTWikiName(searchvalue)
     link = None
-    if ENCYC.has_key(formatted):
+    if formatted in ENCYC:
         link = "<a:%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Item%s"%formatted):
+    elif "Item%s"%formatted in ENCYC:
         link = "<a:Item%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("ItemSet%s"%formatted):
+    elif "ItemSet%s"%formatted in ENCYC:
         link = "<a:ItemSet%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Spell%s"%formatted):
+    elif "Spell%s"%formatted in ENCYC:
         link = "<a:Spell%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Recipe%s"%formatted):
+    elif "Recipe%s"%formatted in ENCYC:
         link = "<a:Recipe%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Skill%s"%formatted):
+    elif "Skill%s"%formatted in ENCYC:
         link = "<a:Skill%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Class%s"%formatted):
+    elif "Class%s"%formatted in ENCYC:
         link = "<a:Class%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Spawn%s"%formatted):
+    elif "Spawn%s"%formatted in ENCYC:
         link = "<a:Spawn%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Quest%s"%formatted):
+    elif "Quest%s"%formatted in ENCYC:
         link = "<a:Quest%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Zone%s"%formatted):
+    elif "Zone%s"%formatted in ENCYC:
         link = "<a:Zone%s>%s</a>"%(formatted,searchvalue)
-    elif ENCYC.has_key("Faction%s"%formatted):
+    elif "Faction%s"%formatted in ENCYC:
         link = "<a:Faction%s>%s</a>"%(formatted,searchvalue)
     return link
 

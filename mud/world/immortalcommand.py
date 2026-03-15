@@ -129,7 +129,7 @@ def CmdStasis(mob, args):
         #  take all mobs in this dictionary out of stasis if necessary.
         try:
             zoneDict = MOB_STASISDICT.pop(zone)
-            for stmob,values in zoneDict.iteritems():
+            for stmob,values in zoneDict.items():
                 if values[1]:
                     stmob.stun -= 5
                     stmob.invulnerable -= 1
@@ -154,7 +154,7 @@ def CmdStasis(mob, args):
             return
         # Build the info string.
         mobZoneDict = MOB_STASISDICT[zone]
-        stasisGroups = "\\n".join(" - %s:\\n%s"%(groupName,"\\n".join("  -- %s : %s"%(stmob.name,mobZoneDict[stmob][1]) for stmob in groupInfo[0])) for groupName,groupInfo in zoneDict.iteritems())
+        stasisGroups = "\\n".join(" - %s:\\n%s"%(groupName,"\\n".join("  -- %s : %s"%(stmob.name,mobZoneDict[stmob][1]) for stmob in groupInfo[0])) for groupName,groupInfo in zoneDict.items())
         # Display information to immortal and return.
         mob.player.sendGameText(RPG_MSG_GAME_GAINED,"Stasis groups in %s:\\n%s\\n"%(zone.zone.niceName,stasisGroups))
         return
@@ -313,7 +313,7 @@ def CmdSet(mob, args):
     try:
         SetCommands[what](mob,args)
     except KeyError:
-        mob.player.sendGameText(RPG_MSG_GAME_DENIED,"Only %s can be used in conjunction with the set command.\\n"%', '.join(SetCommands.iterkeys()))
+        mob.player.sendGameText(RPG_MSG_GAME_DENIED,"Only %s can be used in conjunction with the set command.\\n"%', '.join(iter(SetCommands.keys())))
 
 
 def CmdSetWind(mob,args):
@@ -603,27 +603,27 @@ def CmdGimme(mob,args):
     elif itemname == 'PLEVEL':
         if levels == 0:
             return #no point in trying
-        for x in xrange(0,levels):
+        for x in range(0,levels):
             mob.player.curChar.gainLevel(0)
         return
     elif itemname == 'SLEVEL':
         if levels == 0:
             return #no point in trying
-        for x in xrange(0,levels):
+        for x in range(0,levels):
             mob.player.curChar.gainLevel(1)
         return
     elif itemname == 'TLEVEL':
         if levels == 0:
             return #no point in trying
-        for x in xrange(0,levels):
+        for x in range(0,levels):
             mob.player.curChar.gainLevel(2)
         return
     elif itemname == 'SKILL':
         if levels == 0:
             return #no point in trying
         m = mob.player.curChar.mob
-        for x in xrange(0,levels):
-            for skname in m.skillLevels.iterkeys():
+        for x in range(0,levels):
+            for skname in m.skillLevels.keys():
                 mob.player.curChar.checkSkillRaise(skname,0,0)
         return
     elif itemname == 'PRESENCE':
@@ -1135,8 +1135,8 @@ def CmdSetWealth(mob, args):
     # Print result to the immortal and log.
     mob.player.sendGameText(RPG_MSG_GAME_WHITE, \
         "%s's wealth in the %s realm has been set to: %s.\\nPlease inform the player once all adjustments have taken place.\\n"%(mob.target.name,args[0],moneyString))
-    print "Immortal %s has set %s's wealth in the %s realm to %s."% \
-        (mob.player.publicName,tplayer.fantasyName,args[0],moneyString)
+    print("Immortal %s has set %s's wealth in the %s realm to %s."% \
+        (mob.player.publicName,tplayer.fantasyName,args[0],moneyString))
     
     # Informing the player about the change is left up to the immortal.
     # Maybe several changes have to be made before the player should be informed.
@@ -1192,8 +1192,8 @@ def DoImmortalCommand(player,cmd,args):
     if type(args)!=list:
         args = [args]
     cmd = cmd.upper()
-    if COMMANDS.has_key(cmd):
+    if cmd in COMMANDS:
         COMMANDS[cmd](mob,args)
     else:
-        print "Unknown Command",cmd
+        print("Unknown Command",cmd)
         

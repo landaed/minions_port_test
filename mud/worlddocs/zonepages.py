@@ -157,15 +157,15 @@ Raw focus types are never dropped and can only be gained through disenchanting.
         page = page.replace("^^SPAWNTEXT^^",SPAWNTEXT)
         page = page.replace("^^LOOTTEXT^^",LOOTTEXT)
         
-        f = file("./distrib/twiki/data/MoMWorld/Zone%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/Zone%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
     
-    f = file("./distrib/twiki/data/MoMWorld/ZoneIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ZoneIndex.txt","w")
     f.write(indexPage)
     f.close()
-    f = file("./distrib/twiki/data/MoMWorld/FocusLootDetails.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/FocusLootDetails.txt","w")
     f.write(FocusLootDetailPage)
     f.close()
         

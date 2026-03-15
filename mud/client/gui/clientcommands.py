@@ -94,7 +94,7 @@ def CmdGuildWho(args, charIndex):
     
     # Assemble information text about which Guild members currently are online.
     text = "Members of <%s> in the worlds of %s:\\n"%(guildName,GAMENAME)
-    for cname,info in FriendsWnd.remoteFriendsInfo.iteritems():
+    for cname,info in FriendsWnd.remoteFriendsInfo.items():
         matchGuild,wname,zname = info
         if matchGuild:
             text += "%s in %s on %s\\n"%(cname,zname,wname)
@@ -222,8 +222,8 @@ def CmdCraft(args, charIndex):
     # Check for the required craft ingredients
     # (will be done on server again, in case there was a communication issue or hacking attempt)
     ingredients = dict((item_proto_id,count) for item_proto_id,count in con.execute("SELECT item_proto_id,count FROM recipe_ingredient WHERE recipe_id=%i AND count!=0"%recipeID).fetchall())
-    for item in cinfo.ITEMS.itervalues():
-        for item_proto_id,count in ingredients.iteritems():
+    for item in cinfo.ITEMS.values():
+        for item_proto_id,count in ingredients.items():
             if item.PROTOID == item_proto_id:
                 sc = item.STACKCOUNT
                 if not sc:
@@ -238,8 +238,8 @@ def CmdCraft(args, charIndex):
             PARTYWND.mind.perspective.callRemote("PlayerAvatar","onCraft",charIndex,recipeID)
             return
     
-    missing = dict((con.execute("SELECT name FROM item_proto WHERE id=%i LIMIT 1;"%(protoID)).fetchone()[0],count) for protoID,count in ingredients.iteritems())
-    receiveGameText(RPG_MSG_GAME_DENIED,"%s lacks %s for this craft.\\n"%(cinfo.NAME,', '.join("%i <a:Item%s>%s</a>"%(count,GetTWikiName(name),name) for name,count in missing.iteritems())))
+    missing = dict((con.execute("SELECT name FROM item_proto WHERE id=%i LIMIT 1;"%(protoID)).fetchone()[0],count) for protoID,count in ingredients.items())
+    receiveGameText(RPG_MSG_GAME_DENIED,"%s lacks %s for this craft.\\n"%(cinfo.NAME,', '.join("%i <a:Item%s>%s</a>"%(count,GetTWikiName(name),name) for name,count in missing.items())))
 
 
 def CmdUseItem(args, charIndex):
@@ -262,7 +262,7 @@ def CmdUseItem(args, charIndex):
     
     # Search for an available item with the desired name in the
     #  chosen characters inventory, exclude cursor item.
-    for itemSlot,itemInfo in charInfo.ITEMS.iteritems():
+    for itemSlot,itemInfo in charInfo.ITEMS.items():
         if itemSlot == RPG_SLOT_CURSOR:
             continue
         if itemInfo.NAME.upper() == itemNameUpper:
@@ -327,7 +327,7 @@ def CmdPoison(args, charIndex):
     
     # Search for an available poison with the desired name in the
     #  chosen characters inventory, exclude cursor item.
-    for itemSlot,itemInfo in charInfo.ITEMS.iteritems():
+    for itemSlot,itemInfo in charInfo.ITEMS.items():
         if itemSlot == RPG_SLOT_CURSOR:
             continue
         if itemInfo.NAME.upper() == poisonNameUpper:

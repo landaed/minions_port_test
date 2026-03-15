@@ -24,11 +24,11 @@ class AllianceWnd:
         self.chealths = {}
         self.pnames = []
         self.invite = None
-        for x in xrange(0,5):
+        for x in range(0,5):
             self.pnames.append(TGEObject("ALLIANCE_P%i_NAME"%x))
             self.cnames[x] = []
             self.chealths[x] = []
-            for y in xrange(0,6):
+            for y in range(0,6):
                 self.chealths[x].append(TGEObject("ALLIANCE_P%i_C%i_HEALTH"%(x,y)))
                 self.cnames[x].append(TGEObject("ALLIANCE_P%i_C%i_NAME"%(x,y)))
                 
@@ -53,7 +53,7 @@ class AllianceWnd:
         
         self.allianceLookup={}
         
-        self.singleOthers = dict((x,(TGEObject("ALLIANCE_SC%i_GUICONTROL"%x),TGEObject("ALLIANCE_SC%i_HEALTH"%x),TGEObject("ALLIANCE_SC%i_NAME"%x))) for x in xrange(0,5))
+        self.singleOthers = dict((x,(TGEObject("ALLIANCE_SC%i_GUICONTROL"%x),TGEObject("ALLIANCE_SC%i_HEALTH"%x),TGEObject("ALLIANCE_SC%i_NAME"%x))) for x in range(0,5))
 
         self.single = False
         self.myCharInfo = None
@@ -81,11 +81,11 @@ class AllianceWnd:
         self.joinButton.visible = False
         self.leaveDeclineButton.visible = False
         
-        for x in xrange(0,5):
+        for x in range(0,5):
             self.singleOthers[x][0].visible=False
             
             self.pnames[x].visible = False
-            for y in xrange(0,6):
+            for y in range(0,6):
                 self.chealths[x][y].visible = False
                 self.cnames[x][y].visible = False
     
@@ -132,9 +132,9 @@ class AllianceWnd:
             self.allianceLookup = {}
             
             # Disable alliance info elements and reenable only needed ones later.
-            for x in xrange(0,5):
+            for x in range(0,5):
                 self.pnames[x].visible = False
-                for y in xrange(0,6):
+                for y in range(0,6):
                     self.chealths[x][y].visible = False
                     self.cnames[x][y].visible = False
                 self.singleOthers[x][0].visible = False

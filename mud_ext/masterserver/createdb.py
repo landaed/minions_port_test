@@ -64,7 +64,7 @@ def main():
 
 
 if __name__ == '__main__':
-    print "Creating Master Database..."
+    print("Creating Master Database...")
     main()
-    print "Done!"
+    print("Done!")
 

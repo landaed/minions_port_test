@@ -428,7 +428,7 @@ def OnNewCharChoosePortrait():
 def OnDefaultStats():
     klass = TGEObject("ClassPopup").getText()
     
-    if RPG_DEFAULT_STATS.has_key(klass):
+    if klass in RPG_DEFAULT_STATS:
         MyChar.ptsRemaining = 0
         MyChar.adjs= {}
         for stat,value in zip(RPG_STATS,RPG_DEFAULT_STATS[klass]):

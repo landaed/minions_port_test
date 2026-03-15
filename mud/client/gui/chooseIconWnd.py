@@ -22,13 +22,13 @@ class ChooseIconWndClass:
         self.nextButton = TGEObject("ChooseIconWnd_NextButton")
         self.prevButton = TGEObject("ChooseIconWnd_PrevButton")
         
-        self.pbuttons = dict((x,TGEObject("ChooseIconWnd_pbutton%i"%x)) for x in xrange(0,18))
+        self.pbuttons = dict((x,TGEObject("ChooseIconWnd_pbutton%i"%x)) for x in range(0,18))
         
         import os
         dir = os.listdir("./%s/data/ui/icons"%GAMEROOT)
         
         # do spell icons
-        self.pics = ["SPELLICON_%i_%i"%(x,y) for x in xrange(1,7) for y in xrange(0,36)]
+        self.pics = ["SPELLICON_%i_%i"%(x,y) for x in range(1,7) for y in range(0,36)]
         self.pics.append("SPELLICON_7_0")
         
         skip = ("gemicons0","spells0")
@@ -56,7 +56,7 @@ class ChooseIconWndClass:
     #-1 clears, which should be done as it frees up the bitmaps
     def setButtonPage(self,index):
         if index == -1:
-            for butt in self.pbuttons.itervalues():
+            for butt in self.pbuttons.values():
                 butt.setBitmap("")
             self.iconPic.setBitmap("")
             
@@ -68,7 +68,7 @@ class ChooseIconWndClass:
         
         pindex = index * 18
         
-        for butt in self.pbuttons.itervalues():
+        for butt in self.pbuttons.values():
             butt.visible = False
         
         num = 18
@@ -83,7 +83,7 @@ class ChooseIconWndClass:
         else:
             self.prevButton.visible = True
         
-        for x in xrange(0,num):
+        for x in range(0,num):
             button = self.pbuttons[x]
             button.visible = True
             

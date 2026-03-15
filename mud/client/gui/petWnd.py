@@ -38,7 +38,7 @@ class PetWnd:
         
         self.playerMind = None
         self.invButtons = {}
-        for slot,name in SLOTNAMES.iteritems():
+        for slot,name in SLOTNAMES.items():
             self.invButtons[slot]=TGEObject("PET_SLOT_"+name)
         
             
@@ -61,17 +61,17 @@ class PetWnd:
         rootInfo = PLAYERMIND.rootInfo
         
         self.charInfo = cinfo
-        for slot,butt in self.invButtons.iteritems():
+        for slot,butt in self.invButtons.items():
             butt.pulseRed = False
             butt.pulseGreen = False
             if cursorItem and (slot-RPG_SLOT_PET_BEGIN) in cursorItem.SLOTS:
                 butt.pulseGreen = True
 
-            if not cinfo.ITEMS.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+            if slot not in cinfo.ITEMS: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
 
-        for slot,ghost in cinfo.ITEMS.iteritems():
-            if self.invButtons.has_key(slot):
+        for slot,ghost in cinfo.ITEMS.items():
+            if slot in self.invButtons:
                 self.invButtons[slot].setBitmap("~/data/ui/items/"+ghost.BITMAP+"/0_0_0")
                 
                 

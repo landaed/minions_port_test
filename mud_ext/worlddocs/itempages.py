@@ -96,30 +96,30 @@ def GetItemList(spellSummonItems,questItems):
             VENDORS[vitem.itemProto].update(proto.spawns)
     
     #SUMMONED
-    for summonItem in spellSummonItems.iterkeys():
+    for summonItem in spellSummonItems.keys():
         items.add(summonItem)
         SUMMONEDITEMS.add(summonItem)
         SUMMONED[summonItem].update(spellSummonItems[summonItem])
     
     #QUEST
     # first come the items taken
-    for qitem in questItems[0].iterkeys():
+    for qitem in questItems[0].keys():
         items.add(qitem)
         QUESTITEMS.add(qitem)
         QUESTSTAKE[qitem].update(questItems[0][qitem])
     # then items checked
-    for qitem in questItems[1].iterkeys():
+    for qitem in questItems[1].keys():
         items.add(qitem)
         QUESTITEMS.add(qitem)
         QUESTSCHECK[qitem].update(questItems[1][qitem])
     # then items given
-    for qitem in questItems[2].iterkeys():
+    for qitem in questItems[2].keys():
         items.add(qitem)
         QUESTITEMS.add(qitem)
         QUESTSGIVE[qitem].update(questItems[2][qitem])
     
     
-    for craftskill,itemlist in CRAFTITEMS.iteritems():
+    for craftskill,itemlist in CRAFTITEMS.items():
         ItemSubIndexes.append(("Item%sIndex"%GetTWikiName(craftskill),"%s Crafts and Ingredients"%craftskill,itemlist))
     
     return items
@@ -301,7 +301,7 @@ def GenStatText(item,contributes):
 def CreateItemSubIndex(indexFile,indexTitle,itemList):
     subpage = "---+ %s\n\n"%indexTitle
     subpage += ''.join("\t* [[%s][%s]]\n"%("Item%s"%GetTWikiName(item.name),item.name) for item in sorted(itemList,key=lambda obj:obj.name))
-    f = file("./distrib/twiki/data/MoMWorld/%s.txt"%indexFile,"w")
+    f = open("./distrib/twiki/data/MoMWorld/%s.txt"%indexFile,"w")
     f.write(subpage)
     f.close()
 
@@ -323,7 +323,7 @@ def CreateItemIndex(items):
             subpage += "---+++ Level %i<br>\n"%level
         TWIKINAME = "Item"+GetTWikiName(item.name)
         subpage+="\t* [[%s][%s]]\n"%(TWIKINAME,item.name)
-    f = file("./distrib/twiki/data/MoMWorld/ItemAllLevelIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ItemAllLevelIndex.txt","w")
     f.write(subpage)
     f.close()
     
@@ -334,7 +334,7 @@ def CreateItemIndex(items):
     # since we go through all scrolls there anyway
     indexPage += "\t* [[ItemSpellScrollsIndex][Spell Scrolls]]\n"
     
-    f = file("./distrib/twiki/data/MoMWorld/ItemIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ItemIndex.txt","w")
     f.write(indexPage)
     f.close()
 
@@ -356,7 +356,7 @@ def CreateItemPages(spellSummonItems,questItems):
         allPage += "\t* [[%s][%s]]\n"%(TWIKINAME,item.name)
         
         PROCUREMENTTEXT = GenProcurementText(item)
-        FLAGTEXT = ' '.join([t for f,t in RPG_ITEM_FLAG_TEXT.iteritems() if item.flags&f])
+        FLAGTEXT = ' '.join([t for f,t in RPG_ITEM_FLAG_TEXT.items() if item.flags&f])
         STATTEXT = GenStatText(item,contributes)
         QUESTTEXT = GenQuestText(item)
         
@@ -371,11 +371,11 @@ def CreateItemPages(spellSummonItems,questItems):
         page = page.replace("^^STATTEXT^^",STATTEXT)
         page = page.replace("^^QUESTTEXT^^",QUESTTEXT)
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/ItemAllIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ItemAllIndex.txt","w")
     f.write(allPage)
     f.close()
     CreateItemIndex(items)

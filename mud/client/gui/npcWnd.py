@@ -130,7 +130,7 @@ class TradePane:
         self.itemList.clear()
         
         if len(stock):
-            for i,ghost in enumerate(stock.iterkeys()):
+            for i,ghost in enumerate(stock.keys()):
                 color = 2 #green
                 if not ghost.isUseable(cinfo):
                     color = 3
@@ -197,7 +197,7 @@ class TradePane:
                 else:
                     self.priceText.setText("This item doesn't have any worth for me.")
             
-            text = ' '.join(r'\cp\c2%s\co '%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.iteritems() if (f&ghost.FLAGS))
+            text = ' '.join(r'\cp\c2%s\co '%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.items() if (f&ghost.FLAGS))
             
             eval = 'NPCWND_TRADEITEM_FLAGS.setText("%s%s");'%(TEXT_HEADER,text)
             TGEEval(eval)
@@ -227,7 +227,7 @@ class TradePane:
             return None  # nothing in stock, which is valid
         
         index = int(self.itemList.getMouseOverId())
-        return self.stock.keys()[index]
+        return list(self.stock.keys())[index]
     
     
     def tick(self):
@@ -276,7 +276,7 @@ class NPCWnd:
             self.tradePane.tradeButton.performClick()
         else:
             traceback.print_stack()
-            print "AssertionError: no interaction!"
+            print("AssertionError: no interaction!")
             return
             
         
@@ -299,7 +299,7 @@ class NPCWnd:
         if isVendor:
             if not markup:
                 traceback.print_stack()
-                print "AssertionError: vendor with no markup defined!"
+                print("AssertionError: vendor with no markup defined!")
                 return
         
         if not isVendor:
@@ -351,7 +351,7 @@ def PyOnCloseNPCWnd():
 def PyOnNPCTradeButton():
     if not NPCWND.tradePane.enabled:
         traceback.print_stack()
-        print "AssertionError: npc trade pane not enabled!"
+        print("AssertionError: npc trade pane not enabled!")
         return
     for p in NPCWND.panes:
         p.pane.visible = False
@@ -361,7 +361,7 @@ def PyOnNPCTradeButton():
 def PyOnNPCInteractButton():
     if not NPCWND.interactPane.enabled:
         traceback.print_stack()
-        print "AssertionError: npc interact pane not enabled!"
+        print("AssertionError: npc interact pane not enabled!")
         return
     for p in NPCWND.panes:
         p.pane.visible = False
@@ -422,19 +422,19 @@ class BankPane:
     def __init__(self):
         self.pane = TGEObject("NPCWND_BANKPANE")
         self.bankButton = TGEObject("NPCWND_BANKBUTTON")
-        self.bankButtons = dict((x,TGEObject("BANK%i_BUTTON"%(x-RPG_SLOT_BANK_BEGIN))) for x in xrange(RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END))
+        self.bankButtons = dict((x,TGEObject("BANK%i_BUTTON"%(x-RPG_SLOT_BANK_BEGIN))) for x in range(RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END))
         self.bank = {}
     
     def set(self,bank):
         self.bank = bank
-        for slot in xrange(RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END):
+        for slot in range(RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END):
             butt = self.bankButtons[slot]
             butt.number = -1
             
-            if not bank.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+            if slot not in bank: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
         
-        for slot,ghost in bank.iteritems():
+        for slot,ghost in bank.items():
             butt = self.bankButtons[slot]
             butt.setBitmap("~/data/ui/items/%s/0_0_0"%ghost.BITMAP)
             if ghost.STACKMAX > 1:

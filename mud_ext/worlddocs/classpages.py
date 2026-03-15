@@ -160,7 +160,7 @@ def GenSpellText(c,spellClasses):
         stable += "| [[%s][%s]] | %i |\n"%(twiki,sname,level)
         spellPage += "\t* (%i)\t [[%s][%s]]\n"%(level,twiki,sname)
     
-    f = file("./distrib/twiki/data/MoMWorld/Spell%sIndex.txt"%GetTWikiName(c.name),"w")
+    f = open("./distrib/twiki/data/MoMWorld/Spell%sIndex.txt"%GetTWikiName(c.name),"w")
     f.write(spellPage)
     f.close()
     stext += stable
@@ -184,11 +184,11 @@ def CreateClassPages(spellClasses):
         page = page.replace("^^SPELLTEXT^^",SPELLTEXT)
         page = page.replace("^^ADVANCEMENTTEXT^^",ADVANCEMENTTEXT)
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/ClassIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ClassIndex.txt","w")
     f.write(indexPage)
     f.close()
     

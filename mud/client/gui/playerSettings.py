@@ -51,7 +51,7 @@ WINDOW_INITIAL = {
     'LOOTWND_WINDOW': (150, 100, -1, -1, -1)
 }
 def fillWindow(cursor):
-    for name,data in WINDOW_INITIAL.iteritems():
+    for name,data in WINDOW_INITIAL.items():
         values = [None,name]
         values.extend(data)
         cursor.execute("INSERT INTO window VALUES(?,?,?,?,?,?,?);",values)
@@ -197,7 +197,7 @@ class PlayerSettings:
         if newDB:
             cursor.executescript(PLAYERSETTINGS_CREATETABLES)
             # Fill database with initial values.
-            for table,filler in PlayerSettingsFillScripts.iteritems():
+            for table,filler in PlayerSettingsFillScripts.items():
                 try:
                     filler(cursor)
                 except:
@@ -272,18 +272,18 @@ class PlayerSettings:
         curlist = dict(cursor.execute("SELECT name,sql FROM sqlite_master WHERE type='table';").fetchall())
         # If layout is equal, clean up and return.
         if memlist == curlist:
-            print 'Player settings database layout is up to date.'
+            print('Player settings database layout is up to date.')
             memcursor.close()
             memconn.close()
             return
         
         # Otherwise, update database layout.
-        print 'Updating player settings database layout ...'
+        print('Updating player settings database layout ...')
         
         # Gather information about tables that need updating.
         tableAdd = []
         tableAlter = {}
-        for name,sql in memlist.iteritems():
+        for name,sql in memlist.items():
             try:
                 prevsql = curlist[name]
                 if prevsql != sql:
@@ -291,7 +291,7 @@ class PlayerSettings:
                 del curlist[name]
             except KeyError:
                 tableAdd.append(name)
-        tableDrop = curlist.iterkeys()
+        tableDrop = iter(curlist.keys())
         
         # First add missing tables.
         for newTable in tableAdd:
@@ -311,7 +311,7 @@ class PlayerSettings:
             cursor.execute('DROP TABLE %s;'%dropTable)
         
         # Finally alter tables that differ in layout.
-        for alterTable,newsql in tableAlter.iteritems():
+        for alterTable,newsql in tableAlter.items():
             # Get table schema.
             curSchema = cursor.execute('PRAGMA TABLE_INFO(%s);'%alterTable).fetchall()
             memSchema = memcursor.execute('PRAGMA TABLE_INFO(%s);'%alterTable).fetchall()
@@ -425,7 +425,7 @@ class PlayerSettings:
         self.charInfos = cinfos
         self.charIndex = 0
         characters = {}
-        for index,cinfo in cinfos.iteritems():
+        for index,cinfo in cinfos.items():
             characterID = cursor.execute("SELECT id FROM character WHERE world_id=? AND (realm=? OR realm isnull) AND name=? LIMIT 1;",(self.worldID,realm,cinfo.NAME)).fetchone()
             # If characterID is None, the entry isn't present in the database, so insert.
             if characterID == None:
@@ -439,7 +439,7 @@ class PlayerSettings:
         self.characterID = characters[self.charIndex]
         
         # Load character settings for all party members.
-        for charIndex,characterID in characters.iteritems():
+        for charIndex,characterID in characters.items():
             charSettings = cinfos[charIndex].clientSettings = dict()
             pXPGain,sXPGain,tXPGain,encounterPVEZone,encounterPVEDeath,linkMouseTarget,linkCharacterTarget,defaultTarget = cursor.execute("SELECT p_xp_gain,s_xp_gain,t_xp_gain,encounter_pve_zone,encounter_pve_death,link_mouse_target,link_character_target,default_target FROM character WHERE id=? LIMIT 1;",(characterID,)).fetchone()
             charSettings['PXPGAIN'] = pXPGain
@@ -468,7 +468,7 @@ class PlayerSettings:
         #  update their special visibility.
         else:
             from macro import MACROMASTER
-            for charIndex in characters.iterkeys():
+            for charIndex in characters.keys():
                 MACROMASTER.updateAttackMacros(charIndex,cinfos[charIndex].RAPIDMOBINFO.AUTOATTACK)
         
         # If the zone name isn't set yet, we're still zoning and points of interest
@@ -482,7 +482,7 @@ class PlayerSettings:
         cursor = self.cursor
         
         # Run through all characters in current party and store their related settings.
-        for charIndex,characterID in self.characters.iteritems():
+        for charIndex,characterID in self.characters.items():
             charSettings = self.charInfos[charIndex].clientSettings
             cursor.execute("UPDATE character SET p_xp_gain=?, s_xp_gain=?, t_xp_gain=?, encounter_pve_zone=?, encounter_pve_death=?, link_mouse_target=?, link_character_target=?, default_target=? WHERE id=?;",(charSettings['PXPGAIN'],charSettings['SXPGAIN'],charSettings['TXPGAIN'],charSettings['ENCOUNTERPVEZONE'],charSettings['ENCOUNTERPVEDIE'],charSettings['LINKMOUSETARGET'],charSettings['LINKTARGET'],charSettings['DEFAULTTARGET'],characterID))
     
@@ -527,7 +527,7 @@ class PlayerSettings:
         if self.windowVersion < WINDOW_DAT_VERSION:
             # Maybe would need to drop and recreate table as well...
             #  we'll see once it's necessary.
-            print "Stored window data is of old version, deleting and recreating window data."
+            print("Stored window data is of old version, deleting and recreating window data.")
             cursor.execute("DELETE FROM window;")
             # Insert initial window data into db.
             fillWindow(cursor)
@@ -536,25 +536,25 @@ class PlayerSettings:
         # Check for old storage method.
         filename = "%s/data/settings/windows.dat"%(GAMEROOT)
         if os.path.exists(filename):
-            from cPickle import load as pickleLoad
+            from pickle import load as pickleLoad
             try:
-                f = file(filename,'rb')
+                f = open(filename,'rb')
                 ws = pickleLoad(f)
                 f.close()
                 if ws['VERSION'] < WINDOW_DAT_VERSION:
-                    print "Stored window data is of old version, deleting and recreating window data."
+                    print("Stored window data is of old version, deleting and recreating window data.")
                     # Already created, just pass.
                 else:
                     pos = ws['POS']
                     active = ws['ACTIVE']
                     extents = ws.get('EXTENTS')
-                    for window,position in pos.iteritems():
+                    for window,position in pos.items():
                         position = position.split(' ')
                         cursor.execute("UPDATE window SET x_coord=?, y_coord=? WHERE name=?;",(position[0],position[1],window))
-                    for window,extent in extents.iteritems():
+                    for window,extent in extents.items():
                         extent = extent.split(' ')
                         cursor.execute("UPDATE window SET x_extent=?, y_extent=? WHERE name=?;",(extent[0],extent[1],window))
-                    for window,a in active.iteritems():
+                    for window,a in active.items():
                         if a:
                             a = 1
                         else:
@@ -606,7 +606,7 @@ class PlayerSettings:
     
     # Call this function on logout to store window settings.
     def storeWindowSettings(self):
-        for name,windowInfo in self.windows.iteritems():
+        for name,windowInfo in self.windows.items():
             window,active,resizable = windowInfo
             posX,posY = window.position.split(' ')
             x_coord = int(posX)
@@ -630,7 +630,7 @@ class PlayerSettings:
     def checkWindowPositions(self):
         resolution = TGECall("getRes").split(" ")
         screenWidth,screenHeight = int(resolution[0]),int(resolution[1])
-        for name,windowInfo in self.windows.iteritems():
+        for name,windowInfo in self.windows.items():
             window,active,resizable = windowInfo
             posX,posY = window.position.split(' ')
             x_coord = int(posX)
@@ -664,8 +664,8 @@ class PlayerSettings:
         filename = "%s/data/settings/%s/%s/lastparty.dat"%(GAMEROOT,gdirname,wdirname)
         if os.path.exists(filename):
             try:
-                from cPickle import load as pickleLoad
-                f = file(filename,'rb')
+                from pickle import load as pickleLoad
+                f = open(filename,'rb')
                 data = pickleLoad(f)
                 f.close()
                 lastParty = data["PARTY"]
@@ -705,9 +705,9 @@ class PlayerSettings:
         # Check for old storage method.
         filename = "%s/data/settings/friends.dat"%(GAMEROOT)
         if os.path.exists(filename):
-            from cPickle import load as pickleLoad
+            from pickle import load as pickleLoad
             try:
-                f = file(filename,'rb')
+                f = open(filename,'rb')
                 friends = pickleLoad(f)
                 f.close()
                 for friend in friends:
@@ -750,9 +750,9 @@ class PlayerSettings:
         # Check for old storage method.
         filename = "%s/data/settings/ignore.dat"%(GAMEROOT)
         if os.path.exists(filename):
-            from cPickle import load as pickleLoad
+            from pickle import load as pickleLoad
             try:
-                f = file(filename,'rb')
+                f = open(filename,'rb')
                 ignored = pickleLoad(f)
                 f.close()
                 for ignore in ignored:
@@ -796,7 +796,7 @@ class PlayerSettings:
             self.poi = dict((description,(x_coord,y_coord,z_coord)) for description,x_coord,y_coord,z_coord in poi)
         else:
             self.poi = dict()
-        if POI.has_key(self.zone):
+        if self.zone in POI:
             self.poi.update(POI[self.zone])
     
     
@@ -813,7 +813,7 @@ class PlayerSettings:
     def removePOI(self,desc,zoneName=None):
         if zoneName == None:
             zoneName = self.zone
-        if not self.poi.has_key(desc):
+        if desc not in self.poi:
             TomeGui.receiveGameText(RPG_MSG_GAME_DENIED,"Point of interest of name %s could not be found.\\n"%desc)
         else:
             del self.poi[desc]
@@ -865,18 +865,18 @@ class PlayerSettings:
             else:
                 filename = "%s/journal_monster.dat"%dirname
             if os.path.exists(filename):
-                print "Could not find character specific journal, copying from old file ..."
+                print("Could not find character specific journal, copying from old file ...")
                 loadOld = True
         
         # If we got some legacy to load, finally do so.
         if loadOld == True:
-            from cPickle import load as pickleLoad
+            from pickle import load as pickleLoad
             try:
-                f = file(filename,'rb')
+                f = open(filename,'rb')
                 journal = pickleLoad(f)
                 f.close()
-                for topic,entryDict in journal.iteritems():
-                    for entry,text in entryDict.iteritems():
+                for topic,entryDict in journal.items():
+                    for entry,text in entryDict.items():
                         cursor.execute("INSERT INTO journal_entry (topic,entry,text,character_id) VALUES(?,?,?,?);",(topic,entry,text,self.characterID))
                 del journal
             except:
@@ -902,8 +902,8 @@ class PlayerSettings:
             from journalWnd import CreateDefaultJournal
             journal = CreateDefaultJournal(self.lastRealm)
             # Directly store new journal to database.
-            for topic,topicData in journal.iteritems():
-                for entry,entryData in topicData[0].iteritems():
+            for topic,topicData in journal.items():
+                for entry,entryData in topicData[0].items():
                     cursor.execute("INSERT INTO journal_entry (topic,entry,text,character_id,hidden) VALUES(?,?,?,?,?);",(topic,entry,entryData[0],self.characterID,entryData[1]))
         
         self.journal = journal
@@ -966,7 +966,7 @@ class PlayerSettings:
         # Update hide flag, in journal and database.
         existingTopic[1] = hide
         cursor.execute("UPDATE journal_entry SET hidden=? WHERE topic=? AND character_id=?;",(hide,topic,self.characterID))
-        for entry,entryData in existingTopic[0].iteritems():
+        for entry,entryData in existingTopic[0].items():
             entryData[1] = hide
         
         # Return that there was a change and current journal.
@@ -994,7 +994,7 @@ class PlayerSettings:
         
         # Hide topic if all topic entries are hidden.
         existingTopic[1] = True
-        for entry,entryData in existingTopic[0].iteritems():
+        for entry,entryData in existingTopic[0].items():
             if entryData[1] == False:
                 existingTopic[1] = False
                 break
@@ -1072,14 +1072,14 @@ class PlayerSettings:
         storeCharacterSettings = False
         
         # Iterate over all characters in the party.
-        for charIndex,characterID in self.characters.iteritems():
+        for charIndex,characterID in self.characters.items():
             charInfo = self.charInfos[charIndex]
             # Check for old storage method.
             filename = "%s/%s_macros.dat"%(dirname,charInfo.NAME)
             if os.path.exists(filename):
-                from cPickle import load as pickleLoad
+                from pickle import load as pickleLoad
                 try:
-                    f = file(filename,'rb')
+                    f = open(filename,'rb')
                     macroStore = pickleLoad(f)
                     f.close()
                     
@@ -1090,7 +1090,7 @@ class PlayerSettings:
                     del macroStore['CLIENTSETTINGS']
                     
                     # Now extract the old macros.
-                    for macroIndex,macroData in macroStore.iteritems():
+                    for macroIndex,macroData in macroStore.items():
                         # Translate macro index to page and slot number.
                         page = macroIndex / 10
                         slot = macroIndex % 10
@@ -1101,7 +1101,7 @@ class PlayerSettings:
                         # This list of macro lines holds tuples of the actual lines plus the delay.
                         macroLines = list()
                         # Gather rest of macro data.
-                        for attr,value in macroData.iteritems():
+                        for attr,value in macroData.items():
                             if attr == 'hotKey':
                                 hotkey = value
                             # Default command, we'll turn that one into a standard macro line.
@@ -1141,7 +1141,7 @@ class PlayerSettings:
                                     if icon and not icon.startswith('SPELLICON_'):
                                         icon = 'icons/%s'%icon
                                     description = name
-                                    for command,delay in zip(value['lines'].itervalues(),value['delays'].itervalues()):
+                                    for command,delay in zip(iter(value['lines'].values()),iter(value['delays'].values())):
                                         macroLines.append((command,delay))
                             # Other possible attributes are either unused, not important
                             #  or simply outdated beyond usability.
@@ -1179,7 +1179,7 @@ class PlayerSettings:
                 
                 # If there was an error at some point and we got this macro
                 #  slot doubly occupied, remove the already existing entry.
-                if characterMacros.has_key((macroData[2],macroData[3])):
+                if (macroData[2],macroData[3]) in characterMacros:
                     oldMacroID = cursor.execute("SELECT id FROM macro WHERE character_id=? AND page=? AND slot=? LIMIT 1;",(characterID,macroData[2],macroData[3])).fetchone()[0]
                     cursor.execute("DELETE FROM macro_line WHERE macro_id=?;",(oldMacroID,))
                     cursor.execute("DELETE FROM macro WHERE id=?;",(oldMacroID,))
@@ -1195,10 +1195,10 @@ class PlayerSettings:
             if len(characterMacros) == 0:
                 characterMacros = CreateDefaultMacros(charIndex,charInfo.PCLASS)
                 # Of course these new macros need to be saved to database.
-                for macro in characterMacros.itervalues():
+                for macro in characterMacros.values():
                     cursor.execute("INSERT INTO macro (name,page,slot,hotkey,icon,description,character_id) VALUES(?,?,?,?,?,?,?);",(macro.name,macro.page,macro.slot,macro.hotkey,macro.icon,macro.description,characterID))
                     macroID = cursor.execute("SELECT id FROM macro WHERE character_id=? AND page=? AND slot=? LIMIT 1;",(characterID,macro.page,macro.slot)).fetchone()[0]
-                    for lineIndex,macroLine in macro.macroLines.iteritems():
+                    for lineIndex,macroLine in macro.macroLines.items():
                         cursor.execute("INSERT INTO macro_line (line_index,command,delay_after,macro_id) VALUES(?,?,?,?);",(lineIndex,macroLine.command,macroLine.delayAfter,macroID))
             
             # Finally all the macros for one character are loaded.
@@ -1230,7 +1230,7 @@ class PlayerSettings:
         # Now insert the new macro into database.
         cursor.execute("INSERT INTO macro VALUES(?,?,?,?,?,?,?,?,?,?);",(None,macro.name,macro.page,macro.slot,macro.hotkey,macro.icon,macro.description,macro.waitAll,macro.manualDelay,characterID))
         macroID = cursor.execute("SELECT id FROM macro WHERE character_id=? AND page=? AND slot=? LIMIT 1;",(characterID,macro.page,macro.slot)).fetchone()[0]
-        for lineIndex,macroLine in macro.macroLines.iteritems():
+        for lineIndex,macroLine in macro.macroLines.items():
             cursor.execute("INSERT INTO macro_line VALUES(?,?,?,?,?,?);",(None,lineIndex,macroLine.command,macroLine.mandatory,macroLine.delayAfter,macroID))
     
     

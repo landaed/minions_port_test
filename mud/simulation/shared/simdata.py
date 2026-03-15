@@ -105,7 +105,7 @@ class SimMobInfo(pb.Cacheable):
             self.state['GUILDNAME'] = player.guildName
         
         bestlight = mob.light
-        for item in mob.worn.itervalues():
+        for item in mob.worn.values():
             if bestlight < item.light:
                 bestlight = item.light
             
@@ -215,7 +215,7 @@ class SimMobInfo(pb.Cacheable):
                     changed['REALM'] = state['REALM'] = mob.realm
             
             bestlight = mob.light
-            for item in mob.worn.itervalues():
+            for item in mob.worn.values():
                 if bestlight < item.light:
                     bestlight = item.light
             

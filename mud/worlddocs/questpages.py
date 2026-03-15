@@ -54,7 +54,7 @@ def GenRewardText(quest):
     
     # Generate Lists
     gitems = []
-    money = 0L
+    money = 0
     experience = []
     cmf = []
     classes = []
@@ -154,7 +154,7 @@ def GenRequireText(quest):
     # Generate Lists
     citems = []
     titems = []
-    money = 0L
+    money = 0
     minFactions = []
     maxFactions = []
     for action in quest.actions:
@@ -231,11 +231,11 @@ def CreateQuestPages(spawnQuests):
         page=page.replace("^^REQUIRETEXT^^",REQUIRETEXT)
         page=page.replace("^^REWARDTEXT^^",REWARDTEXT)
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/QuestIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/QuestIndex.txt","w")
     f.write(indexPage)
     f.close()
     

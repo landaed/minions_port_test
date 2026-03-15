@@ -15,7 +15,7 @@ from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer
 
 from time import time as sysTime
 from base64 import decodestring
-from cPickle import loads
+from pickle import loads
 
 
 
@@ -76,7 +76,7 @@ class Inn(pb.Root):
                 try:
                     c.destroySelf()
                 except:
-                    print "ERROR SWAPPING TO %s"%cname
+                    print("ERROR SWAPPING TO %s"%cname)
                     return
             except:
                 pass
@@ -150,7 +150,7 @@ class Inn(pb.Root):
                 return
             
             if c.player != player:
-                print "WARNING: Player at inn attempting to add a character that isn't theres!"
+                print("WARNING: Player at inn attempting to add a character that isn't theres!")
                 return
             
             if len(player.party.members) == 6:

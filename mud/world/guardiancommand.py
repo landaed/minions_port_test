@@ -252,8 +252,8 @@ def DoGuardianCommand(player,cmd,args):
     if type(args)!=list:
         args = [args]
     cmd = cmd.upper()
-    if COMMANDS.has_key(cmd):
+    if cmd in COMMANDS:
         COMMANDS[cmd](mob,args)
     else:
-        print "Unknown Command",cmd
+        print("Unknown Command",cmd)
  

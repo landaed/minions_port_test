@@ -21,7 +21,7 @@ class Trade:
         for item in p0.curChar.items:
             if RPG_SLOT_TRADE_BEGIN <= item.slot < RPG_SLOT_TRADE_END:
                 self.p0Items[item.slot - RPG_SLOT_TRADE_BEGIN] = item
-        self.p0Tin = 0L
+        self.p0Tin = 0
 
         self.p1 = p1
         self.p1Accepted = False
@@ -32,7 +32,7 @@ class Trade:
         for item in p1.curChar.items:
             if RPG_SLOT_TRADE_BEGIN <= item.slot < RPG_SLOT_TRADE_END:
                 self.p1Items[item.slot - RPG_SLOT_TRADE_BEGIN] = item
-        self.p1Tin = 0L
+        self.p1Tin = 0
         
         self.tradeInfo = TradeInfo(self)
         
@@ -69,8 +69,8 @@ class Trade:
         
         if not player.checkMoney(money):
             #don't have enough
-            print "WARNING: trading.py submitMoney Player with insufficient funds!"
-            money = 0L
+            print("WARNING: trading.py submitMoney Player with insufficient funds!")
+            money = 0
         if self.p0 == player:
             self.p0Tin = money
         else:
@@ -96,8 +96,8 @@ class Trade:
         # If both players have accepted trade, check if the trade can occur.
         if self.p0Accepted and self.p1Accepted:
         
-            p0Items = self.p0Items.values()
-            p1Items = self.p1Items.values()
+            p0Items = list(self.p0Items.values())
+            p1Items = list(self.p1Items.values())
             p1ItemsCopy = p1Items[:]  # Copy needed for later check due to stacking removing items.
 
             p0FreeSlots = 0
@@ -113,7 +113,7 @@ class Trade:
                     
                 # If the item stacks and is not a max stack, check stackability later.
                 if item.itemProto.stackMax > item.stackCount > 1:
-                    if not p0CheckStack.has_key(item.name):
+                    if item.name not in p0CheckStack:
                         p0CheckStack[item.name] = []
                     p0CheckStack[item.name].append([item,item.stackCount])
                     
@@ -125,7 +125,7 @@ class Trade:
                     
                 # If the item stacks and is not a max stack, check stackability later.
                 if item.itemProto.stackMax > item.stackCount > 1:
-                    if not p1CheckStack.has_key(item.name):
+                    if item.name not in p1CheckStack:
                         p1CheckStack[item.name] = []
                     p1CheckStack[item.name].append([item,item.stackCount])
             
@@ -133,7 +133,7 @@ class Trade:
             p0UpdatedStacks = {}
             p1Erase = []
             for char in self.p0.party.members:
-                freeSlots = range(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END)
+                freeSlots = list(range(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END))
                 
                 # For all items on the character.
                 for item in char.items:
@@ -202,7 +202,7 @@ class Trade:
             p1UpdatedStacks = {}
             p0Erase = []
             for char in self.p1.party.members:
-                freeSlots = range(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END)
+                freeSlots = list(range(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END))
                 
                 # For all items on the character.
                 for item in char.items:
@@ -299,12 +299,12 @@ class Trade:
                 self.p0.giveItemInstance(item)
                 
             # Update stack counts for Player 0.
-            for item,amount in p0UpdatedStacks.iteritems():
+            for item,amount in p0UpdatedStacks.items():
                 item.stackCount = amount
                 item.itemInfo.refreshDict({'STACKCOUNT':item.stackCount})
             
             # Update stack counts for Player 1.
-            for item,amount in p1UpdatedStacks.iteritems():
+            for item,amount in p1UpdatedStacks.items():
                 item.stackCount = amount
                 item.itemInfo.refreshDict({'STACKCOUNT':item.stackCount})
             

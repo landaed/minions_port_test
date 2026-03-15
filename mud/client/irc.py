@@ -11,7 +11,7 @@ from mud.gamesettings import *
 from gui.tomeGui import TomeGui
 receiveGameText = TomeGui.instance.receiveGameText
 receiveSpeechText = TomeGui.instance.receiveSpeechText
-from cPickle import load,dump
+from pickle import load,dump
 import re
 
 
@@ -484,7 +484,7 @@ class IRCFactory(protocol.ClientFactory):
         self.protocol = MyIRCClient
     
     def buildProtocol(self,addr):
-        print addr.host
+        print(addr.host)
         
         p = protocol.ClientFactory.buildProtocol(self,addr)
         p.live = False

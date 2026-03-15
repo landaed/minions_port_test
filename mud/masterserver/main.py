@@ -12,11 +12,12 @@ if "-wx" in sys.argv:
 
 if sys.platform == 'win32' and not USE_WX:
     from twisted.internet.iocpreactor import install
-else:
+    install()
+elif USE_WX:
     import wx
     from twisted.internet.wxreactor import install
-    
-install()
+    install()
+# else: use default reactor on Linux (headless)
 
 from mud.server.config import ConfigureServer, LoadConfiguration
 import traceback
@@ -47,14 +48,14 @@ TRANSACTION = None
 BACKUPTICK = 15
 
 def CheckDB():
-    print "Checking Database Integrity"
+    print("Checking Database Integrity")
     conn = Persistent._connection.getConnection()
     cursor = conn.cursor()
 
     cursor.execute("PRAGMA integrity_check;")
     if cursor.fetchone()[0]!='ok':
-        raise "Master Database Error"
-    print "... ok ..."
+        raise Exception("Master Database Error")
+    print("... ok ...")
     
     cursor.close()
 
@@ -67,7 +68,7 @@ def TransactionTick(exiting=False):
     conn = Persistent._connection.getConnection()
     cursor = conn.cursor()
     if TRANSACTION:
-        print "-------------> Commiting Database <-------------"
+        print("-------------> Commiting Database <-------------")
         cursor.execute("END;")
         
     TRANSACTION = False
@@ -81,7 +82,7 @@ def TransactionTick(exiting=False):
         
         BACKUPTICK-=1
         if not BACKUPTICK:
-            print "Backing up master database"
+            print("Backing up master database")
             BackupMaster("./data/master/master.db")
             BACKUPTICK= 60 #once every 60 minutes
 
@@ -200,8 +201,8 @@ class WorldAvatar(Avatar):
 
 from random import choice
 import string
-def GenPasswd(length=8, chars=string.letters):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=8, chars=string.ascii_letters):
+    return ''.join([choice(chars) for i in range(length)])
 
 #also delete
 class NewWorldAvatar(Avatar):
@@ -258,8 +259,8 @@ class NewWorldAvatar(Avatar):
         
 from random import choice
 import string
-def GenRegKey(length=16, chars=string.letters):
-    s = ''.join([choice(chars) for i in xrange(length)])
+def GenRegKey(length=16, chars=string.ascii_letters):
+    s = ''.join([choice(chars) for i in range(length)])
     t=s[:4]+"-"+s[4:8]+"-"+s[8:12]+"-"+s[12:]
     return t.upper()
         
@@ -354,8 +355,8 @@ class RegistrationAvatar(Avatar):
             
         if not USE_WX:
             from newplayeremail import NewPlayerEmail
-            import thread
-            thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
+            import _thread
+            _thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
         
         if RPG_SECURE_REGISTRATION:
             return(0, "Your password has been emailed to you. Please look into your mailbox and use your username and password to login.\\n\\nThank you for registering.", "", regkey)
@@ -374,8 +375,8 @@ class RegistrationAvatar(Avatar):
             return(-1, "Email doesn't match, please make sure to specify the email used when registering.\\n\\n  If you continue to have problems, please contact support.")
         
         if not USE_WX:   
-            import thread
-            thread.start_new(LostPasswordEmail, (a.email, a.publicName, a.password))
+            import _thread
+            _thread.start_new(LostPasswordEmail, (a.email, a.publicName, a.password))
         
         return(0, "Your password has been sent to the email address specified.")
         
@@ -595,15 +596,15 @@ if USE_WX:
     reactor.registerWxApp(app)
 
 
-print "Master Server"
-print "->Initializing"
+print("Master Server")
+print("->Initializing")
 
 from mud.common.permission import Role, User, TablePermission, ColumnPermission
 from mud.common.avatar import RoleAvatar
 
 
 def ConfigureSettings():
-    print "Configuring Settings"
+    print("Configuring Settings")
     #World User (clean this up.. for instance, if we change the username we'll leave row crumbs)
     try:
         user = User.byName(CONFIG["World Username"])
@@ -639,7 +640,7 @@ reactor.listenTCP(CONFIG["Manhole Port"], f)
 #MakeWebServer()
 
 from mud.common.persistent import Persistent
-Persistent._connection.getConnection().text_factory = lambda x: unicode(x, "utf-8", "ignore")
+Persistent._connection.getConnection().text_factory = lambda x: str(x, "utf-8", "ignore")
 
 CheckDB()
 
@@ -647,7 +648,7 @@ ConfigureSettings()
 
 TransactionTick()
 
-print "->Server is up"
+print("->Server is up")
 
 reactor.run()
 

@@ -58,7 +58,7 @@ def NewPlayerEmail(to,publicName,password, regkey,fromProduct):
         s.sendmail(me, SUPPORTEMAIL_ADDRESS, msg.as_string())
         s.quit()
     else:
-        print "Email not configured... Hopefully this server is configured not to require it?"
+        print("Email not configured... Hopefully this server is configured not to require it?")
 
 
 def LostPasswordEmail(to,publicName,password):
@@ -99,7 +99,7 @@ Have fun!!!
         s.sendmail(me, SUPPORTEMAIL_ADDRESS, msg.as_string())
         s.quit()
     else:
-        print "Email not configured... User unable to request new password"
+        print("Email not configured... User unable to request new password")
 
 
 PASSWORD_SUBJECT = "Password Request"

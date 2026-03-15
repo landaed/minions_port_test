@@ -17,7 +17,7 @@ def DoItemRepair(char,ritem):
     rskill = char.mob.skillLevels.get('Repair',0)
     if not rskill:
         traceback.print_stack()
-        print "AssertionError: character %s doesn't have the repair skill?!"%char.name
+        print("AssertionError: character %s doesn't have the repair skill?!"%char.name)
         return
     
     cost = GetItemRepairCost(rskill,ritem.repair,ritem.repairMax,ritem.level,ritem.classes)
@@ -45,7 +45,7 @@ def DoItemRepair(char,ritem):
         mob = None
         if ritem.penalty > 0.0 and ritem.character:
             mob = ritem.character.mob
-            for slot,item in mob.worn.iteritems():
+            for slot,item in mob.worn.items():
                 if item == ritem:
                     equipSlot = slot
                     # If this item has a penalty and is equipped,
@@ -84,7 +84,7 @@ def GetItemRepairCost(rskill,repair,repairMax,level,classes):
     
     #generate cost
     
-    tp = long(level**5+500)
+    tp = int(level**5+500)
     
     s = float(level)/10.0
     if s >= 1:
@@ -123,10 +123,10 @@ def CheckRepairItem(charname,rskill,rinfo,citem):
 def CheckRepairAll(charname,rskill,rinfo,charItems,output = True):
     from mud.client.gui.tomeGui import TomeGui
     receiveGameText = TomeGui.instance.receiveGameText
-    cost = 0L
+    cost = 0
     
     ritems = []
-    for rslot,ritem in charItems.iteritems():
+    for rslot,ritem in charItems.items():
         if RPG_SLOT_WORN_END > rslot >= RPG_SLOT_WORN_BEGIN:
             if not ritem.REPAIRMAX or ritem.REPAIRMAX == ritem.REPAIR:
                 continue
@@ -172,11 +172,11 @@ def CheckRepairAll(charname,rskill,rinfo,charItems,output = True):
 def CheckRepairParty(charname,rskill,rinfo,charinfos):
     from mud.client.gui.tomeGui import TomeGui
     receiveGameText = TomeGui.instance.receiveGameText
-    cost = 0L
+    cost = 0
     
     iskill = 0
     numrepairs = 0
-    for c in charinfos.itervalues():
+    for c in charinfos.values():
         numrep,ciskill,rcost = CheckRepairAll(charname,rskill,rinfo,c.ITEMS,False)
         cost += rcost
         iskill += ciskill
@@ -252,7 +252,7 @@ def RepairAll(player,char):
     
     #start repairs
     points = 0
-    cost = 0L
+    cost = 0
     iskill = 0
     numrepaired = 0
     
@@ -315,7 +315,7 @@ def RepairParty(player,char):
     
     #start repairs
     points = 0
-    cost = 0L
+    cost = 0
     iskill = 0
     numrepaired = 0
     

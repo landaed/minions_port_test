@@ -16,7 +16,7 @@ CRAFTINGWND = None
 class CraftingWnd:
     def __init__(self):
         self.window = TGEObject("CRAFTINGWND_WINDOW")
-        self.craftingButtons = dict((x,TGEObject("CRAFTING_BUTTON%i"%(x-RPG_SLOT_CRAFTING_BEGIN))) for x in xrange(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END))
+        self.craftingButtons = dict((x,TGEObject("CRAFTING_BUTTON%i"%(x-RPG_SLOT_CRAFTING_BEGIN))) for x in range(RPG_SLOT_CRAFTING_BEGIN,RPG_SLOT_CRAFTING_END))
     
     
     def setFromCharacterInfo(self,cinfo):
@@ -25,12 +25,12 @@ class CraftingWnd:
         self.window.setText("%s's Crafting"%cinfo.NAME)
         
         self.charInfo = cinfo
-        for slot,butt in self.craftingButtons.iteritems():
+        for slot,butt in self.craftingButtons.items():
             butt.number = -1
-            if not cinfo.ITEMS.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+            if slot not in cinfo.ITEMS: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
         
-        for slot,ghost in cinfo.ITEMS.iteritems():
+        for slot,ghost in cinfo.ITEMS.items():
             try:
                 self.craftingButtons[slot].setBitmap("~/data/ui/items/%s/0_0_0"%ghost.BITMAP)
                 if ghost.STACKMAX > 1:
@@ -45,7 +45,7 @@ def OnCraft():
     charItems = cinfo.ITEMS
     
     # Get all items present in the crafting window.
-    citems = [charItems[slot] for slot in xrange(RPG_SLOT_CRAFTING_BEGIN, RPG_SLOT_CRAFTING_END) if charItems.has_key(slot)]
+    citems = [charItems[slot] for slot in range(RPG_SLOT_CRAFTING_BEGIN, RPG_SLOT_CRAFTING_END) if slot in charItems]
     # If there are no items present in the crafting window, give a message and return.
     if not len(citems):
         TomeGui.receiveGameText(RPG_MSG_GAME_DENIED,"You first need to put the desired ingredients into the crafting window.\\n")
@@ -61,7 +61,7 @@ def OnCraft():
         passed = True
         for item in citems:
             found = False
-            for item_proto_id,count in ingredients.iteritems():
+            for item_proto_id,count in ingredients.items():
                 if item.PROTOID == item_proto_id:
                     sc = item.STACKCOUNT
                     if not sc:
@@ -74,7 +74,7 @@ def OnCraft():
                 break
         # All items were found in the current recipe.
         else:
-            for x in ingredients.itervalues():
+            for x in ingredients.values():
                 if x:  # Can be negative if too much
                     passed = False
                     break

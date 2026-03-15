@@ -17,7 +17,7 @@ from mud.world.worldupdate import WorldUpdate
 from mud.worldserver.embedded import SetupEmbeddedWorld,ShutdownEmbeddedWorld
 from mud.world.defines import *
 
-from md5 import md5
+from hashlib import md5
 import os
 from shutil import rmtree,copyfile
 import traceback
@@ -28,7 +28,7 @@ WORLDS = []
 
 
 def Error(value):
-    print value
+    print(value)
 
 
 def EnumSinglePlayerWorlds():

@@ -10,12 +10,12 @@ USE_WX = "-wx" in sys.argv
 
 if sys.platform == 'win32' and not USE_WX:
     from twisted.internet.iocpreactor import install
-else:
-    USE_WX = True
+    install()
+elif USE_WX:
     import wx
     from twisted.internet.wxreactor import install
-
-install()
+    install()
+# else: use default reactor on Linux (headless)
 
 from mud.gamesettings import *
 from config import *
@@ -26,9 +26,9 @@ from serverdb import CreateDatabase,CharDB,ReplicateDB
 from zlib import decompress
 from traceback import print_stack,print_exc
 from base64 import encodestring,decodestring
-from cPickle import dumps,loads
+from pickle import dumps,loads
 from time import time
-from md5 import md5
+from hashlib import md5
 import random
 from mud.server.config import LoadConfiguration
 #import MySQLdb
@@ -102,25 +102,25 @@ class WorldConnection(pb.Root):
                 cbuffer = loads(decodestring(cbuffer))
             
             if wname != self.worldName:
-                print "Warning %s trying to save on none world login %s"% \
-                    (publicName,self.worldName)
+                print("Warning %s trying to save on none world login %s"% \
+                    (publicName,self.worldName))
                 return
             
-            print "Saving buffer for %s:%s"%(publicName,cvalues[0])
+            print("Saving buffer for %s:%s"%(publicName,cvalues[0]))
             
             try:
                 dbuffer = decompress(pbuffer)
             except:
                 print_stack()
-                print "Warning: %s bad zlib decompress on pbuffer"%publicName
+                print("Warning: %s bad zlib decompress on pbuffer"%publicName)
                 return
             
             try:
                 dbuffer = decompress(cbuffer)
             except:
                 print_stack()
-                print "Warning: %s bad zlib decompress on cbuffer for %s"% \
-                    (publicName,cvalues[0])
+                print("Warning: %s bad zlib decompress on cbuffer for %s"% \
+                    (publicName,cvalues[0]))
                 return
             
             CHARDB.insertPlayerBuffer(publicName,pbuffer)
@@ -219,7 +219,7 @@ class WorldConnection(pb.Root):
         return d
     
     def checkGenesisTimeResult(self,result):
-        print result
+        print(result)
         r, message = result
         if not r:
             del WORLD_CONNECTIONS[self.worldName]
@@ -297,14 +297,14 @@ class WorldConnection(pb.Root):
         
         gplayers = {}
         t = time()
-        for pname,info in ACTIVE_PLAYER_TIMES.iteritems():
+        for pname,info in ACTIVE_PLAYER_TIMES.items():
             wname,cname,gname,zname,tm = info
             if t - tm < 80:
                 gplayers[cname.upper()] = (cname,gname,wname,zname)
         
         remove = []
         muted = {}
-        for pname,tm in PLAYER_MUTE_TIMES.iteritems():
+        for pname,tm in PLAYER_MUTE_TIMES.items():
             mt = tm - t
             if mt <= 0:
                 remove.append(pname)
@@ -343,14 +343,14 @@ class MasterConnection(pb.Root):
         PLAYER_SUBNETS[publicName] = subnet
         
         # Check if the player is under a temporary ban.
-        if PLAYER_KICK_TIMES.has_key(publicName):
+        if publicName in PLAYER_KICK_TIMES:
             t = PLAYER_KICK_TIMES[publicName] - time()
             t /= 60
             if int(t) > 0:
                 return (False,"This account is temporarily banned.\\n\\n It will be available in %i minutes."%t)
         
         # Check if the player is under a temporary IP ban.
-        elif SUBNET_KICK_TIMES.has_key(subnet):
+        elif subnet in SUBNET_KICK_TIMES:
             t = SUBNET_KICK_TIMES[subnet] - time()
             t /= 60
             if int(t) > 0:
@@ -363,7 +363,7 @@ class MasterConnection(pb.Root):
         except KeyError:
             pass
         
-        if not WORLD_CONNECTIONS.has_key(worldName):
+        if worldName not in WORLD_CONNECTIONS:
             (False,"Please select another world server.")
             
         ACTIVE_PLAYER_TIMES[publicName] = (worldName,"","","",time())
@@ -372,7 +372,7 @@ class MasterConnection(pb.Root):
     
     
     def remote_announceWorld(self,worldName,worldIP,port):
-        if not WORLD_CONNECTIONS.has_key(worldName):
+        if worldName not in WORLD_CONNECTIONS:
             #connect to world
             WorldConnection(worldName,worldIP,port)
     
@@ -380,11 +380,11 @@ class MasterConnection(pb.Root):
     def connected(self,perspective):
         self.perspective = perspective
         #perspective.callRemote("CharacterAvatar","sayHi")
-        print "Character Server is up!"
+        print("Character Server is up!")
     
     
     def failure(self,reason):
-        print reason
+        print(reason)
     
     
     def connect(self):
@@ -392,7 +392,7 @@ class MasterConnection(pb.Root):
         factory = pb.PBClientFactory()
         reactor.connectTCP(MASTER_IP,MASTER_PORT,factory)
         factory.login(UsernamePassword("CharacterServer-CharacterServer", password),self).addCallbacks(self.connected, self.failure)
-        print "Connecting to Master Server..."
+        print("Connecting to Master Server...")
 
 
 
@@ -406,7 +406,7 @@ class GMConnection(pb.Root):
         self.perspective = perspective
         
     def failure(self,reason):
-        print reason
+        print(reason)
        
     def connect(self):
         factory = pb.PBClientFactory()
@@ -547,7 +547,7 @@ class GMConnection(pb.Root):
         
     def remote_gmWho(self,whoworld):
         who = {}
-        for pname,info in ACTIVE_PLAYER_TIMES.iteritems():
+        for pname,info in ACTIVE_PLAYER_TIMES.items():
             wname,cname,gname,zname,wtime = info
             if whoworld and whoworld.upper() != wname.upper():
                 continue
@@ -556,7 +556,7 @@ class GMConnection(pb.Root):
             if t > 120:
                 continue
             
-            if not who.has_key(wname):
+            if wname not in who:
                 who[wname]={}
                 
             who[wname][pname]=cname
@@ -615,7 +615,7 @@ def AwardTicket(pname,levelType="",level=None):
 
 def ReplicateDatabases():
     reactor.callLater(60*60,ReplicateDatabases) #every hour
-    ReplicateDB(WORLD_CONNECTIONS.values(),MASTERCONNECTION.perspective)
+    ReplicateDB(list(WORLD_CONNECTIONS.values()),MASTERCONNECTION.perspective)
 
 mc = MasterConnection()
 mc.connect()

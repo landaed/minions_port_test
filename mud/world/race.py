@@ -143,7 +143,7 @@ def GetRace(racename):
         for race in Race.select():
             RACES[race.name] = race
             
-    if not RACES.has_key(racename):
+    if racename not in RACES:
         race = DummyRace(racename)
         RACES[racename] = race
     

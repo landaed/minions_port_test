@@ -137,8 +137,8 @@ class Player(Persistent):
                     item.destroySelf()
                     continue
                 slot = item.slot
-                if slot < RPG_SLOT_BANK_BEGIN or slot >= RPG_SLOT_BANK_END or bankList.has_key(slot):
-                    print "WARNING: invalid bank item slot, item %s from player %s deleted!"%(item.name,self.name)
+                if slot < RPG_SLOT_BANK_BEGIN or slot >= RPG_SLOT_BANK_END or slot in bankList:
+                    print("WARNING: invalid bank item slot, item %s from player %s deleted!"%(item.name,self.name))
                     item.destroySelf()
                     continue
                 bankList[slot] = ItemInstance(item)
@@ -416,7 +416,7 @@ class Player(Persistent):
         if (item.player and item.player == self) or (item.character and item.character in self.party.members):
             item.destroySelf()
             return
-        raise ValueError,"Attempting to take an item from player %s not belonging to this player!"%self.publicName
+        raise ValueError("Attempting to take an item from player %s not belonging to this player!"%self.publicName)
 
     def collapseMoney(self):
         tin = self.tin
@@ -426,11 +426,11 @@ class Player(Persistent):
         platinum = self.platinum
 
         #convert to tin
-        tin = long(tin)
-        tin += copper*100L
-        tin += silver*10000L
-        tin += gold*1000000L
-        tin += platinum*100000000L
+        tin = int(tin)
+        tin += copper*100
+        tin += silver*10000
+        tin += gold*1000000
+        tin += platinum*100000000
         
         self.tin,self.copper,self.silver,self.gold,self.platinum = CollapseMoney(tin)
     
@@ -445,14 +445,14 @@ class Player(Persistent):
         
         if tin < 0 or copper < 0 or silver < 0 or gold < 0 or platinum < 0:
             traceback.print_stack()
-            print "AssertionError: player %s wealth whackiness!"%self.publicName
+            print("AssertionError: player %s wealth whackiness!"%self.publicName)
             return
         
-        tin = long(tin)
-        tin += copper*100L
-        tin += silver*10000L
-        tin += gold*1000000L
-        tin += platinum*100000000L
+        tin = int(tin)
+        tin += copper*100
+        tin += silver*10000
+        tin += gold*1000000
+        tin += platinum*100000000
         
         if tin >= worth:
             return True
@@ -463,7 +463,7 @@ class Player(Persistent):
             return
         if not self.checkMoney(worth):
             traceback.print_stack()
-            print "AssertionError: player doesn't have enough money!"
+            print("AssertionError: player doesn't have enough money!")
             return
         
         tin = self.tin
@@ -474,15 +474,15 @@ class Player(Persistent):
         
         if tin < 0 or copper < 0 or silver < 0 or gold < 0 or platinum < 0:
             traceback.print_stack()
-            print "AssertionError: player %s wealth whackiness!"%self.publicName
+            print("AssertionError: player %s wealth whackiness!"%self.publicName)
             return
         
         #convert to tin
-        tin = long(tin)
-        tin += copper*100L
-        tin += silver*10000L
-        tin += gold*1000000L
-        tin += platinum*100000000L
+        tin = int(tin)
+        tin += copper*100
+        tin += silver*10000
+        tin += gold*1000000
+        tin += platinum*100000000
         
         tin -= worth
         self.tin,self.copper,self.silver,self.gold,self.platinum = CollapseMoney(tin)
@@ -491,11 +491,11 @@ class Player(Persistent):
         if not worth:
             return
         #convert to tin
-        tin = long(self.tin)
-        tin += self.copper*100L
-        tin += self.silver*10000L
-        tin += self.gold*1000000L
-        tin += self.platinum*100000000L
+        tin = int(self.tin)
+        tin += self.copper*100
+        tin += self.silver*10000
+        tin += self.gold*1000000
+        tin += self.platinum*100000000
         
         tin += worth
         self.tin,self.copper,self.silver,self.gold,self.platinum = CollapseMoney(tin)
@@ -568,7 +568,7 @@ class Player(Persistent):
         
         # Now run through all gathered trade items and try to place them
         #  back into inventory.
-        for c,itemList in tradeItems.iteritems():
+        for c,itemList in tradeItems.items():
             for item in itemList:
                 # If the character owning the item has no more space
                 #  in inventory for the item, try to give it to a different
@@ -769,7 +769,7 @@ class Player(Persistent):
             memberNames = (c.name.upper() for c in self.party.members)
             finfo = {}
             if len(self.friends) or self.guildName:
-                for charName,pinfo in self.world.globalPlayers.iteritems():
+                for charName,pinfo in self.world.globalPlayers.items():
                     if charName in memberNames:
                         continue
                     cname,gname,wname,zname = pinfo
@@ -796,7 +796,7 @@ class Player(Persistent):
         
         # Don't use itervalues here because item tick might modify
         #  the bank dictionary.
-        for item in self.bankItems.values():
+        for item in list(self.bankItems.values()):
             item.tick()
         
         if self.inn:
@@ -852,7 +852,7 @@ class Player(Persistent):
             try:
                 # Using values() instead of itervalues() already makes sure
                 #  we work on a copy, so deleting during loop is safe.
-                for item in self.bankList.values():
+                for item in list(self.bankList.values()):
                     if item.flags & RPG_ITEM_ETHEREAL:
                         item.destroySelf()
                     else:
@@ -1000,7 +1000,7 @@ class Player(Persistent):
         
         # Do some sanity check on the items to be taken away.
         # Don't use iteritems so we iterate over a copy.
-        for proto,count in itemDict.items():
+        for proto,count in list(itemDict.items()):
             if count <= 0:
                 del itemDict[proto]
         
@@ -1030,7 +1030,7 @@ class Player(Persistent):
         
         # Do some sanity check on the item requirements.
         # Don't use iteritems so we iterate over a copy.
-        for proto,count in itemDict.items():
+        for proto,count in list(itemDict.items()):
             if count <= 0:
                 del itemDict[proto]
         
@@ -1124,7 +1124,7 @@ class Player(Persistent):
         
         # Give feedback to the player.
         if not silent:
-            self.sendGameText(RPG_MSG_GAME_DENIED,"You need %s.\\n"%', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in itemDict.iteritems()))
+            self.sendGameText(RPG_MSG_GAME_DENIED,"You need %s.\\n"%', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in itemDict.items()))
         
         # Return the failure.
         return False

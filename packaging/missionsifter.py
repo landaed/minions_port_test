@@ -29,7 +29,7 @@ def SiftInteriorInstance(interior):
     mystat  =  os.lstat(filename)
     size = mystat[stat.ST_SIZE]
     
-    f = file(filename,"rb")
+    f = open(filename,"rb")
     data = array('B')
     data.fromfile(f,size)
     f.close()
@@ -166,7 +166,7 @@ def SiftMission(missionfile):
     spawngroups = []
     dialogTriggers = []
     
-    f = file("./%s/data/missions/%s"%(GAMEROOT,missionfile))
+    f = open("./%s/data/missions/%s"%(GAMEROOT,missionfile))
     mission = f.read()
     f.close()
     mission = mission.replace ("new SimGroup(","xxx xxxx")

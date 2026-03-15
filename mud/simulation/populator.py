@@ -24,20 +24,20 @@ class Populator:
         self.waypoints = {}
         
         
-        for y in xrange(self.boundsMin[1],self.boundsMax[1],48):
-            for x in xrange(self.boundsMin[0],self.boundsMax[0],48):
+        for y in range(self.boundsMin[1],self.boundsMax[1],48):
+            for x in range(self.boundsMin[0],self.boundsMax[0],48):
                 z = float(TGECall('MyCheckGridPoint',"%f %f %f"%(x,y,self.midZ)))
                 if z:
                     bx = x/192
                     by = y/192
-                    if not self.bins.has_key((bx,by)):
+                    if (bx,by) not in self.bins:
                         self.bins[(bx,by)]=[]
                     self.bins[(bx,by)].append((x,y,z))
         
         
         numpoints = 0
         #bin paths
-        for bin,points in self.bins.items():
+        for bin,points in list(self.bins.items()):
             num = len(points)
             if num < 4:
                 del self.bins[bin]
@@ -56,10 +56,10 @@ class Populator:
                     result = TGECall('MyCastRay',"%f %f %f"%(p1[0],p1[1],p1[2]+4),"%f %f %f"%(p2[0],p2[1],p2[2]+4))
                     
                     if int(result):
-                        if not self.binPaths.has_key(bin):
+                        if bin not in self.binPaths:
                             self.binPaths[bin]={}
                             
-                        if not self.binPaths[bin].has_key(x):
+                        if x not in self.binPaths[bin]:
                             self.binPaths[bin][x]=[]
                         self.binPaths[bin][x].append(y)
                         
@@ -69,10 +69,10 @@ class Populator:
         
         wgroup = self.maxWanderGroup+1
         num = 0
-        for bin,points in self.bins.iteritems():
+        for bin,points in self.bins.items():
             wander = False
             
-            if self.binPaths.has_key(bin):
+            if bin in self.binPaths:
                 if len(self.binPaths[bin])>=4:
                     wander = True
                     self.paths[wgroup]=self.binPaths[bin]
@@ -102,8 +102,8 @@ class Populator:
                 num+=1
                 
         #print self.binPaths
-        print "%i bins with a total of %i points"%(len(self.bins),numpoints)
-        print "%i spawnpoints added"%len(self.spawnpoints)
+        print("%i bins with a total of %i points"%(len(self.bins),numpoints))
+        print("%i spawnpoints added"%len(self.spawnpoints))
                 
             
         

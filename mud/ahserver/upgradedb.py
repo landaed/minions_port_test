@@ -41,7 +41,7 @@ def create_protoDB(bcursor,mcursor,clean):
 
 #Item Prototype Database does not exist so lets create it as the baseline and then quit
 if not os.path.exists(BASELINE_DB):
-    print "No Prototype Database found for the Auctin and Mail Store!  Creating a new one!"
+    print("No Prototype Database found for the Auctin and Mail Store!  Creating a new one!")
     MULTICONN = sqlite.connect(MULTIPLAYER_DB,isolation_level = None)
     BASECONN = sqlite.connect(BASELINE_DB,isolation_level = None)
 
@@ -54,10 +54,10 @@ if not os.path.exists(BASELINE_DB):
     bcursor.close()
     MULTICONN.close()
     BASECONN.close()
-    print "New Baseline Item Prototype Database has been created!"
+    print("New Baseline Item Prototype Database has been created!")
     sys.exit(0)  
     
-print "Comparing the Baseline Prototype Database for the Auction and Mail Store!"
+print("Comparing the Baseline Prototype Database for the Auction and Mail Store!")
 #Prototype DB exists, so lets look for some changes
 MULTICONN = sqlite.connect(MULTIPLAYER_DB,isolation_level = None)
 BASECONN = sqlite.connect(BASELINE_DB,isolation_level = None)
@@ -101,7 +101,7 @@ for name,oid in bcursor.fetchall():
                 
     #Item not found in the new DB, time to clean it from the databases
     except:
-        print "ItemProto %s no longer exists.  Purging from the DBs"%name
+        print("ItemProto %s no longer exists.  Purging from the DBs"%name)
         
         acursor.execute("BEGIN TRANSACTION;")
         mailcursor.execute("BEGIN TRANSACTION;")
@@ -110,7 +110,7 @@ for name,oid in bcursor.fetchall():
         try:
             acursor.execute('SELECT id from ItemList WHERE item_id = %d;'%oid)
             for AHID in acursor.fetchall():
-                print "***Warning: %s was found in an Active Auction...It has been purged"%name
+                print("***Warning: %s was found in an Active Auction...It has been purged"%name)
                 acursor.execute('DELETE from ItemList WHERE id = %d;'%AHID)
                 acursor.execute('DELETE from ItemInstance WHERE item_list_id = %d;'%AHID)
                 acursor.execute('DELETE from ItemVariant WHERE item_list_id = %d;'%AHID)               
@@ -124,7 +124,7 @@ for name,oid in bcursor.fetchall():
         try:
             mailcursor.execute('SELECT id from mailStore WHERE item_proto = %d;'%oid)
             for AHID in mailcursor.fetchall():
-                print "***Warning: %s was found in an Active Mail...It has been purged"%name
+                print("***Warning: %s was found in an Active Mail...It has been purged"%name)
                 mailcursor.execute('DELETE from mailStore WHERE id = %d;'%AHID)
                 mailcursor.execute('DELETE from ItemInstance WHERE item_list_id = %d;'%AHID)
                 mailcursor.execute('DELETE from ItemVariant WHERE item_list_id = %d;'%AHID)               
@@ -138,13 +138,13 @@ for name,oid in bcursor.fetchall():
 acursor.execute("BEGIN TRANSACTION;")
 mailcursor.execute("BEGIN TRANSACTION;")
 
-for id,value in TRANS_AH_ITEMLIST.iteritems():
+for id,value in TRANS_AH_ITEMLIST.items():
     acursor.execute("UPDATE ItemList set item_id = %d WHERE id = %d;"%(value,id[0]))
     
-for id,value in TRANS_AH_ITEMTRANS.iteritems():
+for id,value in TRANS_AH_ITEMTRANS.items():
     acursor.execute("UPDATE ItemTransactionDB set item_proto_id = %d WHERE id = %d;"%(value,id[0]))
     
-for id,value in TRANS_MAIL_STORE.iteritems():
+for id,value in TRANS_MAIL_STORE.items():
     mailcursor.execute("UPDATE mailStore set item_proto = %d WHERE id = %d;"%(value,id[0]))
     
 acursor.execute("END TRANSACTION;")
@@ -162,5 +162,5 @@ BASECONN.close()
 AHCONN.close()
 MAILCONN.close()
 
-print "Auction and Mail Store has been updated with the latest changes!"
+print("Auction and Mail Store has been updated with the latest changes!")
 sys.exit(0)  

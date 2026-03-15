@@ -26,15 +26,15 @@ def install():
     if not os.path.exists("%s/mud_ext" % os.getcwd()):
         raise Exception("Should run this from server directory")
 
-    print "Copying directories..."
+    print("Copying directories...")
     copytree(os.path.join(MOM_INSTALL_DIR, 'common'), './common')
     copytree(os.path.join(MOM_INSTALL_DIR, GAMEROOT), GAMEROOT)
     copyfile(os.path.join(MOM_INSTALL_DIR, 'main.cs.dso'), './main.cs.dso')
 
-    print "Creating Master Database..."
+    print("Creating Master Database...")
     CreateMasterDB()
 
-    print "Creating Character Database..."
+    print("Creating Character Database...")
     ConvertWorldDBToCharacterDB()
 
 

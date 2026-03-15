@@ -56,7 +56,7 @@ cur = con.cursor()
 cur.execute('select genesis_time from World where name="TheWorld"')
 dt = cur.fetchone()[0]
 
-f = file("./mud/world/genesistime.py","w")
+f = open("./mud/world/genesistime.py","w")
 f.write("""
 #AUTOMATICALLY GENERATED FILE DO NOT EDIT!
 
@@ -65,7 +65,7 @@ GENESISTIME = "%s"
 
 f.close()
 
-f = file("./mud/binarygameconfig.py","w")
+f = open("./mud/binarygameconfig.py","w")
 f.write("""
 #AUTOMATICALLY GENERATED FILE DO NOT EDIT!
 

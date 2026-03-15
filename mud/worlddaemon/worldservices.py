@@ -66,7 +66,7 @@ class ZoneClusterAvatar(pb.Avatar):
     
     
     def spawnRemoteWorldProcess(self,imp,spawnedCallback):
-        print "spawning remote world process on imp %i"%imp.id
+        print("spawning remote world process on imp %i"%imp.id)
 
         znames="-zones=%s"%'!'.join(self.zoneNames)
         args= r' -cluster=%i -worldname=%s -publicname=%s -password=%s %s'%(self.clusterNum,self.worldName,self.publicName,self.password,znames)
@@ -79,7 +79,7 @@ class ZoneClusterAvatar(pb.Avatar):
         
         
     def spawnWorldProcess(self,spawnedCallback):
-        print "spawning world process"
+        print("spawning world process")
         
         frozen = main_is_frozen()
         
@@ -113,13 +113,13 @@ class ZoneClusterAvatar(pb.Avatar):
             args.insert(0,cmd)
             
             s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print s
+            print(s)
             os.system(s)
     
 #remote
     
     def sendCharacterInfos(self):        
-        for z in ZoneClusterAvatar.avatars.itervalues():
+        for z in ZoneClusterAvatar.avatars.values():
             try:
                 z.mind.callRemote("setCharacterInfos", ZoneClusterAvatar.characterInfos)
             except:
@@ -127,12 +127,12 @@ class ZoneClusterAvatar(pb.Avatar):
 
 
     def perspective_setCharacterInfo(self,publicName,cinfo):
-        if not ZoneClusterAvatar.characterInfos.has_key(publicName) or ZoneClusterAvatar.characterInfos[publicName]!=cinfo:
+        if publicName not in ZoneClusterAvatar.characterInfos or ZoneClusterAvatar.characterInfos[publicName]!=cinfo:
             ZoneClusterAvatar.characterInfos[publicName]=cinfo
             self.sendCharacterInfos()
             
     def clearCharacterInfo(self,publicName):
-        if not ZoneClusterAvatar.characterInfos.has_key(publicName):
+        if publicName not in ZoneClusterAvatar.characterInfos:
             return
         
         del ZoneClusterAvatar.characterInfos[publicName]
@@ -140,7 +140,7 @@ class ZoneClusterAvatar(pb.Avatar):
     
     
     def perspective_resurrectionRequest(self,publicName,xpRecover,healthRecover,manaRecover,staminaRecover,tm,cname):
-        for z in ZoneClusterAvatar.avatars.itervalues():
+        for z in ZoneClusterAvatar.avatars.values():
             try:
                 z.mind.callRemote("resurrectionRequest",publicName,xpRecover,healthRecover,manaRecover,staminaRecover,tm,cname)
             except:
@@ -148,7 +148,7 @@ class ZoneClusterAvatar(pb.Avatar):
     
     
     def sendDeathMarkerInfo(self):        
-        for z in ZoneClusterAvatar.avatars.itervalues():
+        for z in ZoneClusterAvatar.avatars.values():
             try:
                 z.mind.callRemote("setDeathMarkerInfo", ZoneClusterAvatar.deathMarkerInfo)
             except:
@@ -159,13 +159,13 @@ class ZoneClusterAvatar(pb.Avatar):
         self.sendDeathMarkerInfo()
         
     def perspective_clearDeathMarker(self,publicName):
-        if not ZoneClusterAvatar.deathMarkerInfo.has_key(publicName):
+        if publicName not in ZoneClusterAvatar.deathMarkerInfo:
             return
         del ZoneClusterAvatar.deathMarkerInfo[publicName]
         self.sendDeathMarkerInfo()
 
     def sendAllianceInfo(self):        
-        for z in ZoneClusterAvatar.avatars.itervalues():
+        for z in ZoneClusterAvatar.avatars.values():
             try:
                 z.mind.callRemote("setMasterAllianceInfo", ZoneClusterAvatar.masterAllianceInfo)
             except:
@@ -176,14 +176,14 @@ class ZoneClusterAvatar(pb.Avatar):
     def clearAllianceInfo(self,publicName):
         changed = False
         remove = []
-        for leader,a in ZoneClusterAvatar.masterAllianceInfo.iteritems():
+        for leader,a in ZoneClusterAvatar.masterAllianceInfo.items():
             for pname,cname in a:
                 if pname == publicName:
                     changed = True
                     a.remove((pname,cname))
                     break
                 
-        if ZoneClusterAvatar.masterAllianceInfo.has_key(publicName):
+        if publicName in ZoneClusterAvatar.masterAllianceInfo:
             changed = True
             del ZoneClusterAvatar.masterAllianceInfo[publicName]
                 
@@ -200,7 +200,7 @@ class ZoneClusterAvatar(pb.Avatar):
             members.append(pname)
         
         remove = []
-        for leader,a in ZoneClusterAvatar.masterAllianceInfo.iteritems():
+        for leader,a in ZoneClusterAvatar.masterAllianceInfo.items():
             for pname,cname in a[:]:
                 if pname in members:
                     a.remove((pname,cname))
@@ -215,13 +215,13 @@ class ZoneClusterAvatar(pb.Avatar):
         self.sendAllianceInfo()
     
     def perspective_joinAlliance(self,leaderName,publicName,characterName):
-        if ZoneClusterAvatar.masterAllianceInfo.has_key(publicName):
+        if publicName in ZoneClusterAvatar.masterAllianceInfo:
             del ZoneClusterAvatar.masterAllianceInfo[publicName]
             
         a = ZoneClusterAvatar.masterAllianceInfo[leaderName]
         for pname,cname in a:
             if pname == publicName:
-                print "Warning: %s already in %s's alliance"%(publicName,leaderName)
+                print("Warning: %s already in %s's alliance"%(publicName,leaderName))
                 return
         a.append((publicName,characterName))
         self.sendAllianceInfo()
@@ -233,7 +233,7 @@ class ZoneClusterAvatar(pb.Avatar):
         if CServerAvatar.genesisTime:
             if CServerAvatar.genesisTime != genesisTime:
                 traceback.print_stack()
-                print "AssertionError: CServerAvatar.genesisTime != genesisTime!"
+                print("AssertionError: CServerAvatar.genesisTime != genesisTime!")
                 return
         else:
             CServerAvatar.genesisTime = genesisTime
@@ -255,7 +255,7 @@ class ZoneClusterAvatar(pb.Avatar):
         
         
         if not self.live:
-            print "Zone Cluster %i is live"%self.clusterNum
+            print("Zone Cluster %i is live"%self.clusterNum)
             self.live = True
             ZoneClusterAvatar.clusterCount-=1
             self.spawnedCallback(self)
@@ -280,7 +280,7 @@ class ZoneClusterAvatar(pb.Avatar):
     
     
     def perspective_printException(self, exp):
-        print exp
+        print(exp)
     
     
     def killWorld(self):
@@ -294,13 +294,13 @@ class ZoneClusterAvatar(pb.Avatar):
             self.killWorldNow(True)
         
     def perspective_playersExported(self):
-        print "Players Exported"
+        print("Players Exported")
         self.killWorldNow(True)
         
     def killProcess(self,pid):
         if self.imp:
             return
-        print "Killing Process",pid
+        print("Killing Process",pid)
         try:
             if win32api:
                 handle = win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_TERMINATE, 0, pid)
@@ -323,7 +323,7 @@ class ZoneClusterAvatar(pb.Avatar):
             self.imp.mind.callRemote("killWorldNow",self.worldPID,self.zonePID)
             
         else:
-            print "Killing World"
+            print("Killing World")
             for p in self.zonePID:
                 self.killProcess(p)
             self.killProcess(self.worldPID)
@@ -351,7 +351,7 @@ class ZoneClusterAvatar(pb.Avatar):
             traceback.print_exc()
         
         # Call the desired command on all zone clusters.
-        for avatar in ZoneClusterAvatar.avatars.itervalues():
+        for avatar in ZoneClusterAvatar.avatars.values():
             # Skip ourselves.
             if avatar == self:
                 continue
@@ -374,7 +374,7 @@ class SimpleRealm:
 
         ip = mind.broker.transport.getPeer()
         
-        print ip,avatarId,mind
+        print(ip,avatarId,mind)
         
         #if ip.host != '127.0.0.1':
         #    raise BadConnectionError("bad ip")
@@ -390,7 +390,7 @@ def StartServices():
     #fire up the World Stuff
     portal = Portal(SimpleRealm())
     checker = InMemoryUsernamePasswordDatabaseDontUse()
-    from md5 import md5
+    from hashlib import md5
     password = md5("daemon").digest()
     for x in range(0,100):
         checker.addUser(str(x), password)

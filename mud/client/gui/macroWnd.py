@@ -36,25 +36,25 @@ class MacroWnd(object):
     def initTGEObjects(self):
         self.window = TGEObject("MacroWnd_Window")
         
-        for x in xrange(0,6):
+        for x in range(0,6):
             self.charButtons[x]  = TGEObject("MACROWND_CHAR%i"%x)
             self.healthBars[x]   = TGEObject("MACROWND_CHAR%i_HEALTHBAR"%x)
             self.manaBars[x]     = TGEObject("MACROWND_CHAR%i_MANABAR"%x)
             self.staminaBars[x]  = TGEObject("MACROWND_CHAR%i_STAMINABAR"%x)
             self.targetBars[x]   = TGEObject("MACROWND_CHAR%i_TARGETBAR"%x)
-            self.macroButtons[x] = dict((y,TGEObject("MACROWND_MACRO%i_%i"%(x,y))) for y in xrange(0,10))
+            self.macroButtons[x] = dict((y,TGEObject("MACROWND_MACRO%i_%i"%(x,y))) for y in range(0,10))
         
         self.updateActivePage(0)
     
     
     def disableButtons(self, index):
-        for butt in self.macroButtons[index].itervalues():
+        for butt in self.macroButtons[index].values():
             butt.setValue(1)
             butt.toggleLocked = True
     
     
     def enableButtons(self, index):
-        for butt in self.macroButtons[index].itervalues():
+        for butt in self.macroButtons[index].values():
             butt.setValue(0)
             butt.toggleLocked = False
     
@@ -69,20 +69,20 @@ class MacroWnd(object):
         numc = len(cinfos)
         self.window.extent = '418 %i'%(34 + 34 * numc)
         
-        for x in xrange(0,6):
+        for x in range(0,6):
             self.charButtons[x].visible = False
             self.healthBars[x].visible = False
             self.manaBars[x].visible = False
             self.staminaBars[x].visible = False
             self.targetBars[x].visible = False
         
-        for y in xrange(0,10):
-            for x in xrange(numc,6):
+        for y in range(0,10):
+            for x in range(numc,6):
                 self.macroButtons[x][y].visible = False
-            for x in xrange(0,numc):
+            for x in range(0,numc):
                 self.macroButtons[x][y].visible = True
         
-        for cindex,cinfo in cinfos.iteritems():
+        for cindex,cinfo in cinfos.items():
             picCtrl = self.charButtons[cindex]
             hbar    = self.healthBars[cindex]
             mbar    = self.manaBars[cindex]

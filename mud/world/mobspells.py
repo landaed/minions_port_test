@@ -73,16 +73,16 @@ class MobSpells:
         #grab spells from all classes
         
         for klass,level in zip((self.spawn.pclassInternal,self.spawn.sclassInternal,self.spawn.tclassInternal),(self.spawn.plevel,self.spawn.slevel,self.spawn.tlevel)):
-            if MOB_SPELLS.has_key(klass):
+            if klass in MOB_SPELLS:
                 classSpells = MOB_SPELLS[klass]
-                for x in xrange(level-20,level+1):
+                for x in range(level-20,level+1):
                     if x < 1:
                         continue
                     levelSpells = classSpells.get(x,None)
                     if not levelSpells:
                         continue
                     
-                    for t,spells in levelSpells.iteritems():
+                    for t,spells in levelSpells.items():
                         if not len(spells):
                             continue
                         

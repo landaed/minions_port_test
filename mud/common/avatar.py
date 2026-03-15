@@ -99,14 +99,14 @@ class DatabaseAvatar(Avatar):
         persist = tableClass.get(id)
        
         update = False
-        for k,v in data.iteritems():
+        for k,v in data.items():
             attr = getattr(persist,k)
             if isinstance(attr,datetime):
                 continue
             if v != attr:
                 
                 if type(v) != type(attr):
-                    print "Warning: attempting to typecast",k
+                    print("Warning: attempting to typecast",k)
                     v = type(attr)(v)
                 changed[k]=v
                 update=True

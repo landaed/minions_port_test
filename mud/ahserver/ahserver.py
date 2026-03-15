@@ -6,9 +6,8 @@ sys.path.append(os.getcwd())
 
 if sys.platform == "win32":
     from twisted.internet.iocpreactor import install
-else:
-    from twisted.internet.threadedselectreactor import install
-install()
+    install()
+# else: use default reactor on Linux
 
 from twisted.internet import reactor
 from mud.server.app import Server
@@ -27,7 +26,7 @@ import shutil
 from twisted.spread import pb
 from twisted.cred.credentials import UsernamePassword
 
-from md5 import md5
+from hashlib import md5
 from time import strftime,time
 
 from sqlite3 import dbapi2 as sqlite
@@ -38,8 +37,8 @@ import traceback
 
 AHSERVER_AVATAR_GLOBAL = None
 
-print "\nAuction House Server"
-print "->Initializing"
+print("\nAuction House Server")
+print("->Initializing")
 
 """
 DB Use Information
@@ -76,7 +75,7 @@ def clean_player_IDs():
             #Decompress it using zlib
             dbuffer = zlib.decompress(buffer)
             #Write to a file so we can open it up as a DB
-            f = file("./data/tmp/abuffer","wb")
+            f = open("./data/tmp/abuffer","wb")
             f.write(dbuffer)
             f.close()
             
@@ -90,7 +89,7 @@ def clean_player_IDs():
             bconn.close()
             
             #Going to open the file again this time to dump it into a buffer
-            f = file("./data/tmp/abuffer","rb")
+            f = open("./data/tmp/abuffer","rb")
             dbuffer = f.read()
             f.close()
             
@@ -104,13 +103,13 @@ def clean_player_IDs():
             count += 1
         except:
             traceback.print_stack()
-            print "AhServer: %s did not get an update to his/her character buffer"%name
+            print("AhServer: %s did not get an update to his/her character buffer"%name)
             continue         
             
     dcursor.execute("END TRANSACTION;")
     dcursor.close()
     dbconn.close()
-    print "Character IDs Cleaned: %d"%count
+    print("Character IDs Cleaned: %d"%count)
     
 #FLUSH the DB, only do this if you want to delete everything!
 if "dbreset" in sys.argv:
@@ -162,7 +161,7 @@ if "dbreset" in sys.argv:
     dcursor.close()
     dbconn.close()
     clean_player_IDs()
-    print "***Database is reset and cleaned***\n***Make sure to run upgrade.bat before launching the server***"
+    print("***Database is reset and cleaned***\n***Make sure to run upgrade.bat before launching the server***")
     sys.exit(0)
                   
 #Auction House Master.  This is connected to via the proxies from the World Daemon.  We can only have 1 connection to the DB so this is needed -- X
@@ -388,7 +387,7 @@ class AhMaster():
     #Called from the client to grab a DB.  The client DB is part of the main db that is client and realm information only. 
     def perspective_refreshAuctionList(self,realm):
         #Open the buffer to read the DB.  Keep in mind the DB was compressed earlier
-        f = file("./data/ahserver/%s"%RPG_AUCTION_DBNAME[realm],"rb")
+        f = open("./data/ahserver/%s"%RPG_AUCTION_DBNAME[realm],"rb")
         cbuffer = f.read()
         f.close()
         return cbuffer
@@ -478,16 +477,16 @@ class AhMaster():
             dbconn.close()        
         
             #Compress the client DB.  Better to do this once every 10 seconds than a bunch of times under heavy load of client requests
-            f = file("./data/ahserver/%s"%realmDB,"rb")
+            f = open("./data/ahserver/%s"%realmDB,"rb")
             cbuffer = f.read()
             cbuffer = pylzma.compress(cbuffer,algorithm=0)      
             cbuffer = sqlite.Binary(cbuffer)
             f.close()
-            f = file("./data/ahserver/%s"%realmDB,"wb")
+            f = open("./data/ahserver/%s"%realmDB,"wb")
             f.write(cbuffer)
             f.close()     
         except:
-            print "Failed to write %s to disk"%realmDB                           
+            print("Failed to write %s to disk"%realmDB)                           
         
     #Updates the DB with all changes by committing the transactions.  It also creates the client databases to be sent to the clients during this time
     def clientDBUpdate(self):
@@ -495,17 +494,17 @@ class AhMaster():
             #Ends the transaction and forces the changes to the master database
             self.conn.execute("END TRANSACTION;")
         except:
-            print "Error: Failed to Commit Transaction.  Make sure you don't have the DB open and locked"
+            print("Error: Failed to Commit Transaction.  Make sure you don't have the DB open and locked")
             
         #Generate client DBs per realm.  Realm can be anything, just don't go nuts.
-        for realm,realmDB in RPG_AUCTION_DBNAME.iteritems():
+        for realm,realmDB in RPG_AUCTION_DBNAME.items():
             self.generateClientDB(realm,realmDB)            
             
         try:
             #Start the transaction process back up
             self.conn.execute("BEGIN TRANSACTION;")
         except:
-            print "Error: Failed to Begin Transaction.  Make sure you don't have the DB open and locked"
+            print("Error: Failed to Begin Transaction.  Make sure you don't have the DB open and locked")
 
         #Calls itself again in 10 seconds.  Change accordingly if needed.
         self.tickSync = reactor.callLater(10,self.clientDBUpdate)  
@@ -515,10 +514,10 @@ class AhMaster():
         self.MailServerPerspective = perspective
         
     def MSFailure(self, error):
-        print "Mail Server Connection Error",error
+        print("Mail Server Connection Error",error)
         
     def ConnectToMailServer(self):
-        print "Connecting to Mail Server Proxy at: %s"%MAILSERVER_IP
+        print("Connecting to Mail Server Proxy at: %s"%MAILSERVER_IP)
         factory = pb.PBClientFactory()
         reactor.connectTCP(MAILSERVER_IP,MAILSERVER_PORT,factory)
         password = md5("MSP").digest()
@@ -544,7 +543,7 @@ class AhMaster():
                 pass
             self.timeStampSync = None
             
-        print "Logout from the Auction Server is Complete"
+        print("Logout from the Auction Server is Complete")
 
 #Auction House Class.  This is a proxy to push commands back up to the master so we can have multiple connections from World Clusters
 class AHAvatar(Avatar):
@@ -565,7 +564,7 @@ class AHAvatar(Avatar):
         global AHSERVER_AVATAR_GLOBAL
         if not self.masterConn:
             if not AHSERVER_AVATAR_GLOBAL:
-                print "FATAL ERROR CONNECTING WORLD PROXY TO AUCTION SERVER!!!"
+                print("FATAL ERROR CONNECTING WORLD PROXY TO AUCTION SERVER!!!")
                 return False
             else:
                 self.masterConn = AHSERVER_AVATAR_GLOBAL 
@@ -686,16 +685,16 @@ ConfigureUsers()
 server = Server(AHSERVER_PORT,True)    # True to use md5 hashing for passwords
 server.startServices()
 
-print "->AH Server is up"
+print("->AH Server is up")
 reactor.run()
 
 if AHSERVER_AVATAR_GLOBAL:
-    print "Dumping the Transactions to Database"
+    print("Dumping the Transactions to Database")
     AHSERVER_AVATAR_GLOBAL.conn.execute("END TRANSACTION;")
     AHSERVER_AVATAR_GLOBAL.conn.close()
     AHSERVER_AVATAR_GLOBAL.dbconn.close()
-    print "Cleanly shutdown the Auction Server!"
+    print("Cleanly shutdown the Auction Server!")
     sys.exit()
     
-print "Error, could not find the AHServer Avatar, shutdown was not clean!"
+print("Error, could not find the AHServer Avatar, shutdown was not clean!")
 

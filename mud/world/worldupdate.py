@@ -134,7 +134,7 @@ def CheckWorld(worldPath,baselinePath):
 #  or shouldn't be copied over into the new database.
 def FilterColumns(klass,dbAttr):
     del dbAttr["id"]
-    for col,value in dbAttr.items():
+    for col,value in list(dbAttr.items()):
         found = False
         for ncol in klass.sqlmeta._columns:
             if col == ncol.name:
@@ -240,7 +240,7 @@ class ItemCopier:
         try:
             ip = ItemProto.byName(self.protoName)
         except:
-            print "Item: %s no longer exists"%self.protoName
+            print("Item: %s no longer exists"%self.protoName)
             return None
         
         FilterColumns(Item,self.dbAttr)
@@ -302,7 +302,7 @@ class CharacterFactionCopier:
         try:
             f = Faction.byName(self.factionName)
         except:
-            print "Faction: %s no longer exists"%self.factionName
+            print("Faction: %s no longer exists"%self.factionName)
             return
         FilterColumns(CharacterFaction,self.dbAttr)
         self.dbAttr["characterID"] = char.id
@@ -348,7 +348,7 @@ class CharacterAdvancementCopier:
         try:
             adv = AdvancementProto.byName(self.protoName)
         except:
-            print "Advancement: %s no longer exists"%self.protoName
+            print("Advancement: %s no longer exists"%self.protoName)
             return
         
         FilterColumns(CharacterAdvancement,self.dbAttr)
@@ -438,7 +438,7 @@ class CharacterSpellCopier:
         try:
             sp = SpellProto.byName(self.protoName)
         except:
-            print "Spell: %s no longer exists"%self.protoName
+            print("Spell: %s no longer exists"%self.protoName)
             return
         
         FilterColumns(CharacterSpell,self.dbAttr)
@@ -467,7 +467,7 @@ class SpellStoreCopier:
         try:
             sp = SpellProto.byName(self.protoName)
         except:
-            print "Spell: %s no longer exists"%self.protoName
+            print("Spell: %s no longer exists"%self.protoName)
             return
         
         FilterColumns(SpellStore,self.dbAttr)
@@ -531,12 +531,12 @@ class SpawnCopier:
         try:
             s = Spawn(**self.dbAttr)
         except:
-            print "Problem installing %s trying with an appended X to name"%(self.dbAttr["name"])
+            print("Problem installing %s trying with an appended X to name"%(self.dbAttr["name"]))
             self.dbAttr["name"] = self.dbAttr["name"]+"X"
             try:
                 s = Spawn(**self.dbAttr)
             except:
-                raise "Error"
+                raise Exception("Error")
         return s
 
 
@@ -789,7 +789,7 @@ class PlayerCopier:
     # Restore data on this player.
     def install(self):
         if not FROMGAME:
-            print "Installing Player: %s"%self.dbAttr["publicName"]
+            print("Installing Player: %s"%self.dbAttr["publicName"])
         
         # Restore log and bind zone data for the three realms.
         try:
@@ -873,7 +873,7 @@ class UserCopier:
             try:
                 role = Role.byName(r)
             except:
-                print "Role: %s no longer exists!"%r
+                print("Role: %s no longer exists!"%r)
                 continue
             
             user.addRole(role)

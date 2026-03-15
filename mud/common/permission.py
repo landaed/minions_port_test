@@ -72,7 +72,7 @@ class TablePermission(Persistent):
                     
         if not t:
             traceback.print_stack()
-            print "AssertionError: type is still None!"
+            print("AssertionError: type is still None!")
             return None
         
         return ColumnPermission(name=columnName,read=read,write=write,alternateID=alternateID,type=t,table_permission=self)
@@ -122,7 +122,7 @@ class UserSchema(pb.Copyable,pb.RemoteCopy):
             self.tablePermissions = {}
             for role in user.roles:
                 for tp in role.tablePermissions:
-                    if not self.tablePermissions.has_key(tp.name):
+                    if tp.name not in self.tablePermissions:
                         self.tablePermissions[tp.name]=UserTablePermissions(tp)
                     else:
                         utp = self.tablePermissions[tp.name]
@@ -182,8 +182,8 @@ class Role(Persistent):
         
 from random import choice
 import string
-def GenPasswd(length=32, chars=string.letters + string.digits):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=32, chars=string.ascii_letters + string.digits):
+    return ''.join([choice(chars) for i in range(length)])
     
 class RoleGhost(PersistentGhost):
     def __init__(self):

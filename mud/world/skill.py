@@ -107,7 +107,7 @@ class ClassSkill(Persistent):
 def DoAssess(mob):
     # Assess does no good for mobs, so they shouldn't use it.
     if not mob.player:
-        print "WARNING: Non-player mob attempting to assess."
+        print("WARNING: Non-player mob attempting to assess.")
         return (False,False)
     
     # Get handles to the player using the skill and the target.
@@ -144,10 +144,10 @@ def DoAssess(mob):
         # If the target is stunned, take the complete list.
         if tgt.stun > 0:
             assessDict = dict((x,item.itemInfo) \
-                              for x,item in enumerate(tgt.worn.itervalues()))
+                              for x,item in enumerate(tgt.worn.values()))
         else:
             x = 0
-            for item in tgt.worn.itervalues():
+            for item in tgt.worn.values():
                 # Small jewelry is the hardest to detect of the worn items.
                 if item.slot in (RPG_SLOT_LEAR,RPG_SLOT_REAR,RPG_SLOT_NECK, \
                                  RPG_SLOT_LFINGER,RPG_SLOT_RFINGER):
@@ -248,7 +248,7 @@ def DoAssess(mob):
 def DoDisarm(mob):
     # Mobs can't disarm for now. If disarm gets added for PvP, mobs may learn how to do it.
     if not mob.player:
-        print "WARNING: Non-player mob attempting to disarm."
+        print("WARNING: Non-player mob attempting to disarm.")
         return (False,False)
     
     tgt = mob.target
@@ -340,7 +340,7 @@ def DoPickPocket(mob):
     # Mobs shouldn't pick pocket at all. Could be fun in some
     #  instances, but needs a special implementation.
     if not mob.player:
-        print "WARNING: Non-player mob attempting to pick pocket"
+        print("WARNING: Non-player mob attempting to pick pocket")
         return (False,False)
     
     # Check if there is a target to pick pocket.
@@ -395,7 +395,7 @@ def DoPickPocket(mob):
     pickPocketNormal = []  # Normal pick pocket list.
     pickPocketSpecial = []  # Items specially flagged for thieves.
     for item in loot.items:
-        if loot.lootProto.itemDetails.has_key(item.itemProto.name):
+        if item.itemProto.name in loot.lootProto.itemDetails:
             if loot.lootProto.itemDetails[item.itemProto.name] & RPG_LOOT_PICKPOCKET:
                 pickPocketSpecial.append(item)
             # If the item is in the standard loot table but is equipped allow it
@@ -613,7 +613,7 @@ def DoPickPocket(mob):
 
 def DoBackstab(mob):
     if not mob.player:
-        print "WARNING: Non-player mob attempting to backstab"
+        print("WARNING: Non-player mob attempting to backstab")
         return (False,False)
     
     tgt = mob.target
@@ -677,7 +677,7 @@ def DoBackstab(mob):
 
 def DoRescue(mob):
     if not mob.player:
-        print "WARNING: Non-player mob attempting to rescue"
+        print("WARNING: Non-player mob attempting to rescue")
         return (False,False)
     
     # Get all alliance members.
@@ -701,7 +701,7 @@ def DoRescue(mob):
     for m in mob.zone.activeMobs:
         if m.player:
             continue
-        for amob,amt in m.aggro.iteritems():
+        for amob,amt in m.aggro.items():
             if amob in allianceMembers:
                 if amt > aggro.get(m,0):
                     aggro[m] = amt
@@ -714,7 +714,7 @@ def DoRescue(mob):
     
     # Increase aggro on rescuer for all mobs that have aggro
     #  on any alliance member above previous max aggro.
-    for m,amt in aggro.iteritems():
+    for m,amt in aggro.items():
         m.aggro[mob] = amt * 1.25
     
     # Give possible skill raise and feedback.
@@ -727,7 +727,7 @@ def DoRescue(mob):
 # Okay, Evade... here goes!
 def DoEvade(mob):
     if not mob.player:
-        print "WARNING: Non-player mob attempting to evade"
+        print("WARNING: Non-player mob attempting to evade")
         return (False,False)
     
     # Get all alliance members.
@@ -751,7 +751,7 @@ def DoEvade(mob):
     for m in mob.zone.activeMobs:
         if m.player:
             continue
-        for amob,amt in m.aggro.iteritems():
+        for amob,amt in m.aggro.items():
             if amob == mob:
                 if amt > mobAggro.get(m,0):
                     mobAggro[m] = amt
@@ -771,7 +771,7 @@ def DoEvade(mob):
     # Evade all mobs that have aggro on the user and are
     #  already hostile towards another alliance member.
     # Don't create new aggro.
-    for m,amt in mobAggro.iteritems():
+    for m,amt in mobAggro.items():
         try:
             memberAmt = memberAggro[m]
         except:
@@ -971,7 +971,7 @@ def UseSkill(mob,tgt,skillname):
     if not mobSkill.reuseTime:
         return
     # Can't use that skill yet.
-    if mob.skillReuse.has_key(classSkill.skillname):
+    if classSkill.skillname in mob.skillReuse:
         return
     
     # If there is one, process the non-spell part
@@ -980,7 +980,7 @@ def UseSkill(mob,tgt,skillname):
     if skillname in SKILLS:
         if skillname not in mob.skillLevels:
             traceback.print_stack()
-            print "AssertionError: mob %s doesn't know the skill %s!"%(mob.name,skillname)
+            print("AssertionError: mob %s doesn't know the skill %s!"%(mob.name,skillname))
             return
         success,used = SKILLS[skillname](mob)
     else:

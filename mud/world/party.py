@@ -115,7 +115,7 @@ class Party:
             char.charInfo = CharacterInfo(char)
             if char.player != player: #cheater!!!
                 traceback.print_stack()
-                print "AssertionError: %s plays a non-owned character!"%player.name
+                print("AssertionError: %s plays a non-owned character!"%player.name)
                 return
             
             #create the mob

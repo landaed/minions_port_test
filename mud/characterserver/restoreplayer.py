@@ -17,7 +17,7 @@ remove = []
 good = 0
 bad = 0
 for id,buffer in cursor.fetchall():
-    print id
+    print(id)
     try:
         zlib.decompress(buffer)
         keep.append(id)
@@ -28,10 +28,10 @@ for id,buffer in cursor.fetchall():
         traceback.print_exc()
         
 if not good:
-    raise "NO GOOD BUFFERS!"
+    raise Exception("NO GOOD BUFFERS!")
 
-print "Good Buffer IDs",keep
-print "Removing Bad Buffer IDs",remove
+print("Good Buffer IDs",keep)
+print("Removing Bad Buffer IDs",remove)
 
 for b in remove:
     cursor.execute("DELETE from player_buffer WHERE id = '%i';"%b)

@@ -166,7 +166,7 @@ class AdvancePane:
             
             ai = 0
             offset = 0
-            for i in xrange(len(self.availableChoices)):
+            for i in range(len(self.availableChoices)):
                 choice = self.availableChoices[i - offset]
                 name = choice[0]
                 if name in currentExclusions:

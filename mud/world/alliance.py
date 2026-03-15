@@ -52,7 +52,7 @@ class Alliance:
     
     def giveMoney(self,source,worth):
         if not len(self.members):
-            print "WARNING: Alliance with no members in giveMoney"
+            print("WARNING: Alliance with no members in giveMoney")
             return
 
         rewards = []
@@ -91,7 +91,7 @@ class Alliance:
         count = 0
         
         if not len(self.members):
-            print "WARNING: Alliance with no members in rewardXP"
+            print("WARNING: Alliance with no members in rewardXP")
             return
         
         rewards = []
@@ -125,7 +125,7 @@ class Alliance:
         count = 0
         
         if not len(self.members):
-            print "WARNING: Alliance with no members in rewardFaction"
+            print("WARNING: Alliance with no members in rewardFaction")
             return
 
         rewards = []
@@ -157,7 +157,7 @@ class Alliance:
             return
         
         if not len(self.members):
-            print "WARNING: Alliance with no members in rewardKillFaction"
+            print("WARNING: Alliance with no members in rewardKillFaction")
             return
 
         totalFaction = float(mob.plevel*3)
@@ -188,7 +188,7 @@ class Alliance:
     #  too low relative level.
     def killPenalty(self,killer,mob):
         if not len(self.members):
-            print "WARNING: Alliance with no members in killPenalty"
+            print("WARNING: Alliance with no members in killPenalty")
             return
         
         # Set up kill penalty message according to realm.
@@ -223,7 +223,7 @@ class Alliance:
         #todo alliances
         
         if not len(self.members):
-            print "WARNING: Alliance with no members in rewardKillXp"
+            print("WARNING: Alliance with no members in rewardKillXp")
             return
         
         best = 1
@@ -236,7 +236,7 @@ class Alliance:
                         best = char.mob.plevel
         except:
             traceback.print_exc()
-            print "Warning: Exception in getting best alliance member for rewardKillXP"
+            print("Warning: Exception in getting best alliance member for rewardKillXP")
             best = mob.plevel
         
         if mob.player:
@@ -368,7 +368,7 @@ class Alliance:
     
     def disband(self):
         if not self.leader:
-            print "WARNING: Alliance disbanded with no leader!"
+            print("WARNING: Alliance disbanded with no leader!")
             return
         output = self.leader.publicName == self.remoteLeaderName
         self.cancelInvites()
@@ -469,7 +469,7 @@ class Alliance:
             return
         
         if not len(self.members):
-            print "WARNING: 0 member alliance"
+            print("WARNING: 0 member alliance")
             return
         
         if self.world.daemonPerspective:

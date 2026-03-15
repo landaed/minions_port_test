@@ -19,7 +19,7 @@ import mud.world.statsavatar
 
 from base64 import encodestring
 from copy import copy
-from cPickle import dumps
+from pickle import dumps
 from datetime import datetime
 import os
 from shutil import copyfile
@@ -282,7 +282,7 @@ class World(Persistent):
     
     
     def transactionTick(self, commitOnly=False):
-        print "... Commit World Database ..."
+        print("... Commit World Database ...")
         
         conn = Persistent._connection.getConnection()
         cursor = conn.cursor()
@@ -293,7 +293,7 @@ class World(Persistent):
         if self.dbFile and not commitOnly:
             self.backupTick -= 1
             if not self.backupTick:
-                print "Backing up world database"
+                print("Backing up world database")
                 self.backupTick = 30 #once every 30 minutes
                 try:
                     BackupWorld(self.dbFile)
@@ -349,7 +349,7 @@ class World(Persistent):
     def playerJoinWorld(self,player):
         if player in self.activePlayers:
             traceback.print_stack()
-            print "AssertionError: player already in active players!"
+            print("AssertionError: player already in active players!")
             return
         player.world = self
         self.activePlayers.append(player)
@@ -470,7 +470,7 @@ class World(Persistent):
                 if player.alliance:
                     aname = player.alliance.remoteLeaderName
                 else:
-                    print "Warning: Player %s has no alliance on zone trigger, could mess up alliances!!!!!"%player.publicName
+                    print("Warning: Player %s has no alliance on zone trigger, could mess up alliances!!!!!"%player.publicName)
                 
                 from mud.world.cserveravatar import AVATAR
                 
@@ -552,7 +552,7 @@ class World(Persistent):
         
         #zone isn't up
         if CoreSettings.PGSERVER:
-            raise AssertionError,"Error, Zone %s isn't up!"%logZone.name
+            raise AssertionError("Error, Zone %s isn't up!"%logZone.name)
         
         if self.singlePlayer:
             ip = '127.0.0.1'
@@ -617,7 +617,7 @@ class World(Persistent):
         
         if not zinst: #could happen on waiting timeout
             traceback.print_stack()
-            print "AssertionError: zinst is empty!"
+            print("AssertionError: zinst is empty!")
             return
         
         zinst.pid = pid
@@ -639,7 +639,7 @@ class World(Persistent):
                     if zname == z.zone.name:
                         if z.pid == None:
                             traceback.print_stack()
-                            print "AssertionError: z.pid is empty!"
+                            print("AssertionError: z.pid is empty!")
                             return
                         zpid.append(z.pid)
                         zpassword.append(z.password)
@@ -667,7 +667,7 @@ class World(Persistent):
                     
             if not len(znames):
                 #all zones served
-                raise "all zones server, this isn't actually an error... eventually we serve another zone instance, based on waiting etc"
+                raise Exception("all zones server, this isn't actually an error... eventually we serve another zone instance, based on waiting etc")
                 
             zoneName = znames[0]
         else:
@@ -679,7 +679,7 @@ class World(Persistent):
         #this is a dedicated server that has been launched remotely, 
         #shouldn't happen for right now... so we'll assert
         traceback.print_stack()
-        print "AssertionError: dedicated server launched remotely, shouldn't happen for now!"
+        print("AssertionError: dedicated server launched remotely, shouldn't happen for now!")
         return
         
         zone = Zone.byName(zoneName)
@@ -693,7 +693,7 @@ class World(Persistent):
             
     def startZoneProcess(self,zoneName,dynamic=True):
         port = None
-        for x in xrange(self.zoneStartPort,self.zoneStartPort+100):
+        for x in range(self.zoneStartPort,self.zoneStartPort+100):
             if x in self.usedZonePorts:
                 continue
             port = x
@@ -702,7 +702,7 @@ class World(Persistent):
             
         if port == None:
             traceback.print_stack()
-            print "AssertionError: no port assigned!"
+            print("AssertionError: no port assigned!")
             return
         
         zone = Zone.byName(zoneName)
@@ -739,7 +739,7 @@ class World(Persistent):
             args += r' -cluster=%i'%self.clusterNum
             s = 'start "%s" %s %s'%(os.getcwd(),cmd,args)
             s = os.path.normpath(s)
-            print s
+            print(s)
             os.system(s)
         
         else:
@@ -750,7 +750,7 @@ class World(Persistent):
             args = args.split(" ")
             args.insert(0,cmd)
             s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print s
+            print(s)
             os.system(s)
         
         return z
@@ -778,7 +778,7 @@ class World(Persistent):
         
     
     def reallyClearDeathMarker(self,publicName):
-        if not self.deathMarkers.has_key(publicName):
+        if publicName not in self.deathMarkers:
             return
         
         #charName,realm,zoneName,pos,rot = self.deathMarkers[publicName]
@@ -790,12 +790,12 @@ class World(Persistent):
         
     def setDeathMarkerInfo(self,info):
         #get rid of the ones that are just gone
-        for p in self.deathMarkers.keys():
+        for p in list(self.deathMarkers.keys()):
             if p not in info:
                 self.reallyClearDeathMarker(p)
         
         #remaining
-        for pname,dm in info.items():
+        for pname,dm in list(info.items()):
             charName,realm,zoneName,pos,rot = dm
             if pname in self.deathMarkers:
                 #we are holding a death marker
@@ -851,9 +851,9 @@ class World(Persistent):
                 s = c.spawn
                 prefix = ""
                 if player.avatar and player.avatar.masterPerspective:
-                    if player.avatar.masterPerspective.avatars.has_key("GuardianAvatar"):
+                    if "GuardianAvatar" in player.avatar.masterPerspective.avatars:
                         prefix = "(Guardian) "
-                    if player.avatar.masterPerspective.avatars.has_key("ImmortalAvatar"):
+                    if "ImmortalAvatar" in player.avatar.masterPerspective.avatars:
                         prefix = "(Immortal) "
     
                 cinfo = (prefix,c.name,s.realm,s.pclassInternal,s.sclassInternal,s.tclassInternal,s.plevel,s.slevel,s.tlevel,player.zone.zone.niceName,player.guildName)
