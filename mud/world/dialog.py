@@ -24,7 +24,7 @@ class DialogTrigger:
         selection = list(Dialog.selectBy(name=tinfo.dialogTrigger))
         if len(selection) != 1:
             traceback.print_stack()
-            print "AssertionError: dialog selection returned multiple items for dialog trigger %s!"%tinfo.dialogTrigger
+            print("AssertionError: dialog selection returned multiple items for dialog trigger %s!"%tinfo.dialogTrigger)
             return
         self.dialog = selection[0]
         self.range = tinfo.dialogRange
@@ -115,7 +115,7 @@ class DialogAction(Persistent):
 
     takeItems = MultipleJoin('DialogTakeItem')
     takeXP = IntCol(default=0)
-    takeTin = IntCol(default=0L)
+    takeTin = IntCol(default=0)
     openMail = BoolCol(default=False) #open the Mailbox
     
     factions = MultipleJoin('DialogFaction')
@@ -164,7 +164,7 @@ class DialogAction(Persistent):
         z = player.zone
         for sp in z.spawnpoints:
             if not sp.spawngroup:
-                print "WARNING: None Spawngroup in Dialog.checkTriggerSpawnGroup"
+                print("WARNING: None Spawngroup in Dialog.checkTriggerSpawnGroup")
                 continue
             if sp.spawngroup.targetName == self.triggerSpawnGroup:
                 if len(sp.activeMobs):
@@ -231,7 +231,7 @@ class DialogAction(Persistent):
     def checkCheckSkills(self, player, silent=False):
         skillLevels = player.curChar.mob.skillLevels
         for checkSkill in self.checkSkills:
-            if not skillLevels.has_key(checkSkill.skillName):
+            if checkSkill.skillName not in skillLevels:
                 if not silent:
                     player.sendGameText(RPG_MSG_GAME_DENIED,"%s doesn't know the %s skill.\\n"%(player.curChar.name,checkSkill.skillName))
                 return False
@@ -286,7 +286,7 @@ class DialogAction(Persistent):
                             continue
                         noClassSkill.discard(ts.skill)
                         if skill.levelGained > spawn.slevel:
-                            if not pneeded.has_key(skill.skillname):
+                            if skill.skillname not in pneeded:
                                 sneeded[skill.skillname] = skill.levelGained
                             break
                         # The character qualifies for this skill.
@@ -303,7 +303,7 @@ class DialogAction(Persistent):
                                     continue
                                 noClassSkill.discard(ts.skill)
                                 if skill.levelGained > spawn.tlevel:
-                                    if not pneeded.has_key(skill.skillname) and not sneeded.has_key(skill.skillname):
+                                    if skill.skillname not in pneeded and skill.skillname not in sneeded:
                                         tneeded[skill.skillname] = skill.levelGained
                                     break
                                 # The character qualifies for this skill.
@@ -329,17 +329,17 @@ class DialogAction(Persistent):
                 stext = []
                 if pneeded:
                     stext.append('%s '%spawn.pclassInternal)
-                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in pneeded.iteritems()))
+                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in pneeded.items()))
                 if sneeded:
                     if len(stext):
                         stext.append('; ')
                     stext.append('%s '%spawn.sclassInternal)
-                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in sneeded.iteritems()))
+                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in sneeded.items()))
                 if tneeded:
                     if len(stext):
                         stext.append('; ')
                     stext.append('%s '%spawn.tclassInternal)
-                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in tneeded.iteritems()))
+                    stext.append(', '.join('(%s, %i)'%(sname,slevel) for sname,slevel in tneeded.items()))
                 stext = ''.join(stext)
                 if len(trainSkillList) == 1:
                     player.sendGameText(RPG_MSG_GAME_DENIED,"%s isn't experienced enough to learn this skill.\\n< %s >\\n"%(char.name,stext))
@@ -542,7 +542,7 @@ class DialogAction(Persistent):
             
         items = []
         for proto,count in zip(itemProtos,counts):
-            for c in xrange(0,count): #to do, handle stacking
+            for c in range(0,count): #to do, handle stacking
                 item = proto.createInstance()
                 if CoreSettings.PGSERVER:
                     if proto.name == "Guild Charter":
@@ -554,7 +554,7 @@ class DialogAction(Persistent):
             player.giveItemInstance(item)
             if not item.character:
                 traceback.print_stack()
-                print "AssertionError: player didn't receive item %s!"%item.name
+                print("AssertionError: player didn't receive item %s!"%item.name)
                 continue
             player.sendGameText(RPG_MSG_GAME_GAINED,"%s has gained %s!\\n"%(item.character.name,item.name))
 
@@ -631,7 +631,7 @@ class DialogAction(Persistent):
         try:
             bproto = BattleProto.byName(self.triggerBattle)
         except:
-            print "WARNING: Unknown Battle %s"%self.triggerBattle
+            print("WARNING: Unknown Battle %s"%self.triggerBattle)
             return
         
         Battle(player.zone,bproto)
@@ -693,7 +693,7 @@ class DialogAction(Persistent):
         try:
             s = Spawn.byName(self.giveMonster)
         except:
-            print "WARNING: GIVE MONSTER %s has no spawn!!!!"%(self.giveMonster)
+            print("WARNING: GIVE MONSTER %s has no spawn!!!!"%(self.giveMonster))
             return
         
         for ms in player.monsterSpawns:
@@ -971,12 +971,12 @@ class DialogRequireSkill(Persistent):
         if not self.skillName or not mob:
             return True
         if self.positiveCheck:
-            if mob.skillLevels.has_key(self.skillName) and mob.skillLevels[self.skillName] >= self.skillLevel:
+            if self.skillName in mob.skillLevels and mob.skillLevels[self.skillName] >= self.skillLevel:
                 return True
         else:
-            if self.skillLevel and mob.skillLevels.has_key(self.skillName) and mob.skillLevels[self.skillName] < self.skillLevel:
+            if self.skillLevel and self.skillName in mob.skillLevels and mob.skillLevels[self.skillName] < self.skillLevel:
                 return True
-            elif not mob.skillLevels.has_key(self.skillName):
+            elif self.skillName not in mob.skillLevels:
                 return True
         return False
     
@@ -1113,7 +1113,7 @@ class DialogRequirement(Persistent):
                     if RPG_SLOT_LOOT_END > item.slot >= RPG_SLOT_LOOT_BEGIN:
                         continue
                     itemProto = item.itemProto
-                    if posItems.has_key(itemProto):
+                    if itemProto in posItems:
                         if item.stackCount >= posItems[itemProto]:
                             del posItems[itemProto]
                             if self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1122,7 +1122,7 @@ class DialogRequirement(Persistent):
                                 break
                         else:
                             posItems[itemProto] -= item.stackCount
-                    if negItems.has_key(itemProto):
+                    if itemProto in negItems:
                         if item.stackCount >= negItems[itemProto]:
                             passed = False
                             if not self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1135,7 +1135,7 @@ class DialogRequirement(Persistent):
                     if item.container:
                         for citem in item.container.content:
                             citemProto = citem.itemProto
-                            if posItems.has_key(citemProto):
+                            if citemProto in posItems:
                                 if citem.stackCount >= posItems[citemProto]:
                                     del posItems[citemProto]
                                     if self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1144,7 +1144,7 @@ class DialogRequirement(Persistent):
                                         break
                                 else:
                                     posItems[citemProto] -= citem.stackCount
-                            if negItems.has_key(citemProto):
+                            if citemProto in negItems:
                                 if citem.stackCount >= negItems[citemProto]:
                                     passed = False
                                     if not self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1216,7 +1216,7 @@ class DialogRequirement(Persistent):
                     if RPG_SLOT_LOOT_END > item.slot >= RPG_SLOT_LOOT_BEGIN:
                         continue
                     itemProto = item.itemProto
-                    if posItems.has_key(itemProto):
+                    if itemProto in posItems:
                         if item.stackCount >= posItems[itemProto]:
                             passed = False
                             if self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1224,7 +1224,7 @@ class DialogRequirement(Persistent):
                                 break
                         else:
                             posItems[itemProto] -= item.stackCount
-                    if negItems.has_key(itemProto):
+                    if itemProto in negItems:
                         if item.stackCount >= negItems[itemProto]:
                             del negItems[itemProto]
                             if not self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1238,7 +1238,7 @@ class DialogRequirement(Persistent):
                     if item.container:
                         for citem in item.container.content:
                             citemProto = citem.itemProto
-                            if posItems.has_key(citemProto):
+                            if citemProto in posItems:
                                 if citem.stackCount >= posItems[citemProto]:
                                     passed = False
                                     if self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:
@@ -1246,7 +1246,7 @@ class DialogRequirement(Persistent):
                                         break
                                 else:
                                     posItems[citemProto] -= citem.stackCount
-                            if negItems.has_key(citemProto):
+                            if citemProto in negItems:
                                 if citem.stackCount >= negItems[citemProto]:
                                     del negItems[citemProto]
                                     if not self.exclusiveFlags&RPG_DIALOG_REQUIREMENT_EXCLUSIVE_ITEMS:

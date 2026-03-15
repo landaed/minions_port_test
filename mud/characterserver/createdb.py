@@ -7,11 +7,11 @@ from sqlite3 import dbapi2 as sqlite
 import shutil
 from twisted.internet import reactor
 import traceback
-import sha
+import hashlib
 import sys
 import os
 
-from serverdb import CREATE_PLAYER_BUFFER_SQL
+from mud.characterserver.serverdb import CREATE_PLAYER_BUFFER_SQL
 
 sys.path.append(os.getcwd())
 
@@ -40,6 +40,6 @@ def main():
 
 
 if __name__ == '__main__':
-    print "Creating Character Database..."
+    print("Creating Character Database...")
     main()
-    print "Done!"
+    print("Done!")

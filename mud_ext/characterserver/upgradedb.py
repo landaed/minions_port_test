@@ -133,11 +133,11 @@ MUSTRENAMECOUNTER = 0
 def DoTranslation(table):
     nindexes = NINDEXES[str(table)]
     remap = []
-    for name,nindex in nindexes.iteritems():
+    for name,nindex in nindexes.items():
         if name.endswith("_id"):
             n = name[:-3]
             if n not in TTRANS_IGNORE:
-                if not TTRANS.has_key(n):
+                if n not in TTRANS:
                     if table == 'item' and n == 'character':
                         #this happens in player buffer for bank items
                         continue
@@ -145,9 +145,9 @@ def DoTranslation(table):
                     #don't need this, will be set on install on world server
                     continue
                 
-                if not TTRANS.has_key(n):
+                if n not in TTRANS:
                     traceback.print_stack()
-                    print "AssertionError: %s not in TTRANS!"%n
+                    print("AssertionError: %s not in TTRANS!"%n)
                     continue
                 remap.append((name))
     
@@ -156,7 +156,7 @@ def DoTranslation(table):
     
     pcursor = PCONN.cursor()
     ncursor = NEWPCONN.cursor()
-    if nindexes.has_key("name"):
+    if "name" in nindexes:
         sql = "SELECT id, name, "
     else:
         sql = "SELECT id, "
@@ -164,9 +164,9 @@ def DoTranslation(table):
     
     try:
         pcursor.execute(sql)
-    except sqlite.OperationalError, message:
+    except sqlite.OperationalError as message:
         if message[0].startswith("no such table"):
-            print "Table %s does not yet exist."%table
+            print("Table %s does not yet exist."%table)
         else:
             traceback.print_exc()
         return
@@ -179,7 +179,7 @@ def DoTranslation(table):
             sql = "UPDATE %s SET "%table
             
             c = 1
-            if nindexes.has_key("name"):
+            if "name" in nindexes:
                 c = 2
             for name in remap:
                 if name.endswith("_id") and not values[c]: #bank items can do this, player_id and character_id
@@ -199,10 +199,10 @@ def DoTranslation(table):
             #traceback.print_exc()
             
             ncursor.execute("DELETE FROM %s WHERE id = %i"%(table,TTRANS[table][values[0]]))
-            if nindexes.has_key("name"):
-                print "Removing named row %s from %s"%(values[1],table),values
+            if "name" in nindexes:
+                print("Removing named row %s from %s"%(values[1],table),values)
             else:
-                print "Removing anonymous row from %s"%table,values
+                print("Removing anonymous row from %s"%table,values)
     
     pcursor.close()
     ncursor.close()
@@ -213,9 +213,9 @@ def DoTable(table):
     ncursor = NEWPCONN.cursor()
     try:
         pcursor.execute("SELECT * from %s"%table)
-    except sqlite.OperationalError, message:
+    except sqlite.OperationalError as message:
         if message[0].startswith("no such table"):
-            print "Table %s does not yet exist."%table
+            print("Table %s does not yet exist."%table)
         else:
             traceback.print_exc()
         return
@@ -229,13 +229,13 @@ def DoTable(table):
         nindexes = NINDEXES[str(table)]
         cindexes = CINDEXES[str(table)]
         
-        values = nindexes.keys() #just makes a list of the proper size
+        values = list(nindexes.keys()) #just makes a list of the proper size
         
-        for name,nindex in nindexes.iteritems():
+        for name,nindex in nindexes.items():
             if name == "player_id":
                 values[nindex] = 1
             else:
-                if cindexes.has_key(name):
+                if name in cindexes:
                     values[nindex] = ovalues[cindexes[name]]
                 else:
                     values[nindex] = DEFAULTS[table][name]
@@ -247,7 +247,7 @@ def DoTable(table):
             TTRANS[table][oid] = ncursor.lastrowid
         except:
             traceback.print_exc()
-            print table,values
+            print(table,values)
     
     ncursor.close()
     pcursor.close()
@@ -263,11 +263,11 @@ def UpgradeCharacterBuffer(values):
         dbuffer = zlib.decompress(buffer)
     except:
         traceback.print_stack()
-        print "Error in character buffer",publicName,characterName
+        print("Error in character buffer",publicName,characterName)
         BAD_CHARACTERS.append((publicName,characterName))
         return
     
-    f = file("./data/tmp/cbuffer","wb")
+    f = open("./data/tmp/cbuffer","wb")
     f.write(dbuffer)
     f.close()
     
@@ -329,7 +329,7 @@ def UpgradeCharacterBuffer(values):
     PCONN = None
     NEWPCONN = None
     
-    f = file("./data/tmp/nbuffer","rb")
+    f = open("./data/tmp/nbuffer","rb")
     buffer = f.read()
     f.close()
     
@@ -343,15 +343,15 @@ def UpgradeCharacterBuffer(values):
     name = name.replace("And ","and ")
     name = name.replace("Of ","of ")
     
-    spawnc = SPAWN_NAMES.has_key(name.upper())
+    spawnc = name.upper() in SPAWN_NAMES
     
-    if spawnc or CHARACTER_NAMES.has_key(name):
+    if spawnc or name in CHARACTER_NAMES:
         MUSTRENAMECOUNTER += 1
         mname = "Please Rename %i"%MUSTRENAMECOUNTER
         if not spawnc:
-            print "Character Name collision %s, renaming to %s and setting rename=2"%(name,mname)
+            print("Character Name collision %s, renaming to %s and setting rename=2"%(name,mname))
         else:
-            print "Spawn Name collision %s, renaming to %s and setting rename=2"%(name,mname)
+            print("Spawn Name collision %s, renaming to %s and setting rename=2"%(name,mname))
         name = mname
     else:
         CHARACTER_NAMES[name] = name
@@ -369,10 +369,10 @@ def UpgradePlayerBuffer(publicName,buffer):
     global PCONN,NEWPCONN,LASTCHARACTER
     if LASTCHARACTER != publicName[0]:
         LASTCHARACTER = publicName[0]
-        print "Upgrading Players: %s"%LASTCHARACTER
+        print("Upgrading Players: %s"%LASTCHARACTER)
     
     dbuffer = zlib.decompress(buffer)
-    f = file("./data/tmp/pbuffer","wb")
+    f = open("./data/tmp/pbuffer","wb")
     f.write(dbuffer)
     f.close()
     
@@ -413,7 +413,7 @@ def UpgradePlayerBuffer(publicName,buffer):
     PCONN = None
     NEWPCONN = None
     
-    f = file("./data/tmp/nbuffer","rb")
+    f = open("./data/tmp/nbuffer","rb")
     buffer = f.read()
     f.close()
     
@@ -439,11 +439,11 @@ def UpdateCharacters():
     #get the premium accounts
     MCONN = sqlite.connect("./data/master/master.db",isolation_level = None)
     MCURSOR = MCONN.cursor()
-    print "Checking Master database integrity"
+    print("Checking Master database integrity")
     MCURSOR.execute("PRAGMA integrity_check;")
     if MCURSOR.fetchone()[0] != 'ok':
-        raise "Master Database Error"
-    print "... ok ..."
+        raise Exception("Master Database Error")
+    print("... ok ...")
     
     MCURSOR.execute("SELECT account_id FROM product WHERE name='MOM';")
     ids = MCURSOR.fetchall()
@@ -473,15 +473,15 @@ def UpdateCharacters():
     
     CURCONN = sqlite.connect("./data/character/character.db",isolation_level = None)
     NEWCONN = sqlite.connect("./data/updated.db",isolation_level = None)
-    CURCONN.text_factory = lambda x: unicode(x, "utf-8", "ignore")
-    NEWCONN.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+    CURCONN.text_factory = lambda x: str(x, "utf-8", "ignore")
+    NEWCONN.text_factory = lambda x: str(x, "utf-8", "ignore")
     
-    print "... Checking Database Integrity ..."
+    print("... Checking Database Integrity ...")
     cursor = CURCONN.cursor()
     cursor.execute("PRAGMA integrity_check;")
     if cursor.fetchone()[0] != 'ok':
-        raise "Database Error"
-    print "... ok ..."
+        raise Exception("Database Error")
+    print("... ok ...")
     
     cursor.execute("SELECT character_name FROM character_buffer;")
     for n in cursor.fetchall():
@@ -494,7 +494,7 @@ def UpdateCharacters():
     
     cursor.close()
     
-    print "Rename Counter starting at",MUSTRENAMECOUNTER
+    print("Rename Counter starting at",MUSTRENAMECOUNTER)
     
     Initialize()
     
@@ -511,15 +511,15 @@ def UpdateCharacters():
     cursor.execute("SELECT public_name,id FROM player_buffer;")
     for pname,id in cursor.fetchall():
         pname = str(pname)
-        if not ACCOUNT_TIMES.has_key(pname):
-            print "WARNING: %s account has no account time!!!!"%pname
+        if pname not in ACCOUNT_TIMES:
+            print("WARNING: %s account has no account time!!!!"%pname)
             continue
-        if not bid.has_key(pname):
+        if pname not in bid:
             bid[pname] = id
         elif bid[pname] < id:
             bid[pname] = id
     
-    for pname in sorted(bid.iterkeys()):
+    for pname in sorted(bid.keys()):
         #if pname != 'Azdruin':
         #    continue
         
@@ -535,13 +535,13 @@ def UpdateCharacters():
         for char in cursor.fetchall():
             UpgradeCharacterBuffer(char)
     
-    print "Setting up cserver_character table"
+    print("Setting up cserver_character table")
     #convert to uppercase here, and not above because some old character have the same name other than case
     #these are grandfathered in, though new ones are case insenstive
-    CNAMES = [(v.upper(),) for v in CHARACTER_NAMES.iterkeys()]
+    CNAMES = [(v.upper(),) for v in CHARACTER_NAMES.keys()]
     ncursor.executemany("INSERT INTO cserver_character VALUES (NULL,?)",CNAMES)
     
-    print "Copying guild information..."
+    print("Copying guild information...")
     try:
         cursor.execute("SELECT id,name,info,motd,creator FROM guild;")
         guilds = cursor.fetchall()
@@ -564,11 +564,11 @@ def UpdateCharacters():
     NEWCONN.close()
     
     if len(BAD_CHARACTERS):
-        print "WARNING: Bad Character Buffers -> ",BAD_CHARACTERS
+        print("WARNING: Bad Character Buffers -> ",BAD_CHARACTERS)
     
-    print "Pruned Accounts: %i"%PRUNEDACCOUNTS
+    print("Pruned Accounts: %i"%PRUNEDACCOUNTS)
     
-    print "Done"
+    print("Done")
 
 
 def Initialize():
@@ -640,7 +640,7 @@ def Initialize():
             nid = ncursor.fetchone()[0]
             TRANS_ITEMPROTO[oid] = nid
         except:
-            print "ItemProto %s no longer exists"%name
+            print("ItemProto %s no longer exists"%name)
     
     cursor.execute("SELECT name,id from spell_proto;")
     for name,oid in cursor.fetchall():
@@ -649,7 +649,7 @@ def Initialize():
             nid = ncursor.fetchone()[0]
             TRANS_SPELLPROTO[oid] = nid
         except:
-            print "SpellProto %s no longer exists"%name
+            print("SpellProto %s no longer exists"%name)
     
     cursor.execute("SELECT name,id from zone;")
     for name,oid in cursor.fetchall():
@@ -658,7 +658,7 @@ def Initialize():
             nid = ncursor.fetchone()[0]
             TRANS_ZONE[oid] = nid
         except:
-            print "Zone %s no longer exists"%name
+            print("Zone %s no longer exists"%name)
     
     cursor.execute("SELECT name,id from faction;")
     for name,oid in cursor.fetchall():
@@ -667,7 +667,7 @@ def Initialize():
             nid = ncursor.fetchone()[0]
             TRANS_FACTION[oid] = nid
         except:
-            print "Faction %s no longer exists"%name
+            print("Faction %s no longer exists"%name)
     
     cursor.execute("SELECT name,id from advancement_proto;")
     for name,oid in cursor.fetchall():
@@ -676,7 +676,7 @@ def Initialize():
             nid = ncursor.fetchone()[0]
             TRANS_ADVANCEMENTPROTO[oid] = nid
         except:
-            print "Advancement %s no longer exists"%name
+            print("Advancement %s no longer exists"%name)
     
     cursor.execute("SELECT name from spawn;")
     for name in cursor.fetchall():

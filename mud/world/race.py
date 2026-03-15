@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-from defines import *
+from mud.world.defines import *
 from mud.common.persistent import Persistent
 from sqlobject import *
 
@@ -143,7 +143,7 @@ def GetRace(racename):
         for race in Race.select():
             RACES[race.name] = race
             
-    if not RACES.has_key(racename):
+    if racename not in RACES:
         race = DummyRace(racename)
         RACES[racename] = race
     

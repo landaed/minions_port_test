@@ -46,7 +46,7 @@ class MobSkillProfile:
 
 
 class Mob:
-    id = 1L
+    id = 1
     
     MODIFIER_ATTRIBUTES = ("damageMod", "healthMod", "offenseMod", "defenseMod")
     
@@ -461,7 +461,7 @@ class Mob:
         if spawn.vocalSet:
             sex = self.sex
             if sex == 'Neuter':
-                print "Warning: spawn %s has vocal set and is neuter, setting to male"%self.name
+                print("Warning: spawn %s has vocal set and is neuter, setting to male"%self.name)
                 sex = "Male"
                 
             if GAMEROOT == "minions.of.mirth":
@@ -470,13 +470,13 @@ class Mob:
                 try:
                     self.vocals = VOCALSETS[vs]
                 except KeyError:
-                    print "Warning: spawn %s has invalid vocal set %c"%(spawn.name,self.vocalSet)
+                    print("Warning: spawn %s has invalid vocal set %c"%(spawn.name,self.vocalSet))
             else:
                 vs = sex.upper()+"_A"
                 try:
                     self.vocals = VOCALSETS[vs]
                 except KeyError:
-                    print "Warning: spawn %s has invalid vocal set %c"%(spawn.name,self.vocalSet)
+                    print("Warning: spawn %s has invalid vocal set %c"%(spawn.name,self.vocalSet))
         
         self.battle = None
         
@@ -539,7 +539,7 @@ class Mob:
     def initMob(self):
         if self.player:
             traceback.print_stack()
-            print "AssertionError: player already initialized!"
+            print("AssertionError: player already initialized!")
             return
         self.mobInitialized = True
         self.updateClassStats()
@@ -605,13 +605,13 @@ class Mob:
         #secondary class
         if self.sclass:
             sstats = self.sclass.getClassStats(self,self.slevel)
-            for st,value in sstats.iteritems():
+            for st,value in sstats.items():
                 if value > stats[st]:
                     stats[st]=value
         #tertiary class
         if self.tclass:
             tstats = self.tclass.getClassStats(self,self.tlevel)
-            for st,value in tstats.iteritems():
+            for st,value in tstats.items():
                 if value > stats[st]:
                     stats[st]=value
         
@@ -621,15 +621,15 @@ class Mob:
         for p in self.processesIn:
             if isinstance(p,Spell):
                 for e in p.effects:
-                    for stname,value in e.derivedStatMods.iteritems():
+                    for stname,value in e.derivedStatMods.items():
                         self.__dict__[stname] += value
         
-        for item in self.worn.itervalues():
+        for item in self.worn.values():
             for st,value in item.stats:
                 if st in RPG_DERIVEDSTATS:
                     self.__dict__[st] += value
         
-        map(ItemSetProto.updateDerived,self.itemSets.iterkeys(),repeat(self,len(self.itemSets)))
+        map(ItemSetProto.updateDerived,iter(self.itemSets.keys()),repeat(self,len(self.itemSets)))
         
         #add in derived stuff
         if self.character and hasattr(self,"advancementStats"):
@@ -701,7 +701,7 @@ class Mob:
                 if level < cskill.levelGained:
                     if not self.player:
                         continue
-                    if charskills == None or not charskills.has_key(cskill.skillname):
+                    if charskills == None or cskill.skillname not in charskills:
                         continue  # don't qualify
                 
                 if len(cskill.raceRequirements) and self.spawn.race not in cskill.raceRequirements:
@@ -709,7 +709,7 @@ class Mob:
                 
                 if charskills != None and cskill.trained and self.player and \
                     self.player.realm != RPG_REALM_MONSTER:
-                    if not charskills.has_key(cskill.skillname):
+                    if cskill.skillname not in charskills:
                         continue
                 
                 maxValue = cskill.getMaxValueForLevel(level)
@@ -735,7 +735,7 @@ class Mob:
                         if cskill.trained or level < cskill.levelGained:
                             continue
 
-                if not self.mobSkillProfiles.has_key(cskill.skillname):
+                if cskill.skillname not in self.mobSkillProfiles:
                     # not entered yet, just copy it in
                     mskill = MobSkillProfile()
                     mskill.classSkill = cskill
@@ -753,7 +753,7 @@ class Mob:
                     if reuseTime < mskill.reuseTime:
                         mskill.reuseTime = reuseTime
         
-        for mskill in self.mobSkillProfiles.itervalues():
+        for mskill in self.mobSkillProfiles.values():
             if charskills == None:
                 if CoreSettings.DIFFICULTY != RPG_DIFFICULTY_HARDCORE and self.plevel < 5:
                     # in easy and normal, mobs don't get (improved) skills until level 5
@@ -767,7 +767,7 @@ class Mob:
                     if not mskill.classSkill.spellProto.affectsStat("feignDeath"):
                         self.aiSkills.append(mskill)
             else:
-                if not charskills.has_key(mskill.skillname):
+                if mskill.skillname not in charskills:
                     #this is a pretty crappy place for this
                     if mskill.classSkill.levelGained != 1:
                         self.player.sendGameText(RPG_MSG_GAME_YELLOW,"%s has learned <a:Skill%s>%s</a>!\\n"%(self.name,GetTWikiName(mskill.skillname),mskill.skillname))
@@ -810,7 +810,7 @@ class Mob:
     def calcItemHaste(self):
         # find best haste
         self.itemHaste = 0
-        for item in self.worn.itervalues():
+        for item in self.worn.values():
             for stat in item.stats:
                 if stat[0] == "haste" and stat[1] > self.itemHaste:
                     self.itemHaste = stat[1]
@@ -848,12 +848,12 @@ class Mob:
     def equipItem(self, slot, item, printSets=True, reequip=False):
         if slot < RPG_SLOT_WORN_BEGIN or slot >= RPG_SLOT_WORN_END:
             traceback.print_stack()
-            print "AssertionError: trying to equip %s in non-wearable slot!"%item.name
+            print("AssertionError: trying to equip %s in non-wearable slot!"%item.name)
             if item.character:  # Try to fix previously wrong equipped items
                 item.character.player.giveItemInstance(item)
             return False
         if slot in self.worn:
-            print "Warning Mob.equipItem",self.worn[slot].name,"is already worn in slot %i!!!"%slot
+            print("Warning Mob.equipItem",self.worn[slot].name,"is already worn in slot %i!!!"%slot)
             return False
         # Removed in 1.3 SP2
         """
@@ -877,7 +877,7 @@ class Mob:
         """
         # If this item is unique, check if one is already worn by the mob.
         if item.flags & RPG_ITEM_UNIQUE:
-            for testItem in self.worn.itervalues():
+            for testItem in self.worn.values():
                 if testItem.itemProto == item.itemProto:
                     # If this is a player mob, give feedback to the player.
                     if self.player:
@@ -927,7 +927,7 @@ class Mob:
                     setContribution[1] += 1
             # Don't use iterkeys here as dict gets modified
             #  during loop.
-            for set in self.itemSets.keys():
+            for set in list(self.itemSets.keys()):
                 set.checkAndApply(self,printSets)
                 if not len(self.itemSets[set][0]):
                     del self.itemSets[set]
@@ -1007,7 +1007,7 @@ class Mob:
                     contributors[set.contribution][1] -= 1
             # Don't use iterkeys here as dict gets modified
             #  during loop.
-            for set in self.itemSets.keys():
+            for set in list(self.itemSets.keys()):
                 set.checkAndApply(self)
                 if not len(self.itemSets[set][0]):
                     del self.itemSets[set]
@@ -1042,19 +1042,19 @@ class Mob:
         
         # Don't use iterkeys here as dict gets modified
         #  during loop.
-        for m in self.aggro.keys():
+        for m in list(self.aggro.keys()):
             if m.detached:
-                print "WARNING: detached mob %s in %s aggro"%(m.name,self.name)
+                print("WARNING: detached mob %s in %s aggro"%(m.name,self.name))
                 del self.aggro[m]
         
         # Handle player mobs.
         if self.player:
             # Don't use iterkeys here as dict gets modified
             #  during loop.
-            for p in self.playerAggro.keys():
+            for p in list(self.playerAggro.keys()):
                 if self.playerAggro[p] > 120:
                     del self.playerAggro[p]
-                    map(self.aggro.__delitem__,list(m for m in self.aggro.iterkeys() if m.player == p))
+                    map(self.aggro.__delitem__,list(m for m in self.aggro.keys() if m.player == p))
                     try:
                         othermob = self.playerInitiate[p][1]
                         del othermob.playerInitiate[self.player]
@@ -1217,7 +1217,7 @@ class Mob:
                 if self.aiSkillTimer <= 0:
                     self.aiSkillTimer = 72
                     for sk in self.aiSkills:
-                        if not self.skillReuse.has_key(sk.skillname):
+                        if sk.skillname not in self.skillReuse:
                             if not randint(0,2):
                                 UseSkill(self,self.target,sk.skillname)
                                 # Make sure reuse gets always set for mobs.
@@ -1234,7 +1234,7 @@ class Mob:
                 self.visibility = master.visibility
         
         if len(self.itemRequireTick):
-            for item in self.itemRequireTick.copy().iterkeys():
+            for item in self.itemRequireTick.copy().keys():
                 if not item.tick():
                     try:
                         del self.itemRequireTick[item]
@@ -1245,7 +1245,7 @@ class Mob:
         if len(self.xpDamage):
             tm = sysTime()
             remove = []
-            for damager,xpdmg in self.xpDamage.iteritems():
+            for damager,xpdmg in self.xpDamage.items():
                 if tm - xpdmg.lastTime > 60:
                     #every minute that we haven't done any damage reduces damage by 80%
                     xpdmg.lastTime = tm
@@ -1262,7 +1262,7 @@ class Mob:
             self.wornTimer = 180
             spellProcs = self.itemSetSpells.get(RPG_ITEM_TRIGGER_WORN, [])[:]
             spellsGetter = attrgetter('spells')
-            map(spellProcs.extend,imap(spellsGetter,self.worn.itervalues()))
+            map(spellProcs.extend,imap(spellsGetter,iter(self.worn.values())))
             
             for ispell in spellProcs:
                 if ispell.trigger == RPG_ITEM_TRIGGER_WORN:
@@ -1370,7 +1370,7 @@ class Mob:
                 if p.tickCounter <= 0:
                     p.tickCounter = p.tickRate
                     try:
-                        p.iter.next()
+                        next(p.iter)
                     except StopIteration:
                         p.end()
                         if self.player:
@@ -1383,7 +1383,7 @@ class Mob:
         
         rm = []
         if len(self.recastTimers):
-            for sproto,tm in self.recastTimers.iteritems():
+            for sproto,tm in self.recastTimers.items():
                 if self.casting and self.casting.spellProto == sproto:
                     continue
                 tm -= 3
@@ -1400,7 +1400,7 @@ class Mob:
         # tick reuse timers
         if len(self.skillReuse):
             reuse = {}
-            for skill,v in self.skillReuse.iteritems():
+            for skill,v in self.skillReuse.items():
                 v -= 3
                 if v > 0:
                     reuse[skill] = v
@@ -1564,7 +1564,7 @@ class Mob:
         
         # Iterate over this Mob's xpDamage dictionary to determine which
         #  damager gets the kill reward.
-        for damager,xpdmg in self.xpDamage.iteritems():
+        for damager,xpdmg in self.xpDamage.items():
             
             # If the amount of damage the damager did is higher than the highest
             #  damage amount, then update the damager as the new killer.
@@ -1724,7 +1724,7 @@ class Mob:
             # Iterate over the list of Players with whom this Player initiated
             #  combat.
             # TWS: This should be done even if the mob is never able to reattach.
-            for otherPlayer,info in self.playerInitiate.iteritems():
+            for otherPlayer,info in self.playerInitiate.items():
                 
                 # Try to remove this Player from the other Player's initiated
                 #  combat list.
@@ -1813,7 +1813,7 @@ class Mob:
             if player:
                 player.sendGameText(RPG_MSG_GAME_DENIED,"$src can't reuse $srchis %s yet.\\n"%rangedWpn.name,self)
             return
-        if not self.worn.has_key(RPG_SLOT_AMMO):
+        if RPG_SLOT_AMMO not in self.worn:
             if player:
                 player.sendGameText(RPG_MSG_GAME_DENIED,"$src needs more ammunition for $srchis %s.\\n"%rangedWpn.name,self)
             return
@@ -1934,7 +1934,7 @@ class Mob:
                 if isinstance(p,Spell) and p.spellProto.spellType&RPG_SPELL_PERSISTENT:
                     if p in persistent:
                         traceback.print_stack()
-                        print "AssertionError: pending process already in persistent processes!"
+                        print("AssertionError: pending process already in persistent processes!")
                         continue
                     persistent.append(p)
                     continue
@@ -1947,7 +1947,7 @@ class Mob:
                 if isinstance(p,Spell) and p.spellProto.spellType&RPG_SPELL_PERSISTENT:
                     if p in persistent:
                         traceback.print_stack()
-                        print "AssertionError: in process already in persistent processes!"
+                        print("AssertionError: in process already in persistent processes!")
                         continue
                     persistent.append(p)
                     continue
@@ -1960,7 +1960,7 @@ class Mob:
             if isinstance(p,Spell) and p.spellProto.spellType&RPG_SPELL_PERSISTENT and p.dst and p.src and p.dst.player and p.src.player and p.dst!=self:
                 if p in persistent:
                     traceback.print_stack()
-                    print "AssertionError: out process already in persistent processes!"
+                    print("AssertionError: out process already in persistent processes!")
                     continue
                 persistent.append(p)
                 continue
@@ -1981,7 +1981,7 @@ class Mob:
                     spell.takeOwnership(spell.dst)
                     if spell not in spell.dst.processesIn or spell in spell.dst.processesOut:
                         traceback.print_stack()
-                        print "AssertionError: spell process ownership whackiness!"
+                        print("AssertionError: spell process ownership whackiness!")
                         continue
                     
                     spell.dst.processesOut.add(spell)
@@ -1994,7 +1994,7 @@ class Mob:
     def detachMob(self, other):
         if not other.detached:
             traceback.print_stack()
-            print "AssertionError: other mob not detached!"
+            print("AssertionError: other mob not detached!")
             return
         
         try:
@@ -2153,7 +2153,7 @@ class Mob:
                     self.autoAttack = False
                     self.attackOff()
         else:
-            self.autoAttack = target and self.aggro.has_key(target)
+            self.autoAttack = target and target in self.aggro
         
         if self.autoAttack and target:
             self.attackOn()
@@ -2350,7 +2350,7 @@ class Mob:
         try:
             if other.detached:
                 traceback.print_stack()
-                print "AssertionError: other mob is detached!"
+                print("AssertionError: other mob is detached!")
                 return
         except:
             traceback.print_exc()
@@ -2397,7 +2397,7 @@ class Mob:
             return
         
         if selfPlayer and otherPlayer:
-            if not self.playerInitiate.has_key(otherPlayer):
+            if otherPlayer not in self.playerInitiate:
                 # other initiated combat, mark as such
                 self.playerInitiate[otherPlayer] = (False,otherPlayerMob)
                 otherPlayerMob.playerInitiate[selfPlayer] = (True,self)
@@ -2442,7 +2442,7 @@ class Mob:
         sex = 1 if self.sex == 'Female' else 0
         
         if not vocals[vox]:
-            print "warning: spawn %s is being asked to vocalize with no vocals for vox %i"%(self.spawn.name,vox)
+            print("warning: spawn %s is being asked to vocalize with no vocals for vox %i"%(self.spawn.name,vox))
             return
         
         which = randint(1,vocals[vox])

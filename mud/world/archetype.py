@@ -9,7 +9,7 @@
 #  @{
 
 
-from career import ClassProto
+from mud.world.career import ClassProto
 
 
 ## @brief (Dictionary) Stores handles to a RPG-classes (value) by RPG-class
@@ -847,7 +847,7 @@ def InitClassSkills():
     CLASSES['Harvest'] = Harvest()
 
     # For each RPG-class, copy the ClassProto's skill into RPG-class.
-    for cl in CLASSES.itervalues():
+    for cl in CLASSES.values():
         
         # If the RPG-class has an associated ClassProto, then copy the
         # ClassProto's skill into the RPG-class.  This reassignment prevents
@@ -876,7 +876,7 @@ def GetClass(classname):
     # An RPG-class coud not be found for the supplied classname, return the
     # Warrior RPG-class instead.
     except KeyError:
-        print "WARNING: Unknown class:", classname
+        print("WARNING: Unknown class:", classname)
         return CLASSES["Warrior"]
 
 

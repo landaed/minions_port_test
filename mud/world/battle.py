@@ -14,9 +14,9 @@ import traceback
 
 from sqlobject import *
 from mud.common.persistent import Persistent
-from defines import *
-from core import *
-from messages import ZoneMessage, ZoneSound
+from mud.world.defines import *
+from mud.world.core import *
+from mud.world.messages import ZoneMessage, ZoneSound
 
 
 ## @brief Persistent data type defining a group of mobs (SpawnGroup) that will
@@ -200,7 +200,7 @@ class BattleSide:
         # early.
         if not self.sequence:
             traceback.print_stack()
-            print "AssertionError: battle side has no sequence assigned!"
+            print("AssertionError: battle side has no sequence assigned!")
             return
 
         # Clear mob information (BattleGroup, attack timers, mob list) for
@@ -321,7 +321,7 @@ class BattleSide:
             # the mob's aggro list.  After this, standard target selection code
             # and AI will occur.
             if target and not target.detached:
-                if target not in mob.aggro.keys():
+                if target not in list(mob.aggro.keys()):
                     mob.addAggro(target, 10)
 
 
@@ -389,7 +389,7 @@ class BattleSide:
                 self.thinkTimer = 18
 
                 # Iterate over all BattleGroups.
-                for bg, mobs in self.battleGroups.iteritems():
+                for bg, mobs in self.battleGroups.items():
 
                     # If the BattleGroup is passive, then skip it.
                     if bg.passive:
@@ -422,7 +422,7 @@ class BattleSide:
     def detachMob(self, mob):
 
         # Iterate over BattleGroups.
-        for bg, mobs in self.battleGroups.iteritems():
+        for bg, mobs in self.battleGroups.items():
 
             # If the mob being detached is in the BattleGroup.
             if mob in mobs:
@@ -501,8 +501,8 @@ class Battle:
         # If there are no sequences, then return early.
         if not s1seq or not s2seq:
             traceback.print_stack()
-            print "AssertionError: battle %s is missing a start sequence!" \
-                % self.name
+            print("AssertionError: battle %s is missing a start sequence!" \
+                % self.name)
             return
 
         # TWS: These should really be set as part of init'ing the side.

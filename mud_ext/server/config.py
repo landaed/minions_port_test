@@ -14,10 +14,10 @@ def ConfigureServer(DBNAME):
     
     # String options
     for option in ['database']:
-        for x in xrange(len(sys.argv)):
+        for x in range(len(sys.argv)):
             if sys.argv[x].find(option) == 0:
                 pos = sys.argv[x].find('=') + 1
-                if pos > 0 and options.has_key(option):
+                if pos > 0 and option in options:
                     options[option]=sys.argv[x][pos:]
                     sys.argv[x] = ''
     
@@ -29,7 +29,8 @@ def ConfigureServer(DBNAME):
         os.makedirs(DATABASE)
         
     from mud.utils import getSQLiteURL
-    SetDBConnection(getSQLiteURL('/%s/%s'%(DATABASE,DBNAME)),True)
+    dbpath = os.path.abspath(os.path.join(DATABASE, DBNAME))
+    SetDBConnection(getSQLiteURL('/%s'%dbpath),True)
 
 
 def LoadConfiguration(config):

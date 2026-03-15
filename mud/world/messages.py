@@ -11,7 +11,7 @@ $tgtherself
 """
 
 import math
-from defines import *
+from mud.world.defines import *
 
 #range of zero is global to zone
 def ZoneMessage(zone,msg):

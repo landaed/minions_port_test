@@ -118,8 +118,8 @@ def ItemVariantsAHLoad(item, dbconn, id):
     
 def ItemVariantsAHSave(item, dbconn, maxItemList):
     if (item.hasVariants):
-        currentVariants = dict((key,copy(value)) for key,value in item.variants.iteritems())
-        for code,variants in currentVariants.iteritems():
+        currentVariants = dict((key,copy(value)) for key,value in item.variants.items())
+        for code,variants in currentVariants.items():
             if code == V_STAT:
                 if item.spellEnhanceLevel == 9999:  # indicates an enchanted item, additional stat value
                     for var in variants:
@@ -145,8 +145,8 @@ def ItemVariantsSave(item):
     
     # Meh, copy is too shallow and deepcopy too far...
     # Parse list manually
-    currentVariants = dict((key,copy(value)) for key,value in item.variants.iteritems())
-    currentProcs = dict(((proc.spellProto.name,proc.frequency),data) for proc,data in item.procs.iteritems())
+    currentVariants = dict((key,copy(value)) for key,value in item.variants.items())
+    currentProcs = dict(((proc.spellProto.name,proc.frequency),data) for proc,data in item.procs.items())
     
     # first clear out all variants that don't need new saving
     for variant in variantList:
@@ -192,7 +192,7 @@ def ItemVariantsSave(item):
             variant.destroySelf()
     
     # for the rest generate new ItemVariant db entries
-    for code,variants in currentVariants.iteritems():
+    for code,variants in currentVariants.items():
         if code == V_STAT:
             if item.spellEnhanceLevel == 9999:  # indicates an enchanted item, additional stat value
                 for var in variants:
@@ -208,7 +208,7 @@ def ItemVariantsSave(item):
             ItemVariant(item = dbItem,code = code,svalue = variants[0],value = variants[1])
     
     # Generate new ItemVariant entries for volatile procs to store.
-    for procid,procdata in currentProcs.iteritems():
+    for procid,procdata in currentProcs.items():
         ItemVariant(item = dbItem,code = V_WEAPONPROC,svalue = procid[0],value = procid[1],value2 = procdata[0],value3 = procdata[1])
 
 
@@ -283,9 +283,9 @@ def ApplyVStats(item):
         value = VSTAT_VALUES[stat][variant[1]]
         if fabs(value) > kingValue:
             kingValue = fabs(value)
-            if VSTAT_SUFFIXES.has_key(stat):
+            if stat in VSTAT_SUFFIXES:
                 suffix = VSTAT_SUFFIXES[stat][variant[1]]
-            if VSTAT_PREFIXES.has_key(stat):
+            if stat in VSTAT_PREFIXES:
                 prefix = VSTAT_PREFIXES[stat][variant[1]]
         
         try:
@@ -293,7 +293,7 @@ def ApplyVStats(item):
         except KeyError:
             stats[stat] = value
     
-    item.stats = [(s,v) for s,v in stats.iteritems()]
+    item.stats = [(s,v) for s,v in stats.items()]
     
     return prefix,suffix
 
@@ -327,7 +327,7 @@ def GenVStat(item,level):
         #0-5 = how much
         basechances = (10,8,4,1)
         v = 0
-        for c in xrange(0,x):
+        for c in range(0,x):
             if randint(1,basechances[c]) == 1:
                 v = c+1
                 #don't break and we'll have a shot at higher level stuff break
@@ -353,7 +353,7 @@ def GenVStat(item,level):
             x+=1
         chances = (20,15,15,15,10,10,10,5,2)
         v = 0
-        for c in xrange(0,x):
+        for c in range(0,x):
             if randint(1,chances[c]) == 1:
                 v = c+1
     
@@ -452,15 +452,15 @@ def GenVWeapon(item,level):
             debuff = 0
     
     if dmg == 0:
-        for c in xrange(1,x):
+        for c in range(1,x):
             if randint(1,chances[c])==1:
                 dmg += 1
     if rate == 0:
-        for c in xrange(1,x):
+        for c in range(1,x):
             if randint(1,chances[c])==1:
                 rate += 1
     if debuff == 0:
-        for c in xrange(1,x):
+        for c in range(1,x):
             if randint(1,chances[c])==1:
                 debuff += 1
     
@@ -503,7 +503,7 @@ def GenVBaneWeapon(item,level):
         x += 1
     
     v  = 0
-    for c in xrange(1,x):
+    for c in range(1,x):
         if randint(1,chances[c]) == 1:
             v += 1
     
@@ -666,7 +666,7 @@ def ApplyEnchantment(item):
         if len(statVariants):
             stats = {}
             for svalue,value in statVariants:
-                for prop in ENCHANT_SlotLUT['all'].itervalues():
+                for prop in ENCHANT_SlotLUT['all'].values():
                     if prop[0] == svalue:
                         maxVal = enchStatMod * prop[1]
                         if prop[1] >= 10:
@@ -674,7 +674,7 @@ def ApplyEnchantment(item):
                         break
                 else:
                     try:
-                        for prop in ENCHANT_SlotLUT[proto.slots[0]].itervalues():
+                        for prop in ENCHANT_SlotLUT[proto.slots[0]].values():
                             if prop[0] == svalue:
                                 maxVal = enchStatMod * prop[1]
                                 if prop[1] >= 10:
@@ -690,7 +690,7 @@ def ApplyEnchantment(item):
                     stats[svalue] += value
                 except KeyError:
                     stats[svalue] = value
-            item.stats = [(s,v) for s,v in stats.iteritems()]
+            item.stats = [(s,v) for s,v in stats.items()]
         
         try:
             maxBane = int(enchStatMod * ENCHANT_SlotLUT[RPG_SLOT_PRIMARY]["the Ghoul Slayer"][1])

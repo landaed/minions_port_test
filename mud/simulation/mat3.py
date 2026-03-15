@@ -74,11 +74,11 @@ class mat3:
             self.mlist = list(args)
 
         else:
-            raise TypeError,"mat3() arg can't be converted to mat3"
+            raise TypeError("mat3() arg can't be converted to mat3")
 
         # Check if there are really 9 elements in the list
         if len(self.mlist)!=9:
-            raise TypeError, "mat4(): Wrong number of matrix elements ("+`len(self.mlist)`+" instead of 9)"
+            raise TypeError("mat4(): Wrong number of matrix elements ("+`len(self.mlist)`+" instead of 9)")
 
 
     def __repr__(self):
@@ -110,13 +110,13 @@ class mat3:
         if isinstance(other, mat3):
             return mat3(map(lambda x,y: x+y, self.mlist, other.mlist))
         else:
-            raise TypeError, "unsupported operand type for +"
+            raise TypeError("unsupported operand type for +")
 
     def __sub__(self, other):
         if isinstance(other, mat3):
             return mat3(map(lambda x,y: x-y, self.mlist, other.mlist))
         else:
-            raise TypeError, "unsupported operand type for -"
+            raise TypeError("unsupported operand type for -")
 
     def __mul__(self, other):
         T = type(other)
@@ -146,7 +146,7 @@ class mat3:
                          m31*n13+m32*n23+m33*n33)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for *"
+            raise TypeError("unsupported operand type for *")
 
     def __rmul__(self, other):
         T = type(other)
@@ -164,7 +164,7 @@ class mat3:
             return self.__mul__(other)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for *"
+            raise TypeError("unsupported operand type for *")
 
 
     def __div__(self, other):
@@ -174,7 +174,7 @@ class mat3:
             return mat3(map(lambda x,other=other: x/other, self.mlist))
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for /"
+            raise TypeError("unsupported operand type for /")
 
     def __mod__(self, other):
         T = type(other)
@@ -183,7 +183,7 @@ class mat3:
             return mat3(map(lambda x,other=other: x%other, self.mlist))
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for %"
+            raise TypeError("unsupported operand type for %")
 
 
     def __neg__(self):
@@ -204,10 +204,10 @@ class mat3:
         elif type(key)==types.TupleType:
             i,j=key
             if i<0 or i>2 or j<0 or j>2:
-                raise IndexError, "index out of range"
+                raise IndexError("index out of range")
             return self.mlist[i*3+j]
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def __setitem__(self, key, value):
         """Set a column or an individual element."""
@@ -217,10 +217,10 @@ class mat3:
         elif type(key)==types.TupleType:
             i,j=key
             if i<0 or i>2 or j<0 or j>2:
-                raise IndexError, "index out of range"
+                raise IndexError("index out of range")
             self.mlist[i*3+j] = value
         else:
-            raise TypeError,"index must be integer or 2-tuple"
+            raise TypeError("index must be integer or 2-tuple")
 
     def getRow(self, idx):
         """Return a row (as vec3)."""
@@ -228,7 +228,7 @@ class mat3:
         elif idx==1: return _vec3(self.mlist[3], self.mlist[4], self.mlist[5])
         elif idx==2: return _vec3(self.mlist[6], self.mlist[7], self.mlist[8])
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def setRow(self, idx, value):
         """Set a row (as vec3)."""
@@ -236,7 +236,7 @@ class mat3:
         elif idx==1: self.mlist[3], self.mlist[4], self.mlist[5] = value
         elif idx==2: self.mlist[6], self.mlist[7], self.mlist[8] = value
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def getColumn(self, idx):
         """Return a column (as vec3)."""
@@ -244,7 +244,7 @@ class mat3:
         elif idx==1: return _vec3(self.mlist[1], self.mlist[4], self.mlist[7])
         elif idx==2: return _vec3(self.mlist[2], self.mlist[5], self.mlist[8])
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def setColumn(self, idx, value):
         """Set a column."""
@@ -252,7 +252,7 @@ class mat3:
         elif idx==1: self.mlist[1], self.mlist[4], self.mlist[7] = value
         elif idx==2: self.mlist[2], self.mlist[5], self.mlist[8] = value
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def toList(self, rowmajor=0):
         """Create a list containing the matrix elements.
@@ -405,5 +405,5 @@ if __name__=="__main__":
 
     a=mat3(M)
     a[0,0]=17
-    print M
-    print a
+    print(M)
+    print(a)

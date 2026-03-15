@@ -317,7 +317,7 @@ def BreakCharm(effect):
     
     if src.character:
         # Unequip the items given by the Character master.
-        map(pet.unequipItem,xrange(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
+        map(pet.unequipItem,range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
         
         # Refresh the items given by the Character master.
         src.character.refreshPetItems()
@@ -377,7 +377,7 @@ def DoCharm(effect, src, dst):
             petPet.charmEffect.parent.cancel()
             if pet.pet:
                 traceback.print_stack()
-                print "AssertionError: pet charm effect resisted breaking!"
+                print("AssertionError: pet charm effect resisted breaking!")
             return
         petPet.zone.removeMob(petPet)
 
@@ -514,7 +514,7 @@ def DoSummonPet(effect,src):
         src.pet.charmEffect.parent.cancel()
         if src.pet:
             traceback.print_stack()
-            print "AssertionError: charm effect resisted breaking!"
+            print("AssertionError: charm effect resisted breaking!")
             return
     
     zone = src.zone
@@ -604,7 +604,7 @@ def DoBanish(effect,src,dst):
             dst.pet.charmEffect.parent.cancel()
             if dst.pet:
                 traceback.print_stack()
-                print "AssertionError: pet charm effect resisted breaking!"
+                print("AssertionError: pet charm effect resisted breaking!")
             return
         if dst.player:
             dst.player.sendGameText(RPG_MSG_GAME_PET_SPEECH,r'%s\'s pet screams, \"I\'m banished master!!!\"\n'%dst.name)
@@ -767,7 +767,7 @@ def DoResurrection(effect,src,dst):
             cnames = []
             srcZoneName = src.player.zone.zone.name
             srcPos = src.simObject.position
-            for pname,dm in src.player.world.deathMarkers.iteritems():
+            for pname,dm in src.player.world.deathMarkers.items():
                 try:
                     charName,realm,zoneName,dstPos,rot = dm
                     if zoneName == srcZoneName:
@@ -965,7 +965,7 @@ class Effect:
                             traceback.print_exc()
         
         # Apply the nonlinearly stacking stats.
-        for statname,value in nonlinears.iteritems():
+        for statname,value in nonlinears.items():
             dst.doEffectStackNonlinear(statname,value)
             self.statMods[statname] = value
         
@@ -1036,7 +1036,7 @@ class Effect:
                             traceback.print_exc()
             
             # Apply the nonlinearly stacking stats.
-            for statname,value in nonlinears.iteritems():
+            for statname,value in nonlinears.items():
                 dst.doEffectStackNonlinear(statname,value)
                 self.statMods[statname] = value
         
@@ -1088,7 +1088,7 @@ class Effect:
         UndoIllusion(self)
         BreakCharm(self)
         
-        for statname,value in self.statMods.iteritems():
+        for statname,value in self.statMods.items():
             if statname == "effectHaste":
                 effect,effectValue = dst.effectHaste
                 if effect == self:

@@ -47,11 +47,12 @@ try:
     
     if sys.platform == 'win32' and not USE_WX:
         from twisted.internet.iocpreactor import install
-    else:
+        install()
+    elif USE_WX:
         import wx
         from twisted.internet.wxreactor import install
-    
-    install()
+        install()
+    # else: use default reactor on Linux (headless)
     
     
     from twisted.internet import reactor
@@ -157,7 +158,7 @@ try:
         else:
             mask = 1
         
-        print "Setting Processor Affinity Mask to",mask
+        print("Setting Processor Affinity Mask to",mask)
         win32process.SetProcessAffinityMask(handle,mask)
     
     
@@ -170,7 +171,7 @@ try:
     sys.argv.append("-game")
     sys.argv.append(GAMEROOT)
     
-    print "Initialising pytoque with args: " + str(sys.argv)
+    print("Initialising pytoque with args: " + str(sys.argv))
     pytorque.Init(sys.argv)
     
     if USE_WX:
@@ -225,5 +226,5 @@ try:
 
 except:
     print_stack()
-    print format_exc()
-    raw_input("Press Enter to terminate")
+    print(format_exc())
+    input("Press Enter to terminate")

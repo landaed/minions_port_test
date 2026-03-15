@@ -192,7 +192,7 @@ class Spawn(Persistent):
                 spell = SpellProto.byName(s.spellname)
                 self.spawnSpells.append(spell)
             except:
-                print "Warning: Unknown Spawn Spell -> %s"%s.spellname
+                print("Warning: Unknown Spawn Spell -> %s"%s.spellname)
             
         self.spawnStats = []    
         for s in self.spawnStatsInternal:
@@ -390,7 +390,7 @@ class SpawnSoundProfile(Persistent):
         sndattribs = ['sndIdleLoop','sndIdleRandom','sndAlert','sndAttack','sndPain','sndDeath']
         for snd in sndattribs:
             num = 0
-            for x in xrange(1,5):
+            for x in range(1,5):
                 if not getattr(self,snd+str(x)):
                     break
                 num+=1
@@ -436,7 +436,7 @@ class Spawnpoint:
             populator = True
             p,num = group.split("_")
             num = int(num)
-            if zone.populatorGroups.has_key(num):
+            if num in zone.populatorGroups:
                 group = zone.populatorGroups[num]
             else:
                 groups = []
@@ -451,7 +451,7 @@ class Spawnpoint:
                             unique = True
                             break
                     if unique:
-                        print "Warning: pop group contains a unique spawn",sg.groupName
+                        print("Warning: pop group contains a unique spawn",sg.groupName)
                         continue
 
                     if "CMT_RANK" in sg.groupName:
@@ -486,7 +486,7 @@ class Spawnpoint:
                     groups.extend(fgroups)                
                 
                 if not len(groups):                    
-                    print "WARNING!!!!! No spawn for populator %i"%num
+                    print("WARNING!!!!! No spawn for populator %i"%num)
                 elif len(groups) == 1:
                     group = groups[0].groupName.upper()
                 else:
@@ -507,7 +507,7 @@ class Spawnpoint:
                 break
         else:
             if not populator:
-                print "WARNING!!!!! Cannot find %s SpawnGroup"%group
+                print("WARNING!!!!! Cannot find %s SpawnGroup"%group)
     
     
     def removeMob(self, despawnTime=0):
@@ -595,7 +595,7 @@ class Spawnpoint:
                 today = date.today()
                 if endDayRL < startDayRL:
                     #spawn crosses the year boundry
-                    print endDayRL, today, startDayRL, (endDayRL <= today <= startDayRL)
+                    print(endDayRL, today, startDayRL, (endDayRL <= today <= startDayRL))
                     if not (endDayRL < today < startDayRL):
                         sinfos.append(sinfo)
                 elif startDayRL <= today <= endDayRL:
@@ -609,7 +609,7 @@ class Spawnpoint:
         
         #check by frequency, so more common spawns eat less common
         freqs = (RPG_FREQ_COMMON,RPG_FREQ_UNCOMMON,RPG_FREQ_RARE,RPG_FREQ_VERYRARE, RPG_FREQ_IMPOSSIBLE)
-        for x in xrange(0,5):
+        for x in range(0,5):
             for sinfo in sinfos:
                 if sinfo.frequency == freqs[x]:
                     r = randint(0,freqs[x]-1)
@@ -907,35 +907,35 @@ class SpawnGroupController(Persistent):
         if respawnCycle == RPG_SPAWNCONTROLLER_CYCLE_KILLERREALM:
             killerRealm = RPG_REALM_UNDEFINED
             maxNum = 0
-            for realm,numKillers in self.killerRealms.iteritems():
+            for realm,numKillers in self.killerRealms.items():
                 if numKillers > maxNum:
                     maxNum = numKillers
                     killerRealm = realm
-            for setIndex,realm in self.setRealms.iteritems():
+            for setIndex,realm in self.setRealms.items():
                 if realm == killerRealm:
                     setPool.append(setIndex)
             if not len(setPool):
                 respawnCycle = RPG_SPAWNCONTROLLER_CYCLE_REALM
         elif respawnCycle == RPG_SPAWNCONTROLLER_CYCLE_LASTKILLERREALM:
-            for setIndex,realm in self.setRealms.iteritems():
+            for setIndex,realm in self.setRealms.items():
                 if realm == self.lastKillerRealm:
                     setPool.append(setIndex)
             if not len(setPool):
                 respawnCycle = RPG_SPAWNCONTROLLER_CYCLE_REALM
         # Then the more random rules.
         if respawnCycle == RPG_SPAWNCONTROLLER_CYCLE_REALM:
-            for setIndex,realm in self.setRealms.iteritems():
+            for setIndex,realm in self.setRealms.items():
                 if realm != self.realm:
                     setPool.append(setIndex)
         elif respawnCycle == RPG_SPAWNCONTROLLER_CYCLE_OTHER:
-            for setIndex,sgSet in self.spawnGroupSets.iteritems():
+            for setIndex,sgSet in self.spawnGroupSets.items():
                 if sgSet != self.currentSpawnSet:
                     setPool.append(setIndex)
         
         # If the desired rule could not be applied, choose randomly.
         # (Also ends here if random was the rule to begin with.)
         if not len(setPool):
-            setPool = self.spawnGroupSets.keys()
+            setPool = list(self.spawnGroupSets.keys())
         
         # Get a random set out of the built pool.
         choice = setPool[randint(0,len(setPool) - 1)]
@@ -946,9 +946,9 @@ class SpawnGroupController(Persistent):
         
         # Notify all spawnpoints of the change and tell them to resume spawning.
         groupInfo = None
-        for spawnpoint,groupIndex in self.spawnpoints.iteritems():
+        for spawnpoint,groupIndex in self.spawnpoints.items():
             # Don't use get so groupInfo has a valid value on loop exit.
-            if self.currentSpawnSet.has_key(groupIndex):
+            if groupIndex in self.currentSpawnSet:
                 groupInfo = self.currentSpawnSet[groupIndex]
                 spawnpoint.groupName = groupInfo.spawnGroup.groupName
                 spawnpoint.spawngroup = groupInfo.spawnGroup

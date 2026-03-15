@@ -208,12 +208,12 @@ def GenEffectText(spell):
         for es in e.stats:
             stats[es.stage][es.statname] += es.value
         
-        for stage,stext in stages.iteritems():
+        for stage,stext in stages.items():
             if len(stats[stage]):
                 etext.append("<br> %s <br> "%stext)
                 if stage == RPG_EFFECT_STAGE_TICK:
                     etext.append("Tick Rate: %i<br> "%e.tickRate)
-                for name,value in stats[stage].iteritems():
+                for name,value in stats[stage].items():
                     if name == "meleeDmgMod":
                         if value > 0:
                             etext.append("%%GREEN%% MELEE DAMAGE %i%% %%ENDCOLOR%%,"%int(value*100.0))
@@ -262,21 +262,21 @@ def CreateSpellIndex(spawnSpells):
     indexPage = '%META:TOPICINFO{author="JoshRitter" date="1121799107" format="1.0" version="1.1"}%\n'
     indexPage += "---+ Spell Index\n\n"
     indexPage += "\t* [[SpellAllIndex][Index of all Spells]]\n\n"
-    indexPage += ''.join("\t* [[Spell%sIndex][%s Spells]]\n"%(GetTWikiName(cname),cname) for cname in sorted(SPELLCLASSES.iterkeys()))
+    indexPage += ''.join("\t* [[Spell%sIndex][%s Spells]]\n"%(GetTWikiName(cname),cname) for cname in sorted(SPELLCLASSES.keys()))
     indexPage += "\n\t* [[SpellSpawnSpellsIndex][Spawn Spells]]\n"
     indexPage += "\t* [[SpellSkillsIndex][Skill Spells]]\n"
     indexPage += "\t* [[SpellRComponentIndex][Spells with Component requirements]]\n"
-    f = file("./distrib/twiki/data/MoMWorld/SpellIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpellIndex.txt","w")
     f.write(indexPage)
     f.close()
     
     indexPage = "---+ Spawn Spells\n\n"
-    indexPage += ''.join("\t* [[Spell%s][%s]]\n"%(GetTWikiName(sname),sname) for sname in spawnSpells.iterkeys())
-    f = file("./distrib/twiki/data/MoMWorld/SpellSpawnSpellsIndex.txt","w")
+    indexPage += ''.join("\t* [[Spell%s][%s]]\n"%(GetTWikiName(sname),sname) for sname in spawnSpells.keys())
+    f = open("./distrib/twiki/data/MoMWorld/SpellSpawnSpellsIndex.txt","w")
     f.write(indexPage)
     f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/SpellRComponentIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpellRComponentIndex.txt","w")
     f.write(SpellIndexPages["SpellRComponentIndex"])
     f.close()
     
@@ -300,7 +300,7 @@ def CreateSpellPages(spawnSpells):
         
         if len(s.exclusions):
             overwritings = {True: [], False: []}
-            for sname,overwrites in s.exclusions.iteritems():
+            for sname,overwrites in s.exclusions.items():
                 overwritings[overwrites].append(sname)
             page += "*Overwrites:* %s\n\n"%', '.join("[[Spell%s][%s]]"%(GetTWikiName(sname),sname) for sname in overwritings[True])
             page += "*Gets overwritten by:* %s\n\n\n"%', '.join("[[Spell%s][%s]]"%(GetTWikiName(sname),sname) for sname in overwritings[False])
@@ -311,14 +311,14 @@ def CreateSpellPages(spawnSpells):
             page += "*Spell Scroll:* [[Item%s][%s]]\n"%(TWIKISCROLLNAME,scrollname)
             spellScrollPage += "\t* [[Item%s][%s]]\n"%(TWIKISCROLLNAME,scrollname)
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/ItemSpellScrollsIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ItemSpellScrollsIndex.txt","w")
     f.write(spellScrollPage)
     f.close()
-    f = file("./distrib/twiki/data/MoMWorld/SpellAllIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpellAllIndex.txt","w")
     f.write(indexPage)
     f.close()
     

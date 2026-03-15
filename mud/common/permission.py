@@ -32,9 +32,9 @@ class TablePermission(Persistent):
     name = StringCol(notNone=True)
     read = BoolCol(default=False)
     write = BoolCol(default=False)
-    insert = BoolCol(default=False,dbName="iinsert")
-    delete = BoolCol(default=False,dbName="ddelete")
-    update = BoolCol(default=False,dbName="uupdate")    
+    canInsert = BoolCol(default=False,dbName="iinsert")
+    canDelete = BoolCol(default=False,dbName="ddelete")
+    canUpdate = BoolCol(default=False,dbName="uupdate")
     columnPermissions=MultipleJoin('ColumnPermission')
     
     role = ForeignKey('Role')
@@ -72,7 +72,7 @@ class TablePermission(Persistent):
                     
         if not t:
             traceback.print_stack()
-            print "AssertionError: type is still None!"
+            print("AssertionError: type is still None!")
             return None
         
         return ColumnPermission(name=columnName,read=read,write=write,alternateID=alternateID,type=t,table_permission=self)
@@ -122,7 +122,7 @@ class UserSchema(pb.Copyable,pb.RemoteCopy):
             self.tablePermissions = {}
             for role in user.roles:
                 for tp in role.tablePermissions:
-                    if not self.tablePermissions.has_key(tp.name):
+                    if tp.name not in self.tablePermissions:
                         self.tablePermissions[tp.name]=UserTablePermissions(tp)
                     else:
                         utp = self.tablePermissions[tp.name]
@@ -157,9 +157,9 @@ class Role(Persistent):
             #full access
             tp.read=True
             tp.write=True
-            tp.insert=True
-            tp.delete=True
-            tp.update=True
+            tp.canInsert=True
+            tp.canDelete=True
+            tp.canUpdate=True
             
             for col in tclass._columns:
                 tp.grantColumn(col.name,True,True)
@@ -182,8 +182,8 @@ class Role(Persistent):
         
 from random import choice
 import string
-def GenPasswd(length=32, chars=string.letters + string.digits):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=32, chars=string.ascii_letters + string.digits):
+    return ''.join([choice(chars) for i in range(length)])
     
 class RoleGhost(PersistentGhost):
     def __init__(self):

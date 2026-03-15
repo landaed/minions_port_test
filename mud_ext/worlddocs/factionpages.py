@@ -30,11 +30,11 @@ def CreateFactionPages(spawnFactions, questFactions):
         factionPage += GenFactionQuestRewards(faction)
         factionPage += GenFactionQuestRequirements(faction)
 
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%(twikiFactionName),"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%(twikiFactionName),"w")
         f.write(factionPage)
         f.close()    
     
-    f = file("./distrib/twiki/data/MoMWorld/FactionIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/FactionIndex.txt","w")
     f.write(factionTopPage)
     f.close()
  

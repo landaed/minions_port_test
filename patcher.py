@@ -116,8 +116,8 @@ if sys.platform[:6] != 'darwin':
     
         def EndDialogAfter(self, timeOut):
             #thread needed because win32gui does not expose SetTimer API
-            import thread
-            thread.start_new_thread(self.Timer, (timeOut, ))
+            import _thread
+            _thread.start_new_thread(self.Timer, (timeOut, ))
         
         def EndDialog(self):
             win32gui.EndDialog(self.hwnd, 0)
@@ -267,9 +267,9 @@ def RunPatcher():
     
     global LOCK
     if sys.platform[:6] != 'darwin' and main_is_frozen():
-        import thread
-        LOCK = thread.allocate_lock()
-        thread.start_new_thread(SplashThread,(None,))
+        import _thread
+        LOCK = _thread.allocate_lock()
+        _thread.start_new_thread(SplashThread,(None,))
         
     
         pid = -1

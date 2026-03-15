@@ -14,18 +14,18 @@ from mud.world.command import DoCommand
 from mud.world.repair import RepairItem,RepairAll,RepairParty
 from mud.world.zone import Zone
 from mud.world.messages import GameMessage
-from defines import *
-from core import *
+from mud.world.defines import *
+from mud.world.core import *
 from sqlobject import *
 from twisted.internet import reactor
-from alliance import Alliance
+from mud.world.alliance import Alliance
 from traceback import print_stack,print_exc
 from time import time
-from cPickle import dumps,loads
-from base64 import encodestring,decodestring
+from pickle import dumps,loads
+from base64 import encodebytes,decodebytes
 from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer
 from mud.gamesettings import GAMENAME
-from race import GetRaceGraphics
+from mud.world.race import GetRaceGraphics
 
 
 #for jelly
@@ -210,9 +210,9 @@ class PlayerAvatar(Avatar):
         from cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
-            pbuffer = encodestring(dumps(pbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
             if cbuffer:
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
 
             AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
             
@@ -376,11 +376,11 @@ class PlayerAvatar(Avatar):
         sneeded = 0
         tneeded = 0
         if spawn.plevel > 1:
-            pneeded = (spawn.plevel-1)*(spawn.plevel-1)*100L*char.pxpMod
+            pneeded = (spawn.plevel-1)*(spawn.plevel-1)*100*char.pxpMod
         if spawn.slevel > 1:
-            sneeded = (spawn.slevel-1)*(spawn.slevel-1)*100L*char.sxpMod
+            sneeded = (spawn.slevel-1)*(spawn.slevel-1)*100*char.sxpMod
         if spawn.tlevel > 1:
-            tneeded = (spawn.tlevel-1)*(spawn.tlevel-1)*100L*char.txpMod
+            tneeded = (spawn.tlevel-1)*(spawn.tlevel-1)*100*char.txpMod
         
         char.xpPrimary = int(pneeded+1)
         char.xpSecondary = int(sneeded+1)
@@ -397,19 +397,19 @@ class PlayerAvatar(Avatar):
         spawn.mysBase = base
         
         char.advancementLevelPrimary = spawn.plevel
-        for i in xrange(2,char.advancementLevelPrimary):
+        for i in range(2,char.advancementLevelPrimary):
             points = int(float(i) / 2.0)
             if points < 5:
                 points = 5
             char.advancementPoints += points
         char.advancementLevelSecondary = spawn.slevel
-        for i in xrange(2,char.advancementLevelSecondary):
+        for i in range(2,char.advancementLevelSecondary):
             points = int(float(i) / 2.0)
             if points < 3:
                 points = 3
             char.advancementPoints += points
         char.advancementLevelTertiary = spawn.tlevel
-        for i in xrange(2,char.advancementLevelTertiary):
+        for i in range(2,char.advancementLevelTertiary):
             points = int(float(i) / 2.0)
             if points < 1:
                 points = 1
@@ -427,9 +427,9 @@ class PlayerAvatar(Avatar):
         from cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
-            pbuffer = encodestring(dumps(pbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
             if cbuffer:
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
             AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
             
             # Clean up the character in the running database.
@@ -454,7 +454,7 @@ class PlayerAvatar(Avatar):
      
     #Generic Failure message if AH Server doesn't respond
     def AHFailure(self, reason):
-        print "Error with AH: %s"%reason
+        print("Error with AH: %s"%reason)
         self.sendFail()
         
     #Send Generic fail message
@@ -469,7 +469,7 @@ class PlayerAvatar(Avatar):
 
     #Call from client to get ItemInfo on an item (right clicking/hovering)
     def perspective_getItemInfo(self,ida):
-        for id, iid in ida.iteritems():
+        for id, iid in ida.items():
             self.world.AHPerspective.callRemote("AHAvatar","getItemInfo",id,iid).addCallbacks(self.AHItemInfoSuccess, self.AHFailure)
             
     #Call back if a refreshed DB for the client was successful from the AH Server
@@ -533,7 +533,7 @@ class PlayerAvatar(Avatar):
         charID = success[1]
         #Item failed to add to the DB...not good
         if not auctionID:
-            print "AHSellSuccess: ITEM FAILED TO ADD TO AUCTION DB....!!!"
+            print("AHSellSuccess: ITEM FAILED TO ADD TO AUCTION DB....!!!")
             self.sendFail()
             return 
 
@@ -544,7 +544,7 @@ class PlayerAvatar(Avatar):
                  
         #Item was not found on the player...not good!
         if not itemfound:
-            print "AHSellSuccess: ITEM SLOT NOT FOUND on %s...POTENTIAL HACK!!!"%char.name
+            print("AHSellSuccess: ITEM SLOT NOT FOUND on %s...POTENTIAL HACK!!!"%char.name)
             #Remove the item from the AH since there is a problem
             self.world.AHPerspective.callRemote("AHAvatar","revokeAHSell",auctionID)
             self.sendFail()
@@ -552,14 +552,14 @@ class PlayerAvatar(Avatar):
             
         #Items do not match...something is not cool!
         if item != oitem:
-            print "AHSellSuccess: Inventory marked in slot before and after auction transit DO NOT MATCH on %s...POTENTIAL HACK!!!"%char.name
+            print("AHSellSuccess: Inventory marked in slot before and after auction transit DO NOT MATCH on %s...POTENTIAL HACK!!!"%char.name)
             self.world.AHPerspective.callRemote("AHAvatar","revokeAHSell",auctionID)
             self.sendFail()
             return
             
         #Player suddenly cannot cover the fare...
         if fare > ExpandMoney(self.player.tin, self.player.copper, self.player.silver, self.player.gold, self.player.platinum):
-            print "AHSellSuccess: Not enough tin to cover the fare"
+            print("AHSellSuccess: Not enough tin to cover the fare")
             self.world.AHPerspective.callRemote("AHAvatar","revokeAHSell",auctionID)
             self.sendFail()
             return
@@ -682,7 +682,7 @@ class PlayerAvatar(Avatar):
         
         #Character not in party..oops
         if char not in party.members:
-            print "perspective_AHSell: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("perspective_AHSell: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             self.sendFail()
             return
             
@@ -693,18 +693,18 @@ class PlayerAvatar(Avatar):
                 break
         
         if not itemfound:
-            print "perspective_AHSell: Invalid slot specified or it could not be found"
+            print("perspective_AHSell: Invalid slot specified or it could not be found")
             self.sendFail()
             return
                     
         #Not the best validation check, but we can at least make sure the prototypes match
         if item.itemProto.id != protoID:
-            print "perspective_AHSell: Invalid Prototype on the ghost and the actual character inventory"
+            print("perspective_AHSell: Invalid Prototype on the ghost and the actual character inventory")
             self.sendFail()
             return
             
         if item.container and item.container.hasContent():
-            print "perspective_AHSell: Trying to sell a container with content in it!"
+            print("perspective_AHSell: Trying to sell a container with content in it!")
             self.sendFail()
             return
                        
@@ -723,19 +723,19 @@ class PlayerAvatar(Avatar):
             startCost = startCost * 5 / 2 # 5% - 24 Hours
             
         if (startCost != fare):
-            print "perspective_AHSell: Fare validation failed"
+            print("perspective_AHSell: Fare validation failed")
             self.sendFail()
             return
              
         #Make sure the player can cover the fare
         if fare > ExpandMoney(self.player.tin, self.player.copper, self.player.silver, self.player.gold, self.player.platinum):
-            print "perspective_AHSell: Not enough tin to cover the fare"
+            print("perspective_AHSell: Not enough tin to cover the fare")
             self.sendFail()
             return
             
         #Check flags to make sure we aren't selling stuff we couldn't normally sell    
         if item.flags&(RPG_ITEM_SOULBOUND|RPG_ITEM_ETHEREAL|RPG_ITEM_WORLDUNIQUE) or not item.itemProto.worthTin:
-            print "perspective_AHSell: Invalid flag or cost on an item trying to be sold!"
+            print("perspective_AHSell: Invalid flag or cost on an item trying to be sold!")
             self.sendFail()
             return
             
@@ -758,7 +758,7 @@ class PlayerAvatar(Avatar):
     #Beginning of Mail Server Calls
     #Generic Failure message if Mail Server doesn't respond
     def MailFailure(self, reason):
-        print "Error with Mail Server: %s"%reason
+        print("Error with Mail Server: %s"%reason)
         self.sendMailFail()
         
     #Send Generic fail message
@@ -770,8 +770,8 @@ class PlayerAvatar(Avatar):
     def perspective_deleteMail(self, mailID):
         char = self.player.curChar
         
-        if not self.player.mailList.has_key(mailID):
-            print "deleteMail: Player does not have that mail cached on the server"
+        if mailID not in self.player.mailList:
+            print("deleteMail: Player does not have that mail cached on the server")
             return
             
         self.player.giveMoney(self.player.mailList[mailID].mailItem.tin)
@@ -783,7 +783,7 @@ class PlayerAvatar(Avatar):
         
     #Update the description...attempting to save bandwidth here
     def perspective_getMailDescription(self, mailID):   
-        if self.player.mailList.has_key(mailID):
+        if mailID in self.player.mailList:
             self.player.mailList[mailID].updateDesc()
             self.player.mailList[mailID].updateItem()
 
@@ -793,7 +793,7 @@ class PlayerAvatar(Avatar):
         
         deleteList = {}
         #Check for expired mail.  Hopefully shouldn't be much
-        for id,mail in self.player.mailList.iteritems():
+        for id,mail in self.player.mailList.items():
             time_format = "%Y-%m-%d %H:%M:%S"
             mytime = strptime(mail.mailItem.time_end,time_format)
             dtime = datetime(*mytime[:6])
@@ -801,7 +801,7 @@ class PlayerAvatar(Avatar):
                 deleteList[id] = 1
                 
         if len(deleteList):
-            for id,x in deleteList.iteritems():
+            for id,x in deleteList.items():
                 del self.player.mailList[id]
                 
             self.mind.callRemote("deleteMail",deleteList) 
@@ -813,9 +813,9 @@ class PlayerAvatar(Avatar):
         prevMailID = self.player.lastMailID
         toclient = {}
 
-        for id, mail in mailList.iteritems():
-            if self.player.mailList.has_key(id):
-                print "refreshInboxSuccess: Player already has a mail cached that was retreived from the server"
+        for id, mail in mailList.items():
+            if id in self.player.mailList:
+                print("refreshInboxSuccess: Player already has a mail cached that was retreived from the server")
                 continue
             if mail.item:
                 mail.item.setProto(mail.item.auctionItemID)       
@@ -843,13 +843,13 @@ class PlayerAvatar(Avatar):
         char = self.player.curChar
         #Item failed to add to the DB...not good
         if not auctionID:
-            print "finishsendMail: MAIL FAILED TO ADD TO MAIL SERVER DB....!!!"
+            print("finishsendMail: MAIL FAILED TO ADD TO MAIL SERVER DB....!!!")
             self.sendMailFail()
             return 
             
         #Player suddenly does have the coinage
         if tin > ExpandMoney(self.player.tin, self.player.copper, self.player.silver, self.player.gold, self.player.platinum):
-            print "finishsendMail: Not enough tin to cover the fare"
+            print("finishsendMail: Not enough tin to cover the fare")
             self.world.AHPerspective.callRemote("MailAvatar","deleteMail",auctionID)
             self.sendMailFail()
             return
@@ -863,7 +863,7 @@ class PlayerAvatar(Avatar):
                  
             #Item was not found on the player...not good!
             if not itemfound:
-                print "finishsendMail: ITEM SLOT NOT FOUND on %s...POTENTIAL HACK!!!"%char.name
+                print("finishsendMail: ITEM SLOT NOT FOUND on %s...POTENTIAL HACK!!!"%char.name)
                 #Remove the item from the AH since there is a problem
                 self.world.AHPerspective.callRemote("MailAvatar","deleteMail",auctionID)
                 self.sendMailFail()
@@ -871,7 +871,7 @@ class PlayerAvatar(Avatar):
             
             #Items do not match...something is not cool!
             if item != oitem:
-                print "finishsendMail: Inventory marked in slot before and after auction transit DO NOT MATCH on %s...POTENTIAL HACK!!!"%char.name
+                print("finishsendMail: Inventory marked in slot before and after auction transit DO NOT MATCH on %s...POTENTIAL HACK!!!"%char.name)
                 self.world.AHPerspective.callRemote("MailAvatar","deleteMail",auctionID)
                 self.sendMailFail()
                 return
@@ -889,7 +889,7 @@ class PlayerAvatar(Avatar):
         sitem = None
         #Make sure the player can cover the tin being sent
         if mail.tin > ExpandMoney(self.player.tin, self.player.copper, self.player.silver, self.player.gold, self.player.platinum):
-            print "perspective_sendMail: Not enough tin to cover the tin in the mail"
+            print("perspective_sendMail: Not enough tin to cover the tin in the mail")
             self.sendMailFail()
             return
             
@@ -902,19 +902,19 @@ class PlayerAvatar(Avatar):
                     break
         
             if not itemfound:
-                print "perspective_sendMail: Invalid slot specified or it could not be found"
+                print("perspective_sendMail: Invalid slot specified or it could not be found")
                 self.sendMailFail()
                 return
                     
             #Not the best validation check, but we can at least make sure the prototypes match
             if item.itemProto.id != protoID:
-                print "perspective_sendMail: Invalid Prototype on the ghost and the actual character inventory"
+                print("perspective_sendMail: Invalid Prototype on the ghost and the actual character inventory")
                 self.sendMailFail()
                 return
                 
             #Check flags to make sure we aren't selling stuff we couldn't normally sell    
             if item.flags&(RPG_ITEM_SOULBOUND|RPG_ITEM_ETHEREAL|RPG_ITEM_WORLDUNIQUE) or not item.itemProto.worthTin:
-                print "perspective_sendMail: Invalid flag or cost on an item trying to be sold!"
+                print("perspective_sendMail: Invalid flag or cost on an item trying to be sold!")
                 self.sendMailFail()
                 return
             
@@ -983,7 +983,7 @@ class PlayerAvatar(Avatar):
             mspawns.append(ms.spawn)
 
         names = []
-        for cname,cvalues in result.iteritems():
+        for cname,cvalues in result.items():
             names.append(cname)
             name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename = cvalues
             cinfo = CharacterInfo()
@@ -1058,13 +1058,13 @@ class PlayerAvatar(Avatar):
                 return d
             except:
                 #error!
-                print "ERROR!"
+                print("ERROR!")
                 return [],[],1
             
             
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
         if cbuffer:
-            cbuffer = loads(decodestring(cbuffer))
+            cbuffer = loads(decodebytes(cbuffer))
             InstallCharacterBuffer(self.player.id,party[0],cbuffer)
         self.enterWorld(party,simPort,simPassword)
         
@@ -1120,7 +1120,7 @@ class PlayerAvatar(Avatar):
                 elif c.realm == RPG_REALM_LIGHT:
                     zone = self.player.logZone.name
                 else:
-                    raise "Unknown Realm!"
+                    raise Exception("Unknown Realm!")
                 
         if zone in self.world.staticZoneNames:
             #we're on the right world server already            
@@ -1134,8 +1134,8 @@ class PlayerAvatar(Avatar):
             char = Character.byName(cname)
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(player.publicName,player.id,char.id,False)
             self.player.transfering = True
-            pbuffer = encodestring(dumps(pbuffer, 2))
-            cbuffer = encodestring(dumps(cbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
+            cbuffer = encodebytes(dumps(cbuffer, 2))
             p = self.player
             guildInfo = (p.guildName,p.guildInfo,p.guildMOTD,p.guildRank)
             d = AVATAR.mind.callRemote("transferPlayer",player.publicName,pbuffer,cname,cbuffer,zoneName,cvalues,self.player.publicName,guildInfo)
@@ -1198,7 +1198,7 @@ class PlayerAvatar(Avatar):
         if not zone:
             return
         
-        print "EnterWorld",zone.ip,self.mind.broker.transport.getPeer().host
+        print("EnterWorld",zone.ip,self.mind.broker.transport.getPeer().host)
         ip = zone.ip
         if zone.owningPlayer == self.player:
             #we are being told to host, what about people sharing an IP?
@@ -1228,7 +1228,7 @@ class PlayerAvatar(Avatar):
         self.player.updateKOS()
         
         if AVATAR:
-            if self.masterPerspective.avatars.has_key("ImmortalAvatar"):
+            if "ImmortalAvatar" in self.masterPerspective.avatars:
                 for c in self.player.party.members:
                     c.mob.aggroOff = True
         
@@ -1241,7 +1241,7 @@ class PlayerAvatar(Avatar):
             self.mind.callRemote("setCursorItem",self.player.cursorItem.itemInfo)
             
         
-        if not Player.remoteLeaderNames.has_key(self.player.publicName):
+        if self.player.publicName not in Player.remoteLeaderNames:
             self.player.alliance = Alliance(self.player)
         else:
             rln = Player.remoteLeaderNames[self.player.publicName]
@@ -1310,7 +1310,7 @@ class PlayerAvatar(Avatar):
         party = self.player.party
         char = Character.get(cid)
         if char not in party.members:
-            print "onSpellSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onSpellSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         if char.dead or not char.mob:
             return
@@ -1324,7 +1324,7 @@ class PlayerAvatar(Avatar):
         party = self.player.party
         char = Character.get(cid)
         if char not in party.members:
-            print "onSpellSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onSpellSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         if char.dead or not char.mob:
             return
@@ -1336,7 +1336,7 @@ class PlayerAvatar(Avatar):
         party = self.player.party
         char = Character.get(cid)
         if char not in party.members:
-            print "onInvSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onInvSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         if char.dead or not char.mob:
             return
@@ -1349,7 +1349,7 @@ class PlayerAvatar(Avatar):
         party = self.player.party
         char = Character.get(cid)
         if char not in party.members:
-            print "onInvSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onInvSlot: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         if char.dead or not char.mob:
             return
@@ -1369,7 +1369,7 @@ class PlayerAvatar(Avatar):
         
         # Check if our Player truly is the owner of this Character.
         if char not in self.player.party.members:
-            print "onInvSlotCtrl: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onInvSlotCtrl: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         
         # If this Character is dead or has no Mob, then return early.
@@ -1394,7 +1394,7 @@ class PlayerAvatar(Avatar):
         else:
             
             # Player attempted to use invalid slot, give debug print.
-            print "onInvSlotCtrl: PLAYER ATTEMPTING TO USE INVALID SLOT"
+            print("onInvSlotCtrl: PLAYER ATTEMPTING TO USE INVALID SLOT")
             return
     
     
@@ -1408,7 +1408,7 @@ class PlayerAvatar(Avatar):
         
         # Check if our Player truly is the owner of this Character.
         if char not in player.party.members:
-            print "onApplyPoison: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER"
+            print("onApplyPoison: PLAYER ATTEMPTING TO MANIPULATE NONPARTY CHARACTER")
             return
         
         # Get a handle to this Characters Mob.
@@ -1441,7 +1441,7 @@ class PlayerAvatar(Avatar):
                 player.sendGameText(RPG_MSG_GAME_DENIED,"Can't apply poison, %s has no pet.\\n"%(char.name))
                 return
         if not poisonTarget:
-            print "onApplyPoison: PLAYER ATTEMPTING TO APPLY POISON TO WRONG SLOT"
+            print("onApplyPoison: PLAYER ATTEMPTING TO APPLY POISON TO WRONG SLOT")
             return
         
         # Iterate over the Character's items to find the specified poison.
@@ -1456,7 +1456,7 @@ class PlayerAvatar(Avatar):
         
         # Player attempted to use invalid slot, give debug print.
         else:
-            print "onApplyPoison: PLAYER ATTEMPTING TO USE INVALID SLOT"
+            print("onApplyPoison: PLAYER ATTEMPTING TO USE INVALID SLOT")
             return
         
         # Check if the mob is allowed to use this item.
@@ -1492,7 +1492,7 @@ class PlayerAvatar(Avatar):
                     # It really is a poison, so apply it.
                     targetProcs = poisonTarget.procs
                     # If the weapon already has this poison active, refresh it.
-                    if targetProcs.has_key(ispell):
+                    if ispell in targetProcs:
                         targetProcs[ispell] = [ispell.duration,RPG_ITEMPROC_POISON]
                         player.sendGameText(RPG_MSG_GAME_GAINED,"%s refreshes %s.\\n"%(char.name,poison.name))
                     # Else check if there's still room for one additional poison.
@@ -1503,7 +1503,7 @@ class PlayerAvatar(Avatar):
                     else:
                         # Get the poison with the lowest duration.
                         overwriting = []
-                        for proc,procData in targetProcs.iteritems():
+                        for proc,procData in targetProcs.items():
                             if procData[1] != RPG_ITEMPROC_ENCHANTMENT:
                                 if not overwriting or overwriting[1] < procData[0]:
                                     overwriting = (proc,procData[0])
@@ -1572,7 +1572,7 @@ class PlayerAvatar(Avatar):
         item = self.player.cursorItem
         self.player.cursorItem = None
         if item.character.player != self.player:
-            raise ValueError,"Attempting to expunge an item not belonging to player!"
+            raise ValueError("Attempting to expunge an item not belonging to player!")
             return
         item.slot = -1
         self.player.updateCursorItem(item)
@@ -1583,7 +1583,7 @@ class PlayerAvatar(Avatar):
     def perspective_splitItem(self,newStackSize):
         item = self.player.cursorItem
         if item.character not in self.player.party.members:
-            raise "Attempting to split an item not belonging to player's present party!"
+            raise Exception("Attempting to split an item not belonging to player's present party!")
             self.player.cursorItem = None
             return
         item.character.splitItem(item,newStackSize)
@@ -1626,7 +1626,7 @@ class PlayerAvatar(Avatar):
             zi = self.world.getZoneByInstanceName(zoneInstanceName)
             if not zi:
                 print_stack()
-                print "AssertionError: zone not found!"
+                print("AssertionError: zone not found!")
                 return
             
             player.zone = zi
@@ -1686,7 +1686,7 @@ class PlayerAvatar(Avatar):
         if item and found:
             self.player.interacting.vendor.buyItem(self.player,item)
         else:
-            print "Warning: Player item selling wackiness!!! Item to be sold not found!"
+            print("Warning: Player item selling wackiness!!! Item to be sold not found!")
     
     def perspective_buyItem(self,charIndex,itemIndex):  # use index from vendor list
         if not self.player.interacting or not self.player.interacting.vendor:
@@ -1781,7 +1781,7 @@ class PlayerAvatar(Avatar):
         player.alliance.invite(otherplayer)
     
     def gotCheckIgnoreAllianceError(self,error):
-        print "Error in checkIgnore: %s"%str(error)
+        print("Error in checkIgnore: %s"%str(error))
     
     def perspective_joinAlliance(self):
         player = self.player
@@ -1867,7 +1867,7 @@ class PlayerAvatar(Avatar):
     def perspective_onPlayerTradeMoney(self,money):
         player = self.player
         if not player.trade:
-            return 0L
+            return 0
         return player.trade.submitMoney(player,money)
     
     def perspective_onPlayerTradeSlot(self,slot):
@@ -1985,7 +1985,7 @@ class PlayerAvatar(Avatar):
                 c.chooseAdvancement(advancement)
                 return
             
-        raise RuntimeWarning,"Player %s attempting to choose advancement %s for %s"%(self.player.name,advancement,cname)
+        raise RuntimeWarning("Player %s attempting to choose advancement %s for %s"%(self.player.name,advancement,cname))
     
     
     def perspective_onCraft(self,cindex,recipeID,useCraftWindow=False):
@@ -2131,11 +2131,11 @@ class PlayerAvatar(Avatar):
         try:
             vitem = CharacterVaultItem.get(id)
         except:
-            print "WARNING: Invalid vault item id %i"%id
+            print("WARNING: Invalid vault item id %i"%id)
             return
         
         if char != vitem.character:
-            print "WARNING: Player %s attempting to remove vault item to incorrect character %s"%(player.name,char.name)
+            print("WARNING: Player %s attempting to remove vault item to incorrect character %s"%(player.name,char.name))
             return
         
         item = ItemInstance(vitem.item)
@@ -2340,7 +2340,7 @@ class PlayerAvatar(Avatar):
         if charID:
             srcChar = Character.get(charID)
             if srcChar not in player.party.members:
-                print "insertItem: PLAYER %s IS ATTEMPTING TO MANIPULATE NONPARTY CHARACTER %s!"%(player.name,srcChar.name)
+                print("insertItem: PLAYER %s IS ATTEMPTING TO MANIPULATE NONPARTY CHARACTER %s!"%(player.name,srcChar.name))
                 return
         
         # Get the container item.
@@ -2348,7 +2348,7 @@ class PlayerAvatar(Avatar):
         if RPG_SLOT_BANK_BEGIN <= containerSlot < RPG_SLOT_BANK_END:
             container = player.bankItems.get(containerSlot)
         elif not srcChar:
-            print "insertItem: ERROR, container owner unspecified!"
+            print("insertItem: ERROR, container owner unspecified!")
             return
         elif srcChar.mob and RPG_SLOT_WORN_BEGIN <= containerSlot < RPG_SLOT_WORN_END:
             container = srcChar.mob.worn.get(containerSlot)
@@ -2360,7 +2360,7 @@ class PlayerAvatar(Avatar):
         
         # If the container could not be found, log a warning.
         if not container or not container.container:
-            print "insertItem: WARNING, could not find desired container for player %s!"%player.name
+            print("insertItem: WARNING, could not find desired container for player %s!"%player.name)
             return
         
         # Insert the item on cursor into the container.
@@ -2384,7 +2384,7 @@ class PlayerAvatar(Avatar):
         if charID:
             srcChar = Character.get(charID)
             if srcChar not in player.party.members:
-                print "extractItem: PLAYER %s IS ATTEMPTING TO MANIPULATE NONPARTY CHARACTER %s!"%(player.name,srcChar.name)
+                print("extractItem: PLAYER %s IS ATTEMPTING TO MANIPULATE NONPARTY CHARACTER %s!"%(player.name,srcChar.name))
                 return
         
         # Get the character that will be owning the extracted item.
@@ -2395,7 +2395,7 @@ class PlayerAvatar(Avatar):
         if RPG_SLOT_BANK_BEGIN <= containerSlot < RPG_SLOT_BANK_END:
             container = player.bankItems.get(containerSlot)
         elif not srcChar:
-            print "extractItem: ERROR, container owner unspecified!"
+            print("extractItem: ERROR, container owner unspecified!")
             return
         elif srcChar.mob and RPG_SLOT_WORN_BEGIN <= containerSlot < RPG_SLOT_WORN_END:
             container = srcChar.mob.worn.get(containerSlot)
@@ -2407,7 +2407,7 @@ class PlayerAvatar(Avatar):
         
         # If the container could not be found, log a warning.
         if not container or not container.container:
-            print "extractItem: WARNING, could not find desired container for player %s!"%player.name
+            print("extractItem: WARNING, could not find desired container for player %s!"%player.name)
             return
         
         # Extract the item from the container.
@@ -2431,6 +2431,6 @@ class PlayerAvatar(Avatar):
 
 
     def perspective_queryRaceGraphics(self):
-        from race import GetRaceGraphics
+        from mud.world.race import GetRaceGraphics
         return GetRaceGraphics()
 

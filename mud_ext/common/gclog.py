@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-import gc, marshal, cPickle
+import gc, marshal, pickle
 from types import InstanceType
 
 from twisted.python import log
@@ -24,11 +24,11 @@ def gc_check(verbose=False):
         t = type(o)
         if t is InstanceType:
             name = '<class %s>' % o.__class__.__name__
-            if not D.has_key(name): D[name] = 1
+            if name not in D: D[name] = 1
             else: D[name] += 1
         else:
             name = t.__name__
-            if not D.has_key(name): D[name] = 1
+            if name not in D: D[name] = 1
             else: D[name] += 1
         try:
             L[name] = L.get(name,0)+len(o)
@@ -41,13 +41,13 @@ def gc_check(verbose=False):
             pass
         try:
             if verbose == True:
-                P[name] = P.get(name,0)+len(cPickle.dumps(o))
+                P[name] = P.get(name,0)+len(pickle.dumps(o))
         except:
             pass
     log.msg('Objects:')
     log.msg('    %-30s %10s %10s %10s %10s' % ("Class Name:", "Count", 
     "List Len", "Mshl Size", "Pick Size"))
-    for k in sorted(D.iterkeys()):
+    for k in sorted(D.keys()):
         try:
             if PREVD[k] >= D[k]:
                 continue

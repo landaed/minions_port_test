@@ -66,7 +66,7 @@ class vec4:
                 elif len(args[0])==4:
                     self.x, self.y, self.z, self.w = args[0]
                 else:
-                    raise TypeError, "vec4() takes at most 4 arguments"
+                    raise TypeError("vec4() takes at most 4 arguments")
             # String
             elif T==types.StringType:
                 s=args[0].replace(","," ").replace("  "," ").strip().split(" ")
@@ -77,7 +77,7 @@ class vec4:
                 self.x, self.y, self.z, self.w = dummy
             # error
             else:
-                raise TypeError,"vec4() arg can't be converted to vec4"
+                raise TypeError("vec4() arg can't be converted to vec4")
 
         elif len(args)==2:
             self.x, self.y = args
@@ -91,7 +91,7 @@ class vec4:
             self.x, self.y, self.z, self.w = args
 
         else:
-            raise TypeError, "vec4() takes at most 4 arguments"
+            raise TypeError("vec4() takes at most 4 arguments")
 
 
     def __repr__(self):
@@ -150,7 +150,7 @@ class vec4:
         if isinstance(other, vec4):
             return vec4(self.x+other.x, self.y+other.y, self.z+other.z, self.w+other.w)
         else:
-            raise TypeError, "unsupported operand type for +"
+            raise TypeError("unsupported operand type for +")
 
     def __sub__(self, other):
         """Vector subtraction.
@@ -163,7 +163,7 @@ class vec4:
         if isinstance(other, vec4):
             return vec4(self.x-other.x, self.y-other.y, self.z-other.z, self.w-other.w)
         else:
-            raise TypeError, "unsupported operand type for -"
+            raise TypeError("unsupported operand type for -")
 
     def __mul__(self, other):
         """Multiplication with a scalar or dot product.
@@ -191,7 +191,7 @@ class vec4:
             if getattr(other,"__rmul__",None)!=None:
                 return other.__rmul__(self)
             else:
-                raise TypeError, "unsupported operand type for *"
+                raise TypeError("unsupported operand type for *")
 
     __rmul__ = __mul__
 
@@ -208,7 +208,7 @@ class vec4:
             return vec4(self.x/other, self.y/other, self.z/other, self.w/other)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for /"
+            raise TypeError("unsupported operand type for /")
 
     def __mod__(self, other):
         """Modulo (component wise)
@@ -223,7 +223,7 @@ class vec4:
             return vec4(self.x%other, self.y%other, self.z%other, self.w%other)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for %"
+            raise TypeError("unsupported operand type for %")
 
     def __iadd__(self, other):
         """Inline vector addition.
@@ -241,7 +241,7 @@ class vec4:
             self.w+=other.w
             return self
         else:
-            raise TypeError, "unsupported operand type for +="
+            raise TypeError("unsupported operand type for +=")
 
     def __isub__(self, other):
         """Inline vector subtraction.
@@ -259,7 +259,7 @@ class vec4:
             self.w-=other.w
             return self
         else:
-            raise TypeError, "unsupported operand type for -="
+            raise TypeError("unsupported operand type for -=")
 
     def __imul__(self, other):
         """Inline multiplication (only with scalar)
@@ -278,7 +278,7 @@ class vec4:
             self.w*=other
             return self
         else:
-            raise TypeError, "unsupported operand type for *="
+            raise TypeError("unsupported operand type for *=")
 
     def __idiv__(self, other):
         """Inline division with scalar
@@ -297,7 +297,7 @@ class vec4:
             self.w/=other
             return self
         else:
-            raise TypeError, "unsupported operand type for /="
+            raise TypeError("unsupported operand type for /=")
 
     def __imod__(self, other):
         """Inline modulo
@@ -316,7 +316,7 @@ class vec4:
             self.w%=other
             return self
         else:
-            raise TypeError, "unsupported operand type for %="
+            raise TypeError("unsupported operand type for %=")
 
     def __neg__(self):
         """Negation
@@ -366,14 +366,14 @@ class vec4:
         """
         T=type(key)
         if T!=types.IntType and T!=types.LongType:
-            raise TypeError, "index must be integer"
+            raise TypeError("index must be integer")
 
         if   key==0: return self.x
         elif key==1: return self.y
         elif key==2: return self.z
         elif key==3: return self.w
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def __setitem__(self, key, value):
         """Set a component by index (0-based)
@@ -385,14 +385,14 @@ class vec4:
         """
         T=type(key)
         if T!=types.IntType and T!=types.LongType:
-            raise TypeError, "index must be integer"
+            raise TypeError("index must be integer")
 
         if   key==0: self.x = value
         elif key==1: self.y = value
         elif key==2: self.z = value
         elif key==3: self.w = value
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
 
     def length(self):
@@ -425,7 +425,7 @@ class vec4:
 def _test():
     import doctest, vec4
     failed, total = doctest.testmod(vec4)
-    print "%d/%d failed" % (failed, total)
+    print("%d/%d failed" % (failed, total))
 
 if __name__=="__main__":
 

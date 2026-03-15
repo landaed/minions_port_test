@@ -29,9 +29,9 @@ if main_is_frozen():
 
 
   
-print "\n\n-------------------------------------"
-print "Minions Of Mirth World Updater v .01a"
-print "-------------------------------------"
+print("\n\n-------------------------------------")
+print("Minions Of Mirth World Updater v .01a")
+print("-------------------------------------")
 
 
 mode = False
@@ -46,7 +46,7 @@ try:
     elif sys.argv[index].lower()=="multi":
         mode = "multiplayer"
     else:
-        raise "error"
+        raise Exception("error")
     
     #case?
     worldname = sys.argv[index+1]
@@ -55,10 +55,10 @@ try:
         
 except:
     #traceback.print_exception(sys.exc_info()[0],sys.exc_info()[1],sys.exc_info()[2])
-    print "Usage: WorldUpdate single|multi worldname"
+    print("Usage: WorldUpdate single|multi worldname")
     sys.exit()
 
-print "Updating World: %s"%worldname    
+print("Updating World: %s"%worldname)    
 
 #backup in case something goes wrong
 wpath = "%s/%s/data/worlds/%s/%s/world.db"%(os.getcwd(),GAMEROOT,mode,worldname)
@@ -66,9 +66,9 @@ basepath = "%s/%s/data/worlds/multiplayer.baseline/world.db"%(os.getcwd(),GAMERO
 
 from mud.world.worldupdate import WorldUpdate
 if WorldUpdate(wpath,basepath,False,True):
-    print "Error Updating World"
+    print("Error Updating World")
 else:
-    print "World Updated"
+    print("World Updated")
     
     
     

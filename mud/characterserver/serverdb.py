@@ -6,7 +6,7 @@ from sqlite3 import dbapi2 as sqlite
 import shutil
 from twisted.internet import reactor
 import traceback
-import sha
+import hashlib
 import sys
 import os
 
@@ -111,7 +111,7 @@ def BackupCharacterDB():
 class CharDB:
     def __init__(self,filename):
         self.conn = sqlite.connect(filename,isolation_level=None)
-        self.conn.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+        self.conn.text_factory = lambda x: str(x, "utf-8", "ignore")
         
         cursor = self.conn.cursor()
         cursor.execute("SELECT genesis_time from world")
@@ -137,7 +137,7 @@ class CharDB:
     
     
     def transactionTick(self, commitOnly=False):
-        print "... Commit Character Database ..."
+        print("... Commit Character Database ...")
         
         cursor = self.conn.cursor()
         cursor.execute("END TRANSACTION;")
@@ -145,7 +145,7 @@ class CharDB:
         if not commitOnly:
             self.backupCounter -= 1
             if not self.backupCounter:
-                print "Backing up character database"
+                print("Backing up character database")
                 self.backupCounter = 40 #once every 80 minutes
                 try:
                     BackupCharacterDB()
@@ -159,12 +159,12 @@ class CharDB:
     
     
     def checkIntegrity(self):
-        print "... Checking Database Integrity ..."
+        print("... Checking Database Integrity ...")
         cursor = self.conn.cursor()
         cursor.execute("PRAGMA integrity_check;")
         if cursor.fetchone()[0]!='ok':
-            raise "Database Error"
-        print "... ok ..."
+            raise Exception("Database Error")
+        print("... ok ...")
         
         cursor.close()
         
@@ -713,7 +713,7 @@ def SendBuffer(result,filename,wconn,buffer,pos):
         
     digest = None
     if done:
-        m = sha.new()
+        m = hashlib.sha1()
         m.update(buffer)
         digest = m.hexdigest()
 
@@ -745,27 +745,27 @@ def GotLastBackupFile(masterfile,wconns):
     try:
         if LASTBACKUPFILE:
             
-            f = file(LASTBACKUPFILE,'rb')
+            f = open(LASTBACKUPFILE,'rb')
             buffer = f.read()
             f.close()
 
             d = wconn.perspective.callRemote("beginReplication",LASTBACKUPFILE)
             d.addCallback(SendBuffer,LASTBACKUPFILE,wconn,buffer,0)
-            print "Replicating File: %s to %s"%(LASTBACKUPFILE,wconn.perspective.broker.transport.getPeer().host)
+            print("Replicating File: %s to %s"%(LASTBACKUPFILE,wconn.perspective.broker.transport.getPeer().host))
     except:
         traceback.print_exc()
 
     try:
         if masterfile:
             
-            f = file(masterfile,'rb')
+            f = open(masterfile,'rb')
             buffer = f.read()
             f.close()
 
             md = wconn.perspective.callRemote("beginReplication",masterfile)
             md.addCallback(SendBuffer,masterfile,wconn,buffer,0)
             
-            print "Replicating File: %s to %s"%(masterfile,wconn.perspective.broker.transport.getPeer().host)
+            print("Replicating File: %s to %s"%(masterfile,wconn.perspective.broker.transport.getPeer().host))
     except:
         traceback.print_exc()
     

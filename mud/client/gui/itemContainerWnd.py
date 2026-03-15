@@ -146,7 +146,7 @@ class ItemContainerWnd(object):
         # Update the item name.
         TGEEval('ItemContainerWnd_ContentInfoName.setText("%s%s");'%(TEXT_HEADER,ghost.NAME))
         # Update the item flags.
-        text = ' '.join(r'\cp\c2%s\co '%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.iteritems() if (f&ghost.FLAGS))
+        text = ' '.join(r'\cp\c2%s\co '%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.items() if (f&ghost.FLAGS))
         TGEEval('ItemContainerWnd_ContentInfoFlags.setText("%s%s");'%(TEXT_HEADER,text))
         # Update the item description.
         text = ""

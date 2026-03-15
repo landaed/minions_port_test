@@ -163,7 +163,7 @@ class Brain:
     
     def pain(self):
         if self.death:
-            print "WARNING: mob pain after death"
+            print("WARNING: mob pain after death")
             return
         
         so = self.simObject
@@ -430,7 +430,7 @@ class SimObject(pb.Cacheable):
             # Especially if lag goes into the calculation.
             # (Note that this is distance squared and update is checked in intervals!)
             if role != "Immortal" and distance > 5000.0:
-                print "WARNING: displacement ignored for %s, old position: %s, requested position: %s"%(self.spawnInfo.name,self.position,pos)
+                print("WARNING: displacement ignored for %s, old position: %s, requested position: %s"%(self.spawnInfo.name,self.position,pos))
                 transform = list(self.tgeObject.getTransform())
                 transform[0] = self.position[0]
                 transform[1] = self.position[1]
@@ -480,7 +480,7 @@ class SimObject(pb.Cacheable):
     
     
     def remote_mountImage(self,rpgslot,model):
-        print rpgslot,model
+        print(rpgslot,model)
 
 
 

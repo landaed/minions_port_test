@@ -88,7 +88,7 @@ class LootProto(Persistent):
     spawns = MultipleJoin('Spawn')
     lootItems = MultipleJoin('LootItem')
     
-    tin = IntCol(default = 0L)
+    tin = IntCol(default = 0)
     
     
     def _init(self,*args,**kw):
@@ -125,7 +125,7 @@ class Loot:
         
         # level -> list of item protos
         uniqueProtos = Loot.uniqueItemProtos = {}
-        for itemid,freq in uloot.iteritems():
+        for itemid,freq in uloot.items():
             ip = protos.setdefault(itemid,ItemProto.get(itemid))
             
             level = ip.level
@@ -146,7 +146,7 @@ class Loot:
         
         self.items = []
         
-        self.tin = 0L
+        self.tin = 0
         
         self.fleshDone = False
         self.corpseLootGenerated = False
@@ -163,7 +163,7 @@ class Loot:
             gotsome=True
             player.alliance.giveMoney(player,self.tin)
         
-        self.tin = 0L
+        self.tin = 0
         
         return gotsome
     
@@ -229,7 +229,7 @@ class Loot:
  
     #Start code added by BellyFish
          # Zone dependent Seasonal drops
-        if ZONE_SEASONALITEMS.has_key(self.mob.zone.zone.name):
+        if self.mob.zone.zone.name in ZONE_SEASONALITEMS:
             # check if mob can have a Seasonal drop, a 1 in 4 chance
             # as the ZONE_SEASONALITEMS list increases for the same time period the chance for a
             # specific drop decreases.
@@ -279,7 +279,7 @@ class Loot:
         if len(loot) < 16:
             # Higher level mob possibly carries more random stuff.
             num = randint(0,int(spawn.plevel / 10) + 1)
-            for x in xrange(0,num):
+            for x in range(0,num):
                 # For each single item 25% chance to have or not to have.
                 if randint(0,3):
                     continue
@@ -336,7 +336,7 @@ class Loot:
         # Unique mobs may carry more than one potion.
         if self.mob.uniqueVariant:
             num = 2
-        for x in xrange(0,num):
+        for x in range(0,num):
             if len(loot) < 16:
                 # The higher level the mob, the higher the chance
                 #  to carry a stat potion.
@@ -361,7 +361,7 @@ class Loot:
                         traceback.print_exc()
         
         num = 2 if self.mob.uniqueVariant else 1
-        for x in xrange(0,num):                    
+        for x in range(0,num):                    
             if len(loot) < 16:
                 if not randint(0,4): #got one
                     scrolls = set()
@@ -375,7 +375,7 @@ class Loot:
                     for cl,level in classes:
                         spellScrolls = Loot.spellScrolls.get(cl)
                         if spellScrolls:
-                            for x in xrange(max(1,level - 5),level + 11):
+                            for x in range(max(1,level - 5),level + 11):
                                 try:
                                     scrolls.update(spellScrolls[x])
                                 except KeyError:
@@ -390,7 +390,7 @@ class Loot:
                     if scroll:
                         v = (0,30,55,75,85,90,94,97,101)
                         x = randint(0,100)
-                        for z in xrange(0,9):
+                        for z in range(0,9):
                             if x < v[z]:
                                 break
                         x = z + 1
@@ -408,7 +408,7 @@ class Loot:
         
         #books of learning
         num = 2 if self.mob.uniqueVariant else 1
-        for x in xrange(0,num):
+        for x in range(0,num):
             if len(loot) < 16:
                 chance = (110 - spawn.plevel) / 2
                 if not randint(0,chance):
@@ -436,7 +436,7 @@ class Loot:
             #  to add to the loot table.
             items = {}
             uniqueProtos = Loot.uniqueItemProtos
-            for level in xrange(x,spawn.plevel + 1):
+            for level in range(x,spawn.plevel + 1):
                 try:
                     for freq,ip in uniqueProtos[level]:
                         items.setdefault(freq,[]).append(ip)
@@ -446,13 +446,13 @@ class Loot:
             # If there are random items available...
             if len(items):
                 # Try to add maximally 3.
-                for x in xrange(3):
+                for x in range(3):
                     ip = None
                     # 33% Chance to get an additional item per iteration.
                     if not randint(0,2):
                         # Start iteration over possible items at lowest
                         #  drop frequency.
-                        for freq in sorted(items.iterkeys(),reverse=True):
+                        for freq in sorted(iter(items.keys()),reverse=True):
                             if not randint(0,freq):
                                 if len(items[freq]) == 1:
                                     ip = items[freq][0]
@@ -487,7 +487,7 @@ class Loot:
                         # Random quality for item (lower quality items can be combined
                         #  for higher quality), but don't allow index 0 (raw drop).
                         qualityCursor = randint(1,100)
-                        for qualityTester in xrange(len(ENCHANT_QualityPrefix)):
+                        for qualityTester in range(len(ENCHANT_QualityPrefix)):
                             if qualityCursor <= ENCHANT_QualityDropDistribution[qualityTester]:
                                 break
                             enchQuality += 1

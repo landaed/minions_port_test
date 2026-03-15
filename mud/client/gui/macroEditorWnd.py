@@ -36,7 +36,7 @@ class MacroEditor:
         self.guiLines = dict()
         self.guiDelays = dict()
         self.guiMandatory = dict()
-        for indexA,indexB in zip(xrange(10),xrange(1,11)):
+        for indexA,indexB in zip(range(10),range(1,11)):
             self.guiLines[indexA] = TGEObject('CM_LINE%i'%indexB)
             self.guiDelays[indexA] = TGEObject('CM_DELAY%i'%indexB)
             self.guiMandatory[indexA] = TGEObject('CM_MANDATORY%i'%indexB)
@@ -73,7 +73,7 @@ class MacroEditor:
             manualDelay = 0
         newMacro.manualDelay = manualDelay
         
-        for lineIndex in xrange(10):
+        for lineIndex in range(10):
             lineCommand = self.guiLines[lineIndex].getValue().lstrip().rstrip()
             mandatory = int(self.guiMandatory[lineIndex].getValue()) == 1
             try:
@@ -104,7 +104,7 @@ class MacroEditor:
         self.guiWaitAll.setValue(0)
         self.guiManualDelay.setText("0")
         
-        for index in xrange(10):
+        for index in range(10):
             self.guiLines[index].setText("")
             self.guiMandatory[index].setValue(0)
             self.guiDelays[index].setText("0")
@@ -139,7 +139,7 @@ class MacroEditor:
             self.chooseIcon(macro.icon,True)
             self.guiWaitAll.setValue(macro.waitAll)
             self.guiManualDelay.setText(str(macro.manualDelay))
-            for lineIndex,macroLine in macro.macroLines.iteritems():
+            for lineIndex,macroLine in macro.macroLines.items():
                 self.guiLines[lineIndex].setText(macroLine.command)
                 self.guiMandatory[lineIndex].setValue(macroLine.mandatory)
                 self.guiDelays[lineIndex].setText(str(macroLine.delayAfter))

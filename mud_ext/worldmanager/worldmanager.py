@@ -10,8 +10,8 @@ from twisted.cred.credentials import UsernamePassword
 
 from shutil import rmtree,copyfile
 import os,sys,imp
-from cPickle import load,dump
-from md5 import md5
+from pickle import load,dump
+from hashlib import md5
 from traceback import print_stack
 
 from gui.mainpanel import MainPanel
@@ -48,12 +48,12 @@ if not os.path.exists("%s/cache"%GAMEROOT):
     os.makedirs("%s/cache"%GAMEROOT)
 
 try:
-    f = file('%s/cache/worldmanager.tmp'%GAMEROOT, 'r')
+    f = open('%s/cache/worldmanager.tmp'%GAMEROOT, 'r')
     SETTINGS = load(f)
     f.close()
 except:
     SETTINGS = {}
-    f = file('%s/cache/worldmanager.tmp'%GAMEROOT, 'w')
+    f = open('%s/cache/worldmanager.tmp'%GAMEROOT, 'w')
     SETTINGS['PublicName'] = ''
     SETTINGS['Password'] = ''
     dump(SETTINGS,f)
@@ -116,7 +116,7 @@ class MyMainPanel(MainPanel,pb.Root):
     
     
     def OnCoServeWorld(self,evt=None):
-        print "WARNING: co-serving not yet implemented!"
+        print("WARNING: co-serving not yet implemented!")
         evt.Skip()
             
         
@@ -157,7 +157,7 @@ class MyMainPanel(MainPanel,pb.Root):
         
         worldname = self.myWorld
         worldname = worldname.replace(" ","_")
-        print 'Launching ',worldname
+        print('Launching ',worldname)
         
         cwd = os.getcwd()
         
@@ -182,7 +182,7 @@ class MyMainPanel(MainPanel,pb.Root):
             args.insert(0,cmd)
             
             s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print s
+            print(s)
             os.system(s)
     
     
@@ -216,7 +216,7 @@ class MyMainPanel(MainPanel,pb.Root):
             #can this folder be manipulated?
             if '..' in worldname:
                 print_stack()
-                print "AssertionError: '..' in worldname!"
+                print("AssertionError: '..' in worldname!")
                 return
             try:
                 rmtree('./%s/data/worlds/multiplayer/%s'%(GAMEROOT,worldname))
@@ -293,7 +293,7 @@ ZONEPASSWORD = ""
 MOTD = "%s\\n"
 """%(self.worldPort,self.wconfig.zonePort,self.wconfig.maxLivePlayers,self.wconfig.playerPassword,self.wconfig.motd)
     
-        f = file('./serverconfig/%s.py'%worldname,'w')
+        f = open('./serverconfig/%s.py'%worldname,'w')
         f.write(config)
         f.close()
         
@@ -481,7 +481,7 @@ def main():
     app = WorldManagerApp(0)
     app.MainLoop()
 
-    f = file('%s/cache/worldmanager.tmp'%GAMEROOT, 'w')
+    f = open('%s/cache/worldmanager.tmp'%GAMEROOT, 'w')
     dump(SETTINGS,f)
     f.close()
 

@@ -2,7 +2,7 @@
 # Please see LICENSE.TXT for details
 
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.internet import protocol
 from twisted.application import service, strports
@@ -53,7 +53,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
     def buildProtocol(self, addr):
         
         if addr.host not in self.allowedIP:
-            raise "Unauthorized"
+            raise Exception("Unauthorized")
         
         
         return factory.SSHFactory.buildProtocol(self,addr)
@@ -68,9 +68,8 @@ class chainedProtocolFactory:
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
 
+@interface.implementer(checkers.ICredentialsChecker)
 class ManholeChecker:
-
-    interface.implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.IUsernamePassword,
         credentials.IUsernamePassword)

@@ -10,7 +10,7 @@ TomeGui = TomeGui.instance
 receiveGameText = TomeGui.receiveGameText
 from mud.world.defines import *
 
-from cPickle import load,dump
+from pickle import load,dump
 from time import time as sysTime
 import traceback
 
@@ -70,7 +70,7 @@ class FriendsWnd(object):
             offline = dict((friend.upper(),friend) for friend in FRIENDS)
             
             # Add online friends to list.
-            for index,friend in enumerate(finfo.iterkeys()):
+            for index,friend in enumerate(finfo.keys()):
                 friendUpper = friend.upper()
                 matchGuild,wname,zname = finfo[friend]
                 online.add(friend)
@@ -86,7 +86,7 @@ class FriendsWnd(object):
                 self.textList.addRow(index,"%s%s\t%s\t%s"%(friend,guildTag,wname,zname))
             
             # Add offline friends to list.
-            for index,friend in enumerate(offline.itervalues()):
+            for index,friend in enumerate(offline.values()):
                 self.textList.addRow(index,"%s\tAway\t"%(friend))
             
             if fromServer:

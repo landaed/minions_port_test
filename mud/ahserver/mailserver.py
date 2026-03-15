@@ -6,9 +6,8 @@ sys.path.append(os.getcwd())
 
 if sys.platform == "win32":
     from twisted.internet.iocpreactor import install
-else:
-    from twisted.internet.threadedselectreactor import install
-install()
+    install()
+# else: use default reactor on Linux
 
 from twisted.internet import reactor
 from mud.server.app import Server
@@ -24,7 +23,7 @@ from mud.world.itemvariants import ItemVariantsAHSave,ItemVariantsAHLoad
 from copy import copy
 import shutil
 
-from md5 import md5
+from hashlib import md5
 from time import strftime,time
 
 from sqlite3 import dbapi2 as sqlite
@@ -32,8 +31,8 @@ from sqlite3 import dbapi2 as sqlite
 import pylzma
 import traceback
 
-print "\nMail Server"
-print "->Initializing"
+print("\nMail Server")
+print("->Initializing")
 
 MAILCONNECT = None
 
@@ -81,7 +80,7 @@ if "dbreset" in sys.argv:
     dcursor.execute("END TRANSACTION;")
     dcursor.close()
     dbconn.close()           
-    print "***Database is reset and cleaned****"
+    print("***Database is reset and cleaned****")
     sys.exit(0)       
 
 #Mail Server Master Class.  The World Clusters and the Auction Server proxy into this class
@@ -126,7 +125,7 @@ class MailMaster():
         #Backup DBs
         self.backupCounter -= 1
         if not self.backupCounter:    
-            print "Backing up AH and Mail databases"
+            print("Backing up AH and Mail databases")
             self.backupCounter = 80 #once every 80 minutes
             try:
                 self.BackupDB("./data/ahserver/mailmaster.db")
@@ -168,13 +167,13 @@ class MailMaster():
             #Ends the transaction and forces the changes to the master database
             self.conn.execute("END TRANSACTION;")
         except:
-            print "Error: Failed to Commit Transaction.  Make sure you don't have the DB open and locked"             
+            print("Error: Failed to Commit Transaction.  Make sure you don't have the DB open and locked")             
         
         try:
             #Start the transaction process back up
             self.conn.execute("BEGIN TRANSACTION;")
         except:
-            print "Error: Failed to Begin Transaction.  Make sure you don't have the DB open and locked"            
+            print("Error: Failed to Begin Transaction.  Make sure you don't have the DB open and locked")            
                 
         #Calls itself again in 10 seconds.  Change accordingly if needed.
         self.tickSync = reactor.callLater(10,self.DBUpdate)                  
@@ -193,7 +192,7 @@ class MailMaster():
         if cnt < 1:
             return None
         else:
-            for id, mail in mailList.iteritems():
+            for id, mail in mailList.items():
                 if mail.itemProto:
                     item = ItemInstanceReceive(None, True)
                     #Populate the item with instance values
@@ -263,7 +262,7 @@ class MailMaster():
                 pass
             self.timeStampSync = None
             
-        print "Logout from the Mail Server is Complete"
+        print("Logout from the Mail Server is Complete")
 
 #Mail Server Class.  This is a proxy to push commands back up to the master so we can have multiple connections from World Clusters
 class MailAvatar(Avatar):
@@ -284,7 +283,7 @@ class MailAvatar(Avatar):
         global MAILCONNECT
         if not self.masterConn:
             if not MAILCONNECT:
-                print "FATAL ERROR CONNECTING WORLD PROXY TO AUCTION SERVER!!!"
+                print("FATAL ERROR CONNECTING WORLD PROXY TO AUCTION SERVER!!!")
                 return False
             else:
                 self.masterConn = MAILCONNECT 
@@ -336,7 +335,7 @@ class MailProxyAvatar(Avatar):
         global MAILCONNECT
         if not self.mailConn:
             if not MAILCONNECT:
-                print "FATAL ERROR CONNECTING PROXY TO MAIL SERVER, MAIL FROM AH DROPPED!!!"
+                print("FATAL ERROR CONNECTING PROXY TO MAIL SERVER, MAIL FROM AH DROPPED!!!")
                 return False
             else:
                 self.mailConn = MAILCONNECT 
@@ -429,18 +428,18 @@ ConfigureUsers()
 server = Server(MAILSERVER_PORT,True)    # True to use md5 hashing for passwords
 server.startServices()
 
-print "->Mail Server is up"
+print("->Mail Server is up")
 reactor.run()
 
 if MAILCONNECT:
-    print "Dumping the Transactions to Database"
+    print("Dumping the Transactions to Database")
     MAILCONNECT.conn.execute("END TRANSACTION;")
     MAILCONNECT.conn.close()
     MAILCONNECT.dbconn.close()
-    print "Cleanly shutdown the Mail Server!"
+    print("Cleanly shutdown the Mail Server!")
     sys.exit()
     
-print "Error, could not find the MailServer Avatar, shutdown was not clean!"
+print("Error, could not find the MailServer Avatar, shutdown was not clean!")
 
 
 

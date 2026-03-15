@@ -30,10 +30,10 @@ class MailGui:
         self.mailNum = 0
         self.mailItemGhost = None
         #7 items in a window, change these if you decide to do more than 7
-        self.inboxButton = dict((x,TGEObject("MailGui_Inbox_I%i_B"%x)) for x in xrange(1,8)) #1-7
-        self.inboxFrom = dict((x,TGEObject("MailGui_Inbox_I%i_From"%x)) for x in xrange(1,8)) #1-7
-        self.inboxSubject = dict((x,TGEObject("MailGui_Inbox_I%i_Subject"%x)) for x in xrange(1,8)) #1-7
-        self.inboxTimeLeft = dict((x,TGEObject("MailGui_Inbox_I%i_TimeLeft"%x)) for x in xrange(1,8)) #1-7
+        self.inboxButton = dict((x,TGEObject("MailGui_Inbox_I%i_B"%x)) for x in range(1,8)) #1-7
+        self.inboxFrom = dict((x,TGEObject("MailGui_Inbox_I%i_From"%x)) for x in range(1,8)) #1-7
+        self.inboxSubject = dict((x,TGEObject("MailGui_Inbox_I%i_Subject"%x)) for x in range(1,8)) #1-7
+        self.inboxTimeLeft = dict((x,TGEObject("MailGui_Inbox_I%i_TimeLeft"%x)) for x in range(1,8)) #1-7
         
         self.sendTo = TGEObject("MailGui_Send_To")
         self.sendSubject = TGEObject("MailGui_Send_Subject")
@@ -82,7 +82,7 @@ class MailGui:
         
     #Clears out the inbox information
     def clearlite(self):
-        for x in xrange(1,8):
+        for x in range(1,8):
             self.inboxFrom[x].setText("")
             self.inboxSubject[x].setText("")
             self.inboxTimeLeft[x].setText("") 
@@ -173,7 +173,7 @@ class MailGui:
         #Validate it to make sure it is actually in an inventory slot if an item is in the mail
         if self.mailItemGhost:
             slotfound = 0
-            for slot,ghost in cinfo.ITEMS.iteritems():
+            for slot,ghost in cinfo.ITEMS.items():
                 if ghost == self.mailItemGhost:
                     if RPG_SLOT_CARRY_END > slot >= RPG_SLOT_CARRY_BEGIN:
                         slotfound = 1
@@ -191,9 +191,9 @@ class MailGui:
         PLAYERMIND.perspective.callRemote("PlayerAvatar","sendMail",newMail,protoid,sslot)
         
     def refreshInboxList(self, mailList):
-        for id, mail in mailList.iteritems():
-            if self.mailCache.has_key(id):
-                print "Error: Mail send that was already in the cache"
+        for id, mail in mailList.items():
+            if id in self.mailCache:
+                print("Error: Mail send that was already in the cache")
                 continue
                 
             self.mailCache[id] = mail
@@ -206,7 +206,7 @@ class MailGui:
     def doViewMail(self, pageSearch):
         from mailInfoGui import MAILINFOGUI
         buttonNum = int(pageSearch[1])
-        if self.mailButtonId.has_key(buttonNum):
+        if buttonNum in self.mailButtonId:
             self.mailNum = buttonNum
             TGEEval("canvas.pushDialog(MailInfoGui);")
             MAILINFOGUI.displayInfo(self.mailButtonId[buttonNum])
@@ -214,7 +214,7 @@ class MailGui:
     def deleteMail(self,mailID,fromServer):
         from mud.client.playermind import PLAYERMIND
         
-        if not self.mailCache.has_key(mailID):
+        if mailID not in self.mailCache:
             TGECall("MessageBoxOK","Error Deleting Mail","The mail selected could not be found on the client.  Aborted.")
             return
           
@@ -231,7 +231,7 @@ class MailGui:
             TGECall("MessageBoxOK","Invalid Item","You can only use items in your inventory.  The item MUST be unequiped.")
             return
             
-        for slot,ghost in cinfo.ITEMS.iteritems():
+        for slot,ghost in cinfo.ITEMS.items():
             if slot != RPG_SLOT_CURSOR:
                 continue
                 
@@ -308,7 +308,7 @@ class MailGui:
         count=tcount=1
         scount = (self.inboxPage-1)*7+1
         ecount = (self.inboxPage)*7
-        for id,mail in self.mailCache.iteritems():           
+        for id,mail in self.mailCache.items():           
             #Show only 7 items...we are good now
             if (tcount < scount):
                 tcount += 1

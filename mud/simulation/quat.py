@@ -67,7 +67,7 @@ class quat:
                 self.y = dummy.y
                 self.z = dummy.z
             else:
-                raise TypeError, "quat() arg can't be converted to quat"
+                raise TypeError("quat() arg can't be converted to quat")
 
         # 2 arguments (angle & axis)
         elif len(args)==2:
@@ -79,7 +79,7 @@ class quat:
             self.w, self.x, self.y, self.z = args
 
         else:
-            raise TypeError, "quat() arg can't be converted to quat"
+            raise TypeError("quat() arg can't be converted to quat")
         
 
     def __repr__(self):
@@ -137,7 +137,7 @@ class quat:
             return quat(self.w+other.w, self.x+other.x,
                         self.y+other.y, self.z+other.z)
         else:
-            raise TypeError, "unsupported operand type for +"
+            raise TypeError("unsupported operand type for +")
 
     def __sub__(self, other):
         """Subtraction.
@@ -150,7 +150,7 @@ class quat:
             return quat(self.w-other.w, self.x-other.x,
                         self.y-other.y, self.z-other.z)
         else:
-            raise TypeError, "unsupported operand type for +"
+            raise TypeError("unsupported operand type for +")
 
     def __mul__(self, other):
         """Multiplication.
@@ -181,7 +181,7 @@ class quat:
             if getattr(other,"__rmul__",None)!=None:
                 return other.__rmul__(self)
             else:
-                raise TypeError, "unsupported operand type for *"
+                raise TypeError("unsupported operand type for *")
 
     __rmul__ = __mul__
 
@@ -198,7 +198,7 @@ class quat:
             return quat(self.w/other, self.x/other, self.y/other, self.z/other)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for /"
+            raise TypeError("unsupported operand type for /")
         
 
     def __neg__(self):
@@ -371,7 +371,7 @@ class quat:
 def _test():
     import doctest, quat
     failed, total = doctest.testmod(quat)
-    print "%d/%d failed" % (failed, total)
+    print("%d/%d failed" % (failed, total))
 
 if __name__=="__main__":
 

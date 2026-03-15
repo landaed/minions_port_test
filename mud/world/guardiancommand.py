@@ -2,9 +2,9 @@
 # Please see LICENSE.TXT for details
 
 import math
-from defines import *
+from mud.world.defines import *
 from zone import Zone
-from core import *
+from mud.world.core import *
 import sys
 
 
@@ -252,8 +252,8 @@ def DoGuardianCommand(player,cmd,args):
     if type(args)!=list:
         args = [args]
     cmd = cmd.upper()
-    if COMMANDS.has_key(cmd):
+    if cmd in COMMANDS:
         COMMANDS[cmd](mob,args)
     else:
-        print "Unknown Command",cmd
+        print("Unknown Command",cmd)
  

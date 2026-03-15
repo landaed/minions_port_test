@@ -12,11 +12,12 @@ if "-wx" in sys.argv:
 
 if sys.platform == 'win32' and not USE_WX:
     from twisted.internet.iocpreactor import install
-else:
+    install()
+elif USE_WX:
     import wx
     from twisted.internet.wxreactor import install
-    
-install()
+    install()
+# else: use default reactor on Linux (headless)
 
 from mud_ext.server.config import ConfigureServer, LoadConfiguration
 from mud_ext.server.serversettings import *
@@ -48,14 +49,14 @@ TRANSACTION = None
 BACKUPTICK = 15
 
 def CheckDB():
-    print "Checking Database Integrity"
+    print("Checking Database Integrity")
     conn = Persistent._connection.getConnection()
     cursor = conn.cursor()
 
     cursor.execute("PRAGMA integrity_check;")
     if cursor.fetchone()[0]!='ok':
-        raise "Master Database Error"
-    print "... ok ..."
+        raise Exception("Master Database Error")
+    print("... ok ...")
     
     cursor.close()
 
@@ -65,7 +66,7 @@ def TransactionTick(exiting=False):
     
     from mud.common.persistent import Persistent
     conn = Persistent._connection.getConnection()
-    print "-------------> Commiting Database <-------------"
+    print("-------------> Commiting Database <-------------")
     conn.commit()
     
     if not exiting:
@@ -73,7 +74,7 @@ def TransactionTick(exiting=False):
 
         BACKUPTICK-=1
         if not BACKUPTICK:
-            print "Backing up master database"
+            print("Backing up master database")
             BackupMaster("./data/master/master.db")
             BACKUPTICK= 60 #once every 60 minutes
     
@@ -147,7 +148,7 @@ class WorldAvatar(Avatar):
     #to add player count, etc
     def perspective_announceWorld(self, wname, port, pw, users, players=(0, 0)):
         
-        print "####Announcing World: " + str(wname)
+        print("####Announcing World: " + str(wname))
         try:
             world = World.byName(wname)
         except:
@@ -158,7 +159,7 @@ class WorldAvatar(Avatar):
         #once you actually announce world, verified
         world.verified = True
         world.announceTime = datetime.now()
-        print "####Announcing World: AnnounceTime:" + str(world.announceTime)
+        print("####Announcing World: AnnounceTime:" + str(world.announceTime))
         host = self.mind.broker.transport.getPeer()
         #fix me
         #WAN Server Fix 
@@ -189,8 +190,8 @@ class WorldAvatar(Avatar):
 
 from random import choice
 import string
-def GenPasswd(length=8, chars=string.letters):
-    return ''.join([choice(chars) for i in xrange(length)])
+def GenPasswd(length=8, chars=string.ascii_letters):
+    return ''.join([choice(chars) for i in range(length)])
 
 #also delete
 class NewWorldAvatar(Avatar):
@@ -246,8 +247,8 @@ class NewWorldAvatar(Avatar):
         
 from random import choice
 import string
-def GenRegKey(length=16, chars=string.letters):
-    s = ''.join([choice(chars) for i in xrange(length)])
+def GenRegKey(length=16, chars=string.ascii_letters):
+    s = ''.join([choice(chars) for i in range(length)])
     t=s[:4]+"-"+s[4:8]+"-"+s[8:12]+"-"+s[12:]
     return t.upper()
         
@@ -348,8 +349,8 @@ class RegistrationAvatar(Avatar):
             
         if not USE_WX:
             from newplayeremail import NewPlayerEmail
-            import thread
-            thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
+            import _thread
+            _thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
         
         if RPG_SECURE_REGISTRATION:
             return(0, "Your password has been emailed to you. Please look into your mailbox and use your username and password to login.\n\nThank you for registering.", "", regkey)
@@ -369,8 +370,8 @@ class RegistrationAvatar(Avatar):
             return(-1, "Email doesn't match, please make sure to specify the email used when registering.\n\n  If you continue to have problems, please contact support.")
         
         if not USE_WX:   
-            import thread
-            thread.start_new(LostPasswordEmail, (a.email, a.publicName, a.password))
+            import _thread
+            _thread.start_new(LostPasswordEmail, (a.email, a.publicName, a.password))
         
         return(0, "Your password has been sent to the email address specified.")
         
@@ -502,13 +503,13 @@ class EnumWorldsAvatar(Avatar):
     def perspective_enumLiveWorlds(self, launching = False, demo = False, wm = False, testing = False):
         """Enumerated verified, and active worlds"""
 		
-        print "####Enumerating Live World"
+        print("####Enumerating Live World")
         
         
         winfos = []
         worlds = list(World.select())
         for w in worlds:
-            print "####Checking World: " + str(w.name)
+            print("####Checking World: " + str(w.name))
             #if not w.verified:
                 #world is not verfied, not valid until verified
             #    continue
@@ -521,7 +522,7 @@ class EnumWorldsAvatar(Avatar):
             #    continue
             
             if not testing and not w.allowGuests:
-                print "####Skipped World: Not Testing and not allowGuests"
+                print("####Skipped World: Not Testing and not allowGuests")
                 continue
             
             if not launching:
@@ -529,7 +530,7 @@ class EnumWorldsAvatar(Avatar):
                 
                 if t.days or t.seconds/60 > 2:
                 #no announce within 2 minutes, counts as not being up
-                    print "####Skipped World: Not responding - duration since announcement:" + str(datetime.now() - w.announceTime)
+                    print("####Skipped World: Not responding - duration since announcement:" + str(datetime.now() - w.announceTime))
                     continue
                     
             else:
@@ -538,7 +539,7 @@ class EnumWorldsAvatar(Avatar):
                     
                     if t.days or t.seconds/60 > 2:
                     #no announce within 2 minutes, counts as not being up
-                        print "####Skipped World: Not up yet, Launching - last announceTime" + str(w.announceTime)
+                        print("####Skipped World: Not up yet, Launching - last announceTime" + str(w.announceTime))
                         continue
                 
             wi = WorldInfo()
@@ -561,9 +562,9 @@ class EnumWorldsAvatar(Avatar):
                 
             wi.numLiveZones = 0
             
-            print "####Adding World: " + str(w.name)
+            print("####Adding World: " + str(w.name))
             winfos.append(wi)
-        print "####Num. Live Worlds: " + str(len(winfos))
+        print("####Num. Live Worlds: " + str(len(winfos)))
         return winfos
     
 
@@ -596,7 +597,7 @@ from mud.common.avatar import RoleAvatar
 
 
 def ConfigureSettings():
-    print "Configuring Settings"
+    print("Configuring Settings")
     #World User (clean this up.. for instance, if we change the username we'll leave row crumbs)
     try:
         user = User.byName(CONFIG["World Username"])
@@ -622,13 +623,13 @@ def main():
         app = Setup(reactor)
         reactor.registerWxApp(app)
 
-    print "Master Server"
-    print "->Initializing"
+    print("Master Server")
+    print("->Initializing")
 
     server = Server(CONFIG["Master Port"])
     server.startServices()
 
-    from telnetmanhole import MakeFactory
+    from mud_ext.masterserver.telnetmanhole import MakeFactory
     from twisted.application import app, service, strports
     ips = ["127.0.0.1"]
     f= MakeFactory(ips, CONFIG["Manhole Username"], CONFIG["Manhole Password"])
@@ -638,7 +639,7 @@ def main():
     #MakeWebServer()
 
     from mud.common.persistent import Persistent
-    Persistent._connection.getConnection().text_factory = lambda x: unicode(x, "utf-8", "ignore")
+    Persistent._connection.getConnection().text_factory = lambda x: str(x, "utf-8", "ignore")
 
     CheckDB()
 
@@ -646,7 +647,7 @@ def main():
 
     TransactionTick()
 
-    print "->Server is up"
+    print("->Server is up")
 
     reactor.run()
 

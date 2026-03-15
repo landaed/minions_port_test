@@ -9,7 +9,7 @@ from mud.tgepython.console import TGEExport
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.credentials import UsernamePassword
-from md5 import md5
+from hashlib import md5
 
 from mud.simulation.shared.simdata import SpawnpointInfo,SimMobInfo,DialogTriggerInfo
 from mud.simulation.simobject import SimObject
@@ -89,7 +89,7 @@ def GetModelInfo(race,sex,look):
             break
 
     if hmount != -1:
-        if not HMOUNT.has_key((race,sex,look)):
+        if (race,sex,look) not in HMOUNT:
             HMOUNT[(race,sex,look)]= hmount
 
     
@@ -282,7 +282,7 @@ def CreateTSShapePlayerDatablock(spawn,dbname,model):
     except:
         eval = ""
         if spawn.animation:
-            f = file("%s/data/shapes/character/animations/%s/animation.cfg"%(GAMEROOT,spawn.animation))
+            f = open("%s/data/shapes/character/animations/%s/animation.cfg"%(GAMEROOT,spawn.animation))
             eval = f.read()
             f.close()
             
@@ -472,14 +472,14 @@ class SimMind(pb.Root):
     
     
     def updateSpawnInfo(self,spinfo):
-        for pid,spawninfos in self.playerSpawnInfos.iteritems():
+        for pid,spawninfos in self.playerSpawnInfos.items():
             if spinfo in spawninfos:
                 try:
                     simObject = self.simLookup[pid]
                     if simObject.spawnInfo == spinfo:
                         #we are using this spawninfo as our avatar
                         player = TGEObject(pid)
-                        for x in xrange(0,7):
+                        for x in range(0,7):
                             player.setSkin(x,"") #fix me
                         datablock = CreatePlayerDatablock(spinfo,True)
                         player.SetDataBlock(datablock)
@@ -502,7 +502,7 @@ class SimMind(pb.Root):
     
     def remote_setPlayerSpawnInfo(self,pid,name):
         player = TGEObject(pid)
-        for x in xrange(0,7):
+        for x in range(0,7):
             player.setSkin(x,"") #fix me
         for spinfo in self.playerSpawnInfos[pid]:
             if spinfo.name == name:
@@ -614,7 +614,7 @@ class SimMind(pb.Root):
     def onClientEnterGameResult(self,results,connection):
         #this actually spawns the player object and stuff
         if connection not in self.gameConnectionIds:
-            print "Player Dropped before Client Enter Game, possible kick"
+            print("Player Dropped before Client Enter Game, possible kick")
             return
         transform,spawnInfos,mobInfos,avatarIndex,role = results
         transform[6] = radians(transform[6])
@@ -691,7 +691,7 @@ class SimMind(pb.Root):
         try:
             cansee = TGEGenerateCanSee()
             if cansee:
-                for id,cs in cansee.iteritems():
+                for id,cs in cansee.items():
                     so = self.simLookup[id]
                     if int(so.tgeObject.isSimZombie()):
                         continue
@@ -739,7 +739,7 @@ class SimMind(pb.Root):
                     continue
                 
                 conn = None
-                if self.playerMobInfos.has_key(so.id):
+                if so.id in self.playerMobInfos:
                     if not so.spawnInfo.dirty:
                         for m in self.playerMobInfos[so.id]:
                             if m.dirty:
@@ -1000,7 +1000,7 @@ class SimMind(pb.Root):
     
     
     def getBindPoints_r(self,simgroup,bindpoints):
-        for x in xrange(0,int(simgroup.getCount())):
+        for x in range(0,int(simgroup.getCount())):
             tobj = TGEObject(simgroup.getObject(x))
             if tobj.getClassName() == "SimGroup":
                 self.getBindPoints_r(tobj,bindpoints)
@@ -1028,7 +1028,7 @@ class SimMind(pb.Root):
 
     
     def getWayPoints_r(self,simgroup,waypoints):
-        for x in xrange(0,int(simgroup.getCount())):
+        for x in range(0,int(simgroup.getCount())):
             tobj = TGEObject(simgroup.getObject(x))
             if tobj.getClassName() == "SimGroup":
                 self.getWayPoints_r(tobj,waypoints)
@@ -1046,7 +1046,7 @@ class SimMind(pb.Root):
             transform = wp.getTransform()
             wandergroup = int(wp.wandergroup)
             if wandergroup == -1:
-                print "Warning:  Uninitialized waypoint"
+                print("Warning:  Uninitialized waypoint")
                 continue
             try:
                 self.waypoints[wandergroup].append(transform)
@@ -1055,8 +1055,8 @@ class SimMind(pb.Root):
         
         #now we have all our waypoints seperated into wandergroups... find out which you can get from where
         self.paths = {}
-        for wgroup,waypoints in self.waypoints.iteritems():
-            self.paths[wgroup] = dict((x,[]) for x in xrange(0,len(waypoints)))
+        for wgroup,waypoints in self.waypoints.items():
+            self.paths[wgroup] = dict((x,[]) for x in range(0,len(waypoints)))
             paths = self.paths[wgroup]
             
             for x,wp1 in enumerate(waypoints):
@@ -1067,11 +1067,11 @@ class SimMind(pb.Root):
                     if int(result):
                         paths[x].append(y)
             
-            print wgroup,paths
+            print(wgroup,paths)
     
     
     def getDialogTriggers_r(self,simgroup,dtriggers):
-        for x in xrange(0,int(simgroup.getCount())):
+        for x in range(0,int(simgroup.getCount())):
             tobj = TGEObject(simgroup.getObject(x))
             if tobj.getClassName() == "SimGroup":
                 self.getDialogTriggers_r(tobj,dtriggers)
@@ -1101,7 +1101,7 @@ class SimMind(pb.Root):
     
     def onReachDestination(self,id):
         so = self.simLookup[id]
-        if so.wanderGroup != -1 and self.waypoints.has_key(so.wanderGroup) and len(self.waypoints[so.wanderGroup]) > 1:
+        if so.wanderGroup != -1 and so.wanderGroup in self.waypoints and len(self.waypoints[so.wanderGroup]) > 1:
             if so.waypoint == -1:
                 p1 = so.tgeObject.getPosition()
                 bestd = 999999
@@ -1140,7 +1140,7 @@ class SimMind(pb.Root):
             so.tgeObject.setMoveDestination(transform,True)
         else:
             if so.wanderGroup != -1:
-                print "Warning: Wandering mob with no waypoints.  Wandergroup = %i"%so.wanderGroup
+                print("Warning: Wandering mob with no waypoints.  Wandergroup = %i"%so.wanderGroup)
             
             transform = map(str,so.tgeObject.getTransform()[:3])
             home = so.homePoint.split(" ",3)[-1]
@@ -1152,11 +1152,11 @@ class SimMind(pb.Root):
         try:
             src = self.simLookup[id]
         except:
-            print "WARNING: Warp: SimObject Src doesn't exist"
+            print("WARNING: Warp: SimObject Src doesn't exist")
         try:
             tgt = self.simLookup[tid]
         except:
-            print "WARNING: Warp: SimObject Tgt doesn't exist"
+            print("WARNING: Warp: SimObject Tgt doesn't exist")
         
         strans = src.tgeObject.getTransform()
         ttrans = tgt.tgeObject.getTransform()
@@ -1164,7 +1164,7 @@ class SimMind(pb.Root):
         src.tgeObject.setTransform("%s %s %s %s %s %s %s"%(ttrans[0],ttrans[1],ttrans[2],strans[3],strans[4],strans[5],strans[6]))
     
     def getSpawnPoints_r(self,simgroup,spawnpoints):
-        for x in xrange(0,int(simgroup.getCount())):
+        for x in range(0,int(simgroup.getCount())):
             tobj = TGEObject(simgroup.getObject(x))
             if tobj.getClassName() == "SimGroup":
                 self.getSpawnPoints_r(tobj,spawnpoints)
@@ -1198,10 +1198,10 @@ class SimMind(pb.Root):
                 ppoints,ppaths,pwaypoints = Populate(thepoints,self.paths)
                 thepoints.extend(ppoints)
                 
-                for wgroup,ppoints in pwaypoints.iteritems():
+                for wgroup,ppoints in pwaypoints.items():
                     self.waypoints[wgroup] = ppoints
                 
-                for wgroup,paths in ppaths.iteritems():
+                for wgroup,paths in ppaths.items():
                     self.paths[wgroup] = paths
         except:
             print_exc()
@@ -1211,7 +1211,7 @@ class SimMind(pb.Root):
     
     def remote_spawnBot(self,name,transform,wanderGroup,sinfo,mobInfo):
         datablock = CreatePlayerDatablock(sinfo,False)
-        if not self.spawnInfos.has_key(sinfo.name):
+        if sinfo.name not in self.spawnInfos:
             self.spawnInfos[sinfo.name] = sinfo
         
         spawnInfo  = self.spawnInfos[sinfo.name]
@@ -1609,7 +1609,7 @@ class SimMind(pb.Root):
     
     def onProjectileCollision(self,projId,hitId,hitPos):
         rpgid = self.projectiles[projId]
-        if self.simLookup.has_key(hitId):
+        if hitId in self.simLookup:
             hitPos = map(float, hitPos.split(" "))
             self.perspective.callRemote("SimAvatar","projectileCollision",rpgid,hitId,hitPos)
     
@@ -1853,7 +1853,7 @@ def PySelect(args):
 
 
 def PyClientBegin(args):
-    print args
+    print(args)
 
 
 def PyValidatePlayer(args):
@@ -1910,7 +1910,7 @@ def SetRaceGraphics(graphics):
 def GotZoneConnect(zconnect):
     global RACEGRAPHICS 
     
-    print "Launching: ", zconnect.niceName
+    print("Launching: ", zconnect.niceName)
     RACEGRAPHICS = zconnect.raceGraphics
     SIMMIND.zoneInstanceName = zconnect.instanceName
     eval = """
@@ -1946,13 +1946,13 @@ def GotWorldInfos(winfos,perspective):
     found = False
     
     for world in winfos:
-        print world.worldName, wname
+        print(world.worldName, wname)
         if world.worldName == wname:
             found = True
             #attempt login
             factory = pb.PBClientFactory()
             world.worldIP = "127.0.0.1" #only on local host for now
-            print "Connecting to: ",world.worldIP, world.worldPort
+            print("Connecting to: ",world.worldIP, world.worldPort)
             reactor.connectTCP(world.worldIP,world.worldPort,factory)
             mind = SimMind()
             #to do add authentication (zone password)
@@ -1961,11 +1961,11 @@ def GotWorldInfos(winfos,perspective):
             factory.login(UsernamePassword("ZoneServer-ZoneServer",password),mind).addCallbacks(WorldConnected, Failure)
     
     if not found:
-        print "World is not currently up"
+        print("World is not currently up")
 
 
 def Failure(error):
-    print error
+    print(error)
 
 
 def MasterConnected(perspective):

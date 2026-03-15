@@ -7,7 +7,7 @@
 
 import os, sys
 
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.internet import protocol
 from twisted.application import service, strports
 from twisted.conch.ssh import session
@@ -24,8 +24,8 @@ class MyFactory(protocol.ServerFactory):
         
         
         if addr.host != "127.0.0.1":
-            print "WARNING: Unauthorized manhole attempt from: %s"%addr.host
-            raise "Unauthorized"
+            print("WARNING: Unauthorized manhole attempt from: %s"%addr.host)
+            raise Exception("Unauthorized")
         
         
         return protocol.ServerFactory.buildProtocol(self,addr)
@@ -47,8 +47,8 @@ class chainedProtocolFactory:
     def __call__(self):
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
+@implementer(portal.IRealm)
 class _StupidRealm:
-    implements(portal.IRealm)
 
     def __init__(self, proto, *a, **kw):
         self.protocolFactory = proto

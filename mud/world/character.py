@@ -745,11 +745,11 @@ class Character(Persistent):
         # Calculate percent of experience each class has in its current level.
         
         # Calculate total experience needed to level in primary class.
-        pneeded = spawn.plevel * spawn.plevel * 100L * self.pxpMod
+        pneeded = spawn.plevel * spawn.plevel * 100 * self.pxpMod
         
         # Calculate the previous level's total experience needed to level in
         #  primary class.
-        pprevneeded = ((spawn.plevel - 1) * (spawn.plevel - 1) * 100L * self.pxpMod)
+        pprevneeded = ((spawn.plevel - 1) * (spawn.plevel - 1) * 100 * self.pxpMod)
 
         ## @brief (Float) The percent of experience the primary class has in
         #         the current level.
@@ -760,11 +760,11 @@ class Character(Persistent):
         if spawn.slevel:
         
             # Calculate total experience needed to level in secondary class.
-            sneeded = spawn.slevel * spawn.slevel * 100L * self.sxpMod
+            sneeded = spawn.slevel * spawn.slevel * 100 * self.sxpMod
             
             # Calculate the previous level's total experience needed to level in
             #  secondary class.
-            sprevneeded = ((spawn.slevel - 1) * (spawn.slevel - 1) * 100L * self.sxpMod)
+            sprevneeded = ((spawn.slevel - 1) * (spawn.slevel - 1) * 100 * self.sxpMod)
 
             ## @brief (Float) The percent of experience the secondary class has
             #         in the current level.
@@ -775,11 +775,11 @@ class Character(Persistent):
             if spawn.tlevel:
         
                 # Calculate total experience needed to level in tertiary class.
-                tneeded = spawn.tlevel * spawn.tlevel * 100L * self.txpMod
+                tneeded = spawn.tlevel * spawn.tlevel * 100 * self.txpMod
                 
                 # Calculate the previous level's total experience needed to level in
                 #  tertiary class.
-                tprevneeded = ((spawn.tlevel - 1) * (spawn.tlevel - 1) * 100L * self.txpMod)
+                tprevneeded = ((spawn.tlevel - 1) * (spawn.tlevel - 1) * 100 * self.txpMod)
 
                 ## @brief (Float) The percent of experience the tertiary class has
                 #         in the current level.
@@ -817,17 +817,17 @@ class Character(Persistent):
         # If primary is being leveled, then set primary experience to the amount
         # of experience needed plus one.
         if which == 0:
-            self.xpPrimary = int(spawn.plevel * spawn.plevel * 100L * self.pxpMod + 1)
+            self.xpPrimary = int(spawn.plevel * spawn.plevel * 100 * self.pxpMod + 1)
 
         # If secondary is being leveled, then set secondary experience to the
         # amount of experience needed plus one.
         elif which == 1:
-            self.xpSecondary = int(spawn.slevel * spawn.slevel * 100L * self.sxpMod + 1)
+            self.xpSecondary = int(spawn.slevel * spawn.slevel * 100 * self.sxpMod + 1)
 
         # If tertiary is being leveled, then set tertiary experience to the
         # amount of experience needed plus one.
         elif which == 2:
-            self.xpTertiary = int(spawn.tlevel * spawn.tlevel * 100L * self.txpMod + 1)
+            self.xpTertiary = int(spawn.tlevel * spawn.tlevel * 100 * self.txpMod + 1)
 
         # Call gainXP to trigger the actual leveling and cleanly handle refresh
         #  of experience display, gain of advancement points, stats and calculate
@@ -1058,14 +1058,14 @@ class Character(Persistent):
 
 
         # Calculate total experience needed to level for each class.
-        pneeded = spawn.plevel*spawn.plevel*100L*self.pxpMod
-        sneeded = spawn.slevel*spawn.slevel*100L*self.sxpMod
-        tneeded = spawn.tlevel*spawn.tlevel*100L*self.txpMod
+        pneeded = spawn.plevel*spawn.plevel*100*self.pxpMod
+        sneeded = spawn.slevel*spawn.slevel*100*self.sxpMod
+        tneeded = spawn.tlevel*spawn.tlevel*100*self.txpMod
 
          # Calculate how much experience is required to level each class.
-        pgap = pneeded - ((spawn.plevel-1)*(spawn.plevel-1)*100L*self.pxpMod)
-        sgap = sneeded - ((spawn.slevel-1)*(spawn.slevel-1)*100L*self.sxpMod)
-        tgap = tneeded - ((spawn.tlevel-1)*(spawn.tlevel-1)*100L*self.txpMod)
+        pgap = pneeded - ((spawn.plevel-1)*(spawn.plevel-1)*100*self.pxpMod)
+        sgap = sneeded - ((spawn.slevel-1)*(spawn.slevel-1)*100*self.sxpMod)
+        tgap = tneeded - ((spawn.tlevel-1)*(spawn.tlevel-1)*100*self.txpMod)
 
         # If a clamp is true, then clamp experience based on the amount of
         # experience required to level.
@@ -1218,7 +1218,7 @@ class Character(Persistent):
                     # points are to be rewarded.
                     # TWS: Why iterate?  Just having it in the formulas may be
                     # faster.
-                    for i in xrange(advDiff):
+                    for i in range(advDiff):
 
                         # Increase the primary advancement level.
                         self.advancementLevelPrimary += 1
@@ -1299,7 +1299,7 @@ class Character(Persistent):
                     # points are to be rewarded.
                     # TWS: Why iterate?  Just having it in the formulas may be
                     # faster.
-                    for i in xrange(advDiff):
+                    for i in range(advDiff):
 
                         # Increase the secondary advancement level.
                         self.advancementLevelSecondary += 1
@@ -1374,7 +1374,7 @@ class Character(Persistent):
                     # points are to be rewarded.
                     # TWS: Why iterate?  Just having it in the formulas may be
                     # faster.
-                    for i in xrange(advDiff):
+                    for i in range(advDiff):
                         self.advancementLevelTertiary += 1
 
                         # Calculate how many points to reward for the level.
@@ -1643,7 +1643,7 @@ class Character(Persistent):
                 return
 
             # Iterate over trade slots.
-            for tslot in xrange(RPG_SLOT_TRADE_BEGIN,RPG_SLOT_TRADE_END):
+            for tslot in range(RPG_SLOT_TRADE_BEGIN,RPG_SLOT_TRADE_END):
 
                 # Iterate over this Character's items.
                 for item in self.items:
@@ -1922,7 +1922,7 @@ class Character(Persistent):
         if item.flags & RPG_ITEM_UNIQUE:
             
             # Iterate over the item's worn by this Character's Mob.
-            for iitem in self.mob.worn.itervalues():
+            for iitem in self.mob.worn.values():
                 
                 # If an item of this type is already worn and the items are not
                 #  being swapped because of different slots, then send a message
@@ -2322,7 +2322,7 @@ class Character(Persistent):
             return
 
         # Unequip any pet slot.
-        map(pet.unequipItem,xrange(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
+        map(pet.unequipItem,range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
         
         # Get a handle to the pets realm.
         myrealm = self.mob.spawn.realm
@@ -2490,7 +2490,7 @@ class Character(Persistent):
         for m in self.player.party.members:
 
             # Add the member's food to the list.
-            items.extend(m.mob.itemFood.keys())
+            items.extend(list(m.mob.itemFood.keys()))
 
         # Iterate over the food items found.
         for item in items:
@@ -2564,7 +2564,7 @@ class Character(Persistent):
         for m in self.player.party.members:
 
             # Add the member's drinks to the list.
-            items.extend(m.mob.itemDrink.keys())
+            items.extend(list(m.mob.itemDrink.keys()))
 
         # Iterate over the drink items found.
         for item in items:
@@ -2709,7 +2709,7 @@ class Character(Persistent):
                 if cursorItem.flags & RPG_ITEM_UNIQUE:
 
                     # Iterate over the item's worn by this Character's Mob.
-                    for iitem in self.mob.worn.itervalues():
+                    for iitem in self.mob.worn.values():
 
                         # If an item of this type is already worn and the items
                         # are not being swapped beacuse of different slots, then
@@ -2727,7 +2727,7 @@ class Character(Persistent):
                 # If there is already a shield equipped then deny wearing a
                 # secondary or two handed weapon.
                 if slot == RPG_SLOT_SECONDARY:
-                    for iitem in self.mob.worn.itervalues():
+                    for iitem in self.mob.worn.values():
                         if iitem.slot == RPG_SLOT_PRIMARY and "2H" in iitem.skill and not self.mob.skillLevels.get("Power Wield"):
                             self.player.sendGameText(RPG_MSG_GAME_DENIED,"You can't wear that together with a two handed weapon.\\n")
                             return
@@ -2738,7 +2738,7 @@ class Character(Persistent):
                 # If there is already a secondary weapon equipped then deny
                 # wearing a shield or two handed weapon.
                 if slot == RPG_SLOT_SHIELD:
-                    for iitem in self.mob.worn.itervalues():
+                    for iitem in self.mob.worn.values():
                         if iitem.slot == RPG_SLOT_PRIMARY and "2H" in iitem.skill:
                             self.player.sendGameText(RPG_MSG_GAME_DENIED,"You can't wear that together with a two handed weapon.\\n")
                             return
@@ -2748,7 +2748,7 @@ class Character(Persistent):
 
                 # Scan items for wearability conflicts when trying to equip a 2H weapon.
                 if "2H" in cursorItem.skill:
-                    for iitem in self.mob.worn.itervalues():
+                    for iitem in self.mob.worn.values():
                         # If there is already a secondary weapon equipped then quit.
                         if iitem.slot == RPG_SLOT_SECONDARY  and not self.mob.skillLevels.get("Power Wield"):
                             self.player.sendGameText(RPG_MSG_GAME_DENIED,"You can't wear that together with a secondary weapon.\\n")
@@ -2945,7 +2945,7 @@ class Character(Persistent):
             # Iterate over items that stacked with the item attempting to be
             # stacked, adjusting and refreshing the stack count and charge
             # value for each item.
-            for item,charges in stacking.iteritems():
+            for item,charges in stacking.items():
 
                 # Calculate the amount of stacks that will be added to the item.
                 stackCount = charges / useMax
@@ -3034,7 +3034,7 @@ class Character(Persistent):
 
             # Iterate over items that stacked with the item attempting to be
             # stacked, adjusting and refreshing the stack count for each item.
-            for item,count in stacking.iteritems():
+            for item,count in stacking.items():
 
                 # Update the stack count.
                 item.stackCount += count
@@ -3102,7 +3102,7 @@ class Character(Persistent):
                     # Print a traceback that may provide some useful debug
                     # information.
                     traceback.print_stack()
-                    print "AssertionError: item owner whackiness!"
+                    print("AssertionError: item owner whackiness!")
 
         # The Player single-clicked the loot item, try to put the item into
         # players cursor.
@@ -3452,15 +3452,15 @@ class Character(Persistent):
         spawn = self.spawn
 
         # Calculate total experience needed to level for each class.
-        pneeded = spawn.plevel*spawn.plevel*100L*self.pxpMod
-        sneeded = spawn.slevel*spawn.slevel*100L*self.sxpMod
-        tneeded = spawn.tlevel*spawn.tlevel*100L*self.txpMod
+        pneeded = spawn.plevel*spawn.plevel*100*self.pxpMod
+        sneeded = spawn.slevel*spawn.slevel*100*self.sxpMod
+        tneeded = spawn.tlevel*spawn.tlevel*100*self.txpMod
 
         # Calculate the previous level's total experience needed to level for
         # each class.
-        pprevneeded = ((spawn.plevel-1)*(spawn.plevel-1)*100L*self.pxpMod)
-        sprevneeded = ((spawn.slevel-1)*(spawn.slevel-1)*100L*self.sxpMod)
-        tprevneeded = ((spawn.tlevel-1)*(spawn.tlevel-1)*100L*self.txpMod)
+        pprevneeded = ((spawn.plevel-1)*(spawn.plevel-1)*100*self.pxpMod)
+        sprevneeded = ((spawn.slevel-1)*(spawn.slevel-1)*100*self.sxpMod)
+        tprevneeded = ((spawn.tlevel-1)*(spawn.tlevel-1)*100*self.txpMod)
 
         # Calculate how much experience is required to level each class.
         pgap = pneeded - pprevneeded
@@ -3606,7 +3606,7 @@ class Character(Persistent):
 
             # Calculate the new previous level's total experience required for
             # the level.
-            pprevneeded = (prevLevel*prevLevel*100L*self.pxpMod)
+            pprevneeded = (prevLevel*prevLevel*100*self.pxpMod)
 
         # If levels have been lost, then this Character's Spawn needs updated.
         if lostLevels:
@@ -3644,7 +3644,7 @@ class Character(Persistent):
 
             # Calculate the new previous level's total experience required for
             # the level.
-            sprevneeded = (prevLevel*prevLevel*100L*self.sxpMod)
+            sprevneeded = (prevLevel*prevLevel*100*self.sxpMod)
 
         # If levels have been lost, then this Character's Spawn needs updated.
         if lostLevels:
@@ -3677,7 +3677,7 @@ class Character(Persistent):
 
             # Calculate the new previous level's total experience required for
             # the level.
-            tprevneeded = (prevLevel*prevLevel*100L*self.txpMod)
+            tprevneeded = (prevLevel*prevLevel*100*self.txpMod)
 
         # If levels have been lost, then this Character's Spawn needs updated.
         if lostLevels:
@@ -3912,7 +3912,7 @@ class Character(Persistent):
 
             # For each count associated with the item, create an ItemInstance
             # and place it in a carry slot.
-            for c in xrange(0,count):
+            for c in range(0,count):
 
                 # Create an ItemInstance from the ItemProto.
                 item = proto.createInstance()
@@ -3921,7 +3921,7 @@ class Character(Persistent):
                 slot = None
 
                 # Iterate over slots, attempting to find a free carry slot.
-                for x in xrange(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END):
+                for x in range(RPG_SLOT_CARRY_BEGIN,RPG_SLOT_CARRY_END):
 
                     # Iterate over this Character's items.
                     for sitem in self.items:
@@ -3948,7 +3948,7 @@ class Character(Persistent):
 
                     # Print debug information.
                     traceback.print_stack()
-                    print "AssertionError: no slot found!"
+                    print("AssertionError: no slot found!")
 
                     # Return early.
                     return
@@ -3975,7 +3975,7 @@ class Character(Persistent):
         
         # Do some sanity check on the item requirements.
         # Don't use iteritems so we iterate over a copy.
-        for proto,count in itemDict.items():
+        for proto,count in list(itemDict.items()):
             if count <= 0:
                 del itemDict[proto]
         
@@ -4148,7 +4148,7 @@ class Character(Persistent):
         
         # If output is not disabled, inform the Player of the items lost.
         if not silent:
-            self.player.sendGameText(RPG_MSG_GAME_LOST,"%s lost %s.\\n"%(self.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in lostItems.iteritems())))
+            self.player.sendGameText(RPG_MSG_GAME_LOST,"%s lost %s.\\n"%(self.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in lostItems.items())))
         
         # Flag the Player as having a dirty Character. This will have the
         #  ZoneInstance send a full CharacterInfo refresh to the Player.
@@ -4253,7 +4253,7 @@ class Character(Persistent):
     def getFreeCarrySlots(self):
 
         # Get a list of all carry slots.
-        freeSlots = range(RPG_SLOT_CARRY_BEGIN, RPG_SLOT_CARRY_END)
+        freeSlots = list(range(RPG_SLOT_CARRY_BEGIN, RPG_SLOT_CARRY_END))
 
         # Iterate over this Character's items.
         for item in self.items:
@@ -4627,7 +4627,7 @@ class Character(Persistent):
 
             # Iterate over the amount of primary levels for which advancement
             # points are to be rewarded.
-            for i in xrange(2,template.plevel):
+            for i in range(2,template.plevel):
 
                 # Calculate how many points to reward for the level.
                 points = int(float(i) / 2.0)
@@ -4641,7 +4641,7 @@ class Character(Persistent):
 
             # Iterate over the amount of secondary levels for which advancement
             # points are to be rewarded.
-            for i in xrange(2,template.slevel):
+            for i in range(2,template.slevel):
 
                 # Calculate how many points to reward for the level.
                 points = int(float(i) / 2.0)
@@ -4655,7 +4655,7 @@ class Character(Persistent):
 
             # Iterate over the amount of tertiary levels for which advancement
             # points are to be rewarded.
-            for i in xrange(2,template.tlevel):
+            for i in range(2,template.tlevel):
 
                 # Calculate how many points to reward for the level.
                 points = int(float(i) / 2.0)
@@ -4691,7 +4691,7 @@ class Character(Persistent):
         # The caller provided an invalid advancement name.  Print debug
         # information and return early.
         except:
-            print "WARNING: Unknown Advancement %s"%advance
+            print("WARNING: Unknown Advancement %s"%advance)
             return
 
         # Handle to the choosen CharacterAdvancement.
@@ -4794,7 +4794,7 @@ class Character(Persistent):
         # pass.  The Character should have never been given the option to
         # purchase the advancement, so print a debug message and return early.
         if not passed:
-            print "WARNING: %s attempted unqualified advancement %s"%(self.name,advance)
+            print("WARNING: %s attempted unqualified advancement %s"%(self.name,advance))
             return
 
         # Either an advanceemnt is increasing in rank or a new advancement is
@@ -4917,7 +4917,7 @@ class Character(Persistent):
 
             # Destroy the ItemInstance.
             nitem.destroySelf()
-            raise "Unable to give item instance on split!"
+            raise Exception("Unable to give item instance on split!")
             return
 
         # The ItemInstance could be given to the Character. So update now

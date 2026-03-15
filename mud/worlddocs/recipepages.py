@@ -50,7 +50,7 @@ def CreateRecipeSubIndex(indexFile,indexTitle,recipeList):
     for recipe in recipeList:
         TWIKINAME = "Recipe"+GetTWikiName(recipe.name)
         subpage+="\t* (%i)\t [[%s][%s]]\n"%(recipe.skillLevel,TWIKINAME,recipe.name)
-    f = file("./distrib/twiki/data/MoMWorld/%s.txt"%indexFile,"w")
+    f = open("./distrib/twiki/data/MoMWorld/%s.txt"%indexFile,"w")
     f.write(subpage)
     f.close()
 
@@ -77,18 +77,18 @@ def CreateRecipePages():
         DESCTEXT = GenDescText(r)
         page = page.replace("^^RECIPENAME^^",r.name.upper()+" RECIPE")
         page = page.replace("^^DESCTEXT^^",DESCTEXT)
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(page)
         f.close()
         
-        if not recipeCollection.has_key(r.skillname):
+        if r.skillname not in recipeCollection:
             recipeCollection[r.skillname] = []
         if r not in recipeCollection[r.skillname]:
             recipeCollection[r.skillname].append(r)
         if r not in recipeCollection[listname]:
             recipeCollection[listname].append(r)
     
-    f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAMEALL,"w")
+    f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAMEALL,"w")
     f.write(allPage)
     f.close()
     
@@ -100,7 +100,7 @@ def CreateRecipePages():
     recipeList.sort(RecipeLevelSort)
     CreateRecipeSubIndex(TWIKINAMELEVEL,listnameLevel,recipeList)
     del recipeCollection["All Recipes"]
-    for listname in recipeCollection.iterkeys():
+    for listname in recipeCollection.keys():
         recipeList = recipeCollection[listname]
         TWIKINAME = "Recipe"+GetTWikiName(listname)+"Index"
         TWIKINAMELEVEL = "Recipe"+GetTWikiName(listname)+"LevelIndex"
@@ -111,7 +111,7 @@ def CreateRecipePages():
         recipeList.sort(RecipeLevelSort)
         CreateRecipeSubIndex(TWIKINAMELEVEL,listnameLevel,recipeList)
 
-    f = file("./distrib/twiki/data/MoMWorld/RecipeIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/RecipeIndex.txt","w")
     f.write(indexPage)
     f.close()
         

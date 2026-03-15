@@ -12,8 +12,8 @@ from mud.world.zone import Zone
 from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer, \
     InstallPlayerBuffer
 
-from base64 import decodestring,encodestring
-from cPickle import dumps,loads
+from base64 import decodebytes,encodebytes
+from pickle import dumps,loads
 from random import choice
 from string import letters
 from time import time as sysTime
@@ -22,7 +22,7 @@ import traceback
 
 
 def GenPasswd(length=8, chars=letters):
-    return ''.join([choice(chars) for i in xrange(length)])
+    return ''.join([choice(chars) for i in range(length)])
 
 AVATAR = None
 #public name -> time of last extraction
@@ -58,8 +58,8 @@ class CharacterServerAvatar(pb.Root):
             publicName,pbuffer,cbuffer,cvalues = \
                 ExtractPlayer(player.publicName,player.id, \
                     player.party.members[0].id,False)
-            pbuffer = encodestring(dumps(pbuffer, 2))
-            cbuffer = encodestring(dumps(cbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
+            cbuffer = encodebytes(dumps(cbuffer, 2))
             
             publicName = player.publicName
             player.destroySelf()
@@ -109,12 +109,12 @@ class CharacterServerAvatar(pb.Root):
             try:
                 from mud.worldserver.charutil import PLAYER_BUFFERS
                 for pname,pbuffer,cbuffer,cvalues in PLAYER_BUFFERS[:]:
-                    pbuf = encodestring(dumps(pbuffer, 2))
+                    pbuf = encodebytes(dumps(pbuffer, 2))
                     cbuf = None
                     if cbuffer:
-                        cbuf = encodestring(dumps(cbuffer, 2))
+                        cbuf = encodebytes(dumps(cbuffer, 2))
 
-                    print "Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuf)/1024,len(cbuf)/1024)
+                    print("Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuf)/1024,len(cbuf)/1024))
                     AVATAR.mind.callRemote("savePlayerBuffer",pname,pbuf,cbuf,cvalues) #xxx add callback/errback
                     EXTRACT_TIMES[pname]=now
                     #should be removing these upon success
@@ -150,7 +150,7 @@ class CharacterServerAvatar(pb.Root):
                     extractTarget = pname
             
             remove = []
-            for k in EXTRACT_TIMES.iterkeys():
+            for k in EXTRACT_TIMES.keys():
                 if k not in pnames:
                     remove.append(k)
             map(EXTRACT_TIMES.__delitem__,remove)
@@ -238,7 +238,7 @@ class CharacterServerAvatar(pb.Root):
         
     def remote_transferPlayer(self,publicName,pbuffer,charname,cbuffer,code,premium,remoteLeaderName,guildInfo):
         
-        #pbuffer = loads(decodestring(pbuffer))
+        #pbuffer = loads(decodebytes(pbuffer))
         
         presults = self.remote_installPlayer(publicName,pbuffer,code,premium,guildInfo)
         if not presults[0]:
@@ -248,7 +248,7 @@ class CharacterServerAvatar(pb.Root):
         player = Player.byPublicName(publicName)
         Player.remoteLeaderNames[publicName]=remoteLeaderName
         
-        cbuffer = loads(decodestring(cbuffer))
+        cbuffer = loads(decodebytes(cbuffer))
         InstallCharacterBuffer(player.id,charname,cbuffer)
             
         return presults
@@ -283,7 +283,7 @@ class CharacterServerAvatar(pb.Root):
         from mud.server.app import THESERVER
         
         if buffer:
-            buffer = loads(decodestring(buffer))
+            buffer = loads(decodebytes(buffer))
         
         if not THESERVER.allowConnections:
             return (False,"This world is currently unavailable.  Please try again in a few minutes.")

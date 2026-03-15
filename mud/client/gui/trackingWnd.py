@@ -78,7 +78,7 @@ class TrackingWnd:
             self.interestLookup = {}
             x = -1
             found = False
-            for description,location in poi.iteritems():
+            for description,location in poi.items():
                 if self.trackInterest == description:
                     found = True
                     self.trackLocation = location
@@ -118,7 +118,7 @@ class TrackingWnd:
             tc.clear()
             
             found = False
-            for id,values in self.tracking.iteritems():
+            for id,values in self.tracking.items():
                 #(m.name,m.simObject.position,r)
                 if values[3] != 6:
                     mw.addContact(values[0],values[3],values[1][0],values[1][1],values[1][2])
@@ -139,7 +139,7 @@ class TrackingWnd:
             tc.sortNumerical(1)
             
             id = -1
-            for description,location in poi.iteritems():
+            for description,location in poi.items():
                 mw.addContact(description,6,location[0],location[1],location[2])
                 pos = PLAYERMIND.rootInfo.POSITION
                 xDist = pos[0] - location[0]

@@ -5,7 +5,7 @@ from twisted.spread import pb
 from sqlobject import *
 import weakref
 from weakref import WeakValueDictionary
-from dbconfig import GetDBConnection
+from mud.common.dbconfig import GetDBConnection
 
 from datetime import datetime
 import traceback
@@ -22,7 +22,7 @@ class Persistent(SQLObject):#,pb.Cacheable):
 
         if (observer in self.observers):
             traceback.print_stack()
-            print "AssertionError: observer already hooked up!"
+            print("AssertionError: observer already hooked up!")
             return
         
         tp = None
@@ -34,7 +34,7 @@ class Persistent(SQLObject):#,pb.Cacheable):
                 
         if not tp:
             traceback.print_stack()
-            print "AssertionError: class permission not found!"
+            print("AssertionError: class permission not found!")
             return
         
         state = {}
@@ -61,7 +61,7 @@ class Persistent(SQLObject):#,pb.Cacheable):
                             break
                     if not tname:
                         traceback.print_stack()
-                        print "AssertionError: no class name found!"
+                        print("AssertionError: no class name found!")
                         return
                     
                     v = (tname,myjoin)
@@ -89,12 +89,12 @@ class Persistent(SQLObject):#,pb.Cacheable):
         
         
     def stoppedObserving(self, perspective, observer):
-        print "goodbye"
+        print("goodbye")
         #if observer in self.observers:
         self.observers.remove(observer)
         
     def updateChanged(self,changed):
-        for k,v in changed.iteritems():
+        for k,v in changed.items():
             try:
                 setattr(self,k,v)
             except:
@@ -122,7 +122,7 @@ class PersistentGhost(pb.RemoteCache):
     
     
     def observe_destroySelf(self):
-        print "Destroyed!"
+        print("Destroyed!")
 
 
 

@@ -4,7 +4,7 @@
 from mud.common.permission import User,Role
 from mud.common.avatar import Avatar
 from mud.world.player import Player
-from immortalcommand import DoImmortalCommand
+from mud.world.immortalcommand import DoImmortalCommand
 
 class ImmortalAvatar(Avatar):
     def __init__(self,username,role,mind):

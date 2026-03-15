@@ -66,46 +66,46 @@ def CreateSkillDesc(skill,classSkills):
         skillPage += "*Available to:* %s<br>"%', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classSkills[0])
     
     if len(classSkills[7]):
-        for racenames,classnames in classSkills[7].iteritems():
+        for racenames,classnames in classSkills[7].items():
             skillPage += "%s require one of the following races for this skill: %s<br>"%(', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames),', '.join(racenames))
     
     if len(classSkills[1]) == 1:
-        skillPage += "<br> *Level Gained:* %i<br>"%classSkills[1].keys()[0]
+        skillPage += "<br> *Level Gained:* %i<br>"%list(classSkills[1].keys())[0]
     else:
-        skillPage += "<br> *Level Gained:* %s<br>"%', '.join('%i (%s)'%(levelGained,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for levelGained,classnames in classSkills[1].iteritems())
+        skillPage += "<br> *Level Gained:* %s<br>"%', '.join('%i (%s)'%(levelGained,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for levelGained,classnames in classSkills[1].items())
     
     if len(classSkills[2]) == 1:
-        skillPage += " *Level Capped:* %i<br>"%classSkills[2].keys()[0]
+        skillPage += " *Level Capped:* %i<br>"%list(classSkills[2].keys())[0]
     else:
-        skillPage += " *Level Capped:* %s<br>"%', '.join('%i (%s)'%(levelCapped,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for levelCapped,classnames in classSkills[2].iteritems())
+        skillPage += " *Level Capped:* %s<br>"%', '.join('%i (%s)'%(levelCapped,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for levelCapped,classnames in classSkills[2].items())
     
     if len(classSkills[5]) == 1:
-        skillPage += " *Max Value:* %i<br>"%classSkills[5].keys()[0]
+        skillPage += " *Max Value:* %i<br>"%list(classSkills[5].keys())[0]
     else:
-        skillPage += " *Max Value:* %s<br>"%', '.join('%i (%s)'%(maxValue,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for maxValue,classnames in classSkills[5].iteritems())
+        skillPage += " *Max Value:* %s<br>"%', '.join('%i (%s)'%(maxValue,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for maxValue,classnames in classSkills[5].items())
     
     if len(classSkills[4]) == 1:
-        skillPage += " *Max Reuse Time:* %i seconds<br>"%int(float(classSkills[4].keys()[0])/float(durSecond))
+        skillPage += " *Max Reuse Time:* %i seconds<br>"%int(float(list(classSkills[4].keys())[0])/float(durSecond))
     else:
-        skillPage += " *Max Reuse Time:* %s<br>"%', '.join('%i seconds (%s)'%(int(float(maxReuseTime)/float(durSecond)),', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for maxReuseTime,classnames in classSkills[4].iteritems())
+        skillPage += " *Max Reuse Time:* %s<br>"%', '.join('%i seconds (%s)'%(int(float(maxReuseTime)/float(durSecond)),', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for maxReuseTime,classnames in classSkills[4].items())
     
     if len(classSkills[3]) == 1:
-        skillPage += " *Min Reuse Time:* %i seconds<br>"%int(float(classSkills[3].keys()[0])/float(durSecond))
+        skillPage += " *Min Reuse Time:* %i seconds<br>"%int(float(list(classSkills[3].keys())[0])/float(durSecond))
     else:
-        skillPage += " *Min Reuse Time:* %s<br>"%', '.join('%i seconds (%s)'%(int(float(minReuseTime)/float(durSecond)),', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for minReuseTime,classnames in classSkills[3].iteritems())
+        skillPage += " *Min Reuse Time:* %s<br>"%', '.join('%i seconds (%s)'%(int(float(minReuseTime)/float(durSecond)),', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for minReuseTime,classnames in classSkills[3].items())
     
     if len(classSkills[6]) == 1:
-        skillPage += " *Trained:* %s\n\n"%classSkills[6].keys()[0]
+        skillPage += " *Trained:* %s\n\n"%list(classSkills[6].keys())[0]
     else:
-        skillPage += " *Trained:* %s\n\n"%', '.join('%s (%s)'%(trained,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for trained,classnames in classSkills[6].iteritems())
+        skillPage += " *Trained:* %s\n\n"%', '.join('%s (%s)'%(trained,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for trained,classnames in classSkills[6].items())
     
     if len(classSkills[8]) == 1:
-        sname = classSkills[8].keys()[0]
+        sname = list(classSkills[8].keys())[0]
         skillPage += " *Skill Spell:* [[Spell%s][%s]]\n\n"%(GetTWikiName(sname),sname)
     elif len(classSkills[8]):
-        skillPage += " *Skill Spell:* %s\n\n"%', '.join('[[Spell%s][%s]] (%s)'%(GetTWikiName(sname),sname,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for sname,classnames in classSkills[8].iteritems())
+        skillPage += " *Skill Spell:* %s\n\n"%', '.join('[[Spell%s][%s]] (%s)'%(GetTWikiName(sname),sname,', '.join('[[Class%s][%s]]'%(GetTWikiName(cname),cname) for cname in classnames)) for sname,classnames in classSkills[8].items())
     
-    f = file("./distrib/twiki/data/MoMWorld/Skill%s.txt"%GetTWikiName(skill),"w")
+    f = open("./distrib/twiki/data/MoMWorld/Skill%s.txt"%GetTWikiName(skill),"w")
     f.write(skillPage)
     f.close()
 
@@ -114,16 +114,16 @@ def CreateSkillPages(classSkills):
     skillIndex = "---+ Skill Index\n\n"
     indexPage = "---+ Skill Spells\n\n"
     skillSpells = []
-    for skill in sorted(classSkills.iterkeys()):
+    for skill in sorted(classSkills.keys()):
         skillIndex += "\t* [[Skill%s][%s]]\n"%(GetTWikiName(skill),skill)
         CreateSkillDesc(skill,classSkills[skill])
-        for sname in classSkills[skill][8].keys():
+        for sname in list(classSkills[skill][8].keys()):
             if sname not in skillSpells:
                 skillSpells.append(sname)
                 indexPage += "\t* [[Spell%s][%s]]\n"%(GetTWikiName(sname),sname)
-    f = file("./distrib/twiki/data/MoMWorld/SpellSkillsIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SpellSkillsIndex.txt","w")
     f.write(indexPage)
     f.close()
-    f = file("./distrib/twiki/data/MoMWorld/SkillIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/SkillIndex.txt","w")
     f.write(skillIndex)
     f.close()

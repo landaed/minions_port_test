@@ -6,7 +6,7 @@
 
 import os
 from sqlite3 import dbapi2 as sqlite
-from serverdb import CREATE_PLAYER_BUFFER_SQL
+from mud_ext.characterserver.serverdb import CREATE_PLAYER_BUFFER_SQL
 import zlib
 import shutil
 import traceback
@@ -75,9 +75,9 @@ def DeleteAllCharactersExcept(cursor,keepId):
 
 
 def ConvertBuffer(publicName,buffer):
-    print "Converting Player: %s"%publicName
+    print("Converting Player: %s"%publicName)
     dbuffer = zlib.decompress(buffer)
-    f = file("./data/tmp/pbuffer","wb")
+    f = open("./data/tmp/pbuffer","wb")
     f.write(dbuffer)
     f.close()
 
@@ -114,7 +114,7 @@ def ConvertBuffer(publicName,buffer):
         CHAR_CONN.close()
         
         #insert new PBUFFER
-        f = file("./data/tmp/cbuffer","rb")
+        f = open("./data/tmp/cbuffer","rb")
         cbuffer = f.read()
         f.close()
         
@@ -130,7 +130,7 @@ def ConvertBuffer(publicName,buffer):
     PCONN.close()
     
     #insert new PBUFFER
-    f = file("./data/tmp/nbuffer","rb")
+    f = open("./data/tmp/nbuffer","rb")
     pbuffer = f.read()
     f.close()
     
@@ -146,7 +146,7 @@ try:
 except:
     pass
 if os.path.exists("./data/character_dst.db"):
-    raise "unable to remove ./data/character_dst.db"
+    raise Exception("unable to remove ./data/character_dst.db")
 
 shutil.copyfile("./data/character_src.db","./data/character_dst.db")
     

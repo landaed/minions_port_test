@@ -14,12 +14,12 @@ USE_WX = "-wx" in sys.argv
 
 if sys.platform == 'win32' and not USE_WX:
     from twisted.internet.iocpreactor import install
-else:
-    USE_WX = True
+    install()
+elif USE_WX:
     import wx
     from twisted.internet.wxreactor import install
-
-install()
+    install()
+# else: use default reactor on Linux (headless)
 
 from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
 from twisted.cred.credentials import UsernamePassword
@@ -27,7 +27,7 @@ from twisted.cred.portal import IRealm,Portal
 from twisted.internet import reactor
 from twisted.python import components,failure,log
 from twisted.spread import pb
-from zope.interface import implements
+from zope.interface import implementer
 from sqlite3 import dbapi2 as sqlite
 from traceback import print_exc,print_stack
 
@@ -46,7 +46,7 @@ from mud.worlddaemon.worldservices import \
     StartServices as startWorldServices,ZoneClusterAvatar
 
 from math import ceil
-from md5 import md5
+from hashlib import md5
 from time import localtime,time as sysTime
 import traceback
 try:
@@ -84,8 +84,8 @@ for arg in sys.argv:
 
 
 if not WORLDNAME or not PUBLICNAME or not PASSWORD:
-    print "Usage: WorldDaemon -worldname=MYWORLD -publicname=MYPUBLICNAME -password=MYPASSWORD"
-    raise "Incorrect Usage"
+    print("Usage: WorldDaemon -worldname=MYWORLD -publicname=MYPUBLICNAME -password=MYPASSWORD")
+    raise Exception("Incorrect Usage")
 
 
 
@@ -129,7 +129,7 @@ def Tick():
             if not REBOOT:
                 reactor.stop()
             else:
-                print "Rebooting"
+                print("Rebooting")
                 KILLED = False
                 SpawnWorld()
         return
@@ -166,9 +166,9 @@ def Tick():
         else:
             if minutes < 11 and ANNOUNCE_MINUTE!=minutes:
                 if REBOOT:
-                    print "Reboot in %i minutes"%minutes
+                    print("Reboot in %i minutes"%minutes)
                 else:
-                    print "Shutdown in %i minutes"%minutes
+                    print("Shutdown in %i minutes"%minutes)
                     
                 ANNOUNCE_MINUTE = minutes
                 
@@ -197,7 +197,7 @@ def Tick():
             minutes = 0
                         
         if minutes and minutes < 11 and ANNOUNCE_MINUTE != minutes:
-            print "Reboot in %i minutes"%minutes
+            print("Reboot in %i minutes"%minutes)
             ANNOUNCE_MINUTE = minutes
             if ANNOUNCECALLBACK:
                 ANNOUNCECALLBACK.cancel()
@@ -269,7 +269,7 @@ def SpawnWorld():
     global SPAWNED
     SPAWNED = True
     
-    print "Spawning World Zone Clusters"
+    print("Spawning World Zone Clusters")
     ZoneClusterAvatar.clusterCount = len(CLUSTERNAMES)
     
     #start spawning
@@ -288,7 +288,7 @@ def AnnounceConnected(perspective):
     perspective.callRemote("WorldAvatar","announceWorld",wname,ZoneClusterAvatar.avatars[0].worldPort,False,[],(ZoneClusterAvatar.numPlayers,1024)).addCallbacks(AnnounceSuccess,AnnounceFailure,(perspective,))
     
 def AnnounceFailure(error):
-    print "ANNOUNCE FAILURE!!!!!",error
+    print("ANNOUNCE FAILURE!!!!!",error)
 
 def AnnounceWorld():
     global ANNOUNCECALLBACK
@@ -308,7 +308,7 @@ def AnnounceWorld():
     factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(AnnounceConnected, AnnounceFailure)
 
 def ImpConnected(imp):
-    print "Imp %i connected... spawning world"%imp.id
+    print("Imp %i connected... spawning world"%imp.id)
     WORLDIMPS[imp.id]=imp
     #kickstart my heart
     reactor.callLater(0,SpawnWorld)
@@ -319,7 +319,7 @@ def LoadZoneClusterNames():
         global CLUSTERNAMES
         #should probably remove the CLUSTERNAMES from the gamesettings entirely
         if not len(CLUSTERNAMES):
-            print "./%s/data/worlds/multiplayer.baseline/world.db"%(GAMEROOT)
+            print("./%s/data/worlds/multiplayer.baseline/world.db"%(GAMEROOT))
             conn = sqlite.connect("./%s/data/worlds/multiplayer.baseline/world.db"%(GAMEROOT))
             conn.text_factory = sqlite.OptimizedUnicode
             
@@ -328,13 +328,13 @@ def LoadZoneClusterNames():
             
             zones = {}
             for row in cursor.fetchall():
-                print row
-                if not zones.has_key(row[0]):
+                print(row)
+                if row[0] not in zones:
                     zones[row[0]]=[]
                 zones[row[0]].append(row[1])
                 
             for x in range(0,10):
-                if not zones.has_key(x):
+                if x not in zones:
                     break
                 CLUSTERNAMES.append(zones[x])
             

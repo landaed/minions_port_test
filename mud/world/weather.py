@@ -4,7 +4,7 @@
 
 import random
 from random import randint
-from defines import *
+from mud.world.defines import *
 
 from twisted.internet import reactor
 

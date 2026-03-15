@@ -383,7 +383,7 @@ def Damage(mob, inflictor, amount, dmgType, textDesc=None, doThorns=True, \
         if mob.player and not isDrain:
 
             # Iterate over breakable items.
-            for item in mob.wornBreakable.itervalues():
+            for item in mob.wornBreakable.values():
 
                 # If the item still has a repair value and the random result
                 # is zero (1 out of 21 chance of breaking), then damage the

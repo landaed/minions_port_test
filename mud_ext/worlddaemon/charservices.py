@@ -7,7 +7,7 @@
 from twisted.cred.portal import Portal
 from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
 from twisted.internet import reactor
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
@@ -46,7 +46,7 @@ class CServerAvatar(pb.Avatar):
         self.repfiles = {}
         
     def perspective_kickPlayer(self,publicName):
-        for avatar in CServerAvatar.worldCSAvatars.itervalues():
+        for avatar in CServerAvatar.worldCSAvatars.values():
             avatar.callRemote("kickPlayer",publicName)
         
     def perspective_checkGenesisTime(self,genesisTime):
@@ -58,7 +58,7 @@ class CServerAvatar(pb.Avatar):
         from worldservices import ZoneClusterAvatar
         
         if not len(CServerAvatar.worldCSAvatars):
-            raise "World maybe in a reboot."
+            raise Exception("World maybe in a reboot.")
             
         
         PBUFFERS[publicName]=buffer
@@ -85,7 +85,7 @@ class CServerAvatar(pb.Avatar):
         
         f = "./replication/"+filename
             
-        self.repfiles[filename] = file(f,"wb")
+        self.repfiles[filename] = open(f,"wb")
         
         
     def perspective_receiveBuffer(self,filename,buffer,digest):
@@ -96,16 +96,16 @@ class CServerAvatar(pb.Avatar):
         if digest:
             f.close()
             del self.repfiles[filename]
-            f = file("./replication/"+filename,"rb")
+            f = open("./replication/"+filename,"rb")
             buffer = f.read()
             f.close()
-            m = sha.new()
+            m = hashlib.sha1()
             m.update(buffer)
             if m.hexdigest() != digest:
-                print "File Replication Error!",filename
+                print("File Replication Error!",filename)
                 os.remove("./replication/"+filename)
             else:
-                print "File Replication Successful",filename
+                print("File Replication Successful",filename)
 
 
  
@@ -155,13 +155,13 @@ class CServerMind(pb.Root):
         return CServerMind.themind.callRemote("renameCharacter",oldname,newname)
         
     def remote_checkCharacterName(self,cname):
-        print "####Checking character name"
+        print("####Checking character name")
         return CServerMind.themind.callRemote("checkCharacterName",cname)
 
     def playerTransferredAndInstalled(self,result,wip,wport,zport,zpassword):
         if not result[0] or not result[1]:
             traceback.print_stack()
-            print "AssertionError: result has an empty value!"
+            print("AssertionError: result has an empty value!")
             return
         wpassword = result[1]
         return (wip,wport,wpassword,zport,zpassword)
@@ -169,7 +169,7 @@ class CServerMind(pb.Root):
     def playerTransfered(self,result,avatar,publicname,charname,remoteLeaderName,wip,wport,zport,zpassword):
         if not result[0] or not result[1]:
             traceback.print_stack()
-            print "AssertionError: result has an empty value!"
+            print("AssertionError: result has an empty value!")
             return
         cbuffer = CBUFFERS[publicname]
         d = avatar.callRemote("transferPlayerInstalled", publicname, charname, cbuffer, remoteLeaderName)
@@ -180,7 +180,7 @@ class CServerMind(pb.Root):
         from worldservices import ZoneClusterAvatar
         if not cbuffer:
             traceback.print_stack()
-            print "AssertionError: cbuffer is empty!"
+            print("AssertionError: cbuffer is empty!")
             return
         
         #whenever we're not entering world we'll save (cvalues is NULL in this case)
@@ -197,7 +197,7 @@ class CServerMind(pb.Root):
             
         CBUFFERS[publicname]=cbuffer
             
-        for cluster,a in ZoneClusterAvatar.avatars.iteritems():
+        for cluster,a in ZoneClusterAvatar.avatars.items():
             index =0
             if zonename in a.zoneNames:
                 code,premium = PINFOS[publicname]
@@ -257,11 +257,11 @@ class CServerMind(pb.Root):
     def remote_checkGrants(self, publicName):
         return CServerMind.themind.callRemote("checkGrants", publicName)
         
+@implementer(IRealm)
 class SimpleRealm:
-    implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        
+
         if not mind:
             raise BadConnectionError("no mind")
 
@@ -279,7 +279,7 @@ class SimpleRealm:
             raise NotImplementedError("no interface")
         
 def StartServices(username,password):
-    from md5 import md5
+    from hashlib import md5
     password = md5(password).digest()
     
     portal = Portal(SimpleRealm())

@@ -55,7 +55,7 @@ def GetWorldStatsConnected(perspective):
     perspective.callRemote("StatsAvatar","getStats").addCallbacks(GotWorldStats,GetWorldStatsFailure,(perspective,))
     
 def GetWorldStatsFailure(error):
-    print error
+    print(error)
     
     reactor.callLater(60,GetWorldStats) #try again in one minute
 
@@ -68,7 +68,7 @@ def GetWorldStats():
     reactor.connectTCP(WORLDIP,WORLDPORT,factory)
     #the pb.Root() is a bit of a hack, I don't know how to get host address on server without
     #sending it, and I don't want to take the time to figure it out at the moment
-    from md5 import md5
+    from hashlib import md5
     password = md5(password).digest()
 
     factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(GetWorldStatsConnected, GetWorldStatsFailure)

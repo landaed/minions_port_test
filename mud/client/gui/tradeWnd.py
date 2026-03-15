@@ -29,7 +29,7 @@ class TradeWnd:
         
         self.p0Items = {}
         self.p1Items = {}
-        for x in xrange(0,12):
+        for x in range(0,12):
             self.p0Items[x]=TGEObject("TRADE_P0_BUTTON%i"%x)
             self.p1Items[x]=TGEObject("TRADE_P1_BUTTON%i"%x)
             
@@ -114,17 +114,17 @@ class TradeWnd:
         self.p1Silver.setText(str(p1Silver))
         self.p1Platinum.setText(str(p1Platinum))
         
-        for slot,butt in self.p0Items.iteritems():
-            if not p0Items.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+        for slot,butt in self.p0Items.items():
+            if slot not in p0Items: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
                 butt.number = -1
             
-        for slot,butt in self.p1Items.iteritems():
-            if not p1Items.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+        for slot,butt in self.p1Items.items():
+            if slot not in p1Items: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
                 butt.number = -1
             
-        for slot,ghost in p0Items.iteritems():
+        for slot,ghost in p0Items.items():
             self.p0Items[slot].setBitmap("~/data/ui/items/"+ghost.BITMAP+"/0_0_0") 
             if ghost.STACKMAX > 1:
                 self.p0Items[slot].number = ghost.STACKCOUNT
@@ -133,7 +133,7 @@ class TradeWnd:
                 
                 
 
-        for slot,ghost in p1Items.iteritems():
+        for slot,ghost in p1Items.items():
             self.p1Items[slot].setBitmap("~/data/ui/items/"+ghost.BITMAP+"/0_0_0") 
             if ghost.STACKMAX > 1:
                 self.p1Items[slot].number = ghost.STACKCOUNT
@@ -175,28 +175,28 @@ def PyValidateTradeMoney():
     rootInfo = PARTYWND.mind.rootInfo
     
     try:
-        t = long(TRADEWND.p0Tin.getValue())
+        t = int(TRADEWND.p0Tin.getValue())
     except:
-        t = 0L
+        t = 0
     try:
-        c = long(TRADEWND.p0Copper.getValue())
+        c = int(TRADEWND.p0Copper.getValue())
     except:
-        c = 0L
+        c = 0
     
     try:
-        s = long(TRADEWND.p0Silver.getValue())
+        s = int(TRADEWND.p0Silver.getValue())
     except:
-        s = 0L
+        s = 0
     
     try:
-        g = long(TRADEWND.p0Gold.getValue())
+        g = int(TRADEWND.p0Gold.getValue())
     except:
-        g = 0L
+        g = 0
     
     try:
-        p = long(TRADEWND.p0Platinum.getValue())
+        p = int(TRADEWND.p0Platinum.getValue())
     except:
-        p = 0L
+        p = 0
         
     if t < 0:
         t = 0
@@ -212,10 +212,10 @@ def PyValidateTradeMoney():
     #this is how much we are typing in
     #convert to tin
     itin = t
-    itin += c*100L
-    itin += s*10000L
-    itin += g*1000000L
-    itin += p*100000000L
+    itin += c*100
+    itin += s*10000
+    itin += g*1000000
+    itin += p*100000000
     
     if itin <= rootInfo.TIN:
         #this is fine send it on up for further validation
@@ -224,7 +224,7 @@ def PyValidateTradeMoney():
             d.addCallback(GotMoneyResponse)
     else:
         #we have entered in more than we have... we'll clear in this case for now
-        d = PARTYWND.mind.perspective.callRemote("PlayerAvatar","onPlayerTradeMoney",0L)
+        d = PARTYWND.mind.perspective.callRemote("PlayerAvatar","onPlayerTradeMoney",0)
         if d:
             d.addCallback(GotMoneyResponse)
         TRADEWND.p0Tin.setText("0")

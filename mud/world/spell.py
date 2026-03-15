@@ -410,7 +410,7 @@ class Spell(Process):
             self.time += 3
             
             for e in self.effects:
-                e.iter.next()
+                next(e.iter)
             
             yield True
     
@@ -1026,7 +1026,7 @@ class SpellCasting:
                 player.sendGameText(RPG_MSG_GAME_DENIED,"$src's casting of <a:Spell%s>%s</a> failed, not enough mana.\\n"%(GetTWikiName(proto.name),proto.name),mob)
             else:
                 traceback.print_stack()
-                print "AssertionError: ai mobs should check mana before cast!"
+                print("AssertionError: ai mobs should check mana before cast!")
             return False
         
         # check components
@@ -1042,7 +1042,7 @@ class SpellCasting:
                 # Check if the player has the required components and give
                 #  feedback if not.
                 if not player.checkItems(components.copy(),True):
-                    player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components to cast <a:Spell%s>%s</a>,\\n$srche needs: %s\\n"%(GetTWikiName(proto.name),proto.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in components.iteritems())),mob)
+                    player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components to cast <a:Spell%s>%s</a>,\\n$srche needs: %s\\n"%(GetTWikiName(proto.name),proto.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in components.items())),mob)
                     return False
         
         if proto.recastTime:
@@ -1115,7 +1115,7 @@ class SpellCasting:
                     # Check if the player has the required components and give
                     #  feedback if not.
                     if not player.checkItems(componentsConsumed.copy(),True):
-                        player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components to cast <a:Spell%s>%s</a>,\\n$srche needs: %s\\n"%(GetTWikiName(proto.name),proto.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in componentsConsumed.iteritems())),mob)
+                        player.sendGameText(RPG_MSG_GAME_DENIED,"$src lacks the spell components to cast <a:Spell%s>%s</a>,\\n$srche needs: %s\\n"%(GetTWikiName(proto.name),proto.name,', '.join('<a:Item%s>%i %s</a>'%(GetTWikiName(ip.name),c,ip.name) for ip,c in componentsConsumed.items())),mob)
                         if proto.recastTime and proto in mob.recastTimers:
                             player.cinfoDirty = True
                             del mob.recastTimers[proto]

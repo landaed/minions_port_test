@@ -125,7 +125,7 @@ class CharMiniWnd:
         
         self.charInfos = None
         
-        self.panes = tuple(CharMiniPane(x) for x in xrange(0,6))
+        self.panes = tuple(CharMiniPane(x) for x in range(0,6))
         
         for pane in self.panes:
             pane.paneCtrl.visible = False
@@ -143,7 +143,7 @@ class CharMiniWnd:
         from partyWnd import PARTYWND
         
         #MoMWndProfile
-        for index,cinfo in self.charInfos.iteritems():
+        for index,cinfo in self.charInfos.items():
             pane = self.panes[index]
             if index == PARTYWND.curIndex:
                 pane.paneCtrl.setProfile("MoMSelectedWndProfile")
@@ -154,7 +154,7 @@ class CharMiniWnd:
     
     
     def setCharInfos(self,cinfos):
-        for x in xrange(0,6):
+        for x in range(0,6):
             self.panes[x].paneCtrl.visible = False
         
         self.charInfos = cinfos
@@ -167,7 +167,7 @@ class CharMiniWnd:
         self.window.extent = '121 %i'%int(121 + 92 * (num - 1))
         self.window.setActive(True)
         
-        for x in xrange(0,num):
+        for x in range(0,num):
             self.panes[x].paneCtrl.visible = True
     
     

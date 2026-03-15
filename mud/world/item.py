@@ -441,7 +441,7 @@ class ItemSoundProfile(Persistent):
         sndattribs = ['sndAttack','sndHit']
         for snd in sndattribs:
             num = 0
-            for x in xrange(1,5):
+            for x in range(1,5):
                 if not getattr(self,snd+str(x)):
                     break
                 num+=1
@@ -551,7 +551,7 @@ class ItemProto(Persistent):
     equipMessage = StringCol(default="")
     
     # Base worth of this item in tin.
-    worthTin = IntCol(default=0L)
+    worthTin = IntCol(default=0)
     
     # Date parameters for Seasonal items
     startDayRL = StringCol(default="")
@@ -1119,7 +1119,7 @@ class ItemInstance:
     
     def numVariants(self):
         num = 0
-        for varList in self.variants.itervalues():
+        for varList in self.variants.values():
             if isinstance(varList,tuple):
                 num += 1
             else:
@@ -1375,7 +1375,7 @@ class ItemInstance:
                     sslots = [s.slot for s in char.spells]
                     
                     # Iterate over all possible slot values.
-                    for sslot in xrange(0,256):
+                    for sslot in range(0,256):
                         
                         # If the number is not in the used slots, then
                         #  use it.
@@ -1400,7 +1400,7 @@ class ItemInstance:
                             player.sendGameText(RPG_MSG_GAME_DENIED,"%s must have a primary weapon equipped to apply a poison.\\n"%mob.name)
                         return
                     # apply poison, funnier than ever before
-                    if pw.procs.has_key(ispell):    # just refresh old poison
+                    if ispell in pw.procs:    # just refresh old poison
                         pw.procs[ispell] = [ispell.duration,RPG_ITEMPROC_POISON]
                         player.sendGameText(RPG_MSG_GAME_GAINED,"%s refreshes %s.\\n"%(mob.name,self.name))
                     elif len(pw.procs) < RPG_ITEMPROC_MAX:    # check for max temporary procs on weapon
@@ -1408,7 +1408,7 @@ class ItemInstance:
                         player.sendGameText(RPG_MSG_GAME_GAINED,"%s applies %s.\\n"%(mob.name,self.name))
                     else:
                         overwriting = []
-                        for proc in pw.procs.iterkeys():    # overwrite poison with lowest duration
+                        for proc in pw.procs.keys():    # overwrite poison with lowest duration
                             if pw.procs[proc][1] != RPG_ITEMPROC_ENCHANTMENT:
                                 if not overwriting or overwriting[1] < pw.procs[proc][0]:
                                     overwriting = (proc,pw.procs[proc][0])
@@ -1580,7 +1580,7 @@ class ItemInstance:
         
         if self.character:
             if hasattr(self.character,"mob") and self.character.mob:
-                if self in self.character.mob.worn.itervalues():
+                if self in iter(self.character.mob.worn.values()):
                     self.character.mob.unequipItem(self.slot)
             try:
                 mob = self.character.mob
@@ -1674,7 +1674,7 @@ class ItemInstance:
         for cl in list(proto.classes):
             if not cl.level:
                 traceback.print_stack()
-                print "AssertionError: no level to class %s recommendation assigned, on item %s!"%(cl.classname,self.name)
+                print("AssertionError: no level to class %s recommendation assigned, on item %s!"%(cl.classname,self.name))
                 continue
             if forPet:
                 if cl.level > itemLevel:
@@ -1773,7 +1773,7 @@ class ItemInstance:
         
         tin = ceil(tin * mod)
         
-        return long(tin)
+        return int(tin)
     
     
     #this is called when database is recompiled, and when item is first brought into memory
@@ -1818,7 +1818,7 @@ class ItemInstance:
         self.sndProfile = proto.sndProfile
         
         self.dmgType = RPG_DMG_PUMMEL
-        if DAMAGELOOKUP.has_key(proto.skill):
+        if proto.skill in DAMAGELOOKUP:
             self.dmgType = DAMAGELOOKUP[proto.skill]
         
         self.wpnAmmunitionType = proto.wpnAmmunitionType
@@ -1991,7 +1991,7 @@ class ItemSetPower(Persistent):
             else:
                 setattr(mob,stat.statname,getattr(mob,stat.statname)-stat.value)
         for spell in self.spells:
-            if mob.itemSetSpells.has_key(spell.trigger):
+            if spell.trigger in mob.itemSetSpells:
                 mob.itemSetSpells[spell.trigger].remove(spell)
     
     def updateDerived(self,mob):
@@ -2001,7 +2001,7 @@ class ItemSetPower(Persistent):
     
     def checkAndApply(self,mob,contributions,exists,printMessage=True):
         for req in self.requirements:
-            if not contributions.has_key(req.name):
+            if req.name not in contributions:
                 return False
             if self.harmful:
                 if not req.makeTest(contributions[req.name][0]):
@@ -2028,7 +2028,7 @@ class ItemSetPower(Persistent):
             else:
                 setattr(mob,stat.statname,getattr(mob,stat.statname)+stat.value)
         for spell in self.spells:
-            if mob.itemSetSpells.has_key(spell.trigger):
+            if spell.trigger in mob.itemSetSpells:
                 mob.itemSetSpells[spell.trigger].append(spell)
             else:
                 mob.itemSetSpells[spell.trigger] = [spell]
@@ -2054,12 +2054,12 @@ class ItemSetProto(Persistent):
             thisSet[1] = False
             
             if not len(thisSet[0]):
-                for power in mob.equipMods["%s"%self.name].iterkeys():
+                for power in mob.equipMods["%s"%self.name].keys():
                     power.removeMods(mob)
                 del mob.equipMods["%s"%self.name]
                 return
             
-            if not mob.equipMods.has_key("%s"%self.name):
+            if "%s"%self.name not in mob.equipMods:
                 mob.equipMods["%s"%self.name] = []
             for power in self.powers:
                 exists = power in mob.equipMods["%s"%self.name]
@@ -2076,7 +2076,7 @@ class ItemSetProto(Persistent):
 def getTomeAtLevelForScroll(scroll,tomelevel):
     if not scroll or tomelevel < 2 or tomelevel > 10:
         traceback.print_stack()
-        print "AssertionError: invalid attributes!"
+        print("AssertionError: invalid attributes!")
         return
     item = scroll.createInstance("STUFF/38")
     item.spellEnhanceLevel = tomelevel
@@ -2158,7 +2158,7 @@ class MailItemCache(pb.Cacheable):
             o.callRemote('updateChanged', changed)   
     
     def refreshDict(self,dict):
-        for k,v in dict.iteritems():
+        for k,v in dict.items():
             try:
                 if self.state[k] != v:
                     self.state[k] = v

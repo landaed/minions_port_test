@@ -19,7 +19,7 @@ def GetDBConnection():
     #return DBCONNECTION
 
 def SetDBConnection(uri,finalize = False):
-    from persistent import Persistent
+    from mud.common.persistent import Persistent
     global DBCONNECTION,HUB
     DBCONNECTION = uri
     

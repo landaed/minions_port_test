@@ -66,7 +66,7 @@ def SetColoredTextMany(evaluationList):
 class SpellPane:
     def __init__(self):
         self.currentPage = 0
-        self.spellButtons = dict((x,TGEObject("SPELLPANE_SPELL%i"%x)) for x in xrange(0,25))
+        self.spellButtons = dict((x,TGEObject("SPELLPANE_SPELL%i"%x)) for x in range(0,25))
         self.spellText = TGEObject("SPELLPANE_SPELLTEXT")
         self.spellPic = TGEObject("SPELLPANE_SPELLPIC")
         
@@ -77,10 +77,10 @@ class SpellPane:
         self.charInfo = cinfo
         spells = cinfo.SPELLS
         sindex = self.currentPage * 25
-        for x in xrange(sindex,sindex + 25):
+        for x in range(sindex,sindex + 25):
             button = self.spellButtons[x - sindex]
             button.pulseGreen = False
-            if spells.has_key(x):
+            if x in spells:
                 sinfo = spells[x].SPELLINFO
                 
                 if self.swapSlot == x:
@@ -113,7 +113,7 @@ class SpellPane:
         if self.swapSlot == slot:
             self.swapSlot = -1
         elif self.swapSlot == -1:
-            if self.charInfo.SPELLS.has_key(slot):
+            if slot in self.charInfo.SPELLS:
                 self.swapSlot = slot
         else:    # swap!
             PARTYWND.mind.onSpellSlotSwap(self.charInfo,self.swapSlot,slot)
@@ -139,7 +139,7 @@ class SpellPane:
         slot = self.currentPage * 25 + int(args[1])
 
         # If an item is on the cursor or the slot is in the spell book.
-        if PARTYWND.mind.cursorItem or self.charInfo.SPELLS.has_key(slot):
+        if PARTYWND.mind.cursorItem or slot in self.charInfo.SPELLS:
             PARTYWND.mind.onSpellSlot(self.charInfo,slot)
     
     
@@ -245,7 +245,7 @@ class SettingsPane:
         self.defaultTarget.clear()
         self.defaultTarget.add("",0)
         x = 1
-        for c in PARTYWND.charInfos.itervalues():
+        for c in PARTYWND.charInfos.values():
             if c == cinfo:
                 continue
             self.linkTarget.add(c.NAME,x)
@@ -277,9 +277,9 @@ class SkillPane:
     def __init__(self):
         self.currentPage = 0
         self.buttonSkillNames = {}
-        self.skillButtons = dict((x,TGEObject("SKILLBUTTON%i"%x)) for x in xrange(0,16))
+        self.skillButtons = dict((x,TGEObject("SKILLBUTTON%i"%x)) for x in range(0,16))
         
-        for sb in self.skillButtons.itervalues():
+        for sb in self.skillButtons.values():
             sb.visible = False
         
         self.skillList =     TGEObject("PARTYWND_SKILLLIST")
@@ -293,7 +293,7 @@ class SkillPane:
     
     
     def setPage(self,page):
-        for sb in self.skillButtons.itervalues():
+        for sb in self.skillButtons.values():
             sb.visible = False
         
         if not self.charInfo:
@@ -302,7 +302,7 @@ class SkillPane:
         cinfo = self.charInfo
         self.currentPage = page
         
-        skills = cinfo.SKILLS.keys()
+        skills = list(cinfo.SKILLS.keys())
         if not len(skills):
             return
         skills.sort()
@@ -341,7 +341,7 @@ class SkillPane:
             button.setActive(True)
             begin += 1
             
-            if cinfo.SKILLREUSE.has_key(sk.upper()) or cinfo.DEAD:
+            if sk.upper() in cinfo.SKILLREUSE or cinfo.DEAD:
                 button.setValue(1)
                 button.toggleLocked = True
             else:
@@ -427,11 +427,11 @@ class SkillPane:
 
 class InvPane:
     def __init__(self):
-        self.invButtons = dict((slot,TGEObject("SLOT_"+name)) for slot,name in SLOTNAMES.iteritems())
+        self.invButtons = dict((slot,TGEObject("SLOT_"+name)) for slot,name in SLOTNAMES.items())
         #carry slots
-        for i in xrange(0,30):
+        for i in range(0,30):
             self.invButtons[i+RPG_SLOT_CARRY_BEGIN]=TGEObject("SLOT_CARRY%i"%i)
-        for i in xrange(30,60):
+        for i in range(30,60):
             self.invButtons[i+RPG_SLOT_CARRY_BEGIN]=TGEObject("SLOT_CARRY%i"%(i-30))
         
         self.tin =      TGEObject("INVPANE_TIN")
@@ -534,7 +534,7 @@ class InvPane:
             self.platinum.setText(str(platinum))
         
         self.charInfo = cinfo
-        for slot,butt in self.invButtons.iteritems():
+        for slot,butt in self.invButtons.items():
             if self.page == 0 and RPG_SLOT_CARRY_END > slot >= RPG_SLOT_CARRY_BEGIN+30:
                 continue
             if self.page == 1 and RPG_SLOT_CARRY_BEGIN+30 > slot >= RPG_SLOT_CARRY_BEGIN:
@@ -552,16 +552,16 @@ class InvPane:
                 if cursorItem.isUseable(cinfo):
                     butt.pulseGreen = True
             
-            if not cinfo.ITEMS.has_key(slot): #only clear the ones we need to so we don't have to relock texture!
+            if slot not in cinfo.ITEMS: #only clear the ones we need to so we don't have to relock texture!
                 butt.SetBitmap("")
         
-        for slot,ghost in cinfo.ITEMS.iteritems():
+        for slot,ghost in cinfo.ITEMS.items():
             if self.page == 0 and RPG_SLOT_CARRY_END > slot >= RPG_SLOT_CARRY_BEGIN+30:
                 continue
             if self.page == 1 and RPG_SLOT_CARRY_BEGIN+30 > slot >= RPG_SLOT_CARRY_BEGIN:
                 continue
             
-            if self.invButtons.has_key(slot):
+            if slot in self.invButtons:
                 self.invButtons[slot].setBitmap("~/data/ui/items/"+ghost.BITMAP+"/0_0_0")
                 if ghost.REPAIRMAX:
                     if RPG_SLOT_WORN_END > slot >= RPG_SLOT_WORN_BEGIN:
@@ -693,7 +693,7 @@ class StatsPane:
         self.textArmor.setText(int(cinfo.ARMOR))
         self.textAdvance.setText(int(cinfo.ADVANCE))
         
-        for resist,ctrlname in StatsPane.resists.iteritems():
+        for resist,ctrlname in StatsPane.resists.items():
             found = False
             for r,amt in cinfo.RESISTS:
                 if r == resist:
@@ -786,7 +786,7 @@ class PartyWnd:
                 self.settingsPane.encounterSettingTimer.setText('(blocked for another %i seconds)'%timeDelta)
     
     def disablePanes(self):
-        for p in self.panes.iterkeys():
+        for p in self.panes.keys():
             p.visible = False
         
     def changeCharacterInfo(self,result,args):
@@ -1199,7 +1199,7 @@ def PyOnSendXPSliders(override = None):
     if not override:
         override = XPSLIDERS_DIRTY
     
-    for index,cinfo in PARTYWND.charInfos.iteritems():
+    for index,cinfo in PARTYWND.charInfos.items():
         if index in override:
             pvalue = cinfo.clientSettings['PXPGAIN']
             svalue = cinfo.clientSettings['SXPGAIN']
@@ -1235,20 +1235,20 @@ def GetMouseOverItem():
     #XXX these need to take current page into account (for spells, skills)
     
     if PARTYWND.paneSpells.mouseOver:
-        for slot,button in PARTYWND.spellPane.spellButtons.iteritems():
+        for slot,button in PARTYWND.spellPane.spellButtons.items():
             if button.mouseOver:
                 return ('SPELL',slot)
     elif PARTYWND.paneInventory.mouseOver:
-        for slot,button in PARTYWND.invPane.invButtons.iteritems():
+        for slot,button in PARTYWND.invPane.invButtons.items():
             if button.mouseOver:
                 return ('INV',slot)
     elif PARTYWND.paneSkills.mouseOver:
-        for slot,button in PARTYWND.skillPane.skillButtons.iteritems():
+        for slot,button in PARTYWND.skillPane.skillButtons.items():
             if button.mouseOver:
                 return ('SKILL',PARTYWND.skillPane.buttonSkillNames[slot])
     
     from defaultCommandsWnd import DEFAULTCOMMANDWND
-    for slot,button in DEFAULTCOMMANDWND.commandButtons.iteritems():
+    for slot,button in DEFAULTCOMMANDWND.commandButtons.items():
         if button.mouseOver:
             return ('CMD',slot)
     

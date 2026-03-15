@@ -87,13 +87,13 @@ class DefaultCommandWnd:
         self.prevButton = TGEObject('DefaultCommands_Prev')
         self.nextButton = TGEObject('DefaultCommands_Next')
         self.commandButtons = dict()
-        for x in xrange(0,10):
+        for x in range(0,10):
             button = TGEObject("DefaultCommand%i"%x)
             self.commandButtons[x] = button
             button.visible = False
         
         # Create a lookup dictionary for the default commands by index.
-        self.defaultCommands = dict((i,name) for i,name in enumerate(sorted(DEFAULTCOMMANDS.iterkeys())))
+        self.defaultCommands = dict((i,name) for i,name in enumerate(sorted(DEFAULTCOMMANDS.keys())))
         
         self.setPage(self.currentPage)
     
@@ -112,7 +112,7 @@ class DefaultCommandWnd:
             self.nextButton.setActive(False)
         
         # Fill the 10 buttons for default commands with content.
-        for x in xrange(0,10):
+        for x in range(0,10):
             commandIndex = x + page * 10
             try:
                 defaultCommand = DEFAULTCOMMANDS[self.defaultCommands[commandIndex]]

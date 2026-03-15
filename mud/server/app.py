@@ -16,7 +16,7 @@ from twisted.python import components, failure, log
 from mud.common.avatar import Avatar
 from mud.common.permission import Role,User,BannedUser,BannedIP
 
-from md5 import md5
+from hashlib import md5
 from time import time as sysTime
 import traceback
 
@@ -103,7 +103,7 @@ class Checker:
         except:
             pass
         
-        if THESERVER.roleLimits.has_key(role):
+        if role in THESERVER.roleLimits:
             limit = THESERVER.roleLimits[role]
             if not limit:
                 return failure.Failure(ServerFullError())
@@ -134,7 +134,7 @@ class Checker:
             user = User.byName(username)
 
         except SQLObjectNotFound:
-            print "User not found",username
+            print("User not found",username)
             return failure.Failure(UnauthorizedError())
         
         if self.useMD5:
@@ -156,7 +156,7 @@ class Checker:
             
         r = user.getRole(role)
         if r:
-            print r
+            print(r)
             return credentials.username
                         
         #bad role
@@ -196,7 +196,7 @@ class MasterPerspective(pb.Avatar):
             a.masterPerspective = self
     
     def removeAvatar(self,name):
-        if self.avatars.has_key(name):
+        if name in self.avatars:
             del self.avatars[name]        
             
     def __getattr__(self,attr):
@@ -209,7 +209,7 @@ class MasterPerspective(pb.Avatar):
         raise AttributeError
         
     def perspective_enumAvatars(self):
-        return self.avatars.keys()
+        return list(self.avatars.keys())
     
     
     def perspective_call(self,*args):
@@ -252,7 +252,7 @@ class MasterPerspective(pb.Avatar):
         
         t = sysTime() - tm
         if t > .1:
-            print "Warning: %s %s took %f seconds"%(self.username,args,t)
+            print("Warning: %s %s took %f seconds"%(self.username,args,t))
         self.cpuTime+=t
             
         return result
@@ -266,7 +266,7 @@ class MasterPerspective(pb.Avatar):
         
         del MasterPerspective.deferredCalls[self]
         
-        for avatar in self.avatars.itervalues():
+        for avatar in self.avatars.values():
             try:
                 avatar.logout()
                 avatar.masterPerspective = None
@@ -307,7 +307,7 @@ class Realm:
                 try:
                     subnet=ip.host[:ip.host.rfind('.')]
                 except:
-                    print "Warning:  IP logging isn't working... Windows 2000?"
+                    print("Warning:  IP logging isn't working... Windows 2000?")
                     subnet = ""
                 
                 
@@ -329,7 +329,7 @@ class Realm:
                     return failure.Failure(AllowConnectionsError())
             
             role=Role.byName(role)       
-            print "-------->",THESERVER.__class__.__name__,role.name                     
+            print("-------->",THESERVER.__class__.__name__,role.name)                     
             avatar = MasterPerspective(role,username,mind,self)
             avatar.realm = self
             self.avatars.append(avatar)
@@ -343,7 +343,7 @@ class Server:
         global THESERVER
         if THESERVER:
             traceback.print_stack()
-            print "AssertionError: server already exists!"
+            print("AssertionError: server already exists!")
             return
         
         THESERVER = self
@@ -372,7 +372,7 @@ class Server:
     def throttleTick(self):
         reactor.callLater(.2,self.throttleTick)    
         
-        for avatar,dcalls in MasterPerspective.deferredCalls.iteritems():
+        for avatar,dcalls in MasterPerspective.deferredCalls.items():
             if not len(dcalls):
                 if avatar.cpuTime:
                     avatar.cpuTime-=.025

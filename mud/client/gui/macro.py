@@ -21,7 +21,7 @@ from operator import itemgetter
 
 MACROMASTER = None
 CURSORMACRO = None
-(MACRO_IDLE,MACRO_RUNNING,MACRO_RECOVERING) = range(3)
+(MACRO_IDLE,MACRO_RUNNING,MACRO_RECOVERING) = list(range(3))
 
 
 
@@ -97,7 +97,7 @@ class MacroLine:
         # Check for a retarget command.
         if self.retarget:
             command = self.realCommand
-            for charIndex,charInfo in PARTYWND.charInfos.iteritems():
+            for charIndex,charInfo in PARTYWND.charInfos.items():
                 if charInfo.NAME.upper() == self.retarget:
                     commandCharIndex = charIndex
                     commandCharInfo = charInfo
@@ -126,7 +126,7 @@ class MacroLine:
         # Check for a retarget command.
         if self.retarget:
             command = self.realCommand
-            for charIndex,charInfo in PARTYWND.charInfos.iteritems():
+            for charIndex,charInfo in PARTYWND.charInfos.items():
                 if charInfo.NAME.upper() == self.retarget:
                     commandCharIndex = charIndex
                     commandCharInfo = charInfo
@@ -526,10 +526,10 @@ class Macro:
         # If there is only one macro line, we need this one to be available,
         #  no matter the mandatory setting.
         if self.macroLineNum == 1:
-            for macroLine in self.macroLines.itervalues():
+            for macroLine in self.macroLines.values():
                 recovered = macroLine.checkAvailability(self.charIndex)
         else:
-            for macroLine in self.macroLines.itervalues():
+            for macroLine in self.macroLines.values():
                 # If this line is mandatory or we're required to wait
                 #  for all commands to recover, check if this command
                 #  has already recovered.
@@ -599,7 +599,7 @@ class Macro:
             # Otherwise run through all lines and check which ones need
             #  the skill. If the lines needing the skill are mandatory,
             #  go into recovery mode.
-            for line in self.macroLines.itervalues():
+            for line in self.macroLines.values():
                 if line.mandatory:
                     if line.skill == skill:
                         return True
@@ -624,7 +624,7 @@ class Macro:
             # Otherwise run through all lines and check which ones need
             #  the spell. If the lines needing the spell are mandatory,
             #  go into recovery mode.
-            for line in self.macroLines.itervalues():
+            for line in self.macroLines.values():
                 if line.mandatory:
                     if line.spell == spell:
                         return True
@@ -649,7 +649,7 @@ class Macro:
             # Otherwise run through all lines and check which ones need
             #  the item. If the lines needing the item are mandatory,
             #  go into recovery mode.
-            for line in self.macroLines.itervalues():
+            for line in self.macroLines.values():
                 if line.mandatory:
                     if line.item == item:
                         return True
@@ -710,7 +710,7 @@ class Macro:
                 # Otherwise run through all lines and check which ones need
                 #  the ranged attack. If those lines are mandatory,
                 #  go into recovery mode.
-                for line in self.macroLines.itervalues():
+                for line in self.macroLines.values():
                     if line.mandatory:
                         if line.command.upper().find('/RANGEDATTACK') != -1:
                             return True
@@ -751,12 +751,12 @@ class MacroMaster:
         self.rangedAttackMacros.clear()
         self.emptyVisibleSlots.clear()
         
-        for charIndex,macroDict in macroCollection.iteritems():
+        for charIndex,macroDict in macroCollection.items():
             # Reset the set of empty visible slots for this character index.
             emptyVisibleSlots = self.emptyVisibleSlots[charIndex] = set(range(10))
             # Refill the hotkey, skill, spell and item dictionaries.
             charHotkeys = self.hotkeyDict[charIndex] = dict()
-            for position,macro in macroDict.iteritems():
+            for position,macro in macroDict.items():
                 hotkey = macro.hotkey
                 if hotkey:
                     if hotkey[0] != 'F':
@@ -938,9 +938,9 @@ class MacroMaster:
             # Tell all macros that were visible that they no longer
             #  are and set the macros on the new page visible.
             # Collect data on which slots actually contain a macro.
-            for charIndex,macroDict in self.macros.iteritems():
+            for charIndex,macroDict in self.macros.items():
                 emptyVisibleSlots = self.emptyVisibleSlots.setdefault(charIndex,set(range(10)))
-                for position,macro in macroDict.iteritems():
+                for position,macro in macroDict.items():
                     if position[0] == self.activePage:
                         macro.setVisibility(False)
                     elif position[0] == page:
@@ -966,7 +966,7 @@ class MacroMaster:
     
     # Call this function to show all empty macro slots (pulse green).
     def showEmptySlots(self,show=True):
-        for charIndex,emptyVisibleSlots in self.emptyVisibleSlots.iteritems():
+        for charIndex,emptyVisibleSlots in self.emptyVisibleSlots.items():
             for emptySlot in emptyVisibleSlots:
                 control = TGEObject("MACROWND_MACRO%i_%i"%(charIndex,emptySlot))
                 control.pulseGreen = show
@@ -993,12 +993,12 @@ class MacroMaster:
         
         # Process one macro line per macro active per character.
         curTime = time()
-        for charIndex,runningMacros in self.runningMacros.iteritems():
+        for charIndex,runningMacros in self.runningMacros.items():
             if not runningMacros:
                 continue
             try:
                 oneGetter = itemgetter(1)
-                handleMacro,fireTime = min(runningMacros.iteritems(),key=oneGetter)
+                handleMacro,fireTime = min(iter(runningMacros.items()),key=oneGetter)
                 # If the earliest fire time still is in the future, skip to next character.
                 if fireTime > curTime:
                     continue
@@ -1021,7 +1021,7 @@ class MacroMaster:
                 continue
         
         # Update all recovering macros.
-        for charIndex,recoveringMacros in self.recoveringMacros.iteritems():
+        for charIndex,recoveringMacros in self.recoveringMacros.items():
             recoveredMacros = set()
             for macro in recoveringMacros:
                 if macro.recover():
@@ -1035,7 +1035,7 @@ class MacroMaster:
         runningMacros = self.runningMacros.get(charIndex)
         if runningMacros:
             # Push macros to be stopped over to recovering macros.
-            self.recoveringMacros.setdefault(charIndex,set()).update(runningMacros.iterkeys())
+            self.recoveringMacros.setdefault(charIndex,set()).update(iter(runningMacros.keys()))
             # Effectively stop macros from running by emptying the dictionary.
             runningMacros.clear()
     
@@ -1184,7 +1184,7 @@ class MacroMaster:
                 newMacro.description = macroInfo.description
                 newMacro.waitAll = macroInfo.waitAll
                 newMacro.manualDelay = macroInfo.manualDelay
-                newMacroLines = deepcopy(macroInfo.macroLines.values())
+                newMacroLines = deepcopy(list(macroInfo.macroLines.values()))
             
             # Check for valid charIndex in cursor macro.
             if CURSORMACRO.charIndex != -1:
@@ -1341,7 +1341,7 @@ class MacroMaster:
         if activate:
             # Activate all macros bound to this hotkey if they aren't recovering.
             curTime = time()
-            for charIndex,hotkeyDict in self.hotkeyDict.iteritems():
+            for charIndex,hotkeyDict in self.hotkeyDict.items():
                 try:
                     macroSet = hotkeyDict[hotkey]
                     runningMacros = self.runningMacros.setdefault(charIndex,dict())
@@ -1355,7 +1355,7 @@ class MacroMaster:
                     continue
         else:
             # Stop all macros bound to this hotkey and insert them into the recovering set.
-            for charIndex,hotkeyDict in self.hotkeyDict.iteritems():
+            for charIndex,hotkeyDict in self.hotkeyDict.items():
                 runningMacros = self.runningMacros.setdefault(charIndex,dict())
                 recoveringMacros = self.recoveringMacros.setdefault(charIndex,set())
                 try:
@@ -1388,20 +1388,20 @@ def checkCommandAvailability(charInfo,command):
             command,arg = args[0],''
         
         if command == 'SKILL':
-            if charInfo.SKILLREUSE.has_key(arg):
+            if arg in charInfo.SKILLREUSE:
                 return False
             return True
         elif command == 'CAST':
             if charInfo.RAPIDMOBINFO.CASTING:
                 return False
-            for spellSlot,charSpell in charInfo.SPELLS.iteritems():
+            for spellSlot,charSpell in charInfo.SPELLS.items():
                 if charSpell.SPELLINFO.BASENAME.upper() == arg:
                     if charSpell.RECASTTIMER:
                         return False
                     break
             return True
         elif command == 'USEITEM':
-            for itemSlot,itemInfo in charInfo.ITEMS.iteritems():
+            for itemSlot,itemInfo in charInfo.ITEMS.items():
                 if itemSlot == RPG_SLOT_CURSOR:
                     continue
                 if itemInfo.NAME.upper() == arg:

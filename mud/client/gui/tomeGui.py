@@ -93,7 +93,7 @@ class TomeGui(object):
     pronouns = { 'Female': ('she','her','her','herself'),
                  'Male':   ('he','him','his','himself'),
                  'Neuter': ('it','it','its','itself')}
-    srche,srchim,srchis,srcself = range(4)
+    srche,srchim,srchis,srcself = list(range(4))
     instance = None
     
     

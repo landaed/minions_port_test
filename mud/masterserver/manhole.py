@@ -4,7 +4,7 @@
 
 #master manhole
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.internet import protocol
 from twisted.application import service, strports
@@ -57,7 +57,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
     def buildProtocol(self, addr):
         
         if addr.host not in self.allowedIP:
-            raise "Unauthorized"
+            raise Exception("Unauthorized")
         
         
         return factory.SSHFactory.buildProtocol(self,addr)
@@ -72,9 +72,8 @@ class chainedProtocolFactory:
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
 
+@interface.implementer(checkers.ICredentialsChecker)
 class ManholeChecker:
-
-    interface.implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.IUsernamePassword,
         credentials.IUsernamePassword)
@@ -97,21 +96,21 @@ def QueueProduct(email,product):
     product=product.upper()
     
     if "@" not in email:
-        raise "invalid email"
+        raise Exception("invalid email")
     
     try:
         a = Account.byEmail(email)
         if a.hasProduct(product):
-            print "Email address linked to public name %s, which already has this product"%a.publicName
+            print("Email address linked to public name %s, which already has this product"%a.publicName)
             return
         a.addProduct(product)
-        print "%s product added to existing account by public name %s"%(product,a.publicName)
+        print("%s product added to existing account by public name %s"%(product,a.publicName))
         return
     except:
         pass
     
     ProductEmail(email=email,product=product.upper())
-    print "Product: %s queued for email address: %s"%(product,email)
+    print("Product: %s queued for email address: %s"%(product,email))
     
         
 def RemoveAccount(publicname):

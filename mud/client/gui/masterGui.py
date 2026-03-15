@@ -85,7 +85,7 @@ def GotWorldInfo(results,perspective,worldName):
         except:
             pass
         
-        f = file(filename,"wb")
+        f = open(filename,"wb")
         f.write(banner)
         f.close()
         
@@ -114,7 +114,7 @@ def QueryWorldInfo(worldname):
         if winfo.worldName == worldname:
             factory = pb.PBClientFactory()
             reactor.connectTCP(winfo.worldIP,winfo.worldPort,factory)
-            from md5 import md5
+            from hashlib import md5
             password = md5("").digest()
             factory.login(UsernamePassword("Query-Query", password),pb.Root()).addCallbacks(QueryWorldInfoConnected, QueryWorldInfoFailure,(winfo.worldName,),{},(winfo.worldName,))
             return True
@@ -191,7 +191,7 @@ def PlayerSubmittedToWorld(result):
             TGESetGlobal("$pref::GM_LOGIN_ROLE","Immortal")
             role = "Immortal"
     
-    from md5 import md5
+    from hashlib import md5
     password = md5(result[1]).digest()
 
     factory.login(UsernamePassword("%s-%s"%(TGEGetGlobal("$pref::PublicName"),role), password),mind).addCallbacks(PlayerConnected, MyFailure,(mind,))
@@ -243,7 +243,7 @@ def OnMasterSelectWorld():
     else:
         factory = pb.PBClientFactory()
         reactor.connectTCP(winfo.worldIP,winfo.worldPort,factory)
-        from md5 import md5
+        from hashlib import md5
         password = md5(password).digest()
 
         factory.login(UsernamePassword("NewPlayer-NewPlayer", password),pb.Root()).addCallbacks(NewPlayerConnected, Failure)
@@ -282,7 +282,7 @@ def EnumLiveWorldsResults(worlds):
     wnametext = TGEObject("MASTERGUI_WORLDNAME")
 
     ss = []
-    for x in xrange(0,10):
+    for x in range(0,10):
         s = TGEObject("MASTERGUI_SS%i"%x)
         s.visible = False
         ss.append(s)
@@ -479,7 +479,7 @@ def PyOnWorldChoose():
         SetWorldInfo(winfo.worldName)
     else:
         #not cached
-        if RETRIEVETIMES.has_key(winfo.worldName):
+        if winfo.worldName in RETRIEVETIMES:
             t = RETRIEVETIMES[winfo.worldName]
             t = time.time()-t
 
@@ -538,7 +538,7 @@ def PyOnDirectSelectWorld():
     TGESetGlobal("$Py::WORLDNAME","DirectConnection")
 
     password = ""
-    from md5 import md5
+    from hashlib import md5
     password = md5(password).digest()
 
     factory = pb.PBClientFactory()

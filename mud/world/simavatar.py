@@ -42,7 +42,7 @@ class SimAvatar(Avatar):
         
         
     def error(self,error):
-        print error
+        print(error)
     
     
     def setDisplayName(self,player):
@@ -86,9 +86,9 @@ class SimAvatar(Avatar):
         
     def deleteObject(self,simObject):
         self.mind.callRemote("deleteObject",simObject.id)
-        if self.playerLookup.has_key(simObject.id):
+        if simObject.id in self.playerLookup:
             traceback.print_stack()
-            print "AssertionError: simObject id still in playerLookup!"
+            print("AssertionError: simObject id still in playerLookup!")
             return
         self.simObjects.remove(simObject)
         del self.simLookup[simObject.id]
@@ -113,11 +113,11 @@ class SimAvatar(Avatar):
     def perspective_onZoneTrigger(self,simObject,zoneLink):#,zoneIn):
         if simObject not in self.simObjects:
             traceback.print_stack()
-            print "AssertionError: simObject is not in SimAvatars simObject list!"
+            print("AssertionError: simObject is not in SimAvatars simObject list!")
             return
-        if not self.playerLookup.has_key(simObject):
+        if simObject not in self.playerLookup:
             traceback.print_stack()
-            print "AssertionError: simObject is not in SimAvatars playerLookup list!"
+            print("AssertionError: simObject is not in SimAvatars playerLookup list!")
             return
 
 
@@ -186,7 +186,7 @@ class SimAvatar(Avatar):
         
     def logout(self):
         if self.zone:
-            print "Zone Down!"
+            print("Zone Down!")
             #if any other players in zone, suspend and do a pass off
             self.world.closeZone(self.zone)
             
@@ -341,18 +341,18 @@ class SimAvatar(Avatar):
     def perspective_dialogTrigger(self,srcId,trigger):
         from command import CmdZoneInteract
         
-        if self.simLookup.has_key(srcId):
+        if srcId in self.simLookup:
             so = self.simLookup[srcId]
-            if self.playerLookup.has_key(so):
+            if so in self.playerLookup:
                 player = self.playerLookup[so]
                 CmdZoneInteract(player.curChar.mob,[],trigger)
                 
     def perspective_bindTrigger(self,srcId):
         from command import CmdBind
         
-        if self.simLookup.has_key(srcId):
+        if srcId in self.simLookup:
             so = self.simLookup[srcId]
-            if self.playerLookup.has_key(so):
+            if so in self.playerLookup:
                 player = self.playerLookup[so]
                 CmdBind(player.curChar.mob,[])
         
@@ -386,7 +386,7 @@ class SimAvatar(Avatar):
             so.position = pos
             so.rotation = rot
             
-            if self.playerLookup.has_key(so):
+            if so in self.playerLookup:
                 so.waterCoverage=v
             else:
                 so.canKite=v

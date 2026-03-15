@@ -35,8 +35,8 @@ class LootWnd(object):
         self.window = TGEObject("LootWnd") 
         self.pane = TGEObject("LOOTWnd_Window") 
         self.scroll = TGEObject("LootWnd_Items") 
-        self.lootButtons = dict((x,TGEObject("LOOT_BUTTON%i"%x)) for x in xrange(16)) 
-        self.lootTexts = dict((x,TGEObject("LOOT_TEXT%i"%x)) for x in xrange(16)) 
+        self.lootButtons = dict((x,TGEObject("LOOT_BUTTON%i"%x)) for x in range(16)) 
+        self.lootTexts = dict((x,TGEObject("LOOT_TEXT%i"%x)) for x in range(16)) 
         self.destroyCorpseButton = TGEObject("LOOT_DESTROYCORPSE") 
     
     
@@ -57,7 +57,7 @@ class LootWnd(object):
     #  over or None.
     def getMouseOver(self):
         if int(self.window.isAwake()):
-            for slot,button in self.lootButtons.iteritems():
+            for slot,button in self.lootButtons.items():
                 if int(button.mouseOver):
                     return (True,self.loot.get(slot,None))
         return(False,None)
@@ -79,17 +79,17 @@ class LootWnd(object):
             self.pane.setText("Loot") 
             self.destroyCorpseButton.setText("Destroy Corpse") 
         
-        for button in self.lootButtons.itervalues(): 
+        for button in self.lootButtons.values(): 
             button.visible = False 
             button.number = -1 
             button.setValue(int(assess)) 
             button.toggleLocked = assess 
 
-        for text in self.lootTexts.itervalues(): 
+        for text in self.lootTexts.values(): 
             text.visible = False 
             text.setText("") 
         
-        for x,ghost in loot.iteritems(): 
+        for x,ghost in loot.items(): 
             # Need to check if loot item slot is still in slot range. 
             # This can be false when a mob has an extensive standard 
             #  loot table (especially true on testing). 

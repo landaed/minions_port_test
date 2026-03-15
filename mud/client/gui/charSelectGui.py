@@ -23,14 +23,14 @@ def SetFromCharacterInfos(cinfos):
     
     startX = sizeX/2-pixels/2
     
-    for x in xrange(0,6):
+    for x in range(0,6):
         BUTTONS[x].position = "%i 12"%startX
         startX+=40
 
     
     if num == 1:
         num = 0 #disable all if only one character
-    for x in xrange(0,num):
+    for x in range(0,num):
         BUTTONS[x].visible = True
         BUTTONS[x].setActive("true")
         
@@ -49,7 +49,7 @@ def OnCharButton(args):
 def PyExec():
     global BUTTONS
     BUTTONS = []
-    for x in xrange(0,6):
+    for x in range(0,6):
         BUTTONS.append(TGEObject("PartyWnd_CharButton%i"%x))
         BUTTONS[x].visible = False
         BUTTONS[x].setActive("false")

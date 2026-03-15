@@ -24,7 +24,7 @@ class Projectile:
     
     ## @brief (Long) Count of created Projectiles.  This value is used to create
     #         identifiers for instances of Projectile.  
-    id = 1L
+    id = 1
     
     ## @brief Initialize class.
     #  @param self (Projectile) The object pointer.

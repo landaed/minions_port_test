@@ -17,7 +17,7 @@ class Process:
     
     ## @brief (Long) Count of created Processes.  This value is used to create
     #         identifiers for instances of Processes.  
-    processCounter = 1L
+    processCounter = 1
     
     
     ## @brief Initialize class.

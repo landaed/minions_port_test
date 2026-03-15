@@ -198,7 +198,7 @@ def doAttackProcs(attacker, defender, weapon=None, additionalProcs=None):
 
         # Add the weapon's additional procs (poison and spell enchantments)
         # regardless of the penalty.
-        spellProcs.extend(weapon.procs.keys())
+        spellProcs.extend(list(weapon.procs.keys()))
 
     # If a list of additional procs has been provided, then add them to the proc
     # list.
@@ -1131,7 +1131,7 @@ class CombatProcess(Process):
 
                         # Attempt to perform an attack and skill ups for each
                         # attack.
-                        for a in xrange(0,attacks):
+                        for a in range(0,attacks):
 
                             # Attempt to do an attack based on the primary
                             # damage from the primary hand.
@@ -1159,7 +1159,7 @@ class CombatProcess(Process):
     
                     # If the attacker has a Dual Wield skill or Power Wield, 
                     # then a secondary may occur.
-                    if src.skillLevels.has_key("Dual Wield") or powerWield:
+                    if "Dual Wield" in src.skillLevels or powerWield:
     
                         # Flag indicating if the secondary attack will be
                         # skipped.
@@ -1883,7 +1883,7 @@ class CombatProcess(Process):
 
         # If the defender has a Shield skill and the defender has an item
         # equipped in the shield slot, then defender may shield the attack.
-        if block and defender.worn.has_key(RPG_SLOT_SHIELD):
+        if block and RPG_SLOT_SHIELD in defender.worn:
 
             # Flag used to indicate if the shielding will be skipped.  This
             # can occur if the defender has a two-handed weapon equipped.

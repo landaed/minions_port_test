@@ -29,7 +29,7 @@ class Tactical:
             return
         
         # A new enemy, so perform some additional checks.
-        if not mob.aggro.has_key(otherMob):
+        if otherMob not in mob.aggro:
             
             # Get range to target and our aggro range.
             tgtRange = GetRange(mob,otherMob)
@@ -159,7 +159,7 @@ class Tactical:
                             # Copy aggro list over to friendly assisting mob
                             #  if current mob is in other mobs aggro range.
                             if GetRange(mob,otherMob) <= (otherMob.spawn.aggroRange * mob.zone.zone.aggroMod) * .65:
-                                for m in mob.aggro.iterkeys():
+                                for m in mob.aggro.keys():
                                     if not otherMob.aggro.get(m,0):
                                         otherMob.addAggro(m,5)
                     
@@ -182,7 +182,7 @@ class Tactical:
                             if GetRange(mob,otherMob) <= (mob.spawn.aggroRange * mob.zone.zone.aggroMod) * .65:
                                 # Run through the list of mobs hostile
                                 #  to the player.
-                                for m in otherMob.aggro.iterkeys():
+                                for m in otherMob.aggro.keys():
                                     # Only consider valid player mobs.
                                     if not m.player or m.detached:
                                         continue
@@ -258,7 +258,7 @@ class Tactical:
                         bestRangeMob = mob.target
             
             # Now run through the whole aggro list to determine best target.
-            for m,hate in mob.aggro.iteritems():
+            for m,hate in mob.aggro.items():
                 # Ignore targets that are feigning death.
                 if m.feignDeath:
                     continue
@@ -304,7 +304,7 @@ class Tactical:
                 #  if possible.
                 if mostHated.isFeared and mostHated.master:
                     master = mostHated.master
-                    if mob.aggro.has_key(master):
+                    if master in mob.aggro:
                         testRange = GetRange(mob,master)
                         if testRange <= mob.followRange or mob.damageTimer or mob.battle:
                             mostHated = master

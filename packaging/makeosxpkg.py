@@ -11,7 +11,7 @@ if '-free' in sys.argv:
 elif '-testing' in sys.argv:
     FREE = False
 else:
-    raise "Please specifiy -free or -testing in command line options"
+    raise Exception("Please specifiy -free or -testing in command line options")
 
     
 PKGNAME = "MoMFreeEdition"

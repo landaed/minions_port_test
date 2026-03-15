@@ -6,12 +6,12 @@ from sqlobject import *
 from mud.common.persistent import Persistent
 from twisted.internet import reactor
 
-from item import ItemProto,ItemInstance
-from defines import *
+from mud.world.item import ItemProto,ItemInstance
+from mud.world.defines import *
 from random import randint
-import spawn
+from mud.world import spawn
 import math
-from core import *
+from mud.world.core import *
 import traceback
 
 
@@ -91,7 +91,7 @@ class VendorInstance:
                 if vitem.frequency != RPG_FREQ_ALWAYS:
                     if count > 0:
                         count = 0
-                        for x in xrange(vitem.count):
+                        for x in range(vitem.count):
                             if not randint(0,vitem.frequency - 1):
                                 count += 1
                     elif count == -1:  # infinite amount
@@ -106,7 +106,7 @@ class VendorInstance:
     
     def sendStock(self, player):
         # indexes 20 and above are reserved for vendor default items
-        itemInfos = dict((item.itemInfo,i+20) for i,item in enumerate(self.stock.iterkeys()))
+        itemInfos = dict((item.itemInfo,i+20) for i,item in enumerate(self.stock.keys()))
         
         if len(self.playerSubmitted) > 20:
             remove = self.playerSubmitted[0:len(self.playerSubmitted) - 20]
@@ -125,7 +125,7 @@ class VendorInstance:
             if 0 <= lookitem < len(self.playerSubmitted):  # valid index
                 return self.playerSubmitted[lookitem]
         elif lookitem - 20 < len(self.stock):  # valid index
-            return self.stock.keys()[lookitem - 20]
+            return list(self.stock.keys())[lookitem - 20]
         
         return None
     
@@ -149,7 +149,7 @@ class VendorInstance:
         # validate and get the item by index
         buyitem = self.getItem(itemIndex)
         if not buyitem:
-            print "Warning: Player buying item vendor doesn't have!!!!"
+            print("Warning: Player buying item vendor doesn't have!!!!")
             return
         
         money = buyitem.getWorth(self.markup)
@@ -209,7 +209,7 @@ class VendorInstance:
             else:
                 diff = buyitem.stackCount - needStack
                 player.sendGameText(RPG_MSG_GAME_DENIED,"%s's inventory is full, only %i items could be bought.\\n"%(char.name,diff))
-                money = long(math.ceil(float(money) * float(diff) / float(buyitem.stackCount)))
+                money = int(math.ceil(float(money) * float(diff) / float(buyitem.stackCount)))
         
         if not money:
             player.sendGameText(RPG_MSG_GAME_GAINED,"%s receives the item for free.\\n"%char.name)
@@ -266,6 +266,6 @@ class VendorInstance:
                 
                 return
         
-        print "Warning: Player item selling wackiness!!!"
+        print("Warning: Player item selling wackiness!!!")
 
 

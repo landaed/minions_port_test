@@ -90,10 +90,10 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
                     if vault:
                         cursor.execute("SELECT stack_count,name FROM character_vault_item WHERE item_id=? LIMIT 1;",(itemID[0],))
                         itemValues = cursor.fetchone()
-                        print "ERROR: %i %s had to be purged from character %s's vault because they miss item backing."%(itemValues[0],itemValues[1],charName)
+                        print("ERROR: %i %s had to be purged from character %s's vault because they miss item backing."%(itemValues[0],itemValues[1],charName))
                     else:
                         dstCursor.execute("SELECT name FROM item WHERE id=? LIMIT 1;",(containerItem,))
-                        print "ERROR: an item from character %s's container %s had to be purged because it misses item backing."%(charName,dstCursor.fetchone()[0])
+                        print("ERROR: an item from character %s's container %s had to be purged because it misses item backing."%(charName,dstCursor.fetchone()[0]))
                 # Shouldn't happen, but if an exception occurs, sqlite returned us an
                 #  empty value to process ... means there's no further error about
                 #  vault or container content.
@@ -116,7 +116,7 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
                 InstallItemList(cursor,dstCursor,cursor.fetchall(),playerID,characterID,spawnID,True,itemID,newItemID)
             except:
                 traceback.print_exc()
-                print "Probably a database that didn't yet hear of the introduction of item containers."
+                print("Probably a database that didn't yet hear of the introduction of item containers.")
             
             # Store vault or container content elements.
             if vault:
@@ -130,7 +130,7 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
                     dstCursor.executemany('INSERT INTO item_container_content VALUES(%s)'%(TVALUES['item_container_content']),values)
                 except:
                     traceback.print_exc()
-                    print "Probably a database that didn't yet hear of the introduction of item containers."
+                    print("Probably a database that didn't yet hear of the introduction of item containers.")
     
     # Otherwise we deal with standard bank or inventory items.
     else:
@@ -149,7 +149,7 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
                 InstallItemList(cursor,dstCursor,cursor.fetchall(),playerID,characterID,spawnID,True,itemID,newItemID)
             except:
                 traceback.print_exc()
-                print "Probably a database that didn't yet hear of the introduction of item containers."
+                print("Probably a database that didn't yet hear of the introduction of item containers.")
 
 
 def InstallCharacterBuffer(playerID,cname,buffer):
@@ -161,7 +161,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     
     try:
         dbuffer = zlib.decompress(buffer)
-        f = file("data/tmp/character%i.db"%CLUSTER,"wb")
+        f = open("data/tmp/character%i.db"%CLUSTER,"wb")
         f.write(dbuffer)
         f.close()
         
@@ -202,8 +202,8 @@ def InstallCharacterBuffer(playerID,cname,buffer):
             dstCursor.executemany(sql,values)
         except:
             traceback.print_exc()
-            print sql,values
-            raise "Error installing character",cname
+            print(sql,values)
+            raise Exception("Error installing character: %s" % cname)
         characterID = dstCursor.lastrowid
         #generate spawn
         cursor.execute("SELECT * FROM spawn WHERE character_id = %i LIMIT 1;"%cid)
@@ -254,7 +254,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     cursor.close()
     dbconn.close()
     
-    print "Character installation took %f seconds"%(time.time()-tm)
+    print("Character installation took %f seconds"%(time.time()-tm))
     
     return error
 
@@ -272,7 +272,7 @@ def InstallPlayerBuffer(buffer):
     
     try:
         dbuffer = zlib.decompress(buffer)
-        f = file("data/tmp/player%i.db"%CLUSTER,"wb")
+        f = open("data/tmp/player%i.db"%CLUSTER,"wb")
         f.write(dbuffer)
         f.close()
         
@@ -362,7 +362,7 @@ def InstallPlayerBuffer(buffer):
     cursor.close()
     dbconn.close()
     
-    print "Player installation took %f seconds"%(time.time()-tm)
+    print("Player installation took %f seconds"%(time.time()-tm))
     
     return error
 
@@ -428,7 +428,7 @@ def ExtractItemList(cursor, excursor, itemList, indirect=False):
                 excursor.executemany('INSERT INTO item_container_content VALUES(%s)'%(TVALUES['item_container_content']),cursor.fetchall())
             except:
                 traceback.print_exc()
-                print "Probably a database that didn't yet hear of the introduction of item containers."
+                print("Probably a database that didn't yet hear of the introduction of item containers.")
     else:
         for item in itemList:
             itemID = item[0]
@@ -442,7 +442,7 @@ def ExtractItemList(cursor, excursor, itemList, indirect=False):
                 excursor.executemany('INSERT INTO item_container_content VALUES(%s)'%(TVALUES['item_container_content']),cursor.fetchall())
             except:
                 traceback.print_exc()
-                print "Probably a database that didn't yet hear of the introduction of item containers."
+                print("Probably a database that didn't yet hear of the introduction of item containers.")
         excursor.executemany('INSERT INTO item VALUES(%s)'%(TVALUES['item']),itemList)
 
 
@@ -500,7 +500,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         excursor.close()
         exconn.close()
         
-        f = file("export%i.db"%CLUSTER,"rb")
+        f = open("export%i.db"%CLUSTER,"rb")
         buff = f.read()
         f.close()
         pbuffer = zlib.compress(buff)
@@ -558,7 +558,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         excursor.close()
         exconn.close()
         
-        f = file("cexport%i.db"%CLUSTER,"rb")
+        f = open("cexport%i.db"%CLUSTER,"rb")
         buff = f.read()
         f.close()
         cbuffer = zlib.compress(buff)
@@ -569,7 +569,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         if append:
             PLAYER_BUFFERS.append(v)
         
-        print "Character export took %f seconds"%(time.time()-tm)
+        print("Character export took %f seconds"%(time.time()-tm))
         return v
     
     except:

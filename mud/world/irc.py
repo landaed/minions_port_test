@@ -12,7 +12,7 @@ class IRCFactory(protocol.ClientFactory):
         self.protocol = MyIRCClient
     
     def buildProtocol(self,addr):
-        print addr.host
+        print(addr.host)
         
         p = protocol.ClientFactory.buildProtocol(self,addr)
         p.player = self.player

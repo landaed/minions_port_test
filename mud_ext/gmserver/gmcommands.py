@@ -16,10 +16,10 @@ def GotWho(result,avatar):
     
     num = 0
     text = ""
-    for wname,info in who.iteritems():
+    for wname,info in who.items():
         text += "----------------\n"
         text += "Players on world: %s\n"%wname
-        for pname,cname in info.iteritems():
+        for pname,cname in info.items():
             if not cname:
                 text += "Character: Logging In Account: %s\n"%(pname)
             else:
@@ -274,7 +274,7 @@ def DoGMCommand(gmavatar, command):
     if command == "RAFFLETICKET" and gmavatar.username.lower() != "pgsupport":
         return
     
-    if not COMMANDS.has_key(command):
+    if command not in COMMANDS:
         gmavatar.mind.callRemote("logText","Unknown command %s\n"%command)
         return
     

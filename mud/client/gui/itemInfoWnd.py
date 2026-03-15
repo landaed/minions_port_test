@@ -85,21 +85,21 @@ class ItemInfoWnd:
         self.bitmapTimer = 0
         self.ctrl = TGEObject("ITEMINFOWND")
         
-        self.invButtons = dict((slot,TGEObject("SLOT_"+name)) for slot,name in SLOTNAMES.iteritems())
+        self.invButtons = dict((slot,TGEObject("SLOT_"+name)) for slot,name in SLOTNAMES.items())
         #carry slots
-        for i in xrange(0,30):
+        for i in range(0,30):
             self.invButtons[i+RPG_SLOT_CARRY_BEGIN] = TGEObject("SLOT_CARRY%i"%i)
-        for i in xrange(30,60):
+        for i in range(30,60):
             self.invButtons[i+RPG_SLOT_CARRY_BEGIN] = TGEObject("SLOT_CARRY%i"%(i-30))
         
         #trade buttons
         self.tradeButtons = {}
-        for x in xrange(0,12):
+        for x in range(0,12):
             self.tradeButtons[x]    = TGEObject("TRADE_P0_BUTTON%i"%x)
             self.tradeButtons[x+12] = TGEObject("TRADE_P1_BUTTON%i"%x)
         
         #spell slots
-        self.spellButtons = dict((i,TGEObject("SPELLPANE_SPELL%i"%i)) for i in xrange(0,25))
+        self.spellButtons = dict((i,TGEObject("SPELLPANE_SPELL%i"%i)) for i in range(0,25))
         
         #on partywnd spellpane
         self.spellText = TGEObject("SPELLPANE_SPELLTEXT")
@@ -125,7 +125,7 @@ class ItemInfoWnd:
         invSlot = -1
         page = PARTYWND.invPane.page
         
-        for slot,button in self.invButtons.iteritems():
+        for slot,button in self.invButtons.items():
             if page == 0 and (RPG_SLOT_CARRY_END > slot >= RPG_SLOT_CARRY_BEGIN+30):
                 continue
             if page == 1 and (RPG_SLOT_CARRY_BEGIN+30 > slot >= RPG_SLOT_CARRY_BEGIN):
@@ -134,7 +134,7 @@ class ItemInfoWnd:
             if int(button.mouseOver):
                 found = True
                 invSlot = slot
-                if cinfo.ITEMS.has_key(slot):
+                if slot in cinfo.ITEMS:
                     ghost = cinfo.ITEMS[slot]
                     break
         
@@ -147,17 +147,17 @@ class ItemInfoWnd:
                 p1Items = TRADEWND.tradeInfo.P0ITEMS
                 p0Items = TRADEWND.tradeInfo.P1ITEMS
             
-            for slot,button in self.tradeButtons.iteritems():
+            for slot,button in self.tradeButtons.items():
                 if int(button.mouseOver):
                     found = True
                     cslot = slot
                     if cslot > 11:
                         #player 2
-                        if p1Items.has_key(slot-12):
+                        if slot-12 in p1Items:
                             ghost = p1Items[slot-12]
                     else:
                         #player 1
-                       if p0Items.has_key(slot):
+                       if slot in p0Items:
                             ghost = p0Items[slot]
                     break
         
@@ -171,10 +171,10 @@ class ItemInfoWnd:
             lootwnd = TGEObject("PetWnd")
             if int(lootwnd.isAwake()):
                 from petWnd import PETWND
-                for slot,button in PETWND.invButtons.iteritems():
+                for slot,button in PETWND.invButtons.items():
                     if int(button.mouseOver):
                         found = True
-                        if cinfo.ITEMS.has_key(slot):
+                        if slot in cinfo.ITEMS:
                             ghost = cinfo.ITEMS[slot]
                             break
         
@@ -182,10 +182,10 @@ class ItemInfoWnd:
             craftwnd = TGEObject("CraftingWnd")
             if int(craftwnd.isAwake()):
                 from craftingWnd import CRAFTINGWND
-                for slot,button in CRAFTINGWND.craftingButtons.iteritems():
+                for slot,button in CRAFTINGWND.craftingButtons.items():
                     if int(button.mouseOver):
                         found = True
-                        if cinfo.ITEMS.has_key(slot):
+                        if slot in cinfo.ITEMS:
                             ghost = cinfo.ITEMS[slot]
                             isCraft = True
                             break
@@ -194,11 +194,11 @@ class ItemInfoWnd:
             npcwnd = TGEObject("NPCWND")
             if int(npcwnd.isAwake()):
                 from npcWnd import NPCWND
-                for slot,button in NPCWND.bankPane.bankButtons.iteritems():
+                for slot,button in NPCWND.bankPane.bankButtons.items():
                     if int(button.mouseOver):
                         found = True
                         bank = NPCWND.bankPane.bank
-                        if bank.has_key(slot):
+                        if slot in bank:
                             ghost = bank[slot]
                             isBank = True
                             break
@@ -206,9 +206,9 @@ class ItemInfoWnd:
         if not found:
             #not an inventory item, check spells
             sindex = PARTYWND.spellPane.currentPage*25
-            for slot,button in self.spellButtons.iteritems():
+            for slot,button in self.spellButtons.items():
                 if int(button.mouseOver):
-                    if cinfo.SPELLS.has_key(slot+sindex):
+                    if slot+sindex in cinfo.SPELLS:
                         found = True
                         ghost = cinfo.SPELLS[slot+sindex]
                         isSpell = True
@@ -223,9 +223,9 @@ class ItemInfoWnd:
                 found = True
                 self.isItem = True
                 ghost = AUCTIONGUI.auctionItemGhost
-            for slot,button in AUCTIONGUI.itemButton.iteritems():
+            for slot,button in AUCTIONGUI.itemButton.items():
                 if int(button.mouseOver):
-                    if AUCTIONGUI.itemButtonId.has_key(slot):
+                    if slot in AUCTIONGUI.itemButtonId:
                         found = True
                         self.isItem = True
                         ghost = AUCTIONGUI.itemCache[AUCTIONGUI.itemButtonId[slot]]
@@ -260,7 +260,7 @@ class ItemInfoWnd:
         
         if not self.ghost:
             if invSlot != -1:
-                if NICESLOTNAMES.has_key(invSlot):
+                if invSlot in NICESLOTNAMES:
                     TGEObject("PartyWnd_INVITEMNAME").setText(TEXT_HEADER+NICESLOTNAMES[invSlot])
                 else:
                     TGEObject("PartyWnd_INVITEMNAME").setText("")
@@ -339,7 +339,7 @@ class ItemInfoWnd:
                 self.isItem = True
             
             # flags
-            text = ' '.join(r'\cp\c2%s\co'%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.iteritems() if ghost.FLAGS&f)
+            text = ' '.join(r'\cp\c2%s\co'%ftext for f,ftext in RPG_ITEM_FLAG_TEXT.items() if ghost.FLAGS&f)
             eval = 'ItemInfoWnd_FlagsText.setText("%s%s");'%(TEXT_HEADER,text)
             TGEEval(eval)
 

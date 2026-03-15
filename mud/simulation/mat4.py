@@ -66,11 +66,11 @@ class mat4:
             self.mlist = list(args)
 
         else:
-            raise TypeError,"mat4() arg can't be converted to mat4"
+            raise TypeError("mat4() arg can't be converted to mat4")
 
         # Check if there are really 16 elements in the list
         if len(self.mlist)!=16:
-            raise TypeError, "mat4(): Wrong number of matrix elements ("+`len(self.mlist)`+" instead of 16)"
+            raise TypeError("mat4(): Wrong number of matrix elements ("+`len(self.mlist)`+" instead of 16)")
 
     def __repr__(self):
         return 'mat4('+`self.mlist`[1:-1]+')'
@@ -111,7 +111,7 @@ class mat4:
         if isinstance(other, mat4):
             return mat4(map(lambda x,y: x+y, self.mlist, other.mlist))
         else:
-            raise TypeError, "unsupported operand type for +"
+            raise TypeError("unsupported operand type for +")
 
     def __sub__(self, other):
         """Matrix subtraction.
@@ -126,7 +126,7 @@ class mat4:
         if isinstance(other, mat4):
             return mat4(map(lambda x,y: x-y, self.mlist, other.mlist))
         else:
-            raise TypeError, "unsupported operand type for -"
+            raise TypeError("unsupported operand type for -")
 
     def __mul__(self, other):
         """Multiplication.
@@ -195,7 +195,7 @@ class mat4:
                          m41*n14+m42*n24+m43*n34+m44*n44)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for *"
+            raise TypeError("unsupported operand type for *")
 
     def __rmul__(self, other):
         T = type(other)
@@ -221,7 +221,7 @@ class mat4:
             return self.__mul__(other)
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for *"
+            raise TypeError("unsupported operand type for *")
 
     def __div__(self, other):
         """Division
@@ -239,7 +239,7 @@ class mat4:
             return mat4(map(lambda x,other=other: x/other, self.mlist))
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for /"
+            raise TypeError("unsupported operand type for /")
 
     def __mod__(self, other):
         """Modulo.
@@ -257,7 +257,7 @@ class mat4:
             return mat4(map(lambda x,other=other: x%other, self.mlist))
         # unsupported
         else:
-            raise TypeError, "unsupported operand type for %"
+            raise TypeError("unsupported operand type for %")
 
     def __neg__(self):
         """Negation.
@@ -289,7 +289,7 @@ class mat4:
     def __getitem__(self, key):
         if type(key)==types.IntType:
             if key<0 or key>3:
-                raise IndexError,"index out of range"
+                raise IndexError("index out of range")
             m=self.mlist
             if   key==0: return [m[0],m[4],m[8],m[12]]
             elif key==1: return [m[1],m[5],m[9],m[13]]
@@ -298,15 +298,15 @@ class mat4:
         elif type(key)==types.TupleType:
             i,j=key
             if i<0 or i>3 or j<0 or j>3:
-                raise IndexError, "index out of range"
+                raise IndexError("index out of range")
             return self.mlist[i*4+j]
         else:
-            raise TypeError,"index must be integer or 2-tuple"
+            raise TypeError("index must be integer or 2-tuple")
 
     def __setitem__(self, key, value):
         if type(key)==types.IntType:
             if key<0 or key>3:
-                raise IndexError,"index out of range"
+                raise IndexError("index out of range")
             m=self.mlist
             if   key==0: m[0],m[4],m[8],m[12]=value
             elif key==1: m[1],m[5],m[9],m[13]=value
@@ -315,10 +315,10 @@ class mat4:
         elif type(key)==types.TupleType:
             i,j=key
             if i<0 or i>3 or j<0 or j>3:
-                raise IndexError, "index out of range"
+                raise IndexError("index out of range")
             self.mlist[i*4+j] = value
         else:
-            raise TypeError,"index must be integer or 2-tuple"
+            raise TypeError("index must be integer or 2-tuple")
 
     def getRow(self, idx):
         """Return row (as vec4)."""
@@ -328,7 +328,7 @@ class mat4:
         elif idx==2: return _vec4(m[8], m[9], m[10], m[11])
         elif idx==3: return _vec4(m[12], m[13], m[14], m[15])
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def setRow(self, idx, value):
         """Set row."""
@@ -338,7 +338,7 @@ class mat4:
         elif idx==2: m[8],m[9],m[10],m[11] = value
         elif idx==3: m[12],m[13],m[14],m[15] = value
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def getColumn(self, idx):
         """Return column (as vec4)."""
@@ -348,7 +348,7 @@ class mat4:
         elif idx==2: return _vec4(m[2], m[6], m[10], m[14])
         elif idx==3: return _vec4(m[3], m[7], m[11], m[15])
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def setColumn(self, idx, value):
         """Set column."""
@@ -358,7 +358,7 @@ class mat4:
         elif idx==2: m[2],m[6],m[10],m[14] = value
         elif idx==3: m[3],m[7],m[11],m[15] = value
         else:
-            raise IndexError,"index out of range"
+            raise IndexError("index out of range")
 
     def toList(self, rowmajor=0):
         """Return a list containing the matrix elements.
@@ -446,8 +446,8 @@ class mat4:
 
     def _submat(self, i,j):
         M=_mat3()
-        for k in xrange(3):
-            for l in xrange(3):
+        for k in range(3):
+            for l in range(3):
                 t=(k,l)
                 if k>=i:
                     t=(k+1,t[1])
@@ -469,8 +469,8 @@ class mat4:
         
         Mi=mat4()
         d=self.determinant()
-        for i in xrange(4):
-            for j in xrange(4):
+        for i in range(4):
+            for j in range(4):
                 sign=1-((i+j)%2)*2
                 m3=self._submat(i,j)
                 Mi[j,i]=sign*m3.determinant()/d
@@ -667,7 +667,7 @@ class mat4:
 def _test():
     import doctest, mat4
     failed, total = doctest.testmod(mat4)
-    print "%d/%d failed" % (failed, total)
+    print("%d/%d failed" % (failed, total))
 
 if __name__=="__main__":
 

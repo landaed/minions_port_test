@@ -18,7 +18,7 @@ def CreateItemSetPages(itemSetDict):
         RPG_ITEM_TRIGGER_POISON: 'Poison'
     }
     
-    for set,contributions in sorted(itemSetDict.iteritems(), key=lambda obj:obj[0].name):
+    for set,contributions in sorted(iter(itemSetDict.items()), key=lambda obj:obj[0].name):
         TWIKINAME = "ItemSet%s"%GetTWikiName(set.name)
         itemSetTopPage += "\t* [[%s][%s]]\n"%(TWIKINAME,set.name)
         
@@ -65,13 +65,13 @@ def CreateItemSetPages(itemSetDict):
             itemSetPage += "\t*Stats:* %s\n\n"%', '.join(stext)
         else:
             itemSetPage += "\t*Stats:* None\n\n"
-        itemSetPage += "---++ Item Contributions\n\n%s\n"%'\n'.join("\t* %s: %s"%(con,', '.join("[[Item%s][%s]]"%(GetTWikiName(itemname),itemname) for itemname in items)) for con,items in contributions.iteritems())
+        itemSetPage += "---++ Item Contributions\n\n%s\n"%'\n'.join("\t* %s: %s"%(con,', '.join("[[Item%s][%s]]"%(GetTWikiName(itemname),itemname) for itemname in items)) for con,items in contributions.items())
         
-        f = file("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
+        f = open("./distrib/twiki/data/MoMWorld/%s.txt"%TWIKINAME,"w")
         f.write(itemSetPage)
         f.close()
     
-    f = file("./distrib/twiki/data/MoMWorld/ItemSetIndex.txt","w")
+    f = open("./distrib/twiki/data/MoMWorld/ItemSetIndex.txt","w")
     f.write(itemSetTopPage)
     f.close()
 

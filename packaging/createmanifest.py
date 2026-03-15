@@ -5,7 +5,7 @@
 
 import os
 import pickle,time
-import sha,stat,sys
+import hashlib,stat,sys
 import string
 from zipfile import ZipFile,ZIP_DEFLATED
 from shutil import copyfile,rmtree,copytree
@@ -20,7 +20,7 @@ def getsha(filename):
     start = 0
     while (size>0):
         
-        m = sha.new()
+        m = hashlib.sha1()
         d = data[start:start+65535]
         m.update(d)
         shalist.append(m.hexdigest())

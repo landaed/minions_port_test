@@ -16,21 +16,21 @@ def QueueProduct(email,product):
     product=product.upper()
     
     if "@" not in email:
-        raise "invalid email"
+        raise Exception("invalid email")
     
     try:
         a = Account.byEmail(email)
         if a.hasProduct(product):
-            print "Email address linked to public name %s, which already has this product"%a.publicName
+            print("Email address linked to public name %s, which already has this product"%a.publicName)
             return
         a.addProduct(product)
-        print "%s product added to existing account by public name %s"%(product,a.publicName)
+        print("%s product added to existing account by public name %s"%(product,a.publicName))
         return
     except:
         pass
     
     ProductEmail(email=email,product=product.upper())
-    print "Product: %s queued for email address: %s"%(product,email)
+    print("Product: %s queued for email address: %s"%(product,email))
     
         
 def RemoveAccount(publicname):
@@ -60,7 +60,7 @@ def RemoveAccount(publicname):
     
     
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.internet import protocol
 from twisted.application import service, strports
@@ -76,9 +76,9 @@ class MyFactory(protocol.ServerFactory):
         
     def buildProtocol(self, addr):
         
-        print "WARNING: Unauthorized manhole attempt from: %s"%addr.host
+        print("WARNING: Unauthorized manhole attempt from: %s"%addr.host)
         if addr.host not in self.allowedIP:
-            raise "Unauthorized"
+            raise Exception("Unauthorized")
         
         
         return protocol.ServerFactory.buildProtocol(self,addr)
@@ -100,8 +100,8 @@ class chainedProtocolFactory:
     def __call__(self):
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
+@implementer(portal.IRealm)
 class _StupidRealm:
-    implements(portal.IRealm)
 
     def __init__(self, proto, *a, **kw):
         self.protocolFactory = proto
@@ -133,7 +133,7 @@ def NukeUser(publicname):
         except:
             pass
     else:
-        print "WARNING: User had no last connection subnet, ip ban not possible"
+        print("WARNING: User had no last connection subnet, ip ban not possible")
     user.banLevel=3    
 
 def MakeFactory(allowedIP,username,password):

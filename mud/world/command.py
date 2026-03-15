@@ -24,7 +24,7 @@ import traceback
 
 def CheckMuted(mob):
     player = mob.player
-    if player.world.mutedPlayers.has_key(player.publicName):
+    if player.publicName in player.world.mutedPlayers:
         mt = player.world.mutedPlayers[player.publicName]
         m = mt / 60 + 1
         if m > 59:
@@ -76,7 +76,7 @@ def CmdLadder(mob,args):
             players[name]=playerID
         
         
-        v = chars.values()
+        v = list(chars.values())
         v.sort()
         v.reverse()
         v=v[:9]
@@ -85,7 +85,7 @@ def CmdLadder(mob,args):
         for xp in v:
             if x > 20:
                 break
-            for c,cxp in chars.iteritems():
+            for c,cxp in chars.items():
                 if cxp == xp:
                     cursor.execute("select pclass_internal,plevel,sclass_internal,slevel,tclass_internal,tlevel from spawn where name = '%s';"%c)
                     pclassInternal,plevel,sclassInternal,slevel,tclassInternal,tlevel = cursor.fetchone()
@@ -159,7 +159,7 @@ def CmdWho(mob,args):
     if len(args):
         original = ' '.join(args)
         filter = original.upper()
-        for pname,info in mob.player.world.characterInfos.iteritems():        
+        for pname,info in mob.player.world.characterInfos.items():        
             prefix,cname,realm,pclass,sclass,tclass,plevel,slevel,tlevel,zone,guild = info
             if cname.upper() == filter:
                 #MAKE THIS BETTER /who needs total redo!
@@ -180,7 +180,7 @@ def CmdWho(mob,args):
         return
     
     text = ""
-    for pname,info in mob.player.world.characterInfos.iteritems():
+    for pname,info in mob.player.world.characterInfos.items():
         prefix,cname,realm,pclass,sclass,tclass,plevel,slevel,tlevel,zone,guild = info
         classes = (pclass,sclass,tclass)
         levels = (plevel,slevel,tlevel)
@@ -205,9 +205,9 @@ def CmdWhoOld(mob,args):
         
         prefix = ""
         if p.avatar and p.avatar.masterPerspective:
-            if p.avatar.masterPerspective.avatars.has_key("GuardianAvatar"):
+            if "GuardianAvatar" in p.avatar.masterPerspective.avatars:
                 prefix = "(Guardian) "
-            if p.avatar.masterPerspective.avatars.has_key("ImmortalAvatar"):
+            if "ImmortalAvatar" in p.avatar.masterPerspective.avatars:
                 prefix = "(Immortal) "
         
         if p.enteringWorld:
@@ -408,7 +408,7 @@ def gotCheckIgnoreTrade(ignored, player, oplayer):
 
 
 def gotCheckIgnoreTradeError(error):
-    print "Error in checkIgnore: %s"%str(error)
+    print("Error in checkIgnore: %s"%str(error))
 
 
 def CmdInteract(mob, args):
@@ -524,7 +524,7 @@ def CmdInteract(mob, args):
         return
     
     # Limit other NPC interaction on multiplayer so each Player can get a turn.
-    if not CoreSettings.SINGLEPLAYER and target.interactTimes.has_key(player):
+    if not CoreSettings.SINGLEPLAYER and player in target.interactTimes:
         t = sysTime() - target.interactTimes[player]
         if t < 15:
             player.sendGameText(RPG_MSG_GAME_DENIED, \
@@ -1290,7 +1290,7 @@ def CmdSkill(mob, args):
     skillToUseNameUpper = skillToUseName.upper()
     
     # Iteraete through skills the character knows.    
-    for knownSkill in mob.mobSkillProfiles.iterkeys():
+    for knownSkill in mob.mobSkillProfiles.keys():
         
         # Check if the skill being used is a skill the character knows.
         if knownSkill.upper() == skillToUseNameUpper:
@@ -1641,15 +1641,15 @@ def CmdEmptyCraft(mob, args):
     
     # Crafting items will be stored in a [slot, item] list.  This allows for preservation of order
     # when moving items to the inventory.
-    (CRAFTING_SLOT, CRAFTING_ITEM) = range(2)
+    (CRAFTING_SLOT, CRAFTING_ITEM) = list(range(2))
     craftingItems = []
     
     # Using a dictiontary for carry slots.  Although dictionary creation takes longer than a list,
     # the deletion invokations later are faster.
-    carrySlots = dict((index, '') for index in xrange(RPG_SLOT_CARRY_BEGIN, RPG_SLOT_CARRY_END))
+    carrySlots = dict((index, '') for index in range(RPG_SLOT_CARRY_BEGIN, RPG_SLOT_CARRY_END))
     
     # Iterate over the items, looking at the item's slot and handling it appropriately.
-    for slot,item in items.iteritems():
+    for slot,item in items.items():
         
         # Only items with a slot higher than crafting window begin are in the
         # crafting window.
@@ -1679,8 +1679,8 @@ def CmdEmptyCraft(mob, args):
         
         # Get a list of free slots available.  This list is already sorted, so items will be moved to slots
         # appearing at the beginning of the inventory first.
-        freeSlots = carrySlots.keys()
-        for index in xrange(itemsBeingMoved):
+        freeSlots = list(carrySlots.keys())
+        for index in range(itemsBeingMoved):
             craftingItems[index][CRAFTING_ITEM].slot = freeSlots[index]
             craftingItems[index][CRAFTING_ITEM].itemInfo.refreshDict({'SLOT':freeSlots[index]})
 
@@ -1699,7 +1699,7 @@ def CmdStackInventory(mob, args):
 
 
 # Enums used to define sort types.
-(ALPHA_SORT, UNUSED_SORT) = range(2)
+(ALPHA_SORT, UNUSED_SORT) = list(range(2))
 
 
 # This function sorts a subset of a player's inventory based on the 
@@ -1753,7 +1753,7 @@ def CmdInventorySort(mob, args):
         if len(itemSubsetDictionary) == len(positionDictionary):
             
             # Iterate over each item and reassign its slot based on the position dictionary value.
-            for key,item in itemSubsetDictionary.iteritems():
+            for key,item in itemSubsetDictionary.items():
                 newSlot = start + positionDictionary[key]
                 item.slot = newSlot
                 item.itemInfo.refreshDict({'SLOT':newSlot})
@@ -1773,7 +1773,7 @@ def createSortedPositionDictionary(sort, reverse, itemSubsetDictionary):
     
     # There is only one kind of sort right now, so default to alpha.
     #if ALPHA_SORT == sort:
-    itemSortedList = [(item.name.lower(), item.itemProto.stackMax - item.stackCount, i, slot) for i,(slot,item) in enumerate(itemSubsetDictionary.iteritems())]
+    itemSortedList = [(item.name.lower(), item.itemProto.stackMax - item.stackCount, i, slot) for i,(slot,item) in enumerate(itemSubsetDictionary.items())]
     
     # Sort the list.  The overall sort order depends on the created tuples.
     # Reverse sort if caller specified.
@@ -1793,8 +1793,8 @@ def createSortedPositionDictionary(sort, reverse, itemSubsetDictionary):
 
 
 # Define enums used for tuple index.
-(FULL_STACKS, REMAINING_ITEMS, TOTAL_CHARGES) = range(3)
-(ITEM_SLOT, ITEM_OBJECT) = range(2)
+(FULL_STACKS, REMAINING_ITEMS, TOTAL_CHARGES) = list(range(3))
+(ITEM_SLOT, ITEM_OBJECT) = list(range(2))
 
 # This function attempts to stack items within a given item dictionary with item.slot as the key.
 # The items argument is a dictionary key-value pair of item.slot and item.  This dictionary
@@ -1805,7 +1805,7 @@ def stackInventory(mob, items):
     stackData       = {}
     
     # Iterate over all items provided by the caller.
-    for item in items.itervalues():
+    for item in items.values():
         iproto = item.itemProto
         
         # Only process items that stack.
@@ -1830,7 +1830,7 @@ def stackInventory(mob, items):
                 stackData[item.name][TOTAL_CHARGES] += chargesMax * ( item.stackCount - 1 ) + item.useCharges
         
     # Iterate over stackable items.
-    for itemName,stackables in stackableItems.iteritems():
+    for itemName,stackables in stackableItems.items():
         iproto = stackables[0].itemProto
         stackMax = iproto.stackMax
         chargesMax = iproto.useMax
@@ -2049,10 +2049,10 @@ def DoCommand(mob,cmd,args):
         args = [args]
 
     cmd = cmd.upper()
-    if COMMANDS.has_key(cmd):
+    if cmd in COMMANDS:
         COMMANDS[cmd](mob,args)
     else:
-        print "Unknown Command",cmd
+        print("Unknown Command",cmd)
         mob.player.sendGameText(RPG_MSG_GAME_DENIED, r'Unknown command: %s.\n'%cmd)
 
 

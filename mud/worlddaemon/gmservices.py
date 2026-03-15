@@ -8,7 +8,7 @@ from twisted.cred.credentials import UsernamePassword
 from mud.gamesettings import *
 from mud.common.permission import User
 
-from md5 import md5
+from hashlib import md5
 import traceback
 
 
@@ -26,7 +26,7 @@ class GMServices(pb.Root):
     
     
     def failure(self, reason):
-        print reason.getErrorMessage()
+        print(reason.getErrorMessage())
     
     
     def connect(self):
@@ -42,9 +42,9 @@ class GMServices(pb.Root):
             d.addCallback(self.connected)
             d.addErrback(self.failure)
         except KeyError:
-            print "World Daemon couldn't connect to GM server, password not found."
+            print("World Daemon couldn't connect to GM server, password not found.")
         except:
-            print "Error connecting World Daemon to GM server!"
+            print("Error connecting World Daemon to GM server!")
     
     
     def disconnect(self):

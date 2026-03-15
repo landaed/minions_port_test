@@ -70,16 +70,16 @@ class RootInfo(pb.Cacheable):
         player = self.player
         state['PLAYERNAME'] = player.name
         state['CHARINFOS'] = self.charInfos
-        tin = long(player.tin)
-        tin += player.copper * 100L
-        tin += player.silver * 10000L
-        tin += player.gold * 1000000L
-        tin += player.platinum * 100000000L
+        tin = int(player.tin)
+        tin += player.copper * 100
+        tin += player.silver * 10000
+        tin += player.gold * 1000000
+        tin += player.platinum * 100000000
         state['TIN'] = tin
         state['PAUSED'] = False
         state['GUILDNAME'] = player.guildName
         
-        state['BANK'] = dict((slot,item.itemInfo) for slot,item in player.bankItems.iteritems())
+        state['BANK'] = dict((slot,item.itemInfo) for slot,item in player.bankItems.items())
         
         try:
             state['POSITION'] = player.simObject.position
@@ -95,7 +95,7 @@ class RootInfo(pb.Cacheable):
             return
         
         rmiGetter = attrgetter('rapidMobInfo')
-        map(RapidMobInfo.tick,imap(rmiGetter,self.charInfos.itervalues()))
+        map(RapidMobInfo.tick,imap(rmiGetter,iter(self.charInfos.values())))
         
         changed = {}
         state = self.state
@@ -107,15 +107,15 @@ class RootInfo(pb.Cacheable):
         if state['GUILDNAME'] != player.guildName:
             changed['GUILDNAME'] = state['GUILDNAME'] = player.guildName
         
-        tin = long(player.tin)
-        tin += player.copper * 100L
-        tin += player.silver * 10000L
-        tin += player.gold * 1000000L
-        tin += player.platinum * 100000000L
+        tin = int(player.tin)
+        tin += player.copper * 100
+        tin += player.silver * 10000
+        tin += player.gold * 1000000
+        tin += player.platinum * 100000000
         if state['TIN'] != tin:
             changed['TIN'] = state['TIN'] = tin
         
-        bank = dict((slot,item.itemInfo) for slot,item in player.bankItems.iteritems())
+        bank = dict((slot,item.itemInfo) for slot,item in player.bankItems.items())
         
         if self.forceBankUpdate or state['BANK'] != bank:
             changed['BANK'] = state['BANK'] = bank
@@ -332,7 +332,7 @@ class RapidMobInfoGhost(pb.RemoteCache):
         
         from mud.client.gui.partyWnd import PARTYWND
         from mud.client.gui.macro import MACROMASTER
-        for charIndex,cinfo in PARTYWND.charInfos.iteritems():
+        for charIndex,cinfo in PARTYWND.charInfos.items():
             if cinfo.RAPIDMOBINFO == self:
                 break
         
@@ -416,8 +416,8 @@ class ItemInfo(pb.Cacheable):
         
         item = self.item
         
-        state.update((k,getattr(item,attr)) for k,attr in ItemInfo.keysDynamicHigh.iteritems())
-        state.update((k,getattr(item,attr)) for k,attr in ItemInfo.keysDynamicLow.iteritems())
+        state.update((k,getattr(item,attr)) for k,attr in ItemInfo.keysDynamicHigh.items())
+        state.update((k,getattr(item,attr)) for k,attr in ItemInfo.keysDynamicLow.items())
         
         if item.character:
             state['OWNERCHARID'] = item.character.id
@@ -446,7 +446,7 @@ class ItemInfo(pb.Cacheable):
         
         state['POISONS'] = []
         state['ENCHANTMENTS'] = []
-        for proc,details in item.procs.iteritems():
+        for proc,details in item.procs.items():
             if details[1] == RPG_ITEMPROC_POISON:
                 state['POISONS'].append(proc.spellProto.name)
             else:
@@ -484,7 +484,7 @@ class ItemInfo(pb.Cacheable):
             
             item = self.item
             
-            for k,attr in ItemInfo.keysDynamicHigh.iteritems():
+            for k,attr in ItemInfo.keysDynamicHigh.items():
                 v = getattr(item,attr)
                 if state[k] != v:
                     state[k] = changed[k] = v
@@ -498,7 +498,7 @@ class ItemInfo(pb.Cacheable):
             
             poisons = []
             enchantments = []
-            for proc,details in item.procs.iteritems():
+            for proc,details in item.procs.items():
                 if details[1] == RPG_ITEMPROC_POISON:
                     poisons.append(proc.spellProto.name)
                 else:
@@ -519,7 +519,7 @@ class ItemInfo(pb.Cacheable):
     
     def refreshDict(self, selection):
         rm = []
-        for k,v in selection.iteritems():
+        for k,v in selection.items():
             try:
                 if self.state[k] != v:
                     self.state[k] = v
@@ -539,7 +539,7 @@ class ItemInfo(pb.Cacheable):
     def refreshProcs(self):
         poisons = []
         enchantments = []
-        for proc,details in self.item.procs.iteritems():
+        for proc,details in self.item.procs.items():
             if details[1] == RPG_ITEMPROC_POISON:
                 poisons.append(proc.spellProto.name)
             else:
@@ -657,7 +657,7 @@ class ItemInfoGhost(pb.RemoteCache):
 
             # Incase nothing else caught the print, print it.
             else:
-                print "Warning!  Item stat print style not defined: %s" % stat
+                print("Warning!  Item stat print style not defined: %s" % stat)
                 stattext.append(r'\c3%s \c2%i '%(stat,value))
             
         if gotResist:
@@ -880,7 +880,7 @@ class ItemInfoGhost(pb.RemoteCache):
         
         tin = ceil(tin * mod)
         
-        return long(tin)
+        return int(tin)
     
     
     def isUseable(self, cinfo):
@@ -976,13 +976,13 @@ class ItemInfoGhost(pb.RemoteCache):
         
         # If this item info is a container and the player is currently
         #  viewing the same, update the item container window.
-        if changed.has_key('CONTENT'):
+        if 'CONTENT' in changed:
             from mud.client.gui.itemContainerWnd import ItemContainerWnd
             ItemContainerWnd = ItemContainerWnd.instance
             if ItemContainerWnd.container == self:
                 ItemContainerWnd.openContainer(self)
         
-        if changed.has_key('REUSETIMER'):
+        if 'REUSETIMER' in changed:
             from mud.client.gui.macro import MACROMASTER
             MACROMASTER.updateItemUsingMacros(self.NAME)
         
@@ -1047,9 +1047,9 @@ class CharacterInfo(pb.Cacheable):
         mob = self.character.mob
         spawn = mob.spawn
         
-        for k,attr in CharacterInfo.spawnkeys.iteritems():
+        for k,attr in CharacterInfo.spawnkeys.items():
             state[k] = getattr(spawn,attr)
-        for k,attr in CharacterInfo.mobkeys.iteritems():
+        for k,attr in CharacterInfo.mobkeys.items():
             state[k] = getattr(mob,attr)
         
         self.rapidMobInfo = state['RAPIDMOBINFO'] = RapidMobInfo(mob)
@@ -1096,7 +1096,7 @@ class CharacterInfo(pb.Cacheable):
         #skills
         state['SKILLS'] = mob.skillLevels.copy()
         
-        state['SKILLREUSE'] = dict((key.upper(),1) for key in mob.skillReuse.iterkeys())
+        state['SKILLREUSE'] = dict((key.upper(),1) for key in mob.skillReuse.keys())
         
         #leveling
         state['PXPPERCENT'] = character.pxpPercent
@@ -1111,9 +1111,9 @@ class CharacterInfo(pb.Cacheable):
         state['DEAD'] = character.dead
         
         #spelleffects
-        if state.has_key('SPELLEFFECTS'): #<--- we are using this solely to cache to player if this changes, change this
+        if 'SPELLEFFECTS' in state: #<--- we are using this solely to cache to player if this changes, change this
             traceback.print_stack()
-            print "AssertionError: CharacterInfo state got spell effects in dictionary and shouldn't!"
+            print("AssertionError: CharacterInfo state got spell effects in dictionary and shouldn't!")
             return
         spelleffects = []
         from mud.world.spell import Spell
@@ -1152,14 +1152,14 @@ class CharacterInfo(pb.Cacheable):
 
         changed = {}
         
-        for k,attr in CharacterInfo.spawnkeys.iteritems():
+        for k,attr in CharacterInfo.spawnkeys.items():
             v = getattr(spawn,attr)
             if state[k] != v:
                 
                 changed[k] = v
                 state[k]=v
                 
-        for k,attr in CharacterInfo.mobkeys.iteritems():
+        for k,attr in CharacterInfo.mobkeys.items():
             v = getattr(mob,attr)
             if state[k] != v:
                 
@@ -1209,7 +1209,7 @@ class CharacterInfo(pb.Cacheable):
         if mob.skillLevels != state['SKILLS']:
             changed['SKILLS'] = state['SKILLS'] = mob.skillLevels.copy()
             
-        skillReuse = dict((key.upper(),1) for key in mob.skillReuse.iterkeys())
+        skillReuse = dict((key.upper(),1) for key in mob.skillReuse.keys())
         if skillReuse != state['SKILLREUSE']:
             changed['SKILLREUSE'] = state['SKILLREUSE'] = skillReuse
         
@@ -1337,7 +1337,7 @@ class CharacterInfoGhost(pb.RemoteCache):
         
         DIRTY = True
         
-        if changed.has_key('SKILLS') or changed.has_key('SKILLREUSE'):
+        if 'SKILLS' in changed or 'SKILLREUSE' in changed:
             SKILLS_DIRTY.append(self)
             try:
                 from mud.client.gui.macro import MACROMASTER
@@ -1345,16 +1345,16 @@ class CharacterInfoGhost(pb.RemoteCache):
             except KeyError:
                 pass
         
-        if changed.has_key('DEAD'):
+        if 'DEAD' in changed:
             if changed['DEAD']:
                 from mud.client.gui.partyWnd import PARTYWND
                 from mud.client.gui.macro import MACROMASTER
-                for charIndex,cinfo in PARTYWND.charInfos.iteritems():
+                for charIndex,cinfo in PARTYWND.charInfos.items():
                     if cinfo == self:
                         break
                 MACROMASTER.stopMacrosForChar(charIndex)
         
-        if changed.has_key('ADVANCE') or changed.has_key('ADVANCEMENTS') or changed.has_key('PLEVEL') or changed.has_key('SLEVEL') or changed.has_key('TLEVEL') or changed.has_key('TCLASS') or changed.has_key('SCLASS') or changed.has_key('PCLASS'):
+        if 'ADVANCE' in changed or 'ADVANCEMENTS' in changed or 'PLEVEL' in changed or 'SLEVEL' in changed or 'TLEVEL' in changed or 'TCLASS' in changed or 'SCLASS' in changed or 'PCLASS' in changed:
             ADVANCEMENTS_DIRTY = True
 
 
@@ -1395,7 +1395,7 @@ class CharSpellInfo(pb.Cacheable):
         state['SPELLINFO']=SpellInfo(proto,self.charSpell.level)
         
             
-        if self.char.mob.recastTimers.has_key(proto):
+        if proto in self.char.mob.recastTimers:
             state['RECASTTIMER']=self.char.mob.recastTimers[proto]
             
         
@@ -1424,7 +1424,7 @@ class CharSpellInfo(pb.Cacheable):
             state['SLOT']=changed['SLOT']=slot
             
         recast = 0
-        if self.char.mob.recastTimers.has_key(proto):
+        if proto in self.char.mob.recastTimers:
             recast=self.char.mob.recastTimers[proto]
             
         if recast != state['RECASTTIMER']:
@@ -1444,7 +1444,7 @@ class CharSpellInfoGhost(pb.RemoteCache):
     
     def observe_updateChanged(self,changed):
         self.__dict__.update(changed)
-        if changed.has_key('RECASTTIMER'):
+        if 'RECASTTIMER' in changed:
             from mud.client.gui.macro import MACROMASTER
             MACROMASTER.updateSpellUsingMacros(self.SPELLINFO.BASENAME)
 
@@ -1771,8 +1771,8 @@ class TradeInfo(pb.Cacheable):
         state['P0TIN'] = trade.p0Tin
         state['P1TIN'] = trade.p1Tin
         
-        state['P0ITEMS'] = dict((slot,item.itemInfo) for slot,item in trade.p0Items.iteritems())
-        state['P1ITEMS'] = dict((slot,item.itemInfo) for slot,item in trade.p1Items.iteritems())
+        state['P0ITEMS'] = dict((slot,item.itemInfo) for slot,item in trade.p0Items.items())
+        state['P1ITEMS'] = dict((slot,item.itemInfo) for slot,item in trade.p1Items.items())
         
         return state
 
@@ -1782,8 +1782,8 @@ class TradeInfo(pb.Cacheable):
         
         trade = self.trade
         
-        p0Items = dict((slot,item.itemInfo) for slot,item in trade.p0Items.items())
-        p1Items = dict((slot,item.itemInfo) for slot,item in trade.p1Items.items())
+        p0Items = dict((slot,item.itemInfo) for slot,item in list(trade.p0Items.items()))
+        p1Items = dict((slot,item.itemInfo) for slot,item in list(trade.p1Items.items()))
         
         if self.state['P0ACCEPTED'] != trade.p0Accepted:
             self.state['P0ACCEPTED']=changed['P0ACCEPTED']=trade.p0Accepted
@@ -1805,7 +1805,7 @@ class TradeInfo(pb.Cacheable):
     
     
     def refreshDict(self,dict):
-        for k,v in dict.iteritems():
+        for k,v in dict.items():
             try:
                 if self.state[k] != v:
                     self.state[k] = v
