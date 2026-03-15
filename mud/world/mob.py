@@ -27,7 +27,7 @@ from mud.worlddocs.utils import GetTWikiName
 
 from collections import defaultdict
 from copy import copy
-from itertools import repeat,imap
+from itertools import repeat
 from math import acos,asin,ceil,degrees,floor,pi,sqrt
 from operator import attrgetter
 from random import randint
@@ -1262,7 +1262,7 @@ class Mob:
             self.wornTimer = 180
             spellProcs = self.itemSetSpells.get(RPG_ITEM_TRIGGER_WORN, [])[:]
             spellsGetter = attrgetter('spells')
-            map(spellProcs.extend,imap(spellsGetter,iter(self.worn.values())))
+            list(map(spellProcs.extend,map(spellsGetter,self.worn.values())))
             
             for ispell in spellProcs:
                 if ispell.trigger == RPG_ITEM_TRIGGER_WORN:

@@ -8,7 +8,6 @@ from mud.world.defines import *
 from mud.world.core import *
 import traceback
 from operator import attrgetter
-from itertools import imap
 
 
 
@@ -95,7 +94,7 @@ class RootInfo(pb.Cacheable):
             return
         
         rmiGetter = attrgetter('rapidMobInfo')
-        map(RapidMobInfo.tick,imap(rmiGetter,iter(self.charInfos.values())))
+        list(map(RapidMobInfo.tick,map(rmiGetter,self.charInfos.values())))
         
         changed = {}
         state = self.state
