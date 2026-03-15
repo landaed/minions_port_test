@@ -6,7 +6,7 @@
 
 from mud.world.spawn import Spawn
 from mud.world.defines import *
-from utils import *
+from mud.worlddocs.utils import *
 import os
 from collections import defaultdict
 import re

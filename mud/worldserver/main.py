@@ -37,7 +37,7 @@ try:
 
 
     if USE_WX:
-        from gui import Setup
+        from mud.worldserver.gui import Setup
         app = Setup(reactor)
         reactor.registerWxApp(app)
 
@@ -723,7 +723,7 @@ try:
 
         if SSH_ENABLED:
             print("Security Warning: SSH Enabled on port %i for ip addresses:"%SSH_PORT,SSH_IPS)
-            from manhole import MakeFactory
+            from mud.worldserver.manhole import MakeFactory
             ips = SSH_IPS
             f= MakeFactory(ips,"me","me")
             reactor.listenTCP(SSH_PORT, f)

@@ -81,7 +81,7 @@ def CmdDespawn(mob, args):
 
 
 def CmdKill(mob, args):
-    from damage import Damage
+    from mud.world.damage import Damage
     target = mob.target
     if target:
         # Make sure the mob is properly initialized.
@@ -383,7 +383,7 @@ def CmdGiveMonster(mob,args):
             mob.player.sendGameText(RPG_MSG_GAME_DENIED,"You already have the %s monster template.\\n"%monsterSpawn.spawn)
             return
     
-    from spawn import Spawn
+    from mud.world.spawn import Spawn
     try:
         con = Spawn._connection.getConnection()
         spawn = Spawn.get(con.execute("SELECT id FROM spawn WHERE lower(name)=\"%s\" LIMIT 1;"%lowerSpawn).fetchone()[0])
@@ -392,7 +392,7 @@ def CmdGiveMonster(mob,args):
         mob.player.sendGameText(RPG_MSG_GAME_DENIED,"No such spawn %s.\\n"%mspawn)
         return
     
-    from player import PlayerMonsterSpawn
+    from mud.world.player import PlayerMonsterSpawn
     PlayerMonsterSpawn(player=mob.player,spawn=mspawn)
     mob.player.sendGameText(RPG_MSG_GAME_GAINED,"You now have the %s monster template.\\n"%mspawn)
 
@@ -408,7 +408,7 @@ def CmdGrantMonster(mob,args):
     mspawn = ' '.join(args)
     lowerSpawn = mspawn.lower()
     
-    from player import Player
+    from mud.world.player import Player
     try:
         con = Player._connection.getConnection()
         player = Player.get(con.execute("SELECT id FROM player WHERE lower(public_name) = \"%s\" LIMIT 1;"%lowerPName).fetchone()[0])
@@ -426,7 +426,7 @@ def CmdGrantMonster(mob,args):
             mob.player.sendGameText(RPG_MSG_GAME_DENIED,"%s already has the %s monster template.\\n"%(pname,monsterSpawn.spawn))
             return
     
-    from spawn import Spawn
+    from mud.world.spawn import Spawn
     try:
         con = Spawn._connection.getConnection()
         spawn = Spawn.get(con.execute("SELECT id FROM spawn WHERE lower(name) = \"%s\" LIMIT 1;"%lowerSpawn).fetchone()[0])
@@ -435,7 +435,7 @@ def CmdGrantMonster(mob,args):
         mob.player.sendGameText(RPG_MSG_GAME_DENIED,"No such spawn %s.\\n"%mspawn)
         return
     
-    from player import PlayerMonsterSpawn
+    from mud.world.player import PlayerMonsterSpawn
     PlayerMonsterSpawn(player=player,spawn=mspawn)
     mob.player.sendGameText(RPG_MSG_GAME_GAINED,"You have granted %s the %s monster template.\\n"%(pname,mspawn))
     if player.zone:
@@ -449,7 +449,7 @@ def CmdListMonsters(mob,args):
     pname = args[0]
     lowerPName = pname.lower()
     
-    from player import Player
+    from mud.world.player import Player
     try:
         con = Player._connection.getConnection()
         player = Player.get(con.execute("SELECT id FROM player WHERE lower(public_name) = \"%s\" LIMIT 1;"%lowerPName).fetchone()[0])
@@ -474,7 +474,7 @@ def CmdDenyMonster(mob,args):
     mspawn = ' '.join(args)
     lowerSpawn = mspawn.lower()
     
-    from player import Player
+    from mud.world.player import Player
     try:
         con = Player._connection.getConnection()
         player = Player.get(con.execute("SELECT id FROM player WHERE lower(public_name) = \"%s\" LIMIT 1;"%lowerPName).fetchone()[0])
@@ -508,7 +508,7 @@ def CmdGrantLevel(mob,args):
     lowerPName = pname.lower()
     klass = args[1].lower()
     
-    from player import Player
+    from mud.world.player import Player
     try:
         con = Player._connection.getConnection()
         player = Player.get(con.execute("SELECT id FROM player WHERE lower(public_name) = \"%s\" LIMIT 1;"%lowerPName).fetchone()[0])
@@ -564,7 +564,7 @@ def CmdModStat(mob,args):
 
 
 def CmdGimme(mob,args):
-    from item import ItemProto,getTomeAtLevelForScroll
+    from mud.world.item import ItemProto,getTomeAtLevelForScroll
     argUpper = args[0].upper()
     if argUpper == 'TOME':
         itemname = argUpper
@@ -686,7 +686,7 @@ def CmdGimme(mob,args):
         mob.player.sendGameText(RPG_MSG_GAME_GAINED,"Gained %s\\n"%nitem.name)
         return
     
-    from crafting import FocusGenSpecific
+    from mud.world.crafting import FocusGenSpecific
     item = FocusGenSpecific(itemname)
     if item:
         if not mob.player.curChar.giveItemInstance(item):
@@ -836,7 +836,7 @@ def CmdTP(mob,args):
         #we just need to respawn player, whew
         player.zone.respawnPlayer(player,dst)
     else:
-        from zone import TempZoneLink
+        from mud.world.zone import TempZoneLink
         zlink = TempZoneLink(zname,dst)
         player.world.onZoneTrigger(player,zlink)
 
@@ -916,7 +916,7 @@ def CmdGrant(mob,args):
             return
         
     if role.name == "Immortal":
-        from newplayeravatar import NewPlayerAvatar
+        from mud.world.newplayeravatar import NewPlayerAvatar
         if mob.player.publicName != NewPlayerAvatar.ownerPublicName:
             mob.player.sendGameText(RPG_MSG_GAME_DENIED,"Immortal access can only be granted by the server's owner.\\n")
             return
@@ -928,7 +928,7 @@ def CmdGrant(mob,args):
     
 def CmdDeny(mob,args):
     from mud.common.permission import User,Role
-    from player import Player
+    from mud.world.player import Player
     
     if len(args) < 2:
         return
@@ -969,7 +969,7 @@ def CmdDeny(mob,args):
     
     
 def CmdSetPlayerPassword(mob,args):
-    from player import Player
+    from mud.world.player import Player
     
     if CoreSettings.SINGLEPLAYER:
         return

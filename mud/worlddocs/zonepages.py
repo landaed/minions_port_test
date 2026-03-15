@@ -4,7 +4,7 @@
 
 from mud.world.zone import Zone
 from mud.world.defines import *
-from utils import *
+from mud.worlddocs.utils import *
 from mud.world.loot import ZONE_ENCHANTINGITEMS
 
 ENCHANT_FocusPowersNice = {

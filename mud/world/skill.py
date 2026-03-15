@@ -849,8 +849,8 @@ SKILLS['Shield Bash'] = DoShieldBash
 # Return value gives no indication if skill was
 #  successful or not, just if it got used.
 def DoSkillSpell(mob,skillname):
-    from projectile import Projectile
-    from spell import SpawnSpell
+    from mud.world.projectile import Projectile
+    from mud.world.spell import SpawnSpell
     
     player = mob.player
     
@@ -889,7 +889,7 @@ def DoSkillSpell(mob,skillname):
     if not tgt:
         if player:
             if proto.spellType&RPG_SPELL_HARMFUL:
-                from command import CmdTargetNearest
+                from mud.world.command import CmdTargetNearest
                 CmdTargetNearest(mob,None,False,True)
                 tgt = mob.target
                 if not tgt:

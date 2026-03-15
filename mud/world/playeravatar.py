@@ -98,7 +98,7 @@ class PlayerAvatar(Avatar):
         return (-1,"There was an error creating this character")
         
     def perspective_newCharacter(self,newchar):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         
         if RPG_BUILD_DEMO and not self.player.premium:
             nc = 0
@@ -207,7 +207,7 @@ class PlayerAvatar(Avatar):
         char.backupItems()
         
         #send off the character
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
             pbuffer = encodebytes(dumps(pbuffer, 2))
@@ -235,7 +235,7 @@ class PlayerAvatar(Avatar):
     
     
     def perspective_newMonster(self,mname,mspawn):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         
         if RPG_BUILD_DEMO and not self.player.premium:
             nc = 0
@@ -424,7 +424,7 @@ class PlayerAvatar(Avatar):
             spawn.spawnStats.append(s)
 
         #send off the character
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
             pbuffer = encodebytes(dumps(pbuffer, 2))
@@ -938,7 +938,7 @@ class PlayerAvatar(Avatar):
     #End of Mail Server Calls
     
     def perspective_deleteCharacter(self,cname):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         if not AVATAR:
             # Does character to be deleted exist?
             try:
@@ -1026,7 +1026,7 @@ class PlayerAvatar(Avatar):
             if not c.rename:
                 continue
             if c.name == oldname:
-                from cserveravatar import AVATAR
+                from mud.world.cserveravatar import AVATAR
                 d = AVATAR.mind.callRemote("renameCharacter",oldname,newname)
                 d.addCallback(self.gotRenameCheckCharacterName,c,newname)
                 d.addErrback(self.gotRenameCheckCharacterNameError)
@@ -1040,7 +1040,7 @@ class PlayerAvatar(Avatar):
         return [],[],1
     
     def perspective_queryCharacters(self):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         if not AVATAR:
             cinfos = []
             mspawns = []
@@ -1084,7 +1084,7 @@ class PlayerAvatar(Avatar):
         d.addErrback(self.playerJumped)
 
     def gotTransferCharacterBuffer(self,cbuffer,party,zoneName):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         self.player.transfering = True
         p = self.player
         guildInfo = (p.guildName,p.guildInfo,p.guildMOTD,p.guildRank)
@@ -1100,7 +1100,7 @@ class PlayerAvatar(Avatar):
     
     
     def perspective_enterWorld(self,party,simPort, simPassword):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
         if not AVATAR:
             self.enterWorld(party,simPort,simPassword)
             return
@@ -1149,7 +1149,7 @@ class PlayerAvatar(Avatar):
         return 
             
     def enterWorld(self,party,simPort,simPassword):
-        from cserveravatar import AVATAR
+        from mud.world.cserveravatar import AVATAR
     
         #zone is an instance
         

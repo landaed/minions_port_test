@@ -730,7 +730,7 @@ class DialogAction(Persistent):
         if not len(trainSkillList):
             return
         
-        from character import CharacterSkill
+        from mud.world.character import CharacterSkill
         
         stext = ""
         for train in trainSkillList:
@@ -1440,7 +1440,7 @@ class DialogChoice(Persistent):
         if self.hideOnMaxBump and self.identifier and self.maxTimes:
             # Get the character dialog choice entry for the current character
             #  and the identifier of this dialog choice.
-            from character import CharacterDialogChoice
+            from mud.world.character import CharacterDialogChoice
             dcs = list(CharacterDialogChoice.select(AND(CharacterDialogChoice.q.identifier==self.identifier,CharacterDialogChoice.q.characterID==player.curChar.id)))
             try:
                 # Check if the player has already chosen this dialog choice
@@ -1597,7 +1597,7 @@ class Dialog(Persistent):
     
     
     def handleChoice(self, player, choiceIndex, pane):
-        from character import CharacterDialogChoice
+        from mud.world.character import CharacterDialogChoice
         
         curLine = player.curDialogLine
         if hasattr(self,"curChoices"): #dialog triggers don't necessarily use this

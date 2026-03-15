@@ -34,7 +34,7 @@ from mud.server.config import LoadConfiguration
 #import MySQLdb
 
 if USE_WX:
-    from gui import Setup
+    from mud.characterserver.gui import Setup
     app = Setup(reactor)
     reactor.registerWxApp(app)
 

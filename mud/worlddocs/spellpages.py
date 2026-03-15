@@ -6,7 +6,7 @@
 
 from mud.world.defines import *
 from mud.world.spell import SpellProto
-from utils import *
+from mud.worlddocs.utils import *
 from collections import defaultdict
 
 SpellPage = """

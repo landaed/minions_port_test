@@ -8,7 +8,7 @@ from twisted.internet import reactor, protocol
 from mud.world.defines import *
 from mud.client.playermind import formatMLString
 from mud.gamesettings import *
-from gui.tomeGui import TomeGui
+from mud.client.gui.tomeGui import TomeGui
 receiveGameText = TomeGui.instance.receiveGameText
 receiveSpeechText = TomeGui.instance.receiveSpeechText
 from pickle import load,dump

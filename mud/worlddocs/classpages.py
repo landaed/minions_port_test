@@ -4,7 +4,7 @@
 #Quest Pages
 
 from mud.world.defines import *
-from utils import *
+from mud.worlddocs.utils import *
 from mud.world.career import ClassProto
 from mud.world.spell import SpellProto
 from mud.world.advancement import *

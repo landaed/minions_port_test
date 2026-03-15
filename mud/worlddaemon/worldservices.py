@@ -224,7 +224,7 @@ class ZoneClusterAvatar(pb.Avatar):
     
     
     def perspective_setWorldPID(self,pid,worldport,genesisTime,csavatar):
-        from charservices import CServerAvatar,CServerMind
+        from mud.worlddaemon.charservices import CServerAvatar,CServerMind
         
         if CServerAvatar.genesisTime:
             if CServerAvatar.genesisTime != genesisTime:

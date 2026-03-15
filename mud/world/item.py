@@ -944,7 +944,7 @@ class ItemInstance:
         self.bitmap            = item.bitmap
         #variants
         self.hasVariants       = item.hasVariants
-        from itemvariants import ItemVariantsLoad
+        from mud.world.itemvariants import ItemVariantsLoad
         ItemVariantsLoad(self)
         self.crafted           = item.crafted
         if self.itemProto.itemContainerProto:
@@ -1019,7 +1019,7 @@ class ItemInstance:
         }
         self.item.set(**data)
         # Save variants.
-        from itemvariants import ItemVariantsSave
+        from mud.world.itemvariants import ItemVariantsSave
         ItemVariantsSave(self)
         # Save container contents.
         if self.container:
@@ -1875,10 +1875,10 @@ class ItemInstance:
             # Always apply enchantments if 'flag' is set.
             # Either to strip normal stats or to give special ones.
             if self.spellEnhanceLevel == 9999:
-                from itemvariants import ApplyEnchantment
+                from mud.world.itemvariants import ApplyEnchantment
                 ApplyEnchantment(self)
             elif numVariants:
-                from itemvariants import ApplyVariants
+                from mud.world.itemvariants import ApplyVariants
                 ApplyVariants(self)
         
         if self.quality == RPG_QUALITY_NORMAL:

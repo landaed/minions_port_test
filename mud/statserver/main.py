@@ -12,7 +12,7 @@ from twisted.application import app,service, strports
 from twisted.python import util
 from nevow import inevow, rend, loaders, url, tags, appserver, static, guard, athena
 
-from webpages import *
+from mud.statserver.webpages import *
 
 #the stat server
 
