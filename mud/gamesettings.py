@@ -1,8 +1,8 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-import os,sys,imp
-from configparser import SafeConfigParser
+import os,sys
+from configparser import ConfigParser
 
 #Game Defaults...Change these only if you are instructed to via the instructions
 GAMENAME = "Testgame MMO"
@@ -80,7 +80,7 @@ WORLDNAMES = {"Premium_MMORPG": "TestDaemon"}
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 
 #IDE
@@ -97,7 +97,7 @@ def LoadGameConfiguration():
             
             if config != ".cfg":
                 if os.path.exists('./projects'):
-                    parser = SafeConfigParser()
+                    parser = ConfigParser()
                     parser.read("./projects/%s"%config)
             
                     GAMENAME = parser.get("Game Settings","Game Name")

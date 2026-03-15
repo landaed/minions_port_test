@@ -9,7 +9,7 @@ from twisted.internet import reactor
 from twisted.cred.credentials import UsernamePassword
 
 from shutil import rmtree,copyfile
-import os,sys,imp
+import os,sys
 from pickle import load,dump
 from hashlib import md5
 from traceback import print_stack
@@ -27,7 +27,7 @@ from mud.gamesettings import *
 def main_is_frozen():
    return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 
 def get_main_dir():

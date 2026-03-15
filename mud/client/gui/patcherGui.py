@@ -15,7 +15,7 @@ from twisted.web.client import HTTPDownloader,_parse
 from twisted.spread import pb
 from twisted.cred.credentials import UsernamePassword
 
-import sys,imp,os
+import sys,os
 import traceback
 from base64 import encodebytes
 from hashlib import sha1 as newSHA
@@ -45,7 +45,7 @@ IGNORE = ("manifest.zip", "manifest.sha", "common/manifest.zip", "common/manifes
 def main_is_frozen():
     return (hasattr(sys, "frozen") or # new py2exe
            hasattr(sys, "importers") # old py2exe
-           or imp.is_frozen("__main__")) # tools/freeze
+           or getattr(sys, 'frozen', False)) # tools/freeze
 
 
 
