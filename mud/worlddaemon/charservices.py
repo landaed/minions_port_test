@@ -20,7 +20,7 @@ try:
 except ImportError:
     win32api = win32con = win32event = None
 import time,traceback
-import os,sha
+import os
 
 import zlib
 from sqlite3 import dbapi2 as sqlite
