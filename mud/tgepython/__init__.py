@@ -2,5 +2,5 @@
 # Please see LICENSE.TXT for details
 
 
-import console
-import reactor
+from mud.tgepython import console
+from mud.tgepython import reactor

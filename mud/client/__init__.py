@@ -9,4 +9,4 @@
 #Binary packaging and the TGEPython modules
 #require these to be imported
 
-import gui
+from mud.client import gui
