@@ -8,7 +8,7 @@
 ####################################################################
 
 import types, math, copy
-from vec3 import vec3 as _vec3
+from mud.simulation.vec3 import vec3 as _vec3
 
 # [  0   1   2 ]
 # [  3   4   5 ]
