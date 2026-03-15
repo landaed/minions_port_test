@@ -7,7 +7,7 @@
 
 import os, sys
 
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.internet import protocol
 from twisted.application import service, strports
 from twisted.conch.ssh import session
@@ -47,8 +47,8 @@ class chainedProtocolFactory:
     def __call__(self):
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
+@implementer(portal.IRealm)
 class _StupidRealm:
-    implements(portal.IRealm)
 
     def __init__(self, proto, *a, **kw):
         self.protocolFactory = proto

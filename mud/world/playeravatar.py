@@ -14,18 +14,18 @@ from mud.world.command import DoCommand
 from mud.world.repair import RepairItem,RepairAll,RepairParty
 from mud.world.zone import Zone
 from mud.world.messages import GameMessage
-from defines import *
-from core import *
+from mud.world.defines import *
+from mud.world.core import *
 from sqlobject import *
 from twisted.internet import reactor
-from alliance import Alliance
+from mud.world.alliance import Alliance
 from traceback import print_stack,print_exc
 from time import time
 from pickle import dumps,loads
-from base64 import encodestring,decodestring
+from base64 import encodebytes,decodebytes
 from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer
 from mud.gamesettings import GAMENAME
-from race import GetRaceGraphics
+from mud.world.race import GetRaceGraphics
 
 
 #for jelly
@@ -210,9 +210,9 @@ class PlayerAvatar(Avatar):
         from cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
-            pbuffer = encodestring(dumps(pbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
             if cbuffer:
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
 
             AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
             
@@ -427,9 +427,9 @@ class PlayerAvatar(Avatar):
         from cserveravatar import AVATAR
         if AVATAR:
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
-            pbuffer = encodestring(dumps(pbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
             if cbuffer:
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
             AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
             
             # Clean up the character in the running database.
@@ -1064,7 +1064,7 @@ class PlayerAvatar(Avatar):
             
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
         if cbuffer:
-            cbuffer = loads(decodestring(cbuffer))
+            cbuffer = loads(decodebytes(cbuffer))
             InstallCharacterBuffer(self.player.id,party[0],cbuffer)
         self.enterWorld(party,simPort,simPassword)
         
@@ -1134,8 +1134,8 @@ class PlayerAvatar(Avatar):
             char = Character.byName(cname)
             publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(player.publicName,player.id,char.id,False)
             self.player.transfering = True
-            pbuffer = encodestring(dumps(pbuffer, 2))
-            cbuffer = encodestring(dumps(cbuffer, 2))
+            pbuffer = encodebytes(dumps(pbuffer, 2))
+            cbuffer = encodebytes(dumps(cbuffer, 2))
             p = self.player
             guildInfo = (p.guildName,p.guildInfo,p.guildMOTD,p.guildRank)
             d = AVATAR.mind.callRemote("transferPlayer",player.publicName,pbuffer,cname,cbuffer,zoneName,cvalues,self.player.publicName,guildInfo)
@@ -2431,6 +2431,6 @@ class PlayerAvatar(Avatar):
 
 
     def perspective_queryRaceGraphics(self):
-        from race import GetRaceGraphics
+        from mud.world.race import GetRaceGraphics
         return GetRaceGraphics()
 

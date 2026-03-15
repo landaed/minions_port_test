@@ -3,7 +3,7 @@
 
 
 from mud.world.shared.playdata import TradeInfo
-from defines import *
+from mud.world.defines import *
 
 # The Trade class handles players trading. To trade, a player must either double click on the other with
 #  an item in cursor, or use the '/interact' macro.

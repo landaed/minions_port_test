@@ -6,10 +6,10 @@
 
 #this could use a rewrite!!!!
 
-from character import Character
-from mob import Mob
+from mud.world.character import Character
+from mud.world.mob import Mob
 from mud.world.shared.playdata import RootInfo,CharacterInfo
-from defines import *
+from mud.world.defines import *
 import traceback
 
 

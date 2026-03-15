@@ -33,7 +33,7 @@ from mud.masterserver.masterdb import *
 from mud.common.avatar import Avatar
 from mud.world.shared.worlddata import WorldConfig, WorldInfo
 from mud.common.permission import BannedIP
-from newplayeremail import ConfigureEmail
+from mud.masterserver.newplayeremail import ConfigureEmail
 from mud.gamesettings import GAMEROOT,DO_WAN_SERVER_FIX,GL_ANNOUNCE_IP
 from mud.world.defines import *
 
@@ -630,7 +630,7 @@ def ConfigureSettings():
 server = Server(CONFIG["Master Port"])
 server.startServices()
 
-from telnetmanhole import MakeFactory
+from mud.masterserver.telnetmanhole import MakeFactory
 from twisted.application import app, service, strports
 ips = ["127.0.0.1"]
 f= MakeFactory(ips, CONFIG["Manhole Username"], CONFIG["Manhole Password"])

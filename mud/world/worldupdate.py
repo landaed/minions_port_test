@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-from genesistime import GENESISTIME
+from mud.world.genesistime import GENESISTIME
 import sys, os, traceback, imp
 from datetime import datetime
 import re

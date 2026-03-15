@@ -17,7 +17,7 @@ from twisted.cred.credentials import UsernamePassword
 
 import sys,imp,os
 import traceback
-from base64 import encodestring
+from base64 import encodebytes
 from hashlib import sha1 as newSHA
 from pickle import loads,load,dump
 from zipfile import ZipFile,ZIP_DEFLATED
@@ -867,7 +867,7 @@ class Patcher(object):
         
         extraHeaders = {}
         extraHeaders['Authorization'] = 'Basic ' + \
-                     encodestring("%s:%s"%(username,password)).strip()
+                     encodebytes("%s:%s"%(username,password)).strip()
         
         url = "%s/%s"%(address,webFile)
         
@@ -1081,7 +1081,7 @@ class Patcher(object):
         
         extraHeaders = {}
         extraHeaders['Authorization'] = 'Basic ' + \
-                     encodestring("%s:%s"%(self.cUsername,self.cPassword)).strip()
+                     encodebytes("%s:%s"%(self.cUsername,self.cPassword)).strip()
         
         if self.patchTag and not RPG_BUILD_LIVE:
             url = "%s/common/%s/manifest.zip"%(self.cPatchServerAddress,self.patchTag)
@@ -1097,7 +1097,7 @@ class Patcher(object):
         
         extraHeaders = {}
         extraHeaders['Authorization'] = 'Basic ' + \
-                     encodestring("%s:%s"%(self.username,self.password)).strip()
+                     encodebytes("%s:%s"%(self.username,self.password)).strip()
         
         if self.patchTag:
             url = "%s/%s/%s/manifest.zip"%(self.patchServerAddress, \

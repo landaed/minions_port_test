@@ -18,14 +18,14 @@ elif USE_WX:
 # else: use default reactor on Linux (headless)
 
 from mud.gamesettings import *
-from config import *
+from mud_ext.characterserver.config import *
 from twisted.internet import reactor
 from twisted.spread import pb
 from twisted.cred.credentials import UsernamePassword
-from serverdb import CharDB,ReplicateDB
+from mud_ext.characterserver.serverdb import CharDB,ReplicateDB
 from zlib import decompress
 from traceback import print_stack,print_exc
-from base64 import encodestring,decodestring
+from base64 import encodebytes,decodebytes
 from pickle import dumps,loads
 from time import time
 from hashlib import md5
@@ -89,7 +89,7 @@ class WorldConnection(pb.Root):
         if not b:
             return None
         #does str(bufferobject) mess up sometimes?
-        buffer = encodestring(dumps(str(b), 2))
+        buffer = encodebytes(dumps(str(b), 2))
         return buffer
     
     
@@ -98,9 +98,9 @@ class WorldConnection(pb.Root):
             wname = WORLD_LOGINS.get(publicName,None)
             
             if pbuffer:
-                pbuffer = loads(decodestring(pbuffer))
+                pbuffer = loads(decodebytes(pbuffer))
             if cbuffer:
-                cbuffer = loads(decodestring(cbuffer))
+                cbuffer = loads(decodebytes(cbuffer))
             
             if wname != self.worldName:
                 print("Warning %s trying to save on none world login %s"% \
@@ -202,7 +202,7 @@ class WorldConnection(pb.Root):
         
         if b:
             #does str(bufferobject) mess up sometimes?
-            buffer = encodestring(dumps(str(b), 2))
+            buffer = encodebytes(dumps(str(b), 2))
         else:
             buffer = None
         

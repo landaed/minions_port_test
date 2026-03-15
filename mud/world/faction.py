@@ -10,7 +10,7 @@
 
 
 from sqlobject import *
-from defines import *
+from mud.world.defines import *
 from mud.common.persistent import Persistent
 
 

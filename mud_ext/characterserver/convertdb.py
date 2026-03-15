@@ -6,7 +6,7 @@
 
 import os
 from sqlite3 import dbapi2 as sqlite
-from serverdb import CREATE_PLAYER_BUFFER_SQL
+from mud_ext.characterserver.serverdb import CREATE_PLAYER_BUFFER_SQL
 import zlib
 import shutil
 import traceback

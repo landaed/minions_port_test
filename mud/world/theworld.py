@@ -17,7 +17,7 @@ import mud.world.guardianavatar
 import mud.world.immortalavatar
 import mud.world.statsavatar
 
-from base64 import encodestring
+from base64 import encodebytes
 from copy import copy
 from pickle import dumps
 from datetime import datetime
@@ -433,8 +433,8 @@ class World(Persistent):
                     player.logZone = Zone.byName(zoneLink.dstZoneName)
                 
                 publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(player.publicName,player.id,player.party.members[0].id,False)
-                pbuffer = encodestring(dumps(pbuffer, 2))
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                pbuffer = encodebytes(dumps(pbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
                 
                 player.transfering = True
                 from mud.world.cserveravatar import AVATAR
@@ -462,8 +462,8 @@ class World(Persistent):
                     player.logZone = Zone.byName(zoneLink.dstZoneName)
                 
                 publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(player.publicName,player.id,player.party.members[0].id,False)
-                pbuffer = encodestring(dumps(pbuffer, 2))
-                cbuffer = encodestring(dumps(cbuffer, 2))
+                pbuffer = encodebytes(dumps(pbuffer, 2))
+                cbuffer = encodebytes(dumps(cbuffer, 2))
                 
                 player.transfering = True
                 aname = player.publicName

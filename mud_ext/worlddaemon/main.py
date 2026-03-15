@@ -27,7 +27,7 @@ from twisted.cred.portal import IRealm,Portal
 from twisted.internet import reactor
 from twisted.python import components,failure,log
 from twisted.spread import pb
-from zope.interface import implements
+from zope.interface import implementer
 from sqlite3 import dbapi2 as sqlite
 from traceback import print_exc,print_stack
 

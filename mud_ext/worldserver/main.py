@@ -8,7 +8,7 @@ try:
 
     #this file is getting a tad ugly with supporting player worlds, pg worlds, and now zone clusters :)
     from time import time as curTime
-    from base64 import encodestring
+    from base64 import encodebytes
     from pickle import dumps
     from shutil import rmtree,copyfile
     from traceback import print_stack,format_exc
@@ -425,9 +425,9 @@ try:
             try:
                 if len(PLAYER_BUFFERS):
                     pname,pbuffer,cbuffer,cvalues = PLAYER_BUFFERS.pop(0)
-                    pbuffer = encodestring(dumps(pbuffer, 2))
+                    pbuffer = encodebytes(dumps(pbuffer, 2))
                     if cbuffer:
-                        cbuffer = encodestring(dumps(cbuffer, 2))
+                        cbuffer = encodebytes(dumps(cbuffer, 2))
 
 
                     print("Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuffer)/1024,len(cbuffer)/1024))

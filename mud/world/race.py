@@ -1,7 +1,7 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-from defines import *
+from mud.world.defines import *
 from mud.common.persistent import Persistent
 from sqlobject import *
 

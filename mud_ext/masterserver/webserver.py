@@ -11,7 +11,7 @@ from twisted.cred.checkers import ICredentialsChecker
 from twisted.cred import error, credentials,checkers
 from sqlobject import *
 from zope import interface
-from mud.masterserver.masterdb import *
+from mud_ext.masterserver.masterdb import *
 
 WINDOWS_DOWNLOAD = "http://www.prairiegames.com/alphabinaries/MoMBetaInstaller.exe"
 MAC_DOWNLOAD = "http://www.prairiegames.com/alphabinaries/MoMBeta_OSX.tar.gz"

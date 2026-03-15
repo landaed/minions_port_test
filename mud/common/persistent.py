@@ -5,7 +5,7 @@ from twisted.spread import pb
 from sqlobject import *
 import weakref
 from weakref import WeakValueDictionary
-from dbconfig import GetDBConnection
+from mud.common.dbconfig import GetDBConnection
 
 from datetime import datetime
 import traceback

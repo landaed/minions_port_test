@@ -7,7 +7,7 @@ from mud.world.shared.playdata import AllianceInfo
 from twisted.internet import reactor
 from mud.world.defines import *
 import math
-from core import *
+from mud.world.core import *
 
 from mud.worlddocs.utils import GetTWikiName
 from mud.world.shared.sounddefs import *

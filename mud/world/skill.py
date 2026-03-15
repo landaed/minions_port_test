@@ -2,12 +2,12 @@
 # Please see LICENSE.TXT for details
 
 
-from core import *
+from mud.world.core import *
 
 from random import randint
 from math import floor,ceil,sqrt
 from damage import Damage
-from defines import *
+from mud.world.defines import *
 import traceback
 from mud.worlddocs.utils import GetTWikiName
 

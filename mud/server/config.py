@@ -25,7 +25,9 @@ def ConfigureServer(DBNAME):
     
     if not os.path.exists(DATABASE):
         os.makedirs(DATABASE)
-    SetDBConnection('sqlite:/%s/%s'%(DATABASE,DBNAME))
+    dbpath = os.path.abspath(os.path.join(DATABASE, DBNAME))
+    from mud.utils import getSQLiteURL
+    SetDBConnection(getSQLiteURL('/%s'%dbpath))
 
 def LoadConfiguration(config): 
     from configparser import SafeConfigParser 

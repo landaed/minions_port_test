@@ -7,7 +7,7 @@
 from twisted.cred.portal import Portal
 from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
 from twisted.internet import reactor
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
@@ -257,11 +257,11 @@ class CServerMind(pb.Root):
     def remote_checkGrants(self, publicName):
         return CServerMind.themind.callRemote("checkGrants", publicName)
         
+@implementer(IRealm)
 class SimpleRealm:
-    implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        
+
         if not mind:
             raise BadConnectionError("no mind")
 

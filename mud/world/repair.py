@@ -1,11 +1,11 @@
 # Copyright (C) 2004-2007 Prairie Games, Inc
 # Please see LICENSE.TXT for details
 
-from core import *
+from mud.world.core import *
 
 from random import randint
 from math import floor
-from defines import *
+from mud.world.defines import *
 
 from mud.worlddocs.utils import GetTWikiName
 

@@ -15,7 +15,7 @@ from mud_ext.server.config import ConfigureServer, LoadConfiguration
 from mud.common.permission import Role,User
 from mud.common.avatar import Avatar,RoleAvatar
 
-from gmcommands import DoGMCommand
+from mud_ext.gmserver.gmcommands import DoGMCommand
 from mud.gamesettings import *
 
 from hashlib import md5

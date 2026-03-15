@@ -2,9 +2,9 @@
 # Please see LICENSE.TXT for details
 
 import math
-from defines import *
+from mud.world.defines import *
 from zone import Zone
-from core import *
+from mud.world.core import *
 import sys
 
 

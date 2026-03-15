@@ -9,7 +9,7 @@
 #  @{
 
 
-from career import ClassProto
+from mud.world.career import ClassProto
 
 
 ## @brief (Dictionary) Stores handles to a RPG-classes (value) by RPG-class

@@ -14,9 +14,9 @@ import traceback
 
 from sqlobject import *
 from mud.common.persistent import Persistent
-from defines import *
-from core import *
-from messages import ZoneMessage, ZoneSound
+from mud.world.defines import *
+from mud.world.core import *
+from mud.world.messages import ZoneMessage, ZoneSound
 
 
 ## @brief Persistent data type defining a group of mobs (SpawnGroup) that will

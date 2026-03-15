@@ -32,9 +32,9 @@ class TablePermission(Persistent):
     name = StringCol(notNone=True)
     read = BoolCol(default=False)
     write = BoolCol(default=False)
-    insert = BoolCol(default=False,dbName="iinsert")
-    delete = BoolCol(default=False,dbName="ddelete")
-    update = BoolCol(default=False,dbName="uupdate")    
+    canInsert = BoolCol(default=False,dbName="iinsert")
+    canDelete = BoolCol(default=False,dbName="ddelete")
+    canUpdate = BoolCol(default=False,dbName="uupdate")
     columnPermissions=MultipleJoin('ColumnPermission')
     
     role = ForeignKey('Role')
@@ -157,9 +157,9 @@ class Role(Persistent):
             #full access
             tp.read=True
             tp.write=True
-            tp.insert=True
-            tp.delete=True
-            tp.update=True
+            tp.canInsert=True
+            tp.canDelete=True
+            tp.canUpdate=True
             
             for col in tclass._columns:
                 tp.grantColumn(col.name,True,True)

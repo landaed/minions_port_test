@@ -4,9 +4,9 @@
 #npc spell casting
 from sqlobject import *
 
-from spell import SpellClass,SpellProto
-from defines import *
-from core import *
+from mud.world.spell import SpellClass,SpellProto
+from mud.world.defines import *
+from mud.world.core import *
 import random
 
 #we need spell lines, for casting logic! (ie best pet, etc)

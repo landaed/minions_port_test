@@ -4,7 +4,7 @@
 
 #master manhole
 
-from zope.interface import implements
+from zope.interface import implementer
 
 from twisted.internet import protocol
 from twisted.application import service, strports
@@ -72,9 +72,8 @@ class chainedProtocolFactory:
         return insults.ServerProtocol(manhole.ColoredManhole, self.namespace)
 
 
+@interface.implementer(checkers.ICredentialsChecker)
 class ManholeChecker:
-
-    interface.implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.IUsernamePassword,
         credentials.IUsernamePassword)

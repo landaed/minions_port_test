@@ -2,10 +2,10 @@
 # Please see LICENSE.TXT for details
 
 import math
-from defines import *
+from mud.world.defines import *
 from zone import Zone
-from spawn import Spawn
-from core import *
+from mud.world.spawn import Spawn
+from mud.world.core import *
 import sys
 from mud.common.permission import User
 from damage import XPDamage

@@ -5,7 +5,7 @@
 import smtplib
 
 # Import the email modules we'll need
-from email.MIMEText import MIMEText
+from email.mime.text import MIMEText
 
 from mud.gamesettings import GAMEROOT#,SERVER_EMAIL_USE_GMAIL
 

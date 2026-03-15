@@ -6,12 +6,12 @@ from sqlobject import *
 from mud.common.persistent import Persistent
 from twisted.internet import reactor
 
-from item import ItemProto,ItemInstance
-from defines import *
+from mud.world.item import ItemProto,ItemInstance
+from mud.world.defines import *
 from random import randint
-import spawn
+from mud.world import spawn
 import math
-from core import *
+from mud.world.core import *
 import traceback
 
 

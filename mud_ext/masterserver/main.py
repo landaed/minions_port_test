@@ -629,7 +629,7 @@ def main():
     server = Server(CONFIG["Master Port"])
     server.startServices()
 
-    from telnetmanhole import MakeFactory
+    from mud_ext.masterserver.telnetmanhole import MakeFactory
     from twisted.application import app, service, strports
     ips = ["127.0.0.1"]
     f= MakeFactory(ips, CONFIG["Manhole Username"], CONFIG["Manhole Password"])

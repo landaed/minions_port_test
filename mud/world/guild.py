@@ -2,9 +2,9 @@
 # Please see LICENSE.TXT for details
 
 #guild commands
-from defines import *
-from messages import GameMessage
-from core import *
+from mud.world.defines import *
+from mud.world.messages import GameMessage
+from mud.world.core import *
 import random
 import time
 import traceback,sys

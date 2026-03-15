@@ -14,7 +14,7 @@ from mud.world.shared.worlddata import CharacterInfo
 from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer
 
 from time import time as sysTime
-from base64 import decodestring
+from base64 import decodebytes
 from pickle import loads
 
 
@@ -69,7 +69,7 @@ class Inn(pb.Root):
         player = self.player
         
         if cbuffer:
-            cbuffer = loads(decodestring(cbuffer))
+            cbuffer = loads(decodebytes(cbuffer))
             c = None
             try:
                 c = Character.byName(cname)

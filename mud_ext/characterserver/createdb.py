@@ -11,7 +11,7 @@ import hashlib
 import sys
 import os
 
-from serverdb import CREATE_PLAYER_BUFFER_SQL
+from mud_ext.characterserver.serverdb import CREATE_PLAYER_BUFFER_SQL
 
 sys.path.append(os.getcwd())
 

@@ -5,7 +5,7 @@
 from twisted.cred.portal import Portal
 from twisted.cred.checkers import InMemoryUsernamePasswordDatabaseDontUse
 from twisted.internet import reactor
-from zope.interface import implements
+from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
@@ -364,18 +364,18 @@ class ZoneClusterAvatar(pb.Avatar):
 
 
 
+@implementer(IRealm)
 class SimpleRealm:
-    implements(IRealm)
 
     def requestAvatar(self, avatarId, mind, *interfaces):
-        
-        
-        
+
+
+
         if not mind:
             raise BadConnectionError("no mind")
 
         ip = mind.broker.transport.getPeer()
-        
+
         print(ip,avatarId,mind)
         
         #if ip.host != '127.0.0.1':
