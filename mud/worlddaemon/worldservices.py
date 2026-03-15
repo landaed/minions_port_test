@@ -9,7 +9,7 @@ from zope.interface import implementer
 from twisted.spread import pb
 from twisted.internet import reactor
 from twisted.cred.portal import IRealm
-import os,sys
+import os,sys,subprocess
 from twisted.python import components, failure, log
 
 import math
@@ -103,18 +103,14 @@ class ZoneClusterAvatar(pb.Avatar):
         
         self.spawnedCallback = spawnedCallback
         
-        if sys.platform[:6] != 'darwin':
+        if sys.platform == 'win32':
             s = 'start "%s" %s %s'%(os.getcwd(),cmd,args)
             s = os.path.normpath(s)
             os.system(s)
         else:
-            cmd = sys.executable
-            args = args.split(" ")
-            args.insert(0,cmd)
-            
-            s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print(s)
-            os.system(s)
+            full_args = [cmd] + args.split()
+            print("Spawning: %s" % ' '.join(full_args))
+            subprocess.Popen(full_args)
     
 #remote
     

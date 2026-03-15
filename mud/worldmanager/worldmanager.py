@@ -9,7 +9,7 @@ from twisted.internet import reactor
 from twisted.cred.credentials import UsernamePassword
 
 from shutil import rmtree,copyfile
-import os,sys
+import os,sys,subprocess
 from pickle import load,dump
 from hashlib import md5
 from traceback import print_stack
@@ -172,18 +172,14 @@ class MyMainPanel(MainPanel,pb.Root):
         args += r' -publicname=%s -password=%s'%(SETTINGS['PublicName'],SETTINGS['Password'])
         args += r' -wx'
         
-        if sys.platform[:6] != 'darwin':
+        if sys.platform == 'win32':
             s = 'start "%s" %s %s'%(os.getcwd(),cmd,args)
             s = os.path.normpath(s)
             os.system(s)
         else:
-            cmd = sys.executable
-            args = args.split(" ")
-            args.insert(0,cmd)
-            
-            s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print(s)
-            os.system(s)
+            full_args = [cmd] + args.split()
+            print("Spawning: %s" % ' '.join(full_args))
+            subprocess.Popen(full_args)
     
     
     def enumMyWorldsResult(self,worlds):

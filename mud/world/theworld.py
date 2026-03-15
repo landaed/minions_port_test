@@ -21,7 +21,7 @@ from base64 import encodebytes
 from copy import copy
 from pickle import dumps
 from datetime import datetime
-import os
+import os,subprocess
 from shutil import copyfile
 from sqlobject import *
 import sys
@@ -733,25 +733,17 @@ class World(Persistent):
             if arg.startswith("gameconfig="):
                 args += " %s"%arg
         
-        if sys.platform[:6] != "darwin":
-            # Just don't provide cluster number via gameconfig until
-            #  MoM uses gameconfig as well.
-            args += r' -cluster=%i'%self.clusterNum
+        args += r' -cluster=%i'%self.clusterNum
+
+        if sys.platform == 'win32':
             s = 'start "%s" %s %s'%(os.getcwd(),cmd,args)
             s = os.path.normpath(s)
             print(s)
             os.system(s)
-        
         else:
-            if arg.startswith("-wx"):
-                args += " -wx"
-            
-            cmd = sys.executable
-            args = args.split(" ")
-            args.insert(0,cmd)
-            s = 'pythonw -c \'import os;os.spawnv(os.P_NOWAIT,"%s",[%s])\''%(cmd,','.join('"%s"'%arg for arg in args))
-            print(s)
-            os.system(s)
+            full_args = [cmd] + args.split()
+            print("Spawning: %s" % ' '.join(full_args))
+            subprocess.Popen(full_args)
         
         return z
     
