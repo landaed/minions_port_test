@@ -67,7 +67,7 @@ def StartServices(callback):
     portal = Portal(SimpleRealm())
     checker = InMemoryUsernamePasswordDatabaseDontUse()
     from hashlib import md5
-    password = md5("imp").digest()
+    password = md5(b"imp").digest()
     for x in range(0,100):
         checker.addUser(str(x), password)
     portal.registerChecker(checker)
@@ -150,7 +150,7 @@ def main():
     factory = pb.PBClientFactory()
     reactor.connectTCP(IP,PORT,factory)
     from hashlib import md5
-    password = md5("imp").digest()
+    password = md5(b"imp").digest()
     mind = ImpMind()
     mind.daemonIP = IP
     factory.login(UsernamePassword("0", password),mind).addCallbacks(mind.connected, mind.failure)

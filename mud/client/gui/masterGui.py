@@ -115,7 +115,7 @@ def QueryWorldInfo(worldname):
             factory = pb.PBClientFactory()
             reactor.connectTCP(winfo.worldIP,winfo.worldPort,factory)
             from hashlib import md5
-            password = md5("").digest()
+            password = md5(b"").digest()
             factory.login(UsernamePassword("Query-Query", password),pb.Root()).addCallbacks(QueryWorldInfoConnected, QueryWorldInfoFailure,(winfo.worldName,),{},(winfo.worldName,))
             return True
     return False
@@ -192,7 +192,7 @@ def PlayerSubmittedToWorld(result):
             role = "Immortal"
     
     from hashlib import md5
-    password = md5(result[1]).digest()
+    password = md5(result[1].encode()).digest()
 
     factory.login(UsernamePassword("%s-%s"%(TGEGetGlobal("$pref::PublicName"),role), password),mind).addCallbacks(PlayerConnected, MyFailure,(mind,))
     
@@ -244,7 +244,7 @@ def OnMasterSelectWorld():
         factory = pb.PBClientFactory()
         reactor.connectTCP(winfo.worldIP,winfo.worldPort,factory)
         from hashlib import md5
-        password = md5(password).digest()
+        password = md5(password.encode()).digest()
 
         factory.login(UsernamePassword("NewPlayer-NewPlayer", password),pb.Root()).addCallbacks(NewPlayerConnected, Failure)
     
@@ -539,7 +539,7 @@ def PyOnDirectSelectWorld():
 
     password = ""
     from hashlib import md5
-    password = md5(password).digest()
+    password = md5(password.encode()).digest()
 
     factory = pb.PBClientFactory()
     reactor.connectTCP(ip,port,factory)

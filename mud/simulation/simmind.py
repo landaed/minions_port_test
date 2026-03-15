@@ -1956,7 +1956,7 @@ def GotWorldInfos(winfos,perspective):
             reactor.connectTCP(world.worldIP,world.worldPort,factory)
             mind = SimMind()
             #to do add authentication (zone password)
-            password = md5("ZoneServer").digest()
+            password = md5(b"ZoneServer").digest()
             
             factory.login(UsernamePassword("ZoneServer-ZoneServer",password),mind).addCallbacks(WorldConnected, Failure)
     
@@ -2005,7 +2005,7 @@ def WorldSimulationLogin():
         factory = pb.PBClientFactory()
         reactor.connectTCP("127.0.0.1",worldport,factory)
         mind = SimMind()
-        password = md5("ZoneServer").digest()
+        password = md5(b"ZoneServer").digest()
         
         factory.login(UsernamePassword("ZoneServer-ZoneServer",password),mind).addCallbacks(WorldConnected, Failure)
 

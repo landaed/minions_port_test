@@ -67,7 +67,7 @@ def DoMasterLogin():
     factory = pb.PBClientFactory()
     reactor.connectTCP(masterIP,masterPort,factory)
     from hashlib import md5
-    password = md5(password).digest()
+    password = md5(password.encode()).digest()
 
     factory.login(UsernamePassword("%s-Player"%regkey, password),pb.Root()).addCallbacks(Connected, Failure)
 

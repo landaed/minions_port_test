@@ -35,7 +35,7 @@ class GMServices(pb.Root):
         try:
             reactor.connectTCP(GMSERVER_IP,GMSERVER_PORT,factory)
             
-            password = md5(WORLDNAMES[self.worldName]).digest()
+            password = md5(WORLDNAMES[self.worldName].encode()).digest()
             
             d = factory.login(UsernamePassword("%s-WorldDaemon"% \
                 self.worldName,password),self)

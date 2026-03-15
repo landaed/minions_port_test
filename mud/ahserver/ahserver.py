@@ -520,7 +520,7 @@ class AhMaster():
         print("Connecting to Mail Server Proxy at: %s"%MAILSERVER_IP)
         factory = pb.PBClientFactory()
         reactor.connectTCP(MAILSERVER_IP,MAILSERVER_PORT,factory)
-        password = md5("MSP").digest()
+        password = md5(b"MSP").digest()
         
         factory.login(UsernamePassword("MSP-MSP", password),pb.Root()).addCallbacks(self.MSConnected, self.MSFailure)
   

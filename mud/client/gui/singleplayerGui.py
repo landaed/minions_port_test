@@ -113,7 +113,7 @@ def OnLoadSingleWorld(worldname=None):
         factory = pb.PBClientFactory()
         reactor.connectTCP("localhost",3013,factory)
         mind = PlayerMind()
-        password = md5("ThePlayer").digest()
+        password = md5(b"ThePlayer").digest()
         
         d = factory.login(UsernamePassword("ThePlayer-Immortal", password),mind)
         d.addCallback(PlayerConnected,(mind,))

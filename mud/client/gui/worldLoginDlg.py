@@ -68,7 +68,7 @@ def OnWorldLogin(args):
         reactor.connectTCP(WORLDINFO.worldIP,WORLDINFO.worldPort,factory)
         mind = PlayerMind()
         from hashlib import md5
-        password = md5(worldpassword).digest()
+        password = md5(worldpassword.encode()).digest()
 
         factory.login(UsernamePassword("%s-%s"%(TGEGetGlobal("$pref::PublicName"),avatar), password),mind).addCallbacks(PlayerConnected, Failure,(mind,))
     

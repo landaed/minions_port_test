@@ -301,7 +301,7 @@ def AnnounceWorld():
     
     username = "%s-World"%PUBLICNAME
     password = PASSWORD
-    password = md5(password).digest()
+    password = md5(password.encode()).digest()
 
 
     print("Announcing World")

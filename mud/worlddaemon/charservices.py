@@ -266,7 +266,7 @@ class SimpleRealm:
         
 def StartServices(username,password):
     from hashlib import md5
-    password = md5(password).digest()
+    password = md5(password.encode()).digest()
     
     portal = Portal(SimpleRealm())
     checker = InMemoryUsernamePasswordDatabaseDontUse()

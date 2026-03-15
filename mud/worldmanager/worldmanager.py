@@ -422,7 +422,7 @@ MOTD = "%s\\\\n"
                 
                 factory = pb.PBClientFactory()
                 reactor.connectTCP(MASTERIP,MASTERPORT,factory)
-                password = md5(password).digest()
+                password = md5(password.encode()).digest()
 
                 factory.login(UsernamePassword(username, password),self).addCallbacks(self.connected, self.failure)
         else: #logout
