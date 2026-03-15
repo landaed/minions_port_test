@@ -9,9 +9,9 @@
 ####################################################################
 
 import types, math, copy
-from vec3 import vec3 as _vec3
-from vec4 import vec4 as _vec4
-from mat3 import mat3 as _mat3
+from mud.simulation.vec3 import vec3 as _vec3
+from mud.simulation.vec4 import vec4 as _vec4
+from mud.simulation.mat3 import mat3 as _mat3
 
 
 # [  0   1   2   3 ]
@@ -560,7 +560,7 @@ class mat4:
                      0.0, 0.0, -1.0, 0.0)
     
     def perspective(self, fovy, aspect, near, far):
-        """von Mesa übernommen (glu.c)"""
+        """von Mesa ï¿½bernommen (glu.c)"""
 
         top    = near * math.tan(fovy * math.pi / 360.0)
         bottom = -top

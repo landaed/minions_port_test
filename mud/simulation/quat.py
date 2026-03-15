@@ -8,9 +8,9 @@
 ####################################################################
 
 import types, math
-from vec3 import vec3 as _vec3
-from mat3 import mat3 as _mat3
-from mat4 import mat4 as _mat4
+from mud.simulation.vec3 import vec3 as _vec3
+from mud.simulation.mat3 import mat3 as _mat3
+from mud.simulation.mat4 import mat4 as _mat4
 
 # quat
 class quat:
