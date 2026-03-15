@@ -2,7 +2,7 @@
 # Please see LICENSE.TXT for details
 
 from mud.world.defines import *
-from utils import *
+from mud.worlddocs.utils import *
 
 
 def CreateItemSetPages(itemSetDict):

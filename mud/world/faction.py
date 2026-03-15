@@ -82,7 +82,7 @@ KOS = {}
 #        iterations.  This method really only gets called once though, so the
 #        overal gain is minimal.
 def InitKOS():
-    from spawn import Spawn
+    from mud.world.spawn import Spawn
 
     # Get the database connection used by the Spawn class.
     con = Spawn._connection.getConnection()

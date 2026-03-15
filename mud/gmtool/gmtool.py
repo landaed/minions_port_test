@@ -11,7 +11,7 @@ from twisted.internet import wxreactor
 wxreactor.install()
 from twisted.internet import reactor
 import traceback
-from gmmind import GMConnection,setLogFunction
+from mud.gmtool.gmmind import GMConnection,setLogFunction
 
 
 

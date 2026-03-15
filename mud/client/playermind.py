@@ -347,7 +347,7 @@ class PlayerMind(pb.Root):
                 
             if self.pgserver and self.ircNick != self.charInfos[0].NAME:
                 self.ircNick = self.charInfos[0].NAME
-                from irc import ChangeNick
+                from mud.client.irc import ChangeNick
                 ChangeNick(self.ircNick)
             
             PARTYWND.tick()
@@ -1036,7 +1036,7 @@ class PlayerMind(pb.Root):
         
     #tracking
     def remote_setMuteTime(self,t):
-        from irc import SetMuteTime
+        from mud.client.irc import SetMuteTime
         SetMuteTime(t)
     
     def remote_setTracking(self,tracking):

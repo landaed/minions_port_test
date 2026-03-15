@@ -354,7 +354,7 @@ class RegistrationAvatar(Avatar):
             account.addProduct("MOM")
             
         if not USE_WX:
-            from newplayeremail import NewPlayerEmail
+            from mud.masterserver.newplayeremail import NewPlayerEmail
             import _thread
             _thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
         
@@ -364,7 +364,7 @@ class RegistrationAvatar(Avatar):
             return(0, "Your password is:\\n\\n%s\\n\\nPlease store this for reference.\\nIt has also been emailed to you."%password, password, regkey)
 
     def perspective_requestPassword(self, publicname, email):
-        from newplayeremail import LostPasswordEmail
+        from mud.masterserver.newplayeremail import LostPasswordEmail
         
         try:
             a = Account.byPublicName(publicname)
@@ -591,7 +591,7 @@ from mud.server.app import Server
 
 
 if USE_WX:
-    from gui import Setup
+    from mud.masterserver.gui import Setup
     app = Setup(reactor)
     reactor.registerWxApp(app)
 

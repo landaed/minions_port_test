@@ -184,7 +184,7 @@ class Spawn(Persistent):
         self.level = self.plevel
         self.modifiedScale = self.scale # Modified scale may get changed, but should not persist.
         
-        from spell import SpellProto
+        from mud.world.spell import SpellProto
         
         self.spawnSpells = []
         for s in self.spawnSpellsInternal:

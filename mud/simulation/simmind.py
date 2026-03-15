@@ -1194,7 +1194,7 @@ class SimMind(pb.Root):
         
         try:
             if int(TGEGetGlobal("$Server::Dedicated")) or int(TGEGetGlobal("$pref::gameplay::SPpopulators")):
-                from populator import Populate
+                from mud.simulation.populator import Populate
                 ppoints,ppaths,pwaypoints = Populate(thepoints,self.paths)
                 thepoints.extend(ppoints)
                 
@@ -1687,7 +1687,7 @@ class SimMind(pb.Root):
     
     
     def remote_setWeather(self,wc):
-        from weather import SetWeather
+        from mud.simulation.weather import SetWeather
         SetWeather(wc)
     
     

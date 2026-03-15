@@ -121,7 +121,7 @@ class SimAvatar(Avatar):
             return
 
 
-        from zone import Zone,ZoneLink
+        from mud.world.zone import Zone,ZoneLink
 
         zlink = ZoneLink.byName(zoneLink)
         
@@ -295,7 +295,7 @@ class SimAvatar(Avatar):
         zconnect.missionFile = zone.zone.missionFile
         zconnect.instanceName = zone.name
         
-        from race import GetRaceGraphics
+        from mud.world.race import GetRaceGraphics
         zconnect.raceGraphics = GetRaceGraphics()
         
         return zconnect
@@ -339,7 +339,7 @@ class SimAvatar(Avatar):
         
         
     def perspective_dialogTrigger(self,srcId,trigger):
-        from command import CmdZoneInteract
+        from mud.world.command import CmdZoneInteract
         
         if srcId in self.simLookup:
             so = self.simLookup[srcId]
@@ -348,7 +348,7 @@ class SimAvatar(Avatar):
                 CmdZoneInteract(player.curChar.mob,[],trigger)
                 
     def perspective_bindTrigger(self,srcId):
-        from command import CmdBind
+        from mud.world.command import CmdBind
         
         if srcId in self.simLookup:
             so = self.simLookup[srcId]

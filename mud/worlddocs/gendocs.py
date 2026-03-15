@@ -43,16 +43,16 @@ SetDBConnection('sqlite:/%s'%DATABASE,True)
 from sqlobject import *
 
 
-from spawnpages import CreateSpawnPages
-from zonepages import CreateZonePages
-from itempages import CreateItemPages
-from questpages import CreateQuestPages
-from classpages import CreateClassPages
-from spellpages import CreateSpellPages
-from skillpages import CreateSkillPages
-from recipepages import CreateRecipePages
-from itemsetpages import CreateItemSetPages
-from factionpages import CreateFactionPages
+from mud.worlddocs.spawnpages import CreateSpawnPages
+from mud.worlddocs.zonepages import CreateZonePages
+from mud.worlddocs.itempages import CreateItemPages
+from mud.worlddocs.questpages import CreateQuestPages
+from mud.worlddocs.classpages import CreateClassPages
+from mud.worlddocs.spellpages import CreateSpellPages
+from mud.worlddocs.skillpages import CreateSkillPages
+from mud.worlddocs.recipepages import CreateRecipePages
+from mud.worlddocs.itemsetpages import CreateItemSetPages
+from mud.worlddocs.factionpages import CreateFactionPages
 
 
 print("Creating Spawn Pages...")

@@ -7,7 +7,7 @@
 # specified in the file license.txt.
 ####################################################################
 
-import types, math
+import math
 from mud.simulation.vec3 import vec3 as _vec3
 from mud.simulation.mat3 import mat3 as _mat3
 from mud.simulation.mat4 import mat4 as _mat4
@@ -41,7 +41,7 @@ class quat:
         elif len(args)==1:
             T = type(args[0])
             # Scalar
-            if T==types.FloatType or T==types.IntType or T==types.LongType:
+            if isinstance(args[0], (float, int)):
                 self.w = args[0]
                 self.x, self.y, self.z = (0.0, 0.0, 0.0)
             # quat
@@ -55,12 +55,12 @@ class quat:
             elif isinstance(args[0], _mat3) or isinstance(args[0], _mat4):
                 self.fromMat(args[0])
             # List or Tuple
-            elif T==types.ListType or T==types.TupleType:
+            elif isinstance(args[0], (list, tuple)):
                 self.w, self.x, self.y, self.z = args[0]
             # String
-            elif T==types.StringType:
+            elif isinstance(args[0], str):
                 s=args[0].replace(","," ").replace("  "," ").strip().split(" ")
-                f=map(lambda x: float(x), s)
+                f=list(map(lambda x: float(x), s))
                 dummy = quat(f)
                 self.w = dummy.w
                 self.x = dummy.x
@@ -83,7 +83,7 @@ class quat:
         
 
     def __repr__(self):
-        return 'quat('+`self.w`+', '+`self.x`+', '+`self.y`+', '+`self.z`+')'
+        return 'quat('+repr(self.w)+', '+repr(self.x)+', '+repr(self.y)+', '+repr(self.z)+')'
 
     def __str__(self):
         fmt="%1.4f"
@@ -165,7 +165,7 @@ class quat:
         """
         T = type(other)
         # quat*scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return quat(self.w*other, self.x*other, self.y*other, self.z*other)
         # quat*quat
         if isinstance(other, quat):
@@ -185,7 +185,7 @@ class quat:
 
     __rmul__ = __mul__
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         """Division.
 
         >>> q=quat(0.9689, 0.2160, 0.1080, 0.0540)
@@ -194,7 +194,7 @@ class quat:
         """
         T = type(other)
         # quat/scalar
-        if T==types.FloatType or T==types.IntType or T==types.LongType:
+        if isinstance(other, (float, int)):
             return quat(self.w/other, self.x/other, self.y/other, self.z/other)
         # unsupported
         else:

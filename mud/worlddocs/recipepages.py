@@ -4,7 +4,7 @@
 
 from mud.world.crafting import Recipe
 from mud.world.defines import *
-from utils import *
+from mud.worlddocs.utils import *
 
 
 RecipePage = """

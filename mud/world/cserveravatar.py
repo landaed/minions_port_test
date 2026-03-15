@@ -15,7 +15,7 @@ from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer, \
 from base64 import decodebytes,encodebytes
 from pickle import dumps,loads
 from random import choice
-from string import letters
+from string import ascii_letters as letters
 from time import time as sysTime
 import traceback
 

@@ -204,7 +204,7 @@ class ZoneInstance:
         if not self.live:
             if zconnect.ip == '127.0.0.1' and CoreSettings.SINGLEPLAYER:
                 #tell client to kick off zone
-                from race import GetRaceGraphics
+                from mud.world.race import GetRaceGraphics
                 zconnect.raceGraphics = GetRaceGraphics()
                 player.mind.callRemote('createServer',zconnect)
         else:
@@ -501,7 +501,7 @@ class ZoneInstance:
                 target.spawn.race not in ("Undead","Golem"):
                 if target.loot and not target.loot.fleshDone and \
                     len(target.loot.items) < 16:
-                    from item import ItemProto
+                    from mud.world.item import ItemProto
                     fproto = ItemProto.byName("Flesh and Blood")
                     flesh = fproto.createInstance()
                     flesh.slot = -1
@@ -727,7 +727,7 @@ class ZoneInstance:
     
     #dialog triggers
     def setDialogTriggers(self, tinfos):
-        from dialog import DialogTrigger
+        from mud.world.dialog import DialogTrigger
         self.dialogTriggers = [DialogTrigger(t) for t in tinfos]
     
     

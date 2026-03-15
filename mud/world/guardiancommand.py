@@ -3,7 +3,7 @@
 
 import math
 from mud.world.defines import *
-from zone import Zone
+from mud.world.zone import Zone
 from mud.world.core import *
 import sys
 
@@ -16,7 +16,7 @@ def CmdMute(mob, args):
     mob.player.sendGameText(RPG_MSG_GAME_DENIED,"Command currently not working, use GM Tool instead.\\n")
     return
     
-    from player import Player
+    from mud.world.player import Player
     try:
         player = Player.byPublicName(args[0])
     except:
@@ -41,7 +41,7 @@ def CmdUnmute(mob,args):
     mob.player.sendGameText(RPG_MSG_GAME_DENIED,"Command currently not working, use GM Tool instead.\\n")
     return
     
-    from player import Player
+    from mud.world.player import Player
     try:
         player = Player.byPublicName(args[0])
     except:
@@ -58,7 +58,7 @@ def CmdUnmute(mob,args):
 
 
 def CmdKick(mob,args):
-    from player import Player
+    from mud.world.player import Player
     try:
         player = Player.byPublicName(args[0])
     except:
@@ -93,7 +93,7 @@ def CmdUnban(mob,args):
 
 def CmdBan(mob,args):
     from mud.common.permission import User,Role, BannedUser
-    from player import Player
+    from mud.world.player import Player
     
     if not len(args):
         return
@@ -132,7 +132,7 @@ def CmdBan(mob,args):
 
 
 def CmdPlayerInfo(mob,args):
-    from player import Player
+    from mud.world.player import Player
     
     if not len(args):
         return
@@ -171,7 +171,7 @@ def CmdClearFaction(mob,args):
     char = target.player.curChar
     charSpawn = char.spawn
     
-    from faction import KOS
+    from mud.world.faction import KOS
     KOS[charSpawn.name] = []
     
     for charFaction in char.characterFactions:

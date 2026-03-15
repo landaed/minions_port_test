@@ -3,7 +3,7 @@
 
 from mud.world.defines import *
 from mud.world.skill import ClassSkill,ClassSkillRaceRequirement
-from utils import *
+from mud.worlddocs.utils import *
 
 
 # done are /genesis/skill/... barbarian.py,bard.py,cleric.py,combatant.py

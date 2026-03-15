@@ -52,7 +52,7 @@ def GotGuildCreate(result,player,guildName):
 #/gcreate on client should open up a window for creating guild?
 
 def GuildCreate(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:
         return 
     
@@ -127,7 +127,7 @@ def GotGuildDisband(result,player):
     player.sendGameText(RPG_MSG_GAME_DENIED,"%s\\n"%text)    
         
 def GuildDisband(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -163,7 +163,7 @@ def GotGuildSetLeader(result,player,promote):
         
 
 def GuildSetLeader(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -234,7 +234,7 @@ def GotGuildRoster(result,player):
     player.sendGameText(RPG_MSG_GAME_DENIED,"%s\\n"%text)    
 
 def GuildRoster(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -270,7 +270,7 @@ def GotGuildCharacters(result,player,who):
 
 
 def GuildCharacters(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -306,7 +306,7 @@ def GotGuildPublicName(result,player,cname):
 
 
 def GuildPublicName(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -343,7 +343,7 @@ def GotGuildClearMOTD(result,player):
     player.sendGameText(RPG_MSG_GAME_DENIED,"%s\\n"%text)    
         
 def GuildClearMOTD(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -377,7 +377,7 @@ def GotGuildSetMOTD(result,player,text):
     
 
 def GuildSetMOTD(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -422,7 +422,7 @@ def GotGuildRemove(result,player,removed):
 
 
 def GuildRemove(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -460,7 +460,7 @@ def GotGuildDemote(result,player):
 
 
 def GuildDemote(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -499,7 +499,7 @@ def GotGuildPromote(result,player,promote):
         
 
 def GuildPromote(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -561,7 +561,7 @@ def GotGuildLeave(result,player):
     player.sendGameText(RPG_MSG_GAME_DENIED,"%s\\n"%text)
         
 def GuildLeave(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -594,7 +594,7 @@ def GotGuildJoin(result,player):
     player.sendGameText(RPG_MSG_GAME_DENIED,"%s\\n"%text)
 
 def GuildJoin(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -618,7 +618,7 @@ def GuildJoin(mob,args):
     d.addCallback(GotGuildJoin,player)
 
 def GuildDecline(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     
@@ -639,7 +639,7 @@ def GuildDecline(mob,args):
 
 
 def GuildInvite(mob,args):
-    from cserveravatar import AVATAR
+    from mud.world.cserveravatar import AVATAR
     if not AVATAR:    
         return 
     

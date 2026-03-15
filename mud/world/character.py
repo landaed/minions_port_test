@@ -3386,7 +3386,7 @@ class Character(Persistent):
         else:
             
             # TWS: This inline import neesd to be moved to be global.
-            from zone import TempZoneLink
+            from mud.world.zone import TempZoneLink
 
             # Create a temporary zone link (TempZoneLink) to the Zone and
             # location at which this Character had died.
@@ -4620,7 +4620,7 @@ class Character(Persistent):
         if self.spawn.template and not self.spawn.flags&RPG_SPAWN_MONSTERADVANCED:
             
             # TWS: This inline import neesd to be moved to be global.
-            from spawn import Spawn
+            from mud.world.spawn import Spawn
 
             # Get the Spawn's template.
             template = Spawn.byName(self.spawn.template)
@@ -4870,7 +4870,7 @@ class Character(Persistent):
             return
 
         # TWS: This inline import neesd to be moved to be global.
-        from crafting import Craft
+        from mud.world.crafting import Craft
         
         # Delegate crafting to the Craft function.
         Craft(self.mob,recipeID,useCraftWindow)

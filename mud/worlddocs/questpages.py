@@ -8,7 +8,7 @@ from mud.world.zone import Zone
 from mud.world.dialog import Dialog
 from mud.world.defines import *
 from mud.world.core import GenMoneyText
-from utils import *
+from mud.worlddocs.utils import *
 from collections import defaultdict
 
 QuestPage = """

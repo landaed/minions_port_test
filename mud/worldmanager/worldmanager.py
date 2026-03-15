@@ -14,9 +14,9 @@ from pickle import load,dump
 from hashlib import md5
 from traceback import print_stack
 
-from gui.mainpanel import MainPanel
-from gui.masterlogindlg import MasterLoginDlg
-from gui.newworlddlg import NewWorldDlg
+from mud.worldmanager.gui.mainpanel import MainPanel
+from mud.worldmanager.gui.masterlogindlg import MasterLoginDlg
+from mud.worldmanager.gui.newworlddlg import NewWorldDlg
 
 from mud.world.shared.worlddata import WorldConfig,WorldInfo
 from mud.world.defines import *

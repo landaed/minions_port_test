@@ -503,7 +503,7 @@ def UpdateCharacters():
     
     ncursor.execute("BEGIN TRANSACTION;")
     
-    from serverdb import CREATE_PLAYER_BUFFER_SQL
+    from mud.characterserver.serverdb import CREATE_PLAYER_BUFFER_SQL
     ncursor.executescript(CREATE_PLAYER_BUFFER_SQL)
     
     #here we go (I am sure there is some good SQL to do this, but hey)
