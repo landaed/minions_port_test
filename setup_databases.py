@@ -41,6 +41,64 @@ MOM_CLIENT_DIR = os.path.join("MoMReborn")
 BASELINE_WORLD_DB = os.path.join(MOM_CLIENT_DIR, GAMEROOT, "data", "worlds", "multiplayer.baseline", "world.db")
 
 # Schema additions: columns present in server code but missing from old database
+# Tables present in server code but missing from old database
+MISSING_TABLES = [
+    """CREATE TABLE IF NOT EXISTS spawn_effect (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        spawn_id INT,
+        effectname TEXT
+    )""",
+    """CREATE TABLE IF NOT EXISTS race (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        playable BOOLEAN DEFAULT 0,
+        xp_mod REAL DEFAULT 1.0,
+        regen_health REAL DEFAULT 1.0,
+        regen_mana REAL DEFAULT 2.0,
+        regen_stamina REAL DEFAULT 1.0,
+        consume_water REAL DEFAULT 1.0,
+        consume_food REAL DEFAULT 1.0,
+        move REAL DEFAULT 1.0,
+        swim REAL DEFAULT 1.0,
+        realm INT DEFAULT 0,
+        see_invisible REAL DEFAULT 0.0
+    )""",
+    """CREATE TABLE IF NOT EXISTS race_graphic (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE,
+        model_fit_male TEXT DEFAULT '',
+        model_heavy_male TEXT DEFAULT '',
+        model_thin_male TEXT DEFAULT '',
+        model_fit_female TEXT DEFAULT '',
+        model_heavy_female TEXT DEFAULT '',
+        model_thin_female TEXT DEFAULT '',
+        animation_male TEXT DEFAULT '',
+        animation_female TEXT DEFAULT '',
+        texture_head_male TEXT DEFAULT '',
+        texture_body_male TEXT DEFAULT '',
+        texture_arms_male TEXT DEFAULT '',
+        texture_legs_male TEXT DEFAULT '',
+        texture_hands_male TEXT DEFAULT '',
+        texture_feet_male TEXT DEFAULT '',
+        texture_special_male TEXT DEFAULT '',
+        texture_head_female TEXT DEFAULT '',
+        texture_body_female TEXT DEFAULT '',
+        texture_arms_female TEXT DEFAULT '',
+        texture_legs_female TEXT DEFAULT '',
+        texture_hands_female TEXT DEFAULT '',
+        texture_feet_female TEXT DEFAULT '',
+        texture_special_female TEXT DEFAULT '',
+        size_male REAL DEFAULT 1.0,
+        size_female REAL DEFAULT 1.0,
+        hmount_fit_male REAL DEFAULT 1.0,
+        hmount_heavy_male REAL DEFAULT 1.0,
+        hmount_thin_male REAL DEFAULT 1.0,
+        hmount_fit_female REAL DEFAULT 1.0,
+        hmount_heavy_female REAL DEFAULT 1.0,
+        hmount_thin_female REAL DEFAULT 1.0
+    )""",
+]
+
 SCHEMA_ADDITIONS = [
     ('character', 'auction_idn', 'INTEGER', '0'),
     ('character', 'zone_id', 'INTEGER', 'NULL'),
@@ -89,9 +147,13 @@ SCHEMA_ADDITIONS = [
 
 
 def add_missing_columns(db_path):
-    """Add columns that exist in server code but not in the database."""
+    """Add tables and columns that exist in server code but not in the database."""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
+    # Create missing tables
+    for sql in MISSING_TABLES:
+        cursor.execute(sql)
 
     # Get existing tables and columns
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
