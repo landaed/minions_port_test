@@ -13,9 +13,7 @@ class MetaAvatar(type):
         type.__init__(cls,className,bases,d)
         MetaAvatar.avatarClasses[className]=cls
         
-class Avatar(pb.Avatar,object):
-
-    __metaclass__=MetaAvatar
+class Avatar(pb.Avatar, object, metaclass=MetaAvatar):
     
     def createAvatar(classname):
         cls=MetaAvatar.avatarClasses[classname]
