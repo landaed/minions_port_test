@@ -214,6 +214,11 @@ try:
     else:
         DATABASE = "./%s/data/worlds/multiplayer/%s/world.db"%(GAMEROOT,WORLDNAME)
 
+    if not os.path.exists(DATABASE):
+        print("ERROR: World database not found: %s" % os.path.abspath(DATABASE))
+        print("Run 'python3 setup_databases.py' to create the database.")
+        sys.exit(1)
+
     from mud.utils import getSQLiteURL
     SetDBConnection(getSQLiteURL(DATABASE),True)
 
