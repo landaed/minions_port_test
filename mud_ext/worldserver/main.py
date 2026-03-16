@@ -387,7 +387,7 @@ try:
     import re
     import http.client
 
-    _ip_regex = '([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})'
+    _ip_regex = r'([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})'
     def get_IP():
         # LAN-server-fix 
         if DO_LAN_SERVER_FIX: 
