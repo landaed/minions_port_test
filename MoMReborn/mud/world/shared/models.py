@@ -1,0 +1,162 @@
+# Embedded file name: mud\world\shared\models.pyo
+
+
+def GetModelInfo(race, sex, look):
+    sizes = {}
+    sizes['Drakken'] = 1.15
+    sizes['Halfling'] = 0.6
+    sizes['Human'] = 1.0
+    sizes['Titan'] = 1.35
+    sizes['Dwarf'] = 0.85
+    sizes['Elf'] = 1.0
+    sizes['Dark Elf'] = 0.7
+    sizes['Gnome'] = 0.7
+    sizes['Orc'] = 1.05
+    sizes['Goblin'] = 0.7
+    sizes['Ogre'] = 1.1
+    sizes['Troll'] = 1.4
+    models = {}
+    models['Dark Elf'] = ('elf/elf_female_%i.dts', 'elf/elf_male_%i.dts')
+    models['Elf'] = ('elf/elf_female_%i.dts', 'elf/elf_male_%i.dts')
+    models['Human'] = ('human/human_female_%i.dts', 'human/human_male_%i.dts')
+    models['Titan'] = ('titan/titan_female_%i.dts', 'titan/titan_male_%i.dts')
+    models['Gnome'] = ('gnome/gnome_female_%i.dts', 'gnome/gnome_male_%i.dts')
+    models['Dwarf'] = ('dwarf/dwarf_female_%i.dts', 'dwarf/dwarf_male_%i.dts')
+    models['Halfling'] = ('halfling/halfling_female_%i.dts', 'halfling/halfling_male_%i.dts')
+    models['Orc'] = ('orc/orc_female_%i.dts', 'orc/orc_male_%i.dts')
+    models['Goblin'] = ('goblin/goblin_female_%i.dts', 'goblin/goblin_male_%i.dts')
+    models['Ogre'] = ('ogre/ogre_female_%i.dts', 'ogre/ogre_male_%i.dts')
+    models['Troll'] = ('troll/troll_female_%i.dts', 'troll/troll_male_%i.dts')
+    models['Drakken'] = ('drakken/drakken_female_%i.dts', 'drakken/drakken_male_%i.dts')
+    if sex == 'Female' and race not in ('Dark Elf', 'Elf', 'Human', 'Dwarf', 'Halfling', 'Drakken', 'Ogre', 'Gnome', 'Troll', 'Goblin', 'Titan', 'Orc'):
+        look = 0
+    if sex == 'Female':
+        model = models[race][0] % look
+    else:
+        model = models[race][1] % look
+    size = sizes[race]
+    ftextures = {}
+    ftextures['Dark Elf'] = ('head/head34', 'arms/arms65', 'legs/legs65', 'body/body67', 'feet/feet65', 'hands/hands65')
+    ftextures['Elf'] = ('head/head4', 'arms/arms3', 'legs/legs3', 'body/body4', 'feet/feet3', 'hands/hands3')
+    ftextures['Human'] = ('head/head5', 'arms/arms4', 'legs/legs4', 'body/body5', 'feet/feet4', 'hands/hands4')
+    ftextures['Titan'] = ('head/head39', 'arms/arms71', 'legs/legs72', 'body/body73', 'feet/feet0', 'hands/hands71')
+    ftextures['Gnome'] = ('head/head33', 'arms/arms54', 'legs/legs55', 'body/body56', 'feet/feet55', 'hands/hands55')
+    ftextures['Dwarf'] = ('head/head7', 'arms/arms6', 'legs/legs6', 'body/body7', 'feet/feet6', 'hands/hands6')
+    ftextures['Halfling'] = ('head/head9', 'arms/arms9', 'legs/legs8', 'body/body10', 'feet/feet8', 'hands/hands9')
+    ftextures['Orc'] = ('head/head43', 'arms/arms80', 'legs/legs81', 'body/body82', 'feet/feet78', 'hands/hands80')
+    ftextures['Goblin'] = ('head/head37', 'arms/arms69', 'legs/legs69', 'body/body71', 'feet/feet69', 'hands/hands69')
+    ftextures['Ogre'] = ('head/head32', 'arms/arms53', 'legs/legs54', 'body/body55', 'feet/feet54', 'hands/hands54')
+    ftextures['Troll'] = ('head/head36', 'arms/arms67', 'legs/legs67', 'body/body69', 'feet/feet67', 'hands/hands67')
+    ftextures['Drakken'] = ('head/head12', 'arms/arms16', 'legs/legs17', 'body/body18', 'feet/feet17', 'hands/hands17')
+    mtextures = {}
+    mtextures['Dark Elf'] = ('head/head35', 'arms/arms64', 'legs/legs71', 'body/body66', 'feet/feet65', 'hands/hands65')
+    mtextures['Elf'] = ('head/head3', 'arms/arms2', 'legs/legs2', 'body/body2', 'feet/feet2', 'hands/hands2')
+    mtextures['Human'] = ('head/head1', 'arms/arms0', 'legs/legs0', 'body/body0', 'feet/feet0', 'hands/hands0')
+    mtextures['Titan'] = ('head/head38', 'arms/arms70', 'legs/legs70', 'body/body72', 'feet/feet0', 'hands/hands70')
+    mtextures['Gnome'] = ('head/head29', 'arms/arms32', 'legs/legs33', 'body/body34', 'feet/feet33', 'hands/hands33')
+    mtextures['Dwarf'] = ('head/head6', 'arms/arms5', 'legs/legs5', 'body/body6', 'feet/feet5', 'hands/hands5')
+    mtextures['Halfling'] = ('head/head8', 'arms/arms7', 'legs/legs7', 'body/body8', 'feet/feet7', 'hands/hands7')
+    mtextures['Orc'] = ('head/head42', 'arms/arms79', 'legs/legs80', 'body/body81', 'feet/feet77', 'hands/hands79')
+    mtextures['Goblin'] = ('head/head30', 'arms/arms38', 'legs/legs39', 'body/body40', 'feet/feet39', 'hands/hands39')
+    mtextures['Ogre'] = ('head/head11', 'arms/arms14', 'legs/legs15', 'body/body16', 'feet/feet15', 'hands/hands15')
+    mtextures['Troll'] = ('head/head31', 'arms/arms52', 'legs/legs53', 'body/body54', 'feet/feet53', 'hands/hands53')
+    mtextures['Drakken'] = ('head/head10', 'arms/arms10', 'legs/legs10', 'body/body12', 'feet/feet10', 'hands/hands11')
+    textures = ftextures
+    if sex == 'Male':
+        textures = mtextures
+    tex = textures[race]
+    animations = {}
+    animations['Elf'] = ('humanoidFemale', 'elfmale')
+    animations['Dark Elf'] = ('humanoidFemale', 'elfmale')
+    animations['Human'] = ('humanoidFemale', 'humanoid')
+    animations['Titan'] = ('titanmale', 'titanmale')
+    animations['Gnome'] = ('halflingFemale', 'humanoidshort')
+    animations['Dwarf'] = ('humanoidshort', 'humanoidshort')
+    animations['Halfling'] = ('halflingFemale', 'humanoidshort')
+    animations['Orc'] = ('halflingFemale', 'humanoidshort')
+    animations['Goblin'] = ('halflingFemale', 'humanoidshort')
+    animations['Ogre'] = ('humanoid', 'humanoid')
+    animations['Troll'] = ('trollmale', 'trollmale')
+    animations['Drakken'] = ('drakkenfemale', 'drakken')
+    animation = animations[race][1]
+    if sex == 'Female':
+        animation = animations[race][0]
+    return (size,
+     model,
+     tex,
+     animation)
+
+
+HMOUNT = {}
+HMOUNT[('Drakken', 'Male', 0)] = 1.4
+HMOUNT[('Drakken', 'Male', 1)] = 1.4
+HMOUNT[('Drakken', 'Male', 2)] = 1.45
+HMOUNT[('Drakken', 'Female', 0)] = 1.4
+HMOUNT[('Drakken', 'Female', 1)] = 1.4
+HMOUNT[('Drakken', 'Female', 2)] = 1.45
+HMOUNT[('Halfling', 'Male', 0)] = 1.25
+HMOUNT[('Halfling', 'Male', 1)] = 1.25
+HMOUNT[('Halfling', 'Male', 2)] = 1.3
+HMOUNT[('Halfling', 'Female', 0)] = 1.15
+HMOUNT[('Halfling', 'Female', 1)] = 1.15
+HMOUNT[('Halfling', 'Female', 2)] = 1.2
+HMOUNT[('Human', 'Male', 0)] = 1.0
+HMOUNT[('Human', 'Male', 1)] = 1.1
+HMOUNT[('Human', 'Male', 2)] = 1.1
+HMOUNT[('Human', 'Female', 0)] = 1.1
+HMOUNT[('Human', 'Female', 1)] = 1.1
+HMOUNT[('Human', 'Female', 2)] = 1.1
+HMOUNT[('Titan', 'Male', 0)] = 1.1
+HMOUNT[('Titan', 'Male', 1)] = 1.1
+HMOUNT[('Titan', 'Male', 2)] = 1.1
+HMOUNT[('Titan', 'Female', 0)] = 1.0
+HMOUNT[('Titan', 'Female', 1)] = 1.0
+HMOUNT[('Titan', 'Female', 2)] = 1.0
+HMOUNT[('Dwarf', 'Male', 0)] = 1.2
+HMOUNT[('Dwarf', 'Male', 1)] = 1.3
+HMOUNT[('Dwarf', 'Male', 2)] = 1.3
+HMOUNT[('Dwarf', 'Female', 0)] = 1.2
+HMOUNT[('Dwarf', 'Female', 1)] = 1.3
+HMOUNT[('Dwarf', 'Female', 2)] = 1.3
+HMOUNT[('Elf', 'Male', 0)] = 1.0
+HMOUNT[('Elf', 'Male', 1)] = 1.0
+HMOUNT[('Elf', 'Male', 2)] = 1.0
+HMOUNT[('Elf', 'Female', 0)] = 0.95
+HMOUNT[('Elf', 'Female', 1)] = 1.0
+HMOUNT[('Elf', 'Female', 2)] = 1.0
+HMOUNT[('Gnome', 'Male', 0)] = 1.35
+HMOUNT[('Gnome', 'Male', 1)] = 1.4
+HMOUNT[('Gnome', 'Male', 2)] = 1.4
+HMOUNT[('Gnome', 'Female', 0)] = 1.15
+HMOUNT[('Gnome', 'Female', 1)] = 1.2
+HMOUNT[('Gnome', 'Female', 2)] = 1.2
+HMOUNT[('Dark Elf', 'Male', 0)] = 1.0
+HMOUNT[('Dark Elf', 'Male', 1)] = 1.0
+HMOUNT[('Dark Elf', 'Male', 2)] = 1.0
+HMOUNT[('Dark Elf', 'Female', 0)] = 0.95
+HMOUNT[('Dark Elf', 'Female', 1)] = 1.0
+HMOUNT[('Dark Elf', 'Female', 2)] = 1.0
+HMOUNT[('Orc', 'Male', 0)] = 1.0
+HMOUNT[('Orc', 'Male', 1)] = 1.0
+HMOUNT[('Orc', 'Male', 2)] = 1.0
+HMOUNT[('Orc', 'Female', 0)] = 1.0
+HMOUNT[('Orc', 'Female', 1)] = 1.0
+HMOUNT[('Orc', 'Female', 2)] = 1.0
+HMOUNT[('Goblin', 'Male', 0)] = 1.0
+HMOUNT[('Goblin', 'Male', 1)] = 1.0
+HMOUNT[('Goblin', 'Male', 2)] = 1.0
+HMOUNT[('Goblin', 'Female', 0)] = 0.95
+HMOUNT[('Goblin', 'Female', 1)] = 1.0
+HMOUNT[('Goblin', 'Female', 2)] = 1.0
+HMOUNT[('Ogre', 'Male', 0)] = 1.1
+HMOUNT[('Ogre', 'Male', 1)] = 1.15
+HMOUNT[('Ogre', 'Male', 2)] = 1.25
+HMOUNT[('Ogre', 'Female', 0)] = 1.1
+HMOUNT[('Ogre', 'Female', 1)] = 1.15
+HMOUNT[('Ogre', 'Female', 2)] = 1.25
+HMOUNT[('Troll', 'Male', 0)] = 1.1
+HMOUNT[('Troll', 'Male', 1)] = 1.25
+HMOUNT[('Troll', 'Male', 2)] = 1.35
+HMOUNT[('Troll', 'Female', 0)] = 1.1
+HMOUNT[('Troll', 'Female', 1)] = 1.25
+HMOUNT[('Troll', 'Female', 2)] = 1.3

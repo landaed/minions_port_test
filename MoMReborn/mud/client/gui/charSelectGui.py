@@ -1,0 +1,42 @@
+# Embedded file name: mud\client\gui\charSelectGui.pyo
+from tgenative import *
+from mud.tgepython.console import TGEExport
+BUTTONS = None
+
+def SetFromCharacterInfos(cinfos):
+    global BUTTONS
+    canvas = TGEObject('Canvas')
+    sizeX, sizeY = canvas.extent.split(' ')
+    sizeX = int(sizeX)
+    sizeY = int(sizeY)
+    num = len(cinfos)
+    pixels = 40 * num
+    startX = sizeX / 2 - pixels / 2
+    for x in xrange(0, 6):
+        BUTTONS[x].position = '%i 12' % startX
+        startX += 40
+
+    if num == 1:
+        num = 0
+    for x in xrange(0, num):
+        BUTTONS[x].visible = True
+        BUTTONS[x].setActive('true')
+
+    BUTTONS[0].performClick()
+
+
+def OnCharButton(args):
+    index = int(args[1])
+    from partyWnd import PARTYWND
+    PARTYWND.setFromCharacterInfo(index)
+
+
+def PyExec():
+    global BUTTONS
+    BUTTONS = []
+    for x in xrange(0, 6):
+        BUTTONS.append(TGEObject('PartyWnd_CharButton%i' % x))
+        BUTTONS[x].visible = False
+        BUTTONS[x].setActive('false')
+
+    TGEExport(OnCharButton, 'Py', 'OnCharButton', 'desc', 2, 2)

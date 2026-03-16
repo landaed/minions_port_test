@@ -1,0 +1,260 @@
+//---- 2026-03-15 19:34:55 ----
+Processor Init:
+   Intel (unknown, Pentium Pro/II/III family), ~2.27 Ghz
+     (timed at roughly 2.28 Ghz)
+   FPU detected
+   MMX detected
+   SSE detected
+ 
+Math Init:
+   Installing Standard C extensions
+   Installing Assembly extensions
+   Installing FPU extensions
+   Installing MMX extensions
+   Installing SSE extensions
+ 
+Input Init:
+   keyboard0 input device created.
+   mouse0 input device created.
+   DirectInput enabled.
+
+Loading compiled script ./main.cs.
+--------- Loading MODS ---------
+Loading compiled script minions.of.mirth/main.cs.
+Loading compiled script common/main.cs.
+Loading compiled script common/defaults.cs.
+Loading compiled script minions.of.mirth/client/defaults.cs.
+Loading compiled script minions.of.mirth/server/defaults.cs.
+Missing file: minions.of.mirth/client/prefs.cs!
+Loading compiled script minions.of.mirth/server/prefs.cs.
+Loading compiled script minions.of.mirth/datablocks/init.cs.
+--------- Parsing Arguments ---------
+PyInit
+python 2.7 (r27:82525, Jul  4 2010, 09:01:59) [MSC v.1500 32 bit (Intel)]
+--------- Initializing MOD: Common ---------
+Loading compiled script common/client/canvas.cs.
+Loading compiled script common/client/audio.cs.
+--------- Initializing MOD: FPS Starter Kit ---------
+Loading compiled script minions.of.mirth/client/init.cs.
+Loading compiled script minions.of.mirth/server/init.cs.
+Missing file: minions.of.mirth/data/init.cs!
+--------- Initializing MOD: FPS Starter Kit: Server ---------
+Loading compiled script common/server/audio.cs.
+Loading compiled script common/server/server.cs.
+Loading compiled script common/server/message.cs.
+Loading compiled script common/server/commands.cs.
+Loading compiled script common/server/missionInfo.cs.
+Loading compiled script common/server/missionLoad.cs.
+Loading compiled script common/server/missionDownload.cs.
+Loading compiled script common/server/clientConnection.cs.
+Loading compiled script common/server/kickban.cs.
+Loading compiled script common/server/game.cs.
+Loading compiled script minions.of.mirth/server/scripts/commands.cs.
+Loading compiled script minions.of.mirth/server/scripts/centerPrint.cs.
+Loading compiled script minions.of.mirth/server/scripts/game.cs.
+--------- Initializing MOD: FPS Starter Kit: Client ---------
+Loading compiled script minions.of.mirth/client/ui/customProfiles.cs.
+Loading compiled script common/client/message.cs.
+Loading compiled script common/client/mission.cs.
+Loading compiled script common/client/missionDownload.cs.
+Loading compiled script common/client/actionMap.cs.
+Loading compiled script common/editor/editor.cs.
+Loading compiled script common/editor/particleEditor.cs.
+Loading compiled script common/client/scriptDoc.cs.
+Video Init:
+ Missing OpenGL function 'glDrawRangeElements'
+You are missing some OpenGL functions.  That's bad.
+   OGLTest window
+   color=64 depth=24 acc=1
+available resolutions:
+1920 x 1080 (32)
+640 x 480 (32)
+800 x 600 (32)
+1024 x 768 (32)
+1152 x 864 (32)
+1280 x 600 (32)
+1280 x 720 (32)
+1280 x 768 (32)
+1280 x 800 (32)
+1280 x 960 (32)
+1280 x 1024 (32)
+1360 x 768 (32)
+1366 x 768 (32)
+1400 x 1050 (32)
+1440 x 900 (32)
+1600 x 900 (32)
+1680 x 1050 (32)
+1920 x 1080 (16)
+640 x 480 (16)
+800 x 600 (16)
+1024 x 768 (16)
+1152 x 864 (16)
+1280 x 600 (16)
+1280 x 720 (16)
+1280 x 768 (16)
+1280 x 800 (16)
+1280 x 960 (16)
+1280 x 1024 (16)
+1360 x 768 (16)
+1366 x 768 (16)
+1400 x 1050 (16)
+1440 x 900 (16)
+1600 x 900 (16)
+1680 x 1050 (16)
+   Accelerated OpenGL display device detected.
+Activating the OpenGL display device...
+Activating the OpenGL display device...
+ Missing OpenGL function 'glDrawRangeElements'
+You are missing some OpenGL functions.  That's bad.
+Setting screen mode to 1024x768x32 (w)...
+Creating a new window...
+Acquiring a new device context...
+Pixel format set:
+  32 color bits, 24 depth bits, 8 stencil bits
+Creating a new rendering context...
+Making the new rendering context current...
+OpenGL driver information:
+  Vendor: NVIDIA Corporation
+  Renderer: NVIDIA GeForce RTX 3080 Laptop GPU/PCIe/SSE2
+  Version: 4.6.0 NVIDIA 595.71
+OpenGL Init: Enabled Extensions
+  ARB_multitexture (Max Texture Units: 4)
+  EXT_compiled_vertex_array
+  EXT_texture_env_combine
+  EXT_packed_pixels
+  EXT_fog_coord
+  ARB_texture_compression
+  EXT_texture_compression_s3tc
+  (ARB|EXT)_texture_env_add
+  EXT_texture_filter_anisotropic (Max anisotropy: 16.000000)
+  WGL_EXT_swap_control
+OpenGL Init: Disabled Extensions
+  EXT_paletted_texture
+  NV_vertex_array_range
+Loading compiled script common/ui/defaultProfiles.cs.
+Loading compiled script common/ui/GuiEditorGui.gui.
+Loading compiled script common/ui/ConsoleDlg.gui.
+Loading compiled script common/ui/InspectDlg.gui.
+Loading compiled script common/ui/InspectAddFieldDlg.gui.
+Loading compiled script common/ui/LoadFileDlg.gui.
+Loading compiled script common/ui/SaveFileDlg.gui.
+Loading compiled script common/ui/MessageBoxOkDlg.gui.
+Loading compiled script common/ui/MessageBoxYesNoDlg.gui.
+Loading compiled script common/ui/MessageBoxOKCancelDlg.gui.
+Loading compiled script common/ui/MessagePopupDlg.gui.
+Loading compiled script common/ui/HelpDlg.gui.
+Loading compiled script common/ui/RecordingsDlg.gui.
+Loading compiled script common/ui/NetGraphGui.gui.
+Loading compiled script common/client/metrics.cs.
+Loading compiled script common/ui/FrameOverlayGui.gui.
+Loading compiled script common/client/messageBox.cs.
+Loading compiled script common/client/screenshot.cs.
+Loading compiled script common/client/cursor.cs.
+Loading compiled script common/client/help.cs.
+Loading compiled script common/client/recordings.cs.
+OpenAL Driver Init:
+OpenAL
+   Vendor: Creative Labs Inc.
+   Version: 1.1
+   Renderer: Software
+   Extensions: EAX EAX2.0 EAX3.0 EAX4.0 EAX5.0 EAX3.0EMULATED EAX4.0EMULATED AL_EXT_OFFSET AL_EXT_LINEAR_DISTANCE AL_EXT_EXPONENT_DISTANCE
+Loading compiled script minions.of.mirth/client/scripts/audioProfiles.cs.
+Loading compiled script minions.of.mirth/client/ui/defaultGameProfiles.cs.
+Loading compiled script minions.of.mirth/client/ui/momGameProfiles.cs.
+Loading compiled script minions.of.mirth/client/ui/PlayGui.gui.
+Loading compiled script minions.of.mirth/client/ui/playerList.gui.
+Loading compiled script minions.of.mirth/client/ui/mainMenuGui.gui.
+Loading compiled script minions.of.mirth/client/ui/aboutDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/startMissionGui.gui.
+Loading compiled script minions.of.mirth/client/ui/joinServerGui.gui.
+Loading compiled script minions.of.mirth/client/ui/loadingGui.gui.
+Loading compiled script minions.of.mirth/client/ui/endGameGui.gui.
+Loading compiled script minions.of.mirth/client/ui/optionsDlg.gui.
+local settings database is not found
+Loading compiled script minions.of.mirth/client/ui/remapDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/EULAWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/FadeWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/CreditsWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/NewSinglePlayerWorldDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/multiplayerGui.gui.
+Loading compiled script minions.of.mirth/client/ui/singleplayerGui.gui.
+Loading compiled script minions.of.mirth/client/ui/RegisterDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/MasterLoginDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/MasterGui.gui.
+Loading compiled script minions.of.mirth/client/ui/WorldLoginDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/WorldRegisterDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/NewCharacterGui.gui.
+Loading compiled script minions.of.mirth/client/ui/WorldGui.gui.
+<input> (0): Unable to find function Py::OnRealmFOL
+Loading compiled script minions.of.mirth/client/ui/CraftingWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/SplitStackGui.gui.
+Loading compiled script minions.of.mirth/client/ui/ChatGui.gui.
+Loading compiled script minions.of.mirth/client/ui/GameTextGui.gui.
+Loading compiled script minions.of.mirth/client/ui/TomeGui.gui.
+Loading compiled script minions.of.mirth/client/ui/PartyWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/PetWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/TacticalGui.gui.
+Loading compiled script minions.of.mirth/client/ui/MacroWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/DefaultCommandsWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/CharMiniWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/BuffWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/LootWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/NPCWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/LeaderWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/AllianceWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/TradeWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/InnWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/ItemInfoWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/TrackingWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/GameOptionsWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/CharPortraitWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/PatchInfoWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/MapWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/HelpWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/JournalNewEntryWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/JournalWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/SPGlobalChatGui.gui.
+Loading compiled script minions.of.mirth/client/ui/MacroEditorWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/ChooseIconWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/EncyclopediaWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/EncyclopediaSearchDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/PatcherGui.gui.
+Loading compiled script minions.of.mirth/client/ui/NewMonsterSelection.gui.
+Loading compiled script minions.of.mirth/client/ui/DirectConnectWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/ResurrectionGui.gui.
+Loading compiled script minions.of.mirth/client/ui/VaultWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/lostPasswordDlg.gui.
+Loading compiled script minions.of.mirth/client/ui/FriendsWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/CharRenameWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/CharDeleteWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/TgtDescWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/ItemContainerWnd.gui.
+Loading compiled script minions.of.mirth/client/ui/sgLightEditor.gui.
+Loading compiled script minions.of.mirth/client/ui/sgLightEditorNewDB.gui.
+Loading compiled script minions.of.mirth/client/scripts/client.cs.
+Loading compiled script minions.of.mirth/client/scripts/game.cs.
+Loading compiled script minions.of.mirth/client/scripts/missionDownload.cs.
+Loading compiled script minions.of.mirth/client/scripts/serverConnection.cs.
+Loading compiled script minions.of.mirth/client/scripts/playerList.cs.
+Loading compiled script minions.of.mirth/client/scripts/loadingGui.cs.
+Loading compiled script minions.of.mirth/client/scripts/optionsDlg.cs.
+Loading compiled script minions.of.mirth/client/scripts/playGui.cs.
+Loading compiled script minions.of.mirth/client/scripts/centerPrint.cs.
+Loading compiled script minions.of.mirth/client/scripts/default.bind.cs.
+Missing file: minions.of.mirth/client/config.cs!
+Loading compiled script minions.of.mirth/client/scripts/rpg/mission.cs.
+Binding server port to default IP
+UDP initialized on port 0
+Engine initialized...
+argv=['C:\\Users\\Eli Landa\\Downloads\\MoMReborn\\MoMReborn\\MinionsOfMirth.exe']
+ticking
+shutdown
+Exporting client prefs
+Exporting client config
+Exporting server prefs
+Exporting server prefs...
+PyExit
+Shutting down the OpenGL display device...
+Making the GL rendering context not current...
+Deleting the GL rendering context...
+Releasing the device context...
