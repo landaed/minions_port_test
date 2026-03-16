@@ -190,7 +190,10 @@ class MasterPerspective(pb.Avatar):
         
         for avatar in role.avatars:
             a = Avatar.createAvatar(avatar.name)
-            a.__init__(username,role,mind)
+            if hasattr(a, 'setup'):
+                a.setup(username,role,mind)
+            else:
+                a.__init__(username,role,mind)
             a.realm = realm            
             self.avatars[avatar.name]=a
             a.masterPerspective = self
