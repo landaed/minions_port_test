@@ -503,8 +503,8 @@ class PlayerAvatar(Avatar):
             
     #Get the Character ID from the Auction Server
     def perspective_getCharacterAHID(self):
-	if self.player.world.singlePlayer:
-	    return
+        if self.player.world.singlePlayer:
+            return
         char = self.player.curChar
         if (char.auctionIDN <= 0):
             self.world.AHPerspective.callRemote("AHAvatar","getCharacterAHID", char.name).addCallbacks(self.AHAuctionIDSuccess, self.AHFailure)
@@ -778,7 +778,7 @@ class PlayerAvatar(Avatar):
         if self.player.mailList[mailID].mailItem.item:
             char.giveItemInstance(self.player.mailList[mailID].mailItem.item)
         del self.player.mailList[mailID]
-	if not self.player.world.singlePlayer:
+        if not self.player.world.singlePlayer:
             self.world.MailServerPerspective.callRemote("MailAvatar","deleteMail", mailID)      
         
     #Update the description...attempting to save bandwidth here
@@ -831,9 +831,9 @@ class PlayerAvatar(Avatar):
             self.mind.callRemote("refreshInboxList",toclient)                             
             
     def perspective_refreshInboxList(self,page):
-	#Adds are called directly while offline
-	if self.player.world.singlePlayer:
-	    return
+        #Adds are called directly while offline
+        if self.player.world.singlePlayer:
+            return
         char = self.player.curChar
         d = self.world.MailServerPerspective.callRemote("MailAvatar","refreshInboxList",char.name, self.player.lastMailID)
         d.addCallback(self.refreshInboxSuccess, page)
@@ -883,8 +883,8 @@ class PlayerAvatar(Avatar):
         self.mind.callRemote("clearMailWindow")
         
     def perspective_sendMail(self, mail,protoID, slot):
-	if self.player.world.singlePlayer:
-	    return
+        if self.player.world.singlePlayer:
+            return
         char = self.player.curChar
         sitem = None
         #Make sure the player can cover the tin being sent
@@ -930,8 +930,8 @@ class PlayerAvatar(Avatar):
         d.addCallback(self.finishsendMail,slot,mail.tin,sitem)
         d.addErrback(self.AHFailure)      
         
-    def cleanCharacterMails(self,cname): 
-	if not self.player.world.singlePlayer:
+    def cleanCharacterMails(self,cname):
+        if not self.player.world.singlePlayer:
             self.world.MailServerPerspective.callRemote("MailAvatar","deleteCharacter",cname)
             
             
