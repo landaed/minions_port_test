@@ -437,7 +437,7 @@ class GMConnection(pb.Root):
        
     def connect(self):
         factory = pb.PBClientFactory()
-        reactor.connectTCP(GMSERVERIP,GMSERVERPORT,factory)
+        reactor.connectTCP(GMSERVER_IP,GMSERVER_PORT,factory)
         password = md5(GMSERVER_PASSWORD.encode()).digest()
         factory.login(UsernamePassword("CharacterServer-CharacterServer", password),self).addCallbacks(self.connected, self.failure)
        
