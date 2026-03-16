@@ -336,8 +336,11 @@ class World(Persistent):
             conn = Persistent._connection.getConnection()
             cursor = conn.cursor()
             if self.transaction:
-                cursor.execute("END;")
-            
+                try:
+                    cursor.execute("END;")
+                except Exception:
+                    pass
+
             cursor.close()
             
             self.transaction = False
