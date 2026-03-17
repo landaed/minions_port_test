@@ -144,12 +144,12 @@ class Checker:
                 
             #XXX REMOVE ME AT A LATER TIME, LEGACY non-md5 using CLIENTS!!! 9-10-06
             if not matched:
-                matched = credentials.checkPassword(user.password)
+                matched = credentials.checkPassword(user.password.encode())
 
         else:
-            matched = credentials.checkPassword(user.password)
+            matched = credentials.checkPassword(user.password.encode())
             if not matched:
-                matched = credentials.checkPassword(user.tempPassword)
+                matched = credentials.checkPassword(user.tempPassword.encode())
             
         if not matched:
             return failure.Failure(UnauthorizedError())
