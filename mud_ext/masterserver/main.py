@@ -603,20 +603,21 @@ def ConfigureSettings():
         user = User.byName(CONFIG["World Username"])
     except:
         user = User(name=CONFIG["World Username"], password = "")
-        key = RegKey(key=CONFIG["World Username"]+"!")
-        account = Account(regkey=key.key, publicName=CONFIG["World Username"], email="", password="")
-        account.addProduct("MOM")
         user.addRole(Role.byName("Player"))
         user.addRole(Role.byName("World"))
-        
+
     user.password = CONFIG["World Password"]
+
     try:
         account = Account.byPublicName(user.name)
-        account.password = user.password
     except:
-        key = RegKey(key=user.name+"!")
+        try:
+            key = RegKey.byKey(user.name+"!")
+        except:
+            key = RegKey(key=user.name+"!")
         account = Account(regkey=key.key, publicName=user.name, email=user.name + "@world", password=user.password)
         account.addProduct("MOM")
+    account.password = user.password
     
     cserver = User.byName("CharacterServer")
     cserver.password = CONFIG["Character Server Password"]
