@@ -85,7 +85,7 @@ def main_is_frozen():
 
 #IDE
 def LoadGameConfiguration():
-    global GAMENAME,GAMEROOT,MASTERIP,MASTERPORT
+    global GAMENAME,GAMEROOT,MASTERIP,MASTERPORT,GMSERVER_IP,GMSERVER_PORT
 
     if main_is_frozen():
         from binarygameconfig import GAMECONFIG
