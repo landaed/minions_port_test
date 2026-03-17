@@ -45,6 +45,10 @@ def ConfigureUsers():
     cserver = User(name="CharacterServer",password=CONFIG["Character Server Password"])
     cserver.addRole(Role.byName("CharacterServer"))
 
+    worldUser = User(name="TestWorld",password=CONFIG["World Password"])
+    worldUser.addRole(Role.byName("Player"))
+    worldUser.addRole(Role.byName("World"))
+
 
 def InitTables():
     TABLES = [World,RegKey,Account,Product,Role,User,TablePermission,ColumnPermission,RoleAvatar]
