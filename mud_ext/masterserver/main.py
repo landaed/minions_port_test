@@ -610,8 +610,13 @@ def ConfigureSettings():
         user.addRole(Role.byName("World"))
         
     user.password = CONFIG["World Password"]
-    account = Account.byPublicName(user.name)
-    account.password = user.password
+    try:
+        account = Account.byPublicName(user.name)
+        account.password = user.password
+    except:
+        key = RegKey(key=user.name+"!")
+        account = Account(regkey=key.key, publicName=user.name, email="", password=user.password)
+        account.addProduct("MOM")
     
     cserver = User.byName("CharacterServer")
     cserver.password = CONFIG["Character Server Password"]
