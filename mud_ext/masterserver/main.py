@@ -615,7 +615,7 @@ def ConfigureSettings():
         account.password = user.password
     except:
         key = RegKey(key=user.name+"!")
-        account = Account(regkey=key.key, publicName=user.name, email="", password=user.password)
+        account = Account(regkey=key.key, publicName=user.name, email=user.name + "@world", password=user.password)
         account.addProduct("MOM")
     
     cserver = User.byName("CharacterServer")
