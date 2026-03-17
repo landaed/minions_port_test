@@ -44,7 +44,7 @@ class CharacterAvatar(Avatar):
         self.mind = mind
         CHARSERVER_MIND = mind
         
-        from gmcommands import SetCharServerMind
+        from mud_ext.gmserver.gmcommands import SetCharServerMind
         SetCharServerMind(CHARSERVER_MIND)
 
     def perspective_sayHi(self):
