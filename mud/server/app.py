@@ -138,9 +138,13 @@ class Checker:
             return failure.Failure(UnauthorizedError())
         
         if self.useMD5:
-            matched = credentials.checkPassword(user.password.encode())
+            matched = credentials.checkPassword(md5(user.password.encode()).digest())
             if not matched:
-                matched = credentials.checkPassword(user.tempPassword.encode())
+                matched = credentials.checkPassword(md5(user.tempPassword.encode()).digest())
+
+            #XXX REMOVE ME AT A LATER TIME, LEGACY non-md5 using CLIENTS!!! 9-10-06
+            if not matched:
+                matched = credentials.checkPassword(user.password.encode())
 
         else:
             matched = credentials.checkPassword(user.password.encode())
