@@ -233,15 +233,15 @@ class ProxyProtocol(WebSocketServerProtocol):
             return
         self._do_enum_worlds()
 
-    def _do_enum_worlds(self):
+    def _do_enum_worlds(self, retries_left=3):
         p = self.session.master_perspective
         # callRemote("AvatarName", "methodName", args...)
         # The MasterPerspective dispatches: perspective_EnumWorldsAvatar("enumLiveWorlds", ...)
         d = p.callRemote("EnumWorldsAvatar", "enumLiveWorlds", False, False, False, True)
-        d.addCallback(self._on_worlds_received)
+        d.addCallback(self._on_worlds_received, retries_left)
         d.addErrback(self._on_worlds_failed)
 
-    def _on_worlds_received(self, world_infos):
+    def _on_worlds_received(self, world_infos, retries_left=0):
         worlds = []
         for wi in world_infos:
             worlds.append(
@@ -257,6 +257,10 @@ class ProxyProtocol(WebSocketServerProtocol):
                 }
             )
         print(f"[Proxy] Received {len(worlds)} worlds")
+        if len(worlds) == 0 and retries_left > 0:
+            print(f"[Proxy] No worlds yet, retrying in 10s ({retries_left} retries left)")
+            reactor.callLater(10, self._do_enum_worlds, retries_left - 1)
+            return
         self.session.send({"type": "world_list", "worlds": worlds})
 
     def _on_worlds_failed(self, reason):
