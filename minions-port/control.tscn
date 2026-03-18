@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bkexmkng0mc08" path="res://control.gd" id="1_0fbet"]
 
-[node name="Control" type="Control" unique_id=639929226]
+[node name="Control" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,19 +11,63 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_0fbet")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=197220240]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="LineEdit" type="LineEdit" parent="VBoxContainer" unique_id=1970371636]
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Minions of Mirth"
+horizontal_alignment = 1
+
+[node name="UsernameField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Username"
+
+[node name="PasswordField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Password"
+secret = true
+
+[node name="EmailField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "Email (for registration only)"
+
+[node name="LoginButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Login"
+
+[node name="RegisterButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Register"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 layout_mode = 2
 
-[node name="LineEdit2" type="LineEdit" parent="VBoxContainer" unique_id=1927251435]
+[node name="WorldList" type="ItemList" parent="VBoxContainer"]
 layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
 
-[node name="Button" type="Button" parent="VBoxContainer" unique_id=795790198]
+[node name="JoinWorldButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+text = "Join World"
 
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=940518339]
+[node name="StatusLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
+text = "Connecting..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/RegisterButton" to="." method="_on_register_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/JoinWorldButton" to="." method="_on_join_world_button_pressed"]
