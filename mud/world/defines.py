@@ -8,7 +8,7 @@
 #  @{
 
 # If set to True the password will be sent by email only when registrating.
-RPG_SECURE_REGISTRATION = True
+RPG_SECURE_REGISTRATION = False
 
 RPG_BUILD_DEMO = False
 RPG_BUILD_LIVE = False
