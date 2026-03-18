@@ -49,8 +49,8 @@ func _send(msg: Dictionary):
 # --- Button handlers ---
 
 func _on_login_button_pressed():
-	var user := username_field.text.strip_edges()
-	var pw := password_field.text.strip_edges()
+	var user = username_field.text.strip_edges()
+	var pw = password_field.text.strip_edges()
 	if user.is_empty() or pw.is_empty():
 		status_label.text = "Enter username and password."
 		return
@@ -58,8 +58,8 @@ func _on_login_button_pressed():
 	_send({"type": "login", "username": user, "password": pw})
 
 func _on_register_button_pressed():
-	var user := username_field.text.strip_edges()
-	var email := email_field.text.strip_edges()
+	var user = username_field.text.strip_edges()
+	var email = email_field.text.strip_edges()
 	if user.is_empty() or email.is_empty():
 		status_label.text = "Enter username and email to register."
 		return
@@ -67,7 +67,7 @@ func _on_register_button_pressed():
 	_send({"type": "register", "username": user, "email": email})
 
 func _on_join_world_button_pressed():
-	var selected_items := world_list.get_selected_items()
+	var selected_items = world_list.get_selected_items()
 	if selected_items.is_empty():
 		status_label.text = "Select a world first."
 		return
