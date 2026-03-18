@@ -165,26 +165,19 @@ class ProxyProtocol(WebSocketServerProtocol):
         factory = pb.PBClientFactory()
         reactor.connectTCP(MASTERIP, MASTERPORT, factory)
 
-        # Registration uses empty password with "EnumWorlds-Registration" identity
-        # Actually, looking at the code, registration is done via RegistrationAvatar
-        # which is accessed through a Player login. Let's connect with a temp identity.
-        # The original client connects as the user, then calls RegistrationAvatar.submitKey
-        # But for new registration, we need to use a generic approach.
-        # Looking at the original code more carefully:
-        # The registration perspective is accessed without being logged in first -
-        # it uses a special registration flow.
-
-        # For simplicity, we'll handle registration by directly calling the server
-        # We need a "Registration" role connection
-        hashed_pw = md5(b"").digest()
-        cred = UsernamePassword("EnumWorlds-Registration", hashed_pw)
+        # The original client connects as "Registration-Registration" with
+        # md5(b"Registration") as the password (see registerDlg.py line 132-134)
+        hashed_pw = md5(b"Registration").digest()
+        cred = UsernamePassword("Registration-Registration", hashed_pw)
 
         d = factory.login(cred, pb.Root())
         d.addCallback(self._on_reg_connected, email, username)
         d.addErrback(self._on_reg_failed)
 
     def _on_reg_connected(self, perspective, email, username):
-        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username)
+        # submitKey(regkey, email, publicName, fromProduct)
+        # regkey is unused (generated server-side), fromProduct="MOM" grants premium
+        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username, "MOM")
         d.addCallback(self._on_reg_result, perspective)
         d.addErrback(self._on_reg_failed)
 
