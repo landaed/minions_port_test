@@ -510,10 +510,11 @@ class EnumWorldsAvatar(Avatar):
         
         
         winfos = []
+        # Expire cached SQLObject instances to force fresh DB reads
         worlds = list(World.select())
         for w in worlds:
-            w.sync()  # force fresh read from DB
-            print("####Checking World: " + str(w.name))
+            w.expire()
+            print("####Checking World: " + str(w.name) + " announceTime:" + str(w.announceTime))
             #if not w.verified:
                 #world is not verfied, not valid until verified
             #    continue
