@@ -617,6 +617,7 @@ def ConfigureSettings():
         user.addRole(Role.byName("World"))
         #fix me, this shouldn't really be here... and allowGuests is used for testing worlds
         World(name="Premium MMORPG", announcePort=int(CONFIG["Default World Port"]), account=account, allowGuests=True,maxLivePlayers=-1,maxLiveZones=-1,demoWorld = False)
+        World(name="TestDaemon", announcePort=int(CONFIG["Default World Port"]), account=account, allowGuests=True,maxLivePlayers=-1,maxLiveZones=-1,demoWorld = False)
 
         
     user.password = CONFIG["World Password"]
