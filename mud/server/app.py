@@ -216,6 +216,7 @@ class MasterPerspective(pb.Avatar):
     
     
     def perspective_call(self,*args):
+        print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
         if THESERVER.throttleUsage and self.throttle:
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]
@@ -223,21 +224,23 @@ class MasterPerspective(pb.Avatar):
                 dc.append((d,args))
                 #print "Throttling",args
                 return d
-            
+
         tm = sysTime()
         function = args[0]
         interface = self._interface
         try:
             avatar=self.avatars[interface]
         except KeyError:
-            try: 
+            try:
                 interface = interface + "Avatar"
                 avatar=self.avatars[interface]
             except:
+                print(f"####perspective_call: NoAvatarError for interface={interface}, available={list(self.avatars.keys())}")
                 return failure.Failure(NoAvatarError())
-            
+
         function = "perspective_"+function
         if not hasattr(avatar,function):
+            print(f"####perspective_call: NoFunctionError for {function} on {avatar.__class__.__name__}")
             return failure.Failure(NoFunctionError())
             
             
