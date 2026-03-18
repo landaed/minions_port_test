@@ -121,6 +121,8 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         self.session.username = username
 
+        print(f"[Proxy] Login attempt: username='{username}', password='{password}' (len={len(password)})")
+
         factory = pb.PBClientFactory()
         reactor.connectTCP(MASTERIP, MASTERPORT, factory)
 
@@ -188,13 +190,23 @@ class ProxyProtocol(WebSocketServerProtocol):
         except Exception:
             pass
 
+        print(f"[Proxy] Registration result: {result}")
+
+        if not isinstance(result, (tuple, list)):
+            self.session.send(
+                {"type": "register_result", "success": False, "message": f"Unexpected result: {result}"}
+            )
+            return
+
         if result[0] == 0:
+            password = result[2] if len(result) > 2 else ""
+            print(f"[Proxy] Registration successful! Password: '{password}'")
             self.session.send(
                 {
                     "type": "register_result",
                     "success": True,
                     "message": result[1],
-                    "password": result[2] if len(result) > 2 else "",
+                    "password": password,
                 }
             )
         else:
