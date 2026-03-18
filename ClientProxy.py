@@ -26,6 +26,8 @@ from autobahn.twisted.websocket import (
 from hashlib import md5
 
 # Load game config to get master server IP/port
+from mud.gamesettings import LoadGameConfiguration
+LoadGameConfiguration()
 from mud.gamesettings import MASTERIP, MASTERPORT
 
 # We need WorldInfo to be unjelly-able (deserializable) by PB

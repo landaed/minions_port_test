@@ -23,7 +23,7 @@ SERVERS=(
     ["2-GMServer"]="${ACTIVATE}python3 GMServer.py gameconfig=mom.cfg"
     ["3-CharacterServer"]="${ACTIVATE}python3 CharacterServer.py gameconfig=mom.cfg"
     ["4-WorldDaemon"]="${ACTIVATE}python3 WorldDaemon.py gameconfig=mom.cfg -worldname=TestDaemon -publicname=TestWorld -password=mmo"
-    ["5-ClientProxy"]="${ACTIVATE}python3 ClientProxy.py"
+    ["5-ClientProxy"]="${ACTIVATE}python3 ClientProxy.py gameconfig=mom.cfg"
 )
 
 # Find a terminal emulator
