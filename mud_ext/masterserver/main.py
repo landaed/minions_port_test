@@ -348,9 +348,12 @@ class RegistrationAvatar(Avatar):
             account.addProduct("MOM")
             
         if not USE_WX:
-            from newplayeremail import NewPlayerEmail
-            import _thread
-            _thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
+            try:
+                from mud_ext.masterserver.newplayeremail import NewPlayerEmail
+                import _thread
+                _thread.start_new(NewPlayerEmail, (emailaddress, publicName, password, regkey, fromProduct))
+            except Exception:
+                print("Warning: Could not send registration email (newplayeremail not configured)")
         
         if RPG_SECURE_REGISTRATION:
             return(0, "Your password has been emailed to you. Please look into your mailbox and use your username and password to login.\n\nThank you for registering.", "", regkey)
@@ -359,7 +362,7 @@ class RegistrationAvatar(Avatar):
 
     def perspective_requestPassword(self, publicname, email):
         # TODO: should have some logging here that can be linked to fail2ban
-        from newplayeremail import LostPasswordEmail
+        from mud_ext.masterserver.newplayeremail import LostPasswordEmail
         
         try:
             a = Account.byPublicName(publicname)
