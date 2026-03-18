@@ -621,7 +621,15 @@ def ConfigureSettings():
         account = Account(regkey=key.key, publicName=user.name, email=user.name + "@world", password=user.password)
         account.addProduct("MOM")
     account.password = user.password
-    
+
+    # Ensure default world records exist for local dev
+    try:
+        World.byName("TestDaemon")
+    except:
+        World(name="TestDaemon", announcePort=int(CONFIG["Default World Port"]),
+              account=account, allowGuests=True, maxLivePlayers=-1,
+              maxLiveZones=-1, demoWorld=False)
+
     cserver = User.byName("CharacterServer")
     cserver.password = CONFIG["Character Server Password"]
 
