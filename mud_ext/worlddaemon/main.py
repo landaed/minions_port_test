@@ -56,6 +56,7 @@ except ImportError:
 
 
 ANNOUNCECALLBACK = None
+_SPAWN_START_TIME = None
 
 #the first cluster is the announce server, where players will initially connect and should probably be low cpu usage
 
@@ -146,6 +147,16 @@ def Tick():
                 if not z.live:
                     break
             else:
+                SPAWNED = False
+                AnnounceWorld()
+
+        # Fallback: announce after 30s even if zones aren't live (stub engine)
+        if ANNOUNCECALLBACK is None and _SPAWN_START_TIME and sysTime() - _SPAWN_START_TIME > 30:
+            if 0 in ZoneClusterAvatar.avatars:
+                avatar = ZoneClusterAvatar.avatars[0]
+                if avatar.worldPort == -1:
+                    avatar.worldPort = WORLDPORT
+                print("####Fallback: Announcing world (zones not fully live after 30s)")
                 SPAWNED = False
                 AnnounceWorld()
     
@@ -271,8 +282,9 @@ def ZoneClusterSpawned(cluster=None):
     
 
 def SpawnWorld():
-    global SPAWNED
+    global SPAWNED, _SPAWN_START_TIME
     SPAWNED = True
+    _SPAWN_START_TIME = sysTime()
     
     print("Spawning World Zone Clusters")
     ZoneClusterAvatar.clusterCount = len(CLUSTERNAMES)
@@ -285,15 +297,18 @@ def SpawnWorld():
         
 #announce stuff
 def AnnounceSuccess(result,perspective):
+    print("####Announce success:", result)
     perspective.broker.transport.loseConnection()
 
 def AnnounceConnected(perspective):
     #we'll always connect on zone cluster 0 first
     wname = WORLDNAME.replace("_"," ")
-    perspective.callRemote("WorldAvatar","announceWorld",wname,ZoneClusterAvatar.avatars[0].worldPort,False,[],(ZoneClusterAvatar.numPlayers,1024)).addCallbacks(AnnounceSuccess,AnnounceFailure,(perspective,))
-    
+    port = ZoneClusterAvatar.avatars[0].worldPort
+    print("####AnnounceConnected: announcing %s on port %s" % (wname, port))
+    perspective.callRemote("WorldAvatar","announceWorld",wname,port,False,[],(ZoneClusterAvatar.numPlayers,1024)).addCallbacks(AnnounceSuccess,AnnounceFailure,(perspective,))
+
 def AnnounceFailure(error):
-    print("ANNOUNCE FAILURE!!!!!",error)
+    print("####ANNOUNCE FAILURE!!!!!",error)
 
 def AnnounceWorld():
     global ANNOUNCECALLBACK
