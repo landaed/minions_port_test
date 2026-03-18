@@ -522,7 +522,7 @@ class AhMaster():
         reactor.connectTCP(MAILSERVER_IP,MAILSERVER_PORT,factory)
         password = md5(b"MSP").digest()
         
-        factory.login(UsernamePassword("MSP-MSP", password),pb.Root()).addCallbacks(self.MSConnected, self.MSFailure)
+        factory.login(UsernamePassword("MSP-MSP", password),pb.Referenceable()).addCallbacks(self.MSConnected, self.MSFailure)
   
     #Close databases, rather important when the world daemon reboots
     def logout(self):

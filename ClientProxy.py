@@ -129,7 +129,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         hashed_pw = md5(password.encode()).digest()
         cred = UsernamePassword(f"{username}-Player", hashed_pw)
 
-        d = factory.login(cred, pb.Root())
+        d = factory.login(cred, pb.Referenceable())
         d.addCallback(self._on_master_connected)
         d.addErrback(self._on_master_failed)
 
@@ -172,7 +172,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         hashed_pw = md5(b"Registration").digest()
         cred = UsernamePassword("Registration-Registration", hashed_pw)
 
-        d = factory.login(cred, pb.Root())
+        d = factory.login(cred, pb.Referenceable())
         d.addCallback(self._on_reg_connected, email, username)
         d.addErrback(self._on_reg_failed)
 
@@ -337,7 +337,7 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         hashed_pw = md5(b"").digest()
         cred = UsernamePassword("NewPlayer-NewPlayer", hashed_pw)
-        d = factory.login(cred, pb.Root())
+        d = factory.login(cred, pb.Referenceable())
         d.addCallback(self._on_world_connected, world_name)
         d.addErrback(self._on_world_connect_failed)
 
@@ -376,7 +376,7 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         hashed_pw = md5(b"").digest()
         cred = UsernamePassword("NewPlayer-NewPlayer", hashed_pw)
-        d = factory.login(cred, pb.Root())
+        d = factory.login(cred, pb.Referenceable())
         d.addCallback(self._on_world_connected, world_name)
         d.addErrback(self._on_world_connect_failed)
 
