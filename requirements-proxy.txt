@@ -1,0 +1,3 @@
+# Additional dependency for the ClientProxy WebSocket bridge
+# Install in your existing venv: pip install autobahn
+autobahn[twisted]
