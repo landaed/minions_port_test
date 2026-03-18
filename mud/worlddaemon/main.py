@@ -302,9 +302,9 @@ def AnnounceWorld():
     
     factory = pb.PBClientFactory()
     reactor.connectTCP(MASTERIP,MASTERPORT,factory)
-    #the pb.Root() is a bit of a hack, I don't know how to get host address on server without
+    #the pb.Referenceable() is a bit of a hack, I don't know how to get host address on server without
     #sending it, and I don't want to take the time to figure it out at the moment
-    factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(AnnounceConnected, AnnounceFailure)
+    factory.login(UsernamePassword(username, password),pb.Referenceable()).addCallbacks(AnnounceConnected, AnnounceFailure)
 
 def ImpConnected(imp):
     print("Imp %i connected... spawning world"%imp.id)

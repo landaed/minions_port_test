@@ -370,10 +370,10 @@ try:
 
         factory = pb.PBClientFactory()
         reactor.connectTCP(MASTERIP,MASTERPORT,factory)
-        #the pb.Root() is a bit of a hack, I don't know how to get host address on server without
+        #the pb.Referenceable() is a bit of a hack, I don't know how to get host address on server without
         #sending it, and I don't want to take the time to figure it out at the moment
         password = md5(password.encode()).digest()
-        factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(AnnounceConnected, AnnounceFailure)
+        factory.login(UsernamePassword(username, password),pb.Referenceable()).addCallbacks(AnnounceConnected, AnnounceFailure)
 
     #XXX Fix this, there must be a way to get the WAN address?
     import re
@@ -640,7 +640,7 @@ try:
         reactor.connectTCP(AHSERVER_IP,AHSERVER_PORT,factory)
         password = md5(b"AH").digest()
         
-        factory.login(UsernamePassword("AH-AH", password),pb.Root()).addCallbacks(AHConnected, AHFailure)
+        factory.login(UsernamePassword("AH-AH", password),pb.Referenceable()).addCallbacks(AHConnected, AHFailure)
         
     def MSConnected(perspective):
         world = World.byName("TheWorld")
@@ -655,7 +655,7 @@ try:
         reactor.connectTCP(MAILSERVER_IP,MAILSERVER_PORT,factory)
         password = md5(b"MS").digest()
         
-        factory.login(UsernamePassword("MS-MS", password),pb.Root()).addCallbacks(MSConnected, MSFailure)        
+        factory.login(UsernamePassword("MS-MS", password),pb.Referenceable()).addCallbacks(MSConnected, MSFailure)        
 
     def ConnectToDaemon():
         print("Connecting to World Deamon at: %s"%DAEMONIP)
@@ -681,6 +681,16 @@ try:
         perspective.broker.transport.loseConnection()
         if len(STATICZONES):
             SpawnZones()
+            # Fallback: if zones don't come live (stub engine), connect to daemon after 35s
+            def _fallback_connect_daemon():
+                if ZONECOUNT != -1:  # zones never all came live
+                    print("####Fallback: Connecting to daemon (zones not fully live after 35s)")
+                    if CoreSettings.PGSERVER:
+                        ConnectToDaemon()
+                    else:
+                        THESERVER.allowConnections = True
+                        AnnounceWorld()
+            reactor.callLater(35, _fallback_connect_daemon)
         else:
             if not CoreSettings.PGSERVER:
                 THESERVER.allowConnections = True
@@ -701,7 +711,7 @@ try:
 
             factory = pb.PBClientFactory()
             reactor.connectTCP(MASTERIP,MASTERPORT,factory)
-            factory.login(UsernamePassword(username, password),pb.Root()).addCallbacks(LaunchWorldConnected, AnnounceFailure)
+            factory.login(UsernamePassword(username, password),pb.Referenceable()).addCallbacks(LaunchWorldConnected, AnnounceFailure)
         else:
             world = World.byName("TheWorld")
             ip = get_IP()
