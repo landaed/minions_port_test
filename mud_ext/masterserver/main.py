@@ -512,6 +512,7 @@ class EnumWorldsAvatar(Avatar):
         winfos = []
         worlds = list(World.select())
         for w in worlds:
+            w.sync()  # force fresh read from DB
             print("####Checking World: " + str(w.name))
             #if not w.verified:
                 #world is not verfied, not valid until verified
