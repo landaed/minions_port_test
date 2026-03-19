@@ -400,7 +400,12 @@ class ProxyProtocol(WebSocketServerProtocol):
         self.session.player_mind = None
         self.session.world_account_ready = False
         self.session.cached_characters = []
-        self.session.current_world = {"name": world_name, "ip": ip, "port": int(port)}
+        self.session.current_world = {
+            "name": world_name,
+            "ip": ip,
+            "port": int(port),
+            "has_password": bool(msg.get("has_password", False)),
+        }
 
         factory = pb.PBClientFactory()
         reactor.connectTCP(ip, int(port), factory)
@@ -441,7 +446,17 @@ class ProxyProtocol(WebSocketServerProtocol):
             return
 
         fantasy_name = msg.get("fantasy_name", "").strip().capitalize()
-        player_password = msg.get("player_password", "")
+        player_password = msg.get("player_password", "").strip()
+
+        if self.session.current_world.get("has_password") and not player_password:
+            self.session.send(
+                {
+                    "type": "world_account_result",
+                    "success": False,
+                    "message": "This world requires its shared access password before a world account can be created.",
+                }
+            )
+            return
 
         if len(fantasy_name) < 4 or not fantasy_name.isalpha():
             self.session.send(
@@ -692,7 +707,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         ip = msg.get("ip", "127.0.0.1")
         port = int(msg.get("port", 2006))
         world_name = msg.get("world_name", "DirectConnection")
-        self._direct_connect_to_world({"ip": ip, "port": port, "world_name": world_name})
+        self._direct_connect_to_world({"ip": ip, "port": port, "world_name": world_name, "has_password": bool(msg.get("has_password", False))})
 
 
 def main():

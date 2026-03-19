@@ -74,6 +74,12 @@ layout_mode = 2
 placeholder_text = "World avatar / fantasy name"
 visible = false
 
+[node name="WorldAccessPasswordField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "World access password (server PLAYERPASSWORD, e.g. mmo)"
+secret = true
+visible = false
+
 [node name="CreateWorldAccountButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Create World Account"

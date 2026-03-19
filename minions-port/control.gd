@@ -13,6 +13,7 @@ var connected := false
 @onready var join_button := $VBoxContainer/JoinWorldButton
 @onready var world_password_field := $VBoxContainer/WorldPasswordField
 @onready var fantasy_name_field := $VBoxContainer/FantasyNameField
+@onready var world_access_password_field := $VBoxContainer/WorldAccessPasswordField
 @onready var create_world_account_button := $VBoxContainer/CreateWorldAccountButton
 @onready var login_world_button := $VBoxContainer/LoginWorldButton
 @onready var character_list := $VBoxContainer/CharacterList
@@ -72,6 +73,7 @@ func _send(msg: Dictionary):
 func _set_world_ui_visible(visible: bool):
 	world_password_field.visible = visible
 	fantasy_name_field.visible = visible
+	world_access_password_field.visible = visible and bool(selected_world.get("has_password", false))
 	create_world_account_button.visible = visible
 	login_world_button.visible = visible
 
@@ -126,16 +128,21 @@ func _on_join_world_button_pressed():
 		"world_name": selected_world.get("name", ""),
 		"ip": selected_world.get("ip", ""),
 		"port": selected_world.get("port", 0),
+		"has_password": selected_world.get("has_password", false),
 	})
 
 func _on_create_world_account_button_pressed():
 	var fantasy_name = fantasy_name_field.text.strip_edges()
+	var access_pw = world_access_password_field.text.strip_edges()
+	if bool(selected_world.get("has_password", false)) and access_pw.is_empty():
+		status_label.text = "This world requires its shared access password before a world account can be created. For your setup that should likely be the world server PLAYERPASSWORD (for example, mmo)."
+		return
 	create_world_account_button.disabled = true
 	status_label.text = "Creating world account... this creates a world-specific password, separate from master login."
 	_send({
 		"type": "create_world_account",
 		"fantasy_name": fantasy_name,
-		"player_password": "",
+		"player_password": access_pw,
 	})
 
 func _on_login_world_button_pressed():
@@ -208,10 +215,14 @@ func handle_response(data: Dictionary):
 				_set_character_ui_visible(false)
 				create_world_account_button.disabled = false
 				login_world_button.disabled = false
+				world_access_password_field.visible = bool(selected_world.get("has_password", false))
 				if data.get("has_world_account", false):
 					status_label.text = "World account found. Trying to recover its saved world password from master..."
 				else:
-					status_label.text = "No world account yet. Create one; it will get its own password separate from master login."
+					if bool(selected_world.get("has_password", false)):
+						status_label.text = "No world account yet. First enter the world access password (for this setup likely mmo), then create the world account."
+					else:
+						status_label.text = "No world account yet. Create one; it will get its own password separate from master login."
 			else:
 				status_label.text = "World error: " + data.get("message", "")
 
@@ -232,7 +243,7 @@ func handle_response(data: Dictionary):
 				var world_pw: String = data.get("world_password", "")
 				if not world_pw.is_empty():
 					world_password_field.text = world_pw
-				status_label.text = "World account created. Use the auto-filled world password; it is separate from the master password."
+				status_label.text = "World account created. Use the auto-filled world-account password to log in; it is separate from both the master password and any shared world access password."
 			else:
 				status_label.text = "World account failed: " + data.get("message", "")
 
