@@ -62,6 +62,60 @@ custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 text = "Join World"
 
+
+[node name="WorldPasswordField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "World password"
+secret = true
+visible = false
+
+[node name="FantasyNameField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "World avatar / fantasy name"
+visible = false
+
+[node name="CreateWorldAccountButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Create World Account"
+visible = false
+
+[node name="LoginWorldButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Login To World"
+visible = false
+
+[node name="CharacterList" type="ItemList" parent="VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 150)
+visible = false
+
+[node name="CharacterNameField" type="LineEdit" parent="VBoxContainer"]
+layout_mode = 2
+placeholder_text = "New character name"
+visible = false
+
+[node name="RaceOption" type="OptionButton" parent="VBoxContainer"]
+layout_mode = 2
+visible = false
+
+[node name="ClassOption" type="OptionButton" parent="VBoxContainer"]
+layout_mode = 2
+visible = false
+
+[node name="SexOption" type="OptionButton" parent="VBoxContainer"]
+layout_mode = 2
+visible = false
+
+[node name="CreateCharacterButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Create Character"
+visible = false
+
+[node name="EnterWorldButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Enter World"
+visible = false
+
 [node name="StatusLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "Connecting..."
@@ -71,3 +125,8 @@ autowrap_mode = 2
 [connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/RegisterButton" to="." method="_on_register_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/JoinWorldButton" to="." method="_on_join_world_button_pressed"]
+
+[connection signal="pressed" from="VBoxContainer/CreateWorldAccountButton" to="." method="_on_create_world_account_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/LoginWorldButton" to="." method="_on_login_world_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/EnterWorldButton" to="." method="_on_enter_world_button_pressed"]
