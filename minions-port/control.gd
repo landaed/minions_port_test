@@ -106,9 +106,9 @@ func _on_register_button_pressed():
 	var user = username_field.text.strip_edges()
 	var email = email_field.text.strip_edges()
 	if user.is_empty() or email.is_empty():
-		status_label.text = "Enter username and email to register."
+		status_label.text = "Enter username and email to register. Registration ignores the login password box and the server assigns one."
 		return
-	status_label.text = "Registering..."
+	status_label.text = "Registering... the server will assign your master-account password."
 	_send({"type": "register", "username": user, "email": email})
 
 func _on_join_world_button_pressed():
@@ -130,7 +130,8 @@ func _on_join_world_button_pressed():
 
 func _on_create_world_account_button_pressed():
 	var fantasy_name = fantasy_name_field.text.strip_edges()
-	status_label.text = "Creating world account..."
+	create_world_account_button.disabled = true
+	status_label.text = "Creating world account... this creates a world-specific password, separate from master login."
 	_send({
 		"type": "create_world_account",
 		"fantasy_name": fantasy_name,
@@ -139,15 +140,19 @@ func _on_create_world_account_button_pressed():
 
 func _on_login_world_button_pressed():
 	var world_pw = world_password_field.text.strip_edges()
+	login_world_button.disabled = true
 	if world_pw.is_empty():
-		status_label.text = "Enter the world password first."
+		login_world_button.disabled = false
+		status_label.text = "Enter the world password first. This is separate from the master account password."
 		return
 	status_label.text = "Logging into world..."
 	_send({"type": "world_login", "world_password": world_pw, "role": "Player"})
 
 func _on_create_character_button_pressed():
+	create_character_button.disabled = true
 	var char_name = character_name_field.text.strip_edges()
 	if char_name.is_empty():
+		create_character_button.disabled = false
 		status_label.text = "Enter a character name first."
 		return
 	status_label.text = "Creating character..."
@@ -162,8 +167,10 @@ func _on_create_character_button_pressed():
 	})
 
 func _on_enter_world_button_pressed():
+	enter_world_button.disabled = true
 	var selected_name := _selected_character_name()
 	if selected_name.is_empty():
+		enter_world_button.disabled = false
 		status_label.text = "Select a character first."
 		return
 	status_label.text = "Sending enter-world request for %s..." % selected_name
@@ -184,9 +191,9 @@ func handle_response(data: Dictionary):
 			if data.get("success", false):
 				var pw: String = data.get("password", "")
 				if pw.is_empty():
-					status_label.text = "Registered! Check email for password."
+					status_label.text = "Registered! Check email for the master-account password."
 				else:
-					status_label.text = "Registered! Password: " + pw
+					status_label.text = "Registered! Master-account password assigned by server: " + pw
 					password_field.text = pw
 			else:
 				status_label.text = "Register failed: " + data.get("message", "")
@@ -199,23 +206,38 @@ func handle_response(data: Dictionary):
 			if data.get("success", false):
 				_set_world_ui_visible(true)
 				_set_character_ui_visible(false)
+				create_world_account_button.disabled = false
+				login_world_button.disabled = false
 				if data.get("has_world_account", false):
-					status_label.text = "World account found. Enter world password."
+					status_label.text = "World account found. Trying to recover its saved world password from master..."
 				else:
-					status_label.text = "No world account yet. Create one, then log in."
+					status_label.text = "No world account yet. Create one; it will get its own password separate from master login."
 			else:
 				status_label.text = "World error: " + data.get("message", "")
 
+
+		"world_password_result":
+			login_world_button.disabled = false
+			if data.get("success", false):
+				var recovered_pw: String = data.get("world_password", "")
+				if not recovered_pw.is_empty():
+					world_password_field.text = recovered_pw
+				status_label.text = "Recovered world password from master. You can now log into the world."
+			else:
+				status_label.text = "Could not recover world password automatically: " + data.get("message", "")
+
 		"world_account_result":
+			create_world_account_button.disabled = false
 			if data.get("success", false):
 				var world_pw: String = data.get("world_password", "")
 				if not world_pw.is_empty():
 					world_password_field.text = world_pw
-				status_label.text = "World account created. Now log into the world."
+				status_label.text = "World account created. Use the auto-filled world password; it is separate from the master password."
 			else:
 				status_label.text = "World account failed: " + data.get("message", "")
 
 		"player_login_result":
+			login_world_button.disabled = false
 			if data.get("success", false):
 				status_label.text = "World login ok. Loading characters..."
 				_set_character_ui_visible(true)
@@ -227,6 +249,7 @@ func handle_response(data: Dictionary):
 			_populate_character_list()
 
 		"create_character_result":
+			create_character_button.disabled = false
 			if data.get("success", false):
 				status_label.text = "Character created: " + data.get("name", "")
 				character_name_field.text = ""
@@ -234,6 +257,7 @@ func handle_response(data: Dictionary):
 				status_label.text = "Create character failed: " + data.get("message", "")
 
 		"enter_world_result":
+			enter_world_button.disabled = false
 			if data.get("success", false):
 				status_label.text = data.get("message", "Enter-world request sent.")
 			else:
@@ -247,6 +271,10 @@ func handle_response(data: Dictionary):
 			pass
 
 		"error":
+			create_world_account_button.disabled = false
+			login_world_button.disabled = false
+			create_character_button.disabled = false
+			enter_world_button.disabled = false
 			status_label.text = "Error: " + data.get("message", "")
 
 func _populate_world_list():

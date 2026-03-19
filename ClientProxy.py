@@ -75,6 +75,7 @@ class GodotClientSession:
         self.world_account_ready = False
         self.current_world = None
         self.cached_characters = []
+        self.world_password = ""
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
@@ -419,7 +420,8 @@ class ProxyProtocol(WebSocketServerProtocol):
 
     def _on_query_player_result(self, has_account, world_name):
         self.session.world_account_ready = bool(has_account)
-        message = "Existing world account found. Enter world password to continue." if has_account else "No world account yet. Create one to continue."
+        print(f"[Proxy] World account exists for {self.session.username} on {world_name}: {bool(has_account)}")
+        message = "Existing world account found. Retrieving saved world password from Master Server..." if has_account else "No world account yet. Create one to continue."
         self.session.send(
             {
                 "type": "world_connected",
@@ -429,6 +431,8 @@ class ProxyProtocol(WebSocketServerProtocol):
                 "message": message,
             }
         )
+        if has_account and self.session.master_perspective:
+            self._request_world_password(world_name)
 
     def handle_create_world_account(self, msg):
         perspective = self.session.new_world_perspective
@@ -453,6 +457,43 @@ class ProxyProtocol(WebSocketServerProtocol):
         d.addCallback(self._on_create_world_account_result, fantasy_name)
         d.addErrback(self._on_world_connect_failed)
 
+    def _request_world_password(self, world_name):
+        d = self.session.master_perspective.callRemote("EnumWorldsAvatar", "requestWorldPassword", world_name)
+        d.addCallback(self._on_world_password_result, world_name)
+        d.addErrback(self._on_world_password_failed, world_name)
+
+    def _on_world_password_result(self, result, world_name):
+        print(f"[Proxy] World password lookup for {world_name}: {result}")
+        if not isinstance(result, (tuple, list)) or len(result) < 2:
+            self.session.send({
+                "type": "world_password_result",
+                "success": False,
+                "message": f"Unexpected result: {result}",
+            })
+            return
+
+        success = result[0] == 0
+        password = result[2] if success and len(result) > 2 else ""
+        if success:
+            self.session.world_password = password
+        self.session.send({
+            "type": "world_password_result",
+            "success": success,
+            "world_name": world_name,
+            "world_password": password,
+            "message": result[1],
+        })
+
+    def _on_world_password_failed(self, reason, world_name):
+        msg = str(reason.value) if hasattr(reason, "value") else str(reason)
+        print(f"[Proxy] World password lookup failed for {world_name}: {msg}")
+        self.session.send({
+            "type": "world_password_result",
+            "success": False,
+            "world_name": world_name,
+            "message": msg,
+        })
+
     def _on_create_world_account_result(self, result, fantasy_name):
         if not isinstance(result, (tuple, list)) or len(result) < 2:
             self.session.send(
@@ -462,8 +503,10 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         success = result[0] == 0
         world_password = result[2] if len(result) > 2 else ""
+        print(f"[Proxy] World account result for {self.session.username}: {result}")
         if success:
             self.session.world_account_ready = True
+            self.session.world_password = world_password
         self.session.send(
             {
                 "type": "world_account_result",
@@ -479,7 +522,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             self.session.send({"type": "error", "message": "Select a world first."})
             return
 
-        world_password = msg.get("world_password", "").strip()
+        world_password = msg.get("world_password", "").strip() or self.session.world_password
         role = msg.get("role", "Player").strip() or "Player"
         if role not in ("Player", "Guardian", "Immortal"):
             role = "Player"
