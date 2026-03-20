@@ -212,7 +212,10 @@ class PlayerAvatar(Avatar):
             #send off the character
             from mud.world.cserveravatar import AVATAR
             if AVATAR:
-                publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
+                exported = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)
+                if not exported:
+                    raise RuntimeError("Character export failed before savePlayerBuffer")
+                publicName,pbuffer,cbuffer,cvalues = exported
                 pbuffer = encodebytes(dumps(pbuffer, 2))
                 if cbuffer:
                     cbuffer = encodebytes(dumps(cbuffer, 2))
@@ -442,7 +445,10 @@ class PlayerAvatar(Avatar):
         #send off the character
         from mud.world.cserveravatar import AVATAR
         if AVATAR:
-            publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
+            exported = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)
+            if not exported:
+                raise RuntimeError("Character export failed before savePlayerBuffer")
+            publicName,pbuffer,cbuffer,cvalues = exported
             pbuffer = encodebytes(dumps(pbuffer, 2))
             if cbuffer:
                 cbuffer = encodebytes(dumps(cbuffer, 2))

@@ -481,8 +481,9 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         except:
             pass
         
-        #commit current transaction
-        dbconn = sqlite.connect(GetDBPath())#chars[0]._connection.getConnection()
+        # Use the live world DB connection so freshly-created rows are visible
+        # during export without relying on a second SQLite connection.
+        dbconn = Player._connection.getConnection()
         cursor = dbconn.cursor()
         exconn = sqlite.connect("export%i.db"%CLUSTER,isolation_level = None)
         excursor = exconn.cursor()
