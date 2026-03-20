@@ -13,6 +13,7 @@ try:
     from shutil import rmtree,copyfile
     from traceback import print_stack,format_exc
     import sys,os
+    import importlib
     from hashlib import md5
 
     try:
@@ -161,7 +162,11 @@ try:
     STATSERVERPASSWORD = "WHEE"
 
     try:
-        exec("from serverconfig.%s import *"%WORLDNAME)
+        serverconfig_module = importlib.import_module("serverconfig.%s" % WORLDNAME)
+        for key in dir(serverconfig_module):
+            if key.startswith("__"):
+                continue
+            globals()[key] = getattr(serverconfig_module, key)
     except:
         print("Error reading server configuration")
         print_stack()
@@ -225,6 +230,7 @@ try:
 
     #--- Avatars
     from mud.world.theworld import World
+    from mud.world.zone import Zone
     THEWORLD = World.byName("TheWorld")
     THEWORLD.multiName = WORLDNAME
     if CLUSTER!=-1:
@@ -232,6 +238,20 @@ try:
     THEWORLD.zoneStartPort = ZONESTARTPORT
     THEWORLD.pwNewPlayer = PLAYERPASSWORD
     THEWORLD.staticZoneNames = STATICZONES
+    zoneNames = [z.name for z in Zone.select()]
+
+    def pickZone(preferred, fallback=None):
+        if preferred and preferred in zoneNames:
+            return preferred
+        if fallback and fallback in zoneNames:
+            return fallback
+        if zoneNames:
+            return zoneNames[0]
+        return ""
+
+    THEWORLD.startZone = pickZone(THEWORLD.startZone, "trinst")
+    THEWORLD.dstartZone = pickZone(THEWORLD.dstartZone, "kauldur")
+    THEWORLD.mstartZone = pickZone(THEWORLD.mstartZone, THEWORLD.startZone)
 
     if not CoreSettings.PGSERVER:
         THEWORLD.allowConnections = False
