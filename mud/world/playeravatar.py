@@ -1087,7 +1087,11 @@ class PlayerAvatar(Avatar):
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
         if cbuffer:
             cbuffer = loads(decodebytes(cbuffer))
-            InstallCharacterBuffer(self.player.id,party[0],cbuffer)
+            error = InstallCharacterBuffer(self.player.id,party[0],cbuffer)
+            if error:
+                self.mind.callRemote("messageBox","Transfer Error",
+                    "Unable to install transferred character data. Please try again.")
+                return
         self.enterWorld(party,simPort,simPassword)
         
     def playerJumped(self,result):        
