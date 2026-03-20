@@ -586,9 +586,9 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         print("Character export took %f seconds"%(time.time()-tm))
         return v
     
-    except:
+    except Exception:
         traceback.print_exc()
-        return None
+        raise RuntimeError(traceback.format_exc().strip().splitlines()[-1])
 
 
 
