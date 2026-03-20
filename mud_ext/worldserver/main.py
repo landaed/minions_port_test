@@ -256,12 +256,15 @@ try:
     THEWORLD.pwNewPlayer = PLAYERPASSWORD
     THEWORLD.staticZoneNames = STATICZONES
     zoneNames = [z.name for z in Zone.select()]
+    activeZoneNames = list(STATICZONES) if STATICZONES else zoneNames
 
     def pickZone(preferred, fallback=None):
-        if preferred and preferred in zoneNames:
+        if preferred and preferred in activeZoneNames:
             return preferred
-        if fallback and fallback in zoneNames:
+        if fallback and fallback in activeZoneNames:
             return fallback
+        if activeZoneNames:
+            return activeZoneNames[0]
         if zoneNames:
             return zoneNames[0]
         return ""

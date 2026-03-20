@@ -1143,6 +1143,14 @@ class PlayerAvatar(Avatar):
                     zone = self.player.logZone.name
                 else:
                     raise Exception("Unknown Realm!")
+
+                if self.world.staticZoneNames and zone not in self.world.staticZoneNames:
+                    if c.realm == RPG_REALM_DARKNESS:
+                        zone = self.world.dstartZone
+                    elif c.realm == RPG_REALM_MONSTER:
+                        zone = self.world.mstartZone
+                    else:
+                        zone = self.world.startZone
                 
         if zone in self.world.staticZoneNames:
             #we're on the right world server already            
