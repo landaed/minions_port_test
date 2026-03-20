@@ -255,6 +255,13 @@ class CharacterServerAvatar(pb.Root):
         
         #self.enterWorld(party,simPort,simPassword)
 
+    def remote_transferPlayerInstalled(self,publicName,charname,cbuffer,remoteLeaderName):
+        player = Player.byPublicName(publicName)
+        Player.remoteLeaderNames[publicName]=remoteLeaderName
+        cbuffer = loads(decodebytes(cbuffer))
+        InstallCharacterBuffer(player.id,charname,cbuffer)
+        return (True,player.password)
+
     def remote_kickPlayer(self,publicName):
         try:
             player = Player.byPublicName(publicName)
