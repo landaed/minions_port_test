@@ -27,6 +27,10 @@ def TGEExport(pattern, filename, append=False):
     """Export TGE variables matching pattern to a file."""
     pass
 
+def TGENativeExport(*args):
+    """Register a native-exported console function (stub - no-op)."""
+    pass
+
 
 # --- TGE Object System ---
 
@@ -64,6 +68,11 @@ class TGEConnection(TGEObject):
 
 class SimObject(TGEObject):
     """Stub for TGE SimObject."""
+    pass
+
+
+class SimDataBlock(TGEObject):
+    """Stub for TGE SimDataBlock."""
     pass
 
 
