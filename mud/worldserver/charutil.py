@@ -32,6 +32,12 @@ CREATE_CHARACTER_TABLE_SQL = ""
 
 PLAYER_BUFFERS = []
 
+def GetDBPath():
+    uri = GetDBURI()
+    if uri.startswith("sqlite://"):
+        return uri[9:]
+    return uri
+
 CLUSTER = -1
 
 
@@ -371,7 +377,7 @@ def InstallPlayerBuffer(buffer):
 def Initialize():
     global CREATE_PLAYER_TABLE_SQL,CREATE_CHARACTER_TABLE_SQL
     
-    dbconn = sqlite.connect(GetDBURI()[10:])
+    dbconn = sqlite.connect(GetDBPath())
     cursor = dbconn.cursor()
     
     CREATE_PLAYER_TABLE_SQL = ""
@@ -476,7 +482,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
             pass
         
         #commit current transaction
-        dbconn = sqlite.connect(GetDBURI()[10:])#chars[0]._connection.getConnection()
+        dbconn = sqlite.connect(GetDBPath())#chars[0]._connection.getConnection()
         cursor = dbconn.cursor()
         exconn = sqlite.connect("export%i.db"%CLUSTER,isolation_level = None)
         excursor = exconn.cursor()
