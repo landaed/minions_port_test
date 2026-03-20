@@ -72,6 +72,16 @@ class ProxyPlayerMind(pb.Referenceable):
         self.session.send({"type": "world_time", "hour": hour, "minute": minute})
         return True
 
+    def remote_messageBox(self, title, message):
+        self.session.send(
+            {
+                "type": "error",
+                "title": title,
+                "message": message,
+            }
+        )
+        return True
+
     def remote_jumpServer(self, wip, wport, wpassword, zport, zpassword, party):
         self.session.send(
             {
