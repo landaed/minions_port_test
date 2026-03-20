@@ -211,6 +211,8 @@ func handle_response(data: Dictionary):
 
 		"world_connected":
 			if data.get("success", false):
+				if data.get("requires_world_access_password", false):
+					selected_world["has_password"] = true
 				_set_world_ui_visible(true)
 				_set_character_ui_visible(false)
 				create_world_account_button.disabled = false

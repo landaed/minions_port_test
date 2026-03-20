@@ -325,6 +325,9 @@ class ProxyProtocol(WebSocketServerProtocol):
 
     def _do_enum_worlds(self, retries_left=3):
         p = self.session.master_perspective
+        if not p:
+            print("[Proxy] Skipping enumLiveWorlds retry because master perspective is gone.")
+            return
         d = p.callRemote("EnumWorldsAvatar", "enumLiveWorlds", False, False, False, True)
         d.addCallback(self._on_worlds_received, retries_left)
         d.addErrback(self._on_worlds_failed)
@@ -423,12 +426,17 @@ class ProxyProtocol(WebSocketServerProtocol):
         self.session.player_mind = None
         self.session.world_account_ready = False
         self.session.cached_characters = []
+        local_access_password = _local_world_access_password(world_name)
         self.session.current_world = {
             "name": world_name,
             "ip": ip,
             "port": int(port),
-            "has_password": bool(msg.get("has_password", False)),
+            "has_password": bool(msg.get("has_password", False)) or bool(local_access_password),
+            "local_access_password": local_access_password,
         }
+
+        if local_access_password:
+            print(f"[Proxy] Local world access password discovered for {world_name} before NewPlayer connect.")
 
         factory = pb.PBClientFactory()
         reactor.connectTCP(ip, int(port), factory)
@@ -456,6 +464,7 @@ class ProxyProtocol(WebSocketServerProtocol):
                 "success": True,
                 "world_name": world_name,
                 "has_world_account": bool(has_account),
+                "requires_world_access_password": bool(self.session.current_world and self.session.current_world.get("has_password")),
                 "message": message,
             }
         )
@@ -463,8 +472,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             self._request_world_password(world_name)
 
         if self.session.current_world and self.session.current_world.get("has_password"):
-            access_password = _local_world_access_password(world_name)
+            access_password = self.session.current_world.get("local_access_password", "") or _local_world_access_password(world_name)
             if access_password:
+                self.session.current_world["local_access_password"] = access_password
                 print(f"[Proxy] Local world access password discovered for {world_name}.")
                 self.session.send({
                     "type": "world_access_password_result",
@@ -482,6 +492,9 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         fantasy_name = msg.get("fantasy_name", "").strip().capitalize()
         player_password = msg.get("player_password", "").strip()
+
+        if not player_password:
+            player_password = self.session.current_world.get("local_access_password", "")
 
         if self.session.current_world.get("has_password") and not player_password:
             self.session.send(
