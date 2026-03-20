@@ -176,6 +176,9 @@ class CServerMind(pb.Root):
         d.addCallback(self.playerTransferredAndInstalled,wip,wport,zport,zpassword)
         return d
 
+    def remote_transferPlayer(self,publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo):
+        return self.remote_zoneTransferPlayer(publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo)
+
     def remote_zoneTransferPlayer(self,publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo):
         from worldservices import ZoneClusterAvatar
         if not cbuffer:
