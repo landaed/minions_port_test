@@ -55,7 +55,7 @@ class CServerAvatar(pb.Avatar):
         return (False, "Genesis Time Mismatch: Character Server %s : World Server %s"%(genesisTime,CServerAvatar.genesisTime))
 
     def perspective_installPlayer(self,publicName,buffer,code,premium,guildInfo):
-        from worldservices import ZoneClusterAvatar
+        from mud_ext.worlddaemon.worldservices import ZoneClusterAvatar
         
         if not len(CServerAvatar.worldCSAvatars):
             raise Exception("World maybe in a reboot.")
@@ -176,8 +176,11 @@ class CServerMind(pb.Root):
         d.addCallback(self.playerTransferredAndInstalled,wip,wport,zport,zpassword)
         return d
 
+    def remote_transferPlayer(self,publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo):
+        return self.remote_zoneTransferPlayer(publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo)
+
     def remote_zoneTransferPlayer(self,publicname,pbuffer,charname,cbuffer,zonename,cvalues,remoteLeaderName,guildInfo):
-        from worldservices import ZoneClusterAvatar
+        from mud_ext.worlddaemon.worldservices import ZoneClusterAvatar
         if not cbuffer:
             traceback.print_stack()
             print("AssertionError: cbuffer is empty!")

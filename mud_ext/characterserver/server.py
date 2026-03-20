@@ -102,6 +102,10 @@ class WorldConnection(pb.Root):
             if cbuffer:
                 cbuffer = loads(decodebytes(cbuffer))
             
+            if wname is None:
+                WORLD_LOGINS[publicName] = self.worldName
+                wname = self.worldName
+                print("Info %s save inferred world login %s" % (publicName,self.worldName))
             if wname != self.worldName:
                 print("Warning %s trying to save on none world login %s"% \
                     (publicName,self.worldName))
