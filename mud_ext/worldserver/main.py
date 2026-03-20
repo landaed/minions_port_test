@@ -232,6 +232,14 @@ try:
     THEWORLD.zoneStartPort = ZONESTARTPORT
     THEWORLD.pwNewPlayer = PLAYERPASSWORD
     THEWORLD.staticZoneNames = STATICZONES
+    if STATICZONES:
+        defaultZone = STATICZONES[0]
+        if not THEWORLD.startZone:
+            THEWORLD.startZone = defaultZone
+        if not THEWORLD.dstartZone:
+            THEWORLD.dstartZone = defaultZone
+        if not THEWORLD.mstartZone:
+            THEWORLD.mstartZone = defaultZone
 
     if not CoreSettings.PGSERVER:
         THEWORLD.allowConnections = False
