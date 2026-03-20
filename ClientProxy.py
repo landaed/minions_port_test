@@ -33,7 +33,11 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
-from mud.world.defines import RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER
+from mud.world.defines import (
+    RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
+    RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
+    RPG_RACE_STATS, RPG_DEFAULT_STATS, RPG_STATS,
+)
 
 
 def _local_world_access_password(world_name):
@@ -675,6 +679,38 @@ class ProxyProtocol(WebSocketServerProtocol):
             )
             return
 
+        if race not in RPG_PC_RACES:
+            self.session.send({
+                "type": "create_character_result",
+                "success": False,
+                "message": f"Unsupported race: {race}",
+            })
+            return
+
+        if race not in RPG_REALM_RACES.get(realm, []):
+            self.session.send({
+                "type": "create_character_result",
+                "success": False,
+                "message": f"Race {race} is not valid for this realm.",
+            })
+            return
+
+        if klass not in RPG_RACE_CLASSES.get(race, []):
+            self.session.send({
+                "type": "create_character_result",
+                "success": False,
+                "message": f"Class {klass} is not valid for race {race}.",
+            })
+            return
+
+        if klass not in RPG_REALM_CLASSES.get(realm, []):
+            self.session.send({
+                "type": "create_character_result",
+                "success": False,
+                "message": f"Class {klass} is not valid for this realm.",
+            })
+            return
+
         newchar = NewCharacter()
         newchar.name = name
         newchar.race = race
@@ -683,9 +719,15 @@ class ProxyProtocol(WebSocketServerProtocol):
         newchar.look = max(0, min(2, look))
         newchar.realm = realm
         newchar.ptsRemaining = 0
-        for stat in newchar.scores.keys():
-            newchar.scores[stat] = 10
+
+        rstat = RPG_RACE_STATS[race]
+        for stat in RPG_STATS:
+            newchar.scores[stat] = getattr(rstat, stat)
             newchar.adjs[stat] = 0
+
+        if klass in RPG_DEFAULT_STATS:
+            for stat, value in zip(RPG_STATS, RPG_DEFAULT_STATS[klass]):
+                newchar.adjs[stat] = value
 
         d = self.session.player_perspective.callRemote("PlayerAvatar", "newCharacter", newchar)
         d.addCallback(self._on_create_character_result, name)

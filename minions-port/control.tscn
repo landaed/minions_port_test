@@ -136,3 +136,5 @@ autowrap_mode = 2
 [connection signal="pressed" from="VBoxContainer/LoginWorldButton" to="." method="_on_login_world_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/CreateCharacterButton" to="." method="_on_create_character_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/EnterWorldButton" to="." method="_on_enter_world_button_pressed"]
+
+[connection signal="item_selected" from="VBoxContainer/RaceOption" to="." method="_on_race_option_item_selected"]

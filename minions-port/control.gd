@@ -36,15 +36,35 @@ func _ready():
 	_set_character_ui_visible(false)
 
 func _setup_options():
-	for race in ["Human", "Half-Elf", "Elf", "Dwarf", "Orc"]:
+	for race in ["Human", "Gnome", "Elf", "Halfling", "Dwarf", "Titan", "Drakken"]:
 		race_option.add_item(race)
-	for klass in ["Warrior", "Cleric", "Paladin", "Wizard", "Doom Knight", "Ranger"]:
-		class_option.add_item(klass)
 	for sex in ["Male", "Female"]:
 		sex_option.add_item(sex)
 	race_option.select(0)
-	class_option.select(0)
 	sex_option.select(0)
+	_refresh_class_options()
+
+func _refresh_class_options():
+	var race := race_option.get_item_text(race_option.selected)
+	var race_classes := {
+		"Human": ["Paladin", "Cleric", "Necromancer", "Tempest", "Wizard", "Shaman", "Monk", "Barbarian", "Warrior", "Assassin", "Revealer", "Druid", "Ranger", "Bard", "Thief", "Doom Knight"],
+		"Gnome": ["Necromancer", "Wizard", "Assassin", "Revealer", "Thief", "Monk", "Tempest", "Cleric"],
+		"Halfling": ["Paladin", "Cleric", "Shaman", "Warrior", "Druid", "Ranger", "Bard", "Thief", "Monk", "Tempest", "Wizard"],
+		"Elf": ["Paladin", "Cleric", "Tempest", "Wizard", "Shaman", "Monk", "Warrior", "Druid", "Ranger", "Bard", "Revealer"],
+		"Dwarf": ["Paladin", "Cleric", "Barbarian", "Warrior", "Shaman", "Tempest", "Revealer"],
+		"Titan": ["Paladin", "Cleric", "Tempest", "Wizard", "Monk", "Warrior", "Ranger"],
+		"Drakken": ["Cleric", "Necromancer", "Tempest", "Wizard", "Shaman", "Barbarian", "Warrior", "Assassin", "Revealer", "Thief", "Doom Knight", "Monk", "Ranger"],
+	}
+	var light_classes := ["Shaman", "Warrior", "Paladin", "Cleric", "Tempest", "Wizard", "Monk", "Barbarian", "Thief", "Druid", "Bard", "Ranger", "Revealer"]
+	class_option.clear()
+	for klass in race_classes.get(race, []):
+		if klass in light_classes:
+			class_option.add_item(klass)
+	if class_option.item_count > 0:
+		class_option.select(0)
+
+func _on_race_option_item_selected(_index):
+	_refresh_class_options()
 
 func _process(_delta):
 	socket.poll()
