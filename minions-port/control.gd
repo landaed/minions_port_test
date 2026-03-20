@@ -45,7 +45,7 @@ func _setup_options():
 	_refresh_class_options()
 
 func _refresh_class_options():
-	var race := race_option.get_item_text(race_option.selected)
+	var race: String = race_option.get_item_text(race_option.selected)
 	var race_classes := {
 		"Human": ["Paladin", "Cleric", "Necromancer", "Tempest", "Wizard", "Shaman", "Monk", "Barbarian", "Warrior", "Assassin", "Revealer", "Druid", "Ranger", "Bard", "Thief", "Doom Knight"],
 		"Gnome": ["Necromancer", "Wizard", "Assassin", "Revealer", "Thief", "Monk", "Tempest", "Cleric"],
