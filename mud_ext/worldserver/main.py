@@ -224,6 +224,23 @@ try:
         print("Run 'python3 setup_databases.py' to create the database.")
         sys.exit(1)
 
+    def ensureCharacterAuctionColumn(database):
+        import sqlite3
+
+        conn = sqlite3.connect(database)
+        try:
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA table_info(character)")
+            columns = {row[1] for row in cursor.fetchall()}
+            if "auction_id_n" not in columns:
+                cursor.execute("ALTER TABLE character ADD COLUMN auction_id_n INTEGER DEFAULT 0")
+                conn.commit()
+                print("Added missing character.auction_id_n column to %s" % os.path.abspath(database))
+        finally:
+            conn.close()
+
+    ensureCharacterAuctionColumn(DATABASE)
+
     from mud.utils import getSQLiteURL
     SetDBConnection(getSQLiteURL(DATABASE),True)
 
