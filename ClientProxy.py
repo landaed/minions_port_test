@@ -82,6 +82,33 @@ class ProxyPlayerMind(pb.Referenceable):
         )
         return True
 
+    def remote_setRootInfo(self, rootInfo, *args):
+        self.session.send(
+            {
+                "type": "root_info",
+                "message": "Received root info from world server.",
+            }
+        )
+        return True
+
+    def remote_setCursorItem(self, itemInfo):
+        self.session.send(
+            {
+                "type": "cursor_item",
+                "message": "Received cursor item from world server.",
+            }
+        )
+        return True
+
+    def remote_setZoneOptions(self, zoptions):
+        self.session.send(
+            {
+                "type": "zone_options",
+                "message": "Received zone options from world server.",
+            }
+        )
+        return True
+
     def remote_jumpServer(self, wip, wport, wpassword, zport, zpassword, party):
         self.session.send(
             {
