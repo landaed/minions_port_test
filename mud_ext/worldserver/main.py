@@ -13,6 +13,7 @@ try:
     from shutil import rmtree,copyfile
     from traceback import print_stack,format_exc
     import sys,os
+    import importlib
     from hashlib import md5
 
     try:
@@ -161,7 +162,11 @@ try:
     STATSERVERPASSWORD = "WHEE"
 
     try:
-        exec("from serverconfig.%s import *"%WORLDNAME)
+        serverconfig_module = importlib.import_module("serverconfig.%s" % WORLDNAME)
+        for key in dir(serverconfig_module):
+            if key.startswith("__"):
+                continue
+            globals()[key] = getattr(serverconfig_module, key)
     except:
         print("Error reading server configuration")
         print_stack()
@@ -219,12 +224,30 @@ try:
         print("Run 'python3 setup_databases.py' to create the database.")
         sys.exit(1)
 
+    def ensureCharacterAuctionColumn(database):
+        import sqlite3
+
+        conn = sqlite3.connect(database)
+        try:
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA table_info(character)")
+            columns = {row[1] for row in cursor.fetchall()}
+            if "auction_id_n" not in columns:
+                cursor.execute("ALTER TABLE character ADD COLUMN auction_id_n INTEGER DEFAULT 0")
+                conn.commit()
+                print("Added missing character.auction_id_n column to %s" % os.path.abspath(database))
+        finally:
+            conn.close()
+
+    ensureCharacterAuctionColumn(DATABASE)
+
     from mud.utils import getSQLiteURL
     SetDBConnection(getSQLiteURL(DATABASE),True)
 
 
     #--- Avatars
     from mud.world.theworld import World
+    from mud.world.zone import Zone
     THEWORLD = World.byName("TheWorld")
     THEWORLD.multiName = WORLDNAME
     if CLUSTER!=-1:
@@ -232,6 +255,20 @@ try:
     THEWORLD.zoneStartPort = ZONESTARTPORT
     THEWORLD.pwNewPlayer = PLAYERPASSWORD
     THEWORLD.staticZoneNames = STATICZONES
+    zoneNames = [z.name for z in Zone.select()]
+
+    def pickZone(preferred, fallback=None):
+        if preferred and preferred in zoneNames:
+            return preferred
+        if fallback and fallback in zoneNames:
+            return fallback
+        if zoneNames:
+            return zoneNames[0]
+        return ""
+
+    THEWORLD.startZone = pickZone(THEWORLD.startZone, "trinst")
+    THEWORLD.dstartZone = pickZone(THEWORLD.dstartZone, "kauldur")
+    THEWORLD.mstartZone = pickZone(THEWORLD.mstartZone, THEWORLD.startZone)
 
     if not CoreSettings.PGSERVER:
         THEWORLD.allowConnections = False
