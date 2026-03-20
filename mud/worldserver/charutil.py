@@ -38,6 +38,14 @@ def GetDBPath():
         return uri[9:]
     return uri
 
+
+def SafeEndTransaction(cursor, sql="END TRANSACTION;"):
+    try:
+        cursor.execute(sql)
+    except Exception as exc:
+        if "no transaction is active" not in str(exc).lower():
+            raise
+
 CLUSTER = -1
 
 
@@ -181,7 +189,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     
     error = False
     
-    dstCursor.execute("END TRANSACTION;")
+    SafeEndTransaction(dstCursor)
     dstCursor.execute("BEGIN TRANSACTION;")
     
     try:
@@ -247,7 +255,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
             dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
         
         #print "whee"
-        dstCursor.execute('END TRANSACTION;')
+        SafeEndTransaction(dstCursor)
     except:
         error = True
         traceback.print_exc()
@@ -292,7 +300,7 @@ def InstallPlayerBuffer(buffer):
     
     error = False
     
-    dstCursor.execute("END TRANSACTION;")
+    SafeEndTransaction(dstCursor)
     dstCursor.execute("BEGIN TRANSACTION;")
     try:
         cursor.execute("SELECT * FROM player;")
@@ -355,7 +363,7 @@ def InstallPlayerBuffer(buffer):
                     dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
         
         #print "whee"
-        dstCursor.execute('END TRANSACTION;')
+        SafeEndTransaction(dstCursor)
     except:
         error = True
         traceback.print_exc()
@@ -460,7 +468,7 @@ def ExtractPlayer(publicName,pid,cid,append=True):
     conn = Player._connection.getConnection()
     c = conn.cursor()
     try:
-        c.execute("END TRANSACTION;")
+        SafeEndTransaction(c)
     except Exception as exc:
         if "no transaction is active" not in str(exc).lower():
             c.close()
@@ -509,7 +517,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         cursor.execute("SELECT * FROM item WHERE player_id = %i and slot >= %i and slot < %i;"%(pid,RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END))
         ExtractItemList(cursor,excursor,cursor.fetchall())
         
-        excursor.execute("END;")
+        SafeEndTransaction(excursor, "END;")
         
         excursor.close()
         exconn.close()
@@ -567,7 +575,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
             cursor.execute("SELECT * FROM %s WHERE spawn_id = %i;"%(t,sid))
             excursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),cursor.fetchall())
         
-        excursor.execute("END;")
+        SafeEndTransaction(excursor, "END;")
         
         excursor.close()
         exconn.close()
