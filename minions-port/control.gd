@@ -227,6 +227,16 @@ func handle_response(data: Dictionary):
 				status_label.text = "World error: " + data.get("message", "")
 
 
+		"world_access_password_result":
+			if data.get("success", false):
+				var access_pw: String = data.get("world_access_password", "")
+				if not access_pw.is_empty():
+					world_access_password_field.text = access_pw
+				if not data.get("has_world_account", false):
+					status_label.text = "Recovered local world access password from serverconfig. You can now create the world account."
+			else:
+				status_label.text = "Could not recover local world access password automatically: " + data.get("message", "")
+
 		"world_password_result":
 			login_world_button.disabled = false
 			if data.get("success", false):

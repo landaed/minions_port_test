@@ -11,6 +11,7 @@ import sys
 import os
 import json
 import traceback
+import runpy
 
 sys.path.append(os.getcwd())
 
@@ -33,6 +34,28 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 from mud.world.defines import RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER
+
+
+def _local_world_access_password(world_name):
+    """Best-effort lookup for locally hosted player-world access passwords."""
+    candidates = []
+    if world_name:
+        candidates.append(world_name)
+        candidates.append(world_name.replace(" ", "_"))
+
+    for candidate in candidates:
+        path = os.path.join(os.getcwd(), "serverconfig", f"{candidate}.py")
+        if not os.path.exists(path):
+            continue
+        try:
+            data = runpy.run_path(path)
+        except Exception:
+            traceback.print_exc()
+            continue
+        password = data.get("PLAYERPASSWORD", "")
+        if password:
+            return password
+    return ""
 
 
 class ProxyPlayerMind(pb.Referenceable):
@@ -438,6 +461,18 @@ class ProxyProtocol(WebSocketServerProtocol):
         )
         if has_account and self.session.master_perspective:
             self._request_world_password(world_name)
+
+        if self.session.current_world and self.session.current_world.get("has_password"):
+            access_password = _local_world_access_password(world_name)
+            if access_password:
+                print(f"[Proxy] Local world access password discovered for {world_name}.")
+                self.session.send({
+                    "type": "world_access_password_result",
+                    "success": True,
+                    "world_name": world_name,
+                    "world_access_password": access_password,
+                    "message": "Recovered local world access password from serverconfig.",
+                })
 
     def handle_create_world_account(self, msg):
         perspective = self.session.new_world_perspective
