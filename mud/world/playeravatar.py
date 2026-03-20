@@ -153,75 +153,91 @@ class PlayerAvatar(Avatar):
             return (-1,"That character name is invalid.",None)
         
         
-        rg = GetRaceGraphics()
-        size = 1.0
-        for ri in rg:
-            if ri.name == newchar.race:
-                if newchar.sex == "Male":
-                    size = ri.size_male
-                    animation = ri.animation_male
-                    if newchar.look == 0:
-                        model = ri.model_thin_male
-                    elif newchar.look == 1:
-                        model = ri.model_fit_male
+        char = None
+        spawn = None
+        try:
+            rg = GetRaceGraphics()
+            size = 1.0
+            model = ""
+            animation = ""
+            for ri in rg:
+                if ri.name == newchar.race:
+                    if newchar.sex == "Male":
+                        size = ri.size_male
+                        animation = ri.animation_male
+                        if newchar.look == 0:
+                            model = ri.model_thin_male
+                        elif newchar.look == 1:
+                            model = ri.model_fit_male
+                        else:
+                            model = ri.model_heavy_male
                     else:
-                        model = ri.model_heavy_male
-                else:
-                    size = ri.size_female
-                    animation = ri.animation_female
-                    if newchar.look == 0:
-                        model = ri.model_thin_female
-                    elif newchar.look == 1:
-                        model = ri.model_fit_female
-                    else:
-                        model = ri.model_heavy_female
-                break
-        
-        spawn = Spawn(name=newchar.name,race=newchar.race,pclassInternal = newchar.klass,plevel = 1,model=model,scale=size,radius=2,vocalSet="C")
-        spawn.realm = newchar.realm
-        
-        spawn.sex = newchar.sex
+                        size = ri.size_female
+                        animation = ri.animation_female
+                        if newchar.look == 0:
+                            model = ri.model_thin_female
+                        elif newchar.look == 1:
+                            model = ri.model_fit_female
+                        else:
+                            model = ri.model_heavy_female
+                    break
 
-        #fix this BS, score should be coming from world server and only adj being sent
-        spawn.strBase = newchar.scores['STR'] + newchar.adjs['STR']
-        spawn.dexBase = newchar.scores['DEX'] + newchar.adjs['DEX'] 
-        spawn.refBase = newchar.scores['REF'] + newchar.adjs['REF'] 
-        spawn.agiBase = newchar.scores['AGI'] + newchar.adjs['AGI'] 
-        spawn.wisBase = newchar.scores['WIS'] + newchar.adjs['WIS'] 
-        spawn.bdyBase = newchar.scores['BDY'] + newchar.adjs['BDY'] 
-        spawn.mndBase = newchar.scores['MND'] + newchar.adjs['MND'] 
-        spawn.mysBase = newchar.scores['MYS'] + newchar.adjs['MYS'] 
-
-        
-        
-        char = Character(player=self.player,name=newchar.name,spawn=spawn,portraitPic = newchar.portraitPic)
-        spawn.character = char
-        spawn.playerName = self.player.publicName
-                    
-        if newchar.sex == 'Male':
-            ret = (0,"%s has been created.  He awaits your command!"%newchar.name)
-        else:
-            ret = (0,"%s has been created.  She awaits your command!"%newchar.name)
+            spawn = Spawn(name=newchar.name,race=newchar.race,pclassInternal = newchar.klass,plevel = 1,model=model,scale=size,radius=2,vocalSet="C")
+            spawn.realm = newchar.realm
             
-        char.addStartingGear()
-        char.backupItems()
-        
-        #send off the character
-        from mud.world.cserveravatar import AVATAR
-        if AVATAR:
-            publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
-            pbuffer = encodebytes(dumps(pbuffer, 2))
-            if cbuffer:
-                cbuffer = encodebytes(dumps(cbuffer, 2))
+            spawn.sex = newchar.sex
 
-            AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
+            #fix this BS, score should be coming from world server and only adj being sent
+            spawn.strBase = newchar.scores['STR'] + newchar.adjs['STR']
+            spawn.dexBase = newchar.scores['DEX'] + newchar.adjs['DEX'] 
+            spawn.refBase = newchar.scores['REF'] + newchar.adjs['REF'] 
+            spawn.agiBase = newchar.scores['AGI'] + newchar.adjs['AGI'] 
+            spawn.wisBase = newchar.scores['WIS'] + newchar.adjs['WIS'] 
+            spawn.bdyBase = newchar.scores['BDY'] + newchar.adjs['BDY'] 
+            spawn.mndBase = newchar.scores['MND'] + newchar.adjs['MND'] 
+            spawn.mysBase = newchar.scores['MYS'] + newchar.adjs['MYS'] 
+
+            char = Character(player=self.player,name=newchar.name,spawn=spawn,portraitPic = newchar.portraitPic)
+            spawn.character = char
+            spawn.playerName = self.player.publicName
+                        
+            if newchar.sex == 'Male':
+                ret = (0,"%s has been created.  He awaits your command!"%newchar.name)
+            else:
+                ret = (0,"%s has been created.  She awaits your command!"%newchar.name)
+                
+            char.addStartingGear()
+            char.backupItems()
             
-            # Clean up the character in the running database.
-            # Everything has been saved off and character will
-            #  be queried from player buffer again if needed.
-            char.destroySelf()
+            #send off the character
+            from mud.world.cserveravatar import AVATAR
+            if AVATAR:
+                publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(self.player.publicName,self.player.id,char.id,False)                
+                pbuffer = encodebytes(dumps(pbuffer, 2))
+                if cbuffer:
+                    cbuffer = encodebytes(dumps(cbuffer, 2))
 
-        return ret
+                AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer,cbuffer,cvalues)
+                
+                # Clean up the character in the running database.
+                # Everything has been saved off and character will
+                #  be queried from player buffer again if needed.
+                char.destroySelf()
+
+            return ret
+        except Exception as exc:
+            print_exc()
+            if char:
+                try:
+                    char.destroySelf()
+                except:
+                    pass
+            elif spawn:
+                try:
+                    spawn.destroySelf()
+                except:
+                    pass
+            return (-1,"There was an error creating this character: %s" % exc,None)
 
 
     def gotCheckMonsterName(self,result,mname,mspawn):
