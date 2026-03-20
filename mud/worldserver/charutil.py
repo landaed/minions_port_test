@@ -448,10 +448,17 @@ def ExtractItemList(cursor, excursor, itemList, indirect=False):
 
 def ExtractPlayer(publicName,pid,cid,append=True):
     from mud.world.player import Player
-    #commit current transaction so we are current
+    # Commit the current transaction so the export sees the latest rows.
+    # Some SQLite connections may not currently have an open transaction,
+    # so tolerate the legacy END TRANSACTION call failing and always reopen.
     conn = Player._connection.getConnection()
     c = conn.cursor()
-    c.execute("END TRANSACTION;")
+    try:
+        c.execute("END TRANSACTION;")
+    except Exception as exc:
+        if "no transaction is active" not in str(exc).lower():
+            c.close()
+            raise
     c.execute("BEGIN TRANSACTION;")
     c.close()
     return ExtractCharactersThread(publicName,pid,cid,append)
