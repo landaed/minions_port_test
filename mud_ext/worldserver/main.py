@@ -13,6 +13,7 @@ try:
     from shutil import rmtree,copyfile
     from traceback import print_stack,format_exc
     import sys,os
+    import importlib
     from hashlib import md5
 
     try:
@@ -161,7 +162,11 @@ try:
     STATSERVERPASSWORD = "WHEE"
 
     try:
-        exec("from serverconfig.%s import *"%WORLDNAME)
+        serverconfig_module = importlib.import_module("serverconfig.%s" % WORLDNAME)
+        for key in dir(serverconfig_module):
+            if key.startswith("__"):
+                continue
+            globals()[key] = getattr(serverconfig_module, key)
     except:
         print("Error reading server configuration")
         print_stack()
