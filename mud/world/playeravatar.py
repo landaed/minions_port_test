@@ -1159,24 +1159,12 @@ class PlayerAvatar(Avatar):
             return d
         
         #we need to transfer to another server
-        if newc:
-            #this is a new character and so we need to extract the player/character and transfer it
-            char = Character.byName(cname)
-            publicName,pbuffer,cbuffer,cvalues = ExtractPlayer(player.publicName,player.id,char.id,False)
-            self.player.transfering = True
-            pbuffer = encodebytes(dumps(pbuffer, 2))
-            cbuffer = encodebytes(dumps(cbuffer, 2))
-            p = self.player
-            guildInfo = (p.guildName,p.guildInfo,p.guildMOTD,p.guildRank)
-            d = AVATAR.mind.callRemote("transferPlayer",player.publicName,pbuffer,cname,cbuffer,zoneName,cvalues,self.player.publicName,guildInfo)
-            d.addCallback(self.playerTransfered,party)
-        else:
-            #we just need to transfer servers
-            d = AVATAR.mind.callRemote("getCharacterBuffer",self.player.publicName,party[0])
-            d.addCallback(self.gotTransferCharacterBuffer,party,zone)
-            return d
-
-        return 
+        # New characters have already been exported to the character server and
+        # cleaned up from the local world DB, so always fetch the character
+        # buffer from the character server for cross-server transfers.
+        d = AVATAR.mind.callRemote("getCharacterBuffer",self.player.publicName,party[0])
+        d.addCallback(self.gotTransferCharacterBuffer,party,zone)
+        return d
             
     def enterWorld(self,party,simPort,simPassword):
         from mud.world.cserveravatar import AVATAR
