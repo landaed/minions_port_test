@@ -1,14 +1,14 @@
 # Server configuration for TestDaemon world
 
 CLUSTERNAMES = [
-("base",),
+("trinst", "kauldur"),
 ]
 
 WORLDPORT = 2008
 ZONESTARTPORT = 2010
 PLAYERPASSWORD = "mmo"
 MAXPLAYERS = 64
-STATICZONES = ["base"]
+STATICZONES = ["trinst", "kauldur"]
 
 REBOOT = True
 REBOOT_HOUR = 3
