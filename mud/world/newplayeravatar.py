@@ -10,6 +10,7 @@ from mud.world.theworld import World
 
 from random import choice
 import string
+import traceback
 
 
 
@@ -49,40 +50,44 @@ class NewPlayerAvatar(Avatar):
                 
         password = GenPasswd().upper()
 
-        #move me
-        from mud.world.zone import Zone
-        zone = Zone.byName(self.world.startZone)
-        dzone = Zone.byName(self.world.dstartZone)
-        mzone = Zone.byName(self.world.mstartZone)
+        try:
+            #move me
+            from mud.world.zone import Zone
+            zone = Zone.byName(self.world.startZone)
+            dzone = Zone.byName(self.world.dstartZone)
+            mzone = Zone.byName(self.world.mstartZone)
 
-        t = zone.immTransform
-        dt = dzone.immTransform
-        mt = mzone.immTransform
-        
-        p = Player(publicName=publicName,password=password,fantasyName=publicName,logZone=zone,bindZone=zone,darknessLogZone=dzone,darknessBindZone=dzone,monsterLogZone=mzone,monsterBindZone=mzone)
-        #temp
-        
-        p.logTransformInternal=t
-        p.bindTransformInternal=t
-
-        p.darknessLogTransformInternal=dt
-        p.darknessBindTransformInternal=dt
-
-        p.monsterLogTransformInternal=mt
-        p.monsterBindTransformInternal=mt
-
-        
-        user = User(name=publicName,password=password)
-        user.addRole(Role.byName("Player"))
-        
-        if publicName == NewPlayerAvatar.ownerPublicName: 
-            user.addRole(Role.byName("Immortal"))
-            user.addRole(Role.byName("Guardian"))
+            t = zone.immTransform
+            dt = dzone.immTransform
+            mt = mzone.immTransform
             
-            return (0,"Immortal Account Created.\nYour password is %s"%password,password)
-        
-        
-        return (0,"Account Created.\nYour password is %s"%password,password)
+            p = Player(publicName=publicName,password=password,fantasyName=fantasyName,logZone=zone,bindZone=zone,darknessLogZone=dzone,darknessBindZone=dzone,monsterLogZone=mzone,monsterBindZone=mzone)
+            #temp
+            
+            p.logTransformInternal=t
+            p.bindTransformInternal=t
+
+            p.darknessLogTransformInternal=dt
+            p.darknessBindTransformInternal=dt
+
+            p.monsterLogTransformInternal=mt
+            p.monsterBindTransformInternal=mt
+
+            
+            user = User(name=publicName,password=password)
+            user.addRole(Role.byName("Player"))
+            
+            if publicName == NewPlayerAvatar.ownerPublicName: 
+                user.addRole(Role.byName("Immortal"))
+                user.addRole(Role.byName("Guardian"))
+                
+                return (0,"Immortal Account Created.\nYour password is %s"%password,password)
+            
+            
+            return (0,"Account Created.\nYour password is %s"%password,password)
+        except Exception as exc:
+            traceback.print_exc()
+            return (-1,"Error creating world account: %s" % exc,None)
         
     #returns True if player has an account, otherwise false
     def perspective_queryPlayer(self,publicName):
@@ -101,5 +106,4 @@ class NewPlayerAvatar(Avatar):
 class QueryAvatar(Avatar):
     def perspective_retrieveWorldInfo(self):
         return CoreSettings.WORLDTEXT,CoreSettings.WORLDPIC
-
 
