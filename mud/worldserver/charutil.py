@@ -32,6 +32,20 @@ CREATE_CHARACTER_TABLE_SQL = ""
 
 PLAYER_BUFFERS = []
 
+def GetDBPath():
+    uri = GetDBURI()
+    if uri.startswith("sqlite://"):
+        return uri[9:]
+    return uri
+
+
+def SafeEndTransaction(cursor, sql="END TRANSACTION;"):
+    try:
+        cursor.execute(sql)
+    except Exception as exc:
+        if "no transaction is active" not in str(exc).lower():
+            raise
+
 CLUSTER = -1
 
 
@@ -175,7 +189,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     
     error = False
     
-    dstCursor.execute("END TRANSACTION;")
+    SafeEndTransaction(dstCursor)
     dstCursor.execute("BEGIN TRANSACTION;")
     
     try:
@@ -241,7 +255,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
             dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
         
         #print "whee"
-        dstCursor.execute('END TRANSACTION;')
+        SafeEndTransaction(dstCursor)
     except:
         error = True
         traceback.print_exc()
@@ -286,7 +300,7 @@ def InstallPlayerBuffer(buffer):
     
     error = False
     
-    dstCursor.execute("END TRANSACTION;")
+    SafeEndTransaction(dstCursor)
     dstCursor.execute("BEGIN TRANSACTION;")
     try:
         cursor.execute("SELECT * FROM player;")
@@ -349,7 +363,7 @@ def InstallPlayerBuffer(buffer):
                     dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
         
         #print "whee"
-        dstCursor.execute('END TRANSACTION;')
+        SafeEndTransaction(dstCursor)
     except:
         error = True
         traceback.print_exc()
@@ -371,7 +385,7 @@ def InstallPlayerBuffer(buffer):
 def Initialize():
     global CREATE_PLAYER_TABLE_SQL,CREATE_CHARACTER_TABLE_SQL
     
-    dbconn = sqlite.connect(GetDBURI()[10:])
+    dbconn = sqlite.connect(GetDBPath())
     cursor = dbconn.cursor()
     
     CREATE_PLAYER_TABLE_SQL = ""
@@ -448,10 +462,17 @@ def ExtractItemList(cursor, excursor, itemList, indirect=False):
 
 def ExtractPlayer(publicName,pid,cid,append=True):
     from mud.world.player import Player
-    #commit current transaction so we are current
+    # Commit the current transaction so the export sees the latest rows.
+    # Some SQLite connections may not currently have an open transaction,
+    # so tolerate the legacy END TRANSACTION call failing and always reopen.
     conn = Player._connection.getConnection()
     c = conn.cursor()
-    c.execute("END TRANSACTION;")
+    try:
+        SafeEndTransaction(c)
+    except Exception as exc:
+        if "no transaction is active" not in str(exc).lower():
+            c.close()
+            raise
     c.execute("BEGIN TRANSACTION;")
     c.close()
     return ExtractCharactersThread(publicName,pid,cid,append)
@@ -468,8 +489,9 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         except:
             pass
         
-        #commit current transaction
-        dbconn = sqlite.connect(GetDBURI()[10:])#chars[0]._connection.getConnection()
+        # Use the live world DB connection so freshly-created rows are visible
+        # during export without relying on a second SQLite connection.
+        dbconn = Player._connection.getConnection()
         cursor = dbconn.cursor()
         exconn = sqlite.connect("export%i.db"%CLUSTER,isolation_level = None)
         excursor = exconn.cursor()
@@ -495,7 +517,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         cursor.execute("SELECT * FROM item WHERE player_id = %i and slot >= %i and slot < %i;"%(pid,RPG_SLOT_BANK_BEGIN,RPG_SLOT_BANK_END))
         ExtractItemList(cursor,excursor,cursor.fetchall())
         
-        excursor.execute("END;")
+        SafeEndTransaction(excursor, "END;")
         
         excursor.close()
         exconn.close()
@@ -553,7 +575,7 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
             cursor.execute("SELECT * FROM %s WHERE spawn_id = %i;"%(t,sid))
             excursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),cursor.fetchall())
         
-        excursor.execute("END;")
+        SafeEndTransaction(excursor, "END;")
         
         excursor.close()
         exconn.close()
@@ -572,9 +594,9 @@ def ExtractCharactersThread(publicName,pid,cid,append=True):
         print("Character export took %f seconds"%(time.time()-tm))
         return v
     
-    except:
+    except Exception:
         traceback.print_exc()
-        return None
+        raise RuntimeError(traceback.format_exc().strip().splitlines()[-1])
 
 
 
