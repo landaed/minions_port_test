@@ -118,12 +118,13 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
             # For indirect item storage player and character id must always be None.
             # Otherwise those items will show up in character inventory or bank.
             values = GenerateInsertValues('item',(itemValues,),None,None,spawnID)
-            dstCursor.executemany('INSERT INTO item VALUES(%s)'%(TVALUES['item']),values)
+            dstCursor.execute('INSERT INTO item VALUES(%s)'%(TVALUES['item']),values[0])
             newItemID = dstCursor.lastrowid
             # Item Variants
             cursor.execute("SELECT * FROM item_variant WHERE item_id=?;",(itemID,))
             values = GenerateInsertValues('item_variant',cursor.fetchall(),None,None,spawnID,newItemID)
-            dstCursor.executemany('INSERT INTO item_variant VALUES(%s)'%(TVALUES['item_variant']),values)
+            if values:
+                dstCursor.executemany('INSERT INTO item_variant VALUES(%s)'%(TVALUES['item_variant']),values)
             # Item Containers
             try:
                 cursor.execute("SELECT content_id FROM item_container_content WHERE item_id=?;",(itemID,))
@@ -151,12 +152,13 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
         for itemValues in itemList:
             itemID = itemValues[0]
             values = GenerateInsertValues('item',(itemValues,),playerID,characterID,spawnID)
-            dstCursor.executemany('INSERT INTO item VALUES(%s)'%(TVALUES['item']),values)
+            dstCursor.execute('INSERT INTO item VALUES(%s)'%(TVALUES['item']),values[0])
             newItemID = dstCursor.lastrowid
             # Item Variants
             cursor.execute("SELECT * FROM item_variant WHERE item_id=?;",(itemID,))
             values = GenerateInsertValues('item_variant',cursor.fetchall(),playerID,characterID,spawnID,newItemID)
-            dstCursor.executemany('INSERT INTO item_variant VALUES(%s)'%(TVALUES['item_variant']),values)
+            if values:
+                dstCursor.executemany('INSERT INTO item_variant VALUES(%s)'%(TVALUES['item_variant']),values)
             # Item Containers
             try:
                 cursor.execute("SELECT content_id FROM item_container_content WHERE item_id=?;",(itemID,))
@@ -224,7 +226,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
         _logf.flush()
         sql = 'INSERT INTO character VALUES(%s)'%(TVALUES['character'])
         try:
-            dstCursor.executemany(sql,values)
+            dstCursor.execute(sql,values[0])
         except:
             traceback.print_exc()
             traceback.print_exc(file=_logf)
@@ -242,7 +244,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
         values = GenerateInsertValues('spawn',(svalues,),playerID,characterID)
         _logf.write("####ICB: GenerateInsertValues for spawn: %s\n" % (values,))
         _logf.flush()
-        dstCursor.executemany('INSERT INTO spawn VALUES(%s)'%(TVALUES['spawn']),values)
+        dstCursor.execute('INSERT INTO spawn VALUES(%s)'%(TVALUES['spawn']),values[0])
         spawnID = dstCursor.lastrowid
         _logf.write("####ICB: inserted spawn, lastrowid=%s\n" % spawnID)
         #update character with spawnID now that we have it
@@ -348,7 +350,7 @@ def InstallPlayerBuffer(buffer):
     try:
         cursor.execute("SELECT * FROM player;")
         values = GenerateInsertValues('player',cursor.fetchall())
-        dstCursor.executemany('INSERT INTO player VALUES(%s)'%(TVALUES['player']),values)
+        dstCursor.execute('INSERT INTO player VALUES(%s)'%(TVALUES['player']),values[0])
         playerID = dstCursor.lastrowid
         
         #player tables
