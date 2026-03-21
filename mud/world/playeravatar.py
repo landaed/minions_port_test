@@ -1128,10 +1128,24 @@ class PlayerAvatar(Avatar):
     
     def perspective_enterWorld(self,party,simPort, simPassword):
         from mud.world.cserveravatar import AVATAR
-        print("####perspective_enterWorld: party=%s AVATAR=%s charInfos=%s" % (party, bool(AVATAR), [c.name for c in self.charInfos]))
+        import traceback as _tb
+        _logf = open("/tmp/enterworld_debug.log", "a")
+        _logf.write("####perspective_enterWorld: party=%s AVATAR=%s charInfos=%s\n" % (party, bool(AVATAR), [c.name for c in self.charInfos]))
+        _logf.flush()
         if not AVATAR:
-            print("####perspective_enterWorld: no AVATAR, calling enterWorld directly")
-            self.enterWorld(party,simPort,simPassword)
+            _logf.write("####perspective_enterWorld: no AVATAR, calling enterWorld directly\n")
+            _logf.flush()
+            try:
+                self.enterWorld(party,simPort,simPassword)
+                _logf.write("####perspective_enterWorld: enterWorld completed OK\n")
+                _logf.flush()
+            except Exception as e:
+                _logf.write("####perspective_enterWorld: enterWorld CRASHED: %s\n" % e)
+                _tb.print_exc(file=_logf)
+                _logf.flush()
+                raise
+            finally:
+                _logf.close()
             return
 
         #alright, we need to figure out what zone we are going to so we can pick a zone cluster
@@ -1182,7 +1196,9 @@ class PlayerAvatar(Avatar):
             
     def enterWorld(self,party,simPort,simPassword):
         from mud.world.cserveravatar import AVATAR
-        print("####enterWorld: party=%s simPort=%s simPassword=%s" % (party, simPort, simPassword))
+        _logf = open("/tmp/enterworld_debug.log", "a")
+        _logf.write("####enterWorld: party=%s simPort=%s simPassword=%s\n" % (party, simPort, simPassword))
+        _logf.flush()
 
         #zone is an instance
 
@@ -1192,6 +1208,8 @@ class PlayerAvatar(Avatar):
         chars = []
         for p in party:
             c = Character.byName(p)
+            _logf.write("####enterWorld: Character.byName(%s) = %s dead=%s\n" % (p, c, c.dead))
+            _logf.flush()
             chars.append(c)
             if not c.dead:
                 alldead = False
@@ -1228,9 +1246,12 @@ class PlayerAvatar(Avatar):
                 self.player.logZone = self.player.bindZone
         
         zone = self.world.playerSelectZone(self,simPort,simPassword)
-        print("####enterWorld: playerSelectZone returned %s (liveZones=%s)" % (zone, [z.name for z in self.world.liveZoneInstances]))
+        _logf.write("####enterWorld: playerSelectZone returned %s (liveZones=%s waitingZones=%s)\n" % (zone, [z.name for z in self.world.liveZoneInstances], [z.name for z in self.world.waitingZoneInstances]))
+        _logf.flush()
         if not zone:
-            print("####enterWorld: ERROR - no zone returned from playerSelectZone!")
+            _logf.write("####enterWorld: ERROR - no zone returned from playerSelectZone!\n")
+            _logf.flush()
+            _logf.close()
             return
         
         print("EnterWorld",zone.ip,self.mind.broker.transport.getPeer().host)
@@ -1270,9 +1291,13 @@ class PlayerAvatar(Avatar):
         #if we are logging in with all dead character
         
         self.player.rootInfo = RootInfo(self.player,self.player.party.charInfos)
-        print("####enterWorld: calling setRootInfo on client mind")
+        _logf.write("####enterWorld: calling setRootInfo on client mind\n")
+        _logf.flush()
         d = self.mind.callRemote("setRootInfo",self.player.rootInfo,time()-self.player.world.pauseTime)
-        d.addErrback(lambda f: print("####enterWorld: setRootInfo FAILED: %s" % f))
+        d.addErrback(lambda f: _logf.write("####enterWorld: setRootInfo FAILED: %s\n" % f) or _logf.flush())
+        _logf.write("####enterWorld: completed successfully\n")
+        _logf.flush()
+        _logf.close()
         
         if self.player.cursorItem:
             self.mind.callRemote("setCursorItem",self.player.cursorItem.itemInfo)
