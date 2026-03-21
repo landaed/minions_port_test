@@ -798,18 +798,26 @@ class ProxyProtocol(WebSocketServerProtocol):
             self.session.send({"type": "error", "message": "Missing character_name."})
             return
 
-        d = self.session.player_perspective.callRemote("PlayerAvatar", "enterWorld", [character_name], 0, "")
+        p = self.session.player_perspective
+        print(f"[Proxy] enter_world: perspective={p}, character={character_name}")
+        print(f"[Proxy] enter_world: perspective broker={p.broker if hasattr(p, 'broker') else 'N/A'}")
+        if hasattr(p, 'broker') and hasattr(p.broker, 'transport'):
+            peer = p.broker.transport.getPeer()
+            print(f"[Proxy] enter_world: connected to {peer}")
+
+        d = p.callRemote("PlayerAvatar", "enterWorld", [character_name], 0, "")
         d.addCallback(self._on_enter_world_result, character_name)
         d.addErrback(self._on_character_op_failed, "enter_world")
 
     def _on_enter_world_result(self, result, character_name):
+        print(f"[Proxy] enter_world result: {result}")
         self.session.send(
             {
                 "type": "enter_world_result",
                 "success": True,
                 "character_name": character_name,
                 "message": "Enter-world request sent. Waiting for zone transfer / gameplay protocol bridge.",
-                "result": result,
+                "result": str(result) if result is not None else None,
             }
         )
 
