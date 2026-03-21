@@ -86,8 +86,7 @@ class WorldConnection(pb.Root):
         b = CHARDB.getCharacterBuffer(publicName,characterName)
         if not b:
             return None
-        #does str(bufferobject) mess up sometimes?
-        buffer = encodebytes(dumps(str(b), 2))
+        buffer = encodebytes(dumps(bytes(b), 2))
         return buffer
     
     
@@ -200,8 +199,7 @@ class WorldConnection(pb.Root):
         b = CHARDB.getPlayerBuffer(publicName)
         
         if b:
-            #does str(bufferobject) mess up sometimes?
-            buffer = encodebytes(dumps(str(b), 2))
+            buffer = encodebytes(dumps(bytes(b), 2))
         else:
             buffer = None
         
