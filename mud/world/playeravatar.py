@@ -1243,9 +1243,34 @@ class PlayerAvatar(Avatar):
 
         chars = []
         for p in party:
-            c = Character.byName(p)
-            _logf.write("####enterWorld: Character.byName(%s) = %s dead=%s\n" % (p, c, c.dead))
+            # Check the raw DB state before SQLObject fetches
+            from mud.world.player import Player as _P
+            _rawconn = _P._connection.getConnection()
+            _rawcur = _rawconn.cursor()
+            _rawcur.execute("SELECT id, spawn_id, player_id FROM character WHERE name = ?", (p,))
+            _rawrows = _rawcur.fetchall()
+            _logf.write("####enterWorld: raw DB character rows for '%s': %s\n" % (p, _rawrows))
+            if _rawrows:
+                _sid = _rawrows[0][1]
+                if _sid is not None:
+                    _rawcur.execute("SELECT id, name, race FROM spawn WHERE id = ?", (_sid,))
+                    _srows = _rawcur.fetchall()
+                    _logf.write("####enterWorld: raw DB spawn rows for spawn_id=%s: %s\n" % (_sid, _srows))
+                else:
+                    _logf.write("####enterWorld: spawn_id is NULL!\n")
+            _rawcur.close()
             _logf.flush()
+            try:
+                c = Character.byName(p)
+                _logf.write("####enterWorld: Character.byName(%s) = id=%s spawn_id=%s\n" % (p, c.id, c.spawnID))
+                _logf.flush()
+            except Exception as _e:
+                _logf.write("####enterWorld: Character.byName(%s) FAILED: %s\n" % (p, _e))
+                import traceback as _tb2
+                _tb2.print_exc(file=_logf)
+                _logf.flush()
+                _logf.close()
+                raise
             chars.append(c)
             if not c.dead:
                 alldead = False
