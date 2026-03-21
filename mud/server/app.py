@@ -216,7 +216,9 @@ class MasterPerspective(pb.Avatar):
     
     
     def perspective_call(self,*args):
+        import sys as _sys
         print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
+        _sys.stdout.flush()
         if THESERVER.throttleUsage and self.throttle:
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]
