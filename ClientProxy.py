@@ -110,6 +110,15 @@ class ProxyPlayerMind(pb.Referenceable):
         )
         return True
 
+    def remote_setAllianceInfo(self, *args):
+        self.session.send(
+            {
+                "type": "alliance_info",
+                "message": "Received alliance info from world server.",
+            }
+        )
+        return True
+
     def remote_setAllianceInvite(self, *args):
         self.session.send(
             {
