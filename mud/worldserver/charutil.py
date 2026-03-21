@@ -169,107 +169,150 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
 def InstallCharacterBuffer(playerID,cname,buffer):
     from mud.world.player import Player
     tm = time.time()
-    
+    _logf = open("/tmp/enterworld_debug.log", "a")
+
     if not os.path.exists("data/tmp"):
         os.makedirs("data/tmp")
-    
+
     try:
         dbuffer = zlib.decompress(buffer)
+        _logf.write("####ICB: decompressed %d bytes\n" % len(dbuffer))
         f = open("data/tmp/character%i.db"%CLUSTER,"wb")
         f.write(dbuffer)
         f.close()
-        
+
         dbconn = sqlite.connect("data/tmp/character%i.db"%CLUSTER)
         cursor = dbconn.cursor()
         dstConn = Player._connection.getConnection()
+        _logf.write("####ICB: dstConn isolation_level=%s autocommit=%s\n" % (repr(dstConn.isolation_level), getattr(dstConn, 'autocommit', 'N/A')))
+        _logf.flush()
         dstCursor = dstConn.cursor()
     except:
         traceback.print_exc()
+        traceback.print_exc(file=_logf)
+        _logf.close()
         return True
-    
+
     error = False
-    
+
     SafeEndTransaction(dstCursor)
     dstCursor.execute("BEGIN TRANSACTION;")
-    
+
     try:
         #character tables
-        
+
         #character name and spawn name in buffer can be at odds based on rename
         #in fact rename doesn't check spawn names and must
         cursor.execute("SELECT name FROM character LIMIT 1;")
         name = cursor.fetchone()[0]
         if name != cname:
             cursor.execute("UPDATE character SET name = '%s' WHERE name = '%s';"%(cname,name))
-        
+
         cursor.execute("SELECT name FROM spawn LIMIT 1;")
         name = cursor.fetchone()[0]
         if name != cname:
             cursor.execute("UPDATE spawn SET name = '%s' WHERE name = '%s';"%(cname,name))
-        
+
         cursor.execute("SELECT * FROM character where name = '%s' LIMIT 1;"%cname)
         cvalues = cursor.fetchone()
         cid = cvalues[0] #for look up
+        _logf.write("####ICB: source character id=%s spawn_id=%s\n" % (cid, cvalues))
+        _logf.flush()
         values = GenerateInsertValues('character',(cvalues,),playerID)
+        _logf.write("####ICB: GenerateInsertValues for character: %s\n" % (values,))
+        _logf.write("####ICB: TATTR['character']=%s\n" % (TATTR.get('character'),))
+        _logf.flush()
         sql = 'INSERT INTO character VALUES(%s)'%(TVALUES['character'])
         try:
             dstCursor.executemany(sql,values)
         except:
             traceback.print_exc()
+            traceback.print_exc(file=_logf)
             print(sql,values)
             raise Exception("Error installing character: %s" % cname)
         characterID = dstCursor.lastrowid
+        _logf.write("####ICB: inserted character, lastrowid=%s\n" % characterID)
+        _logf.flush()
         #generate spawn
         cursor.execute("SELECT * FROM spawn WHERE character_id = %i LIMIT 1;"%cid)
         svalues = cursor.fetchone()
         sid = svalues[0]
+        _logf.write("####ICB: source spawn id=%s values=%s\n" % (sid, svalues))
+        _logf.flush()
         values = GenerateInsertValues('spawn',(svalues,),playerID,characterID)
+        _logf.write("####ICB: GenerateInsertValues for spawn: %s\n" % (values,))
+        _logf.flush()
         dstCursor.executemany('INSERT INTO spawn VALUES(%s)'%(TVALUES['spawn']),values)
         spawnID = dstCursor.lastrowid
+        _logf.write("####ICB: inserted spawn, lastrowid=%s\n" % spawnID)
         #update character with spawnID now that we have it
+        _logf.write("####ICB: UPDATE character SET spawn_id = %i WHERE id = %i\n"%(spawnID,characterID))
+        _logf.flush()
         dstCursor.execute("UPDATE character SET spawn_id = %i WHERE id = %i;"%(spawnID,characterID))
-        
+        _logf.write("####ICB: UPDATE rowcount=%s\n" % dstCursor.rowcount)
+        _logf.flush()
+
         #character tables
         ctables = ["character_spell","character_skill","character_advancement","character_dialog_choice","spell_store","character_faction"]
         for t in ctables:
             cursor.execute("SELECT * FROM %s WHERE character_id = %i;"%(t,cid))
             values = GenerateInsertValues(t,cursor.fetchall(),playerID,characterID,spawnID)
             dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
-        
+
         #items
         # Get all items, make sure to leave out bank and vault items
         #  that still have a character id assigned (legacy).
         cursor.execute("SELECT * FROM item WHERE character_id = %i and (slot >= %i or slot < %i) and slot != -1;"%(cid,RPG_SLOT_BANK_END,RPG_SLOT_BANK_BEGIN))
         # player_id must be None for items not in bank.
         InstallItemList(cursor,dstCursor,cursor.fetchall(),None,characterID,spawnID)
-        
+
         #character vault items
         cursor.execute("SELECT item_id FROM character_vault_item WHERE character_id = %i;"%cid)
         InstallItemList(cursor,dstCursor,cursor.fetchall(),playerID,characterID,spawnID,True,None,None,True)
-        
+
         #spawn tables
         stables = ["spawn_skill","spawn_resistance","spawn_spell","spawn_stat"]
         for t in stables:
             cursor.execute("SELECT * FROM %s WHERE spawn_id = %i;"%(t,sid))
             values = GenerateInsertValues(t,cursor.fetchall(),playerID,characterID,spawnID)
             dstCursor.executemany('INSERT INTO %s VALUES(%s)'%(t,TVALUES[t]),values)
-        
-        #print "whee"
+
+        _logf.write("####ICB: about to SafeEndTransaction (COMMIT)\n")
+        _logf.flush()
         SafeEndTransaction(dstCursor)
+
+        # Verify the commit worked
+        verifyCursor = dstConn.cursor()
+        verifyCursor.execute("SELECT id, spawn_id FROM character WHERE id = %i;" % characterID)
+        verifyRow = verifyCursor.fetchone()
+        _logf.write("####ICB: AFTER COMMIT verify character id=%s spawn_id=%s\n" % (verifyRow[0] if verifyRow else None, verifyRow[1] if verifyRow else None))
+        verifyCursor.close()
+        _logf.flush()
     except:
         error = True
         traceback.print_exc()
+        traceback.print_exc(file=_logf)
         dstCursor.execute('ROLLBACK TRANSACTION;')
-    
+
     dstCursor.execute('BEGIN TRANSACTION;')
-    
+
+    # Verify again after BEGIN TRANSACTION
+    verifyCursor2 = dstConn.cursor()
+    verifyCursor2.execute("SELECT id, spawn_id FROM character WHERE name = ?;", (cname,))
+    verifyRow2 = verifyCursor2.fetchone()
+    _logf.write("####ICB: FINAL verify character row: %s\n" % (verifyRow2,))
+    verifyCursor2.close()
+    _logf.flush()
+
     dstCursor.close()
     #dstConn.close()
     cursor.close()
     dbconn.close()
-    
-    print("Character installation took %f seconds"%(time.time()-tm))
-    
+
+    _logf.write("####ICB: Character installation took %f seconds, error=%s\n"%(time.time()-tm, error))
+    _logf.flush()
+    _logf.close()
+
     return error
 
 
