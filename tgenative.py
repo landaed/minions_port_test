@@ -45,6 +45,12 @@ class TGEObject:
     def setFieldValue(self, field, value):
         pass
 
+    def setText(self, text):
+        pass
+
+    def setVisible(self, visible):
+        pass
+
     def call(self, method, *args):
         return ""
 
