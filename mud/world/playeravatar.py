@@ -1085,6 +1085,7 @@ class PlayerAvatar(Avatar):
             
             
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
+        print("####gotCharacterBuffer: cbuffer=%s party=%s" % (bool(cbuffer), party))
         if cbuffer:
             cbuffer = loads(decodebytes(cbuffer))
             error = InstallCharacterBuffer(self.player.id,party[0],cbuffer)
@@ -1127,18 +1128,22 @@ class PlayerAvatar(Avatar):
     
     def perspective_enterWorld(self,party,simPort, simPassword):
         from mud.world.cserveravatar import AVATAR
+        print("####perspective_enterWorld: party=%s AVATAR=%s charInfos=%s" % (party, bool(AVATAR), [c.name for c in self.charInfos]))
         if not AVATAR:
+            print("####perspective_enterWorld: no AVATAR, calling enterWorld directly")
             self.enterWorld(party,simPort,simPassword)
             return
-        
+
         #alright, we need to figure out what zone we are going to so we can pick a zone cluster
         cname = party[0]
         newc = False
         player = self.player
-        
+        zone = None
+
         for c in self.charInfos:
             if cname == c.name:
                 newc = c.newCharacter
+                print("####perspective_enterWorld: found char %s realm=%s newChar=%s" % (cname, c.realm, newc))
                 if c.realm == RPG_REALM_DARKNESS:
                     zone = self.player.darknessLogZone.name
                 elif c.realm == RPG_REALM_MONSTER:
@@ -1155,7 +1160,12 @@ class PlayerAvatar(Avatar):
                         zone = self.world.mstartZone
                     else:
                         zone = self.world.startZone
-                
+
+        if zone is None:
+            print("####perspective_enterWorld: ERROR - character '%s' not found in charInfos!" % cname)
+            return (-1, "Character not found")
+
+        print("####perspective_enterWorld: zone=%s staticZoneNames=%s" % (zone, self.world.staticZoneNames))
         if zone in self.world.staticZoneNames:
             #we're on the right world server already            
             d = AVATAR.mind.callRemote("getCharacterBuffer",self.player.publicName,party[0])
@@ -1172,12 +1182,13 @@ class PlayerAvatar(Avatar):
             
     def enterWorld(self,party,simPort,simPassword):
         from mud.world.cserveravatar import AVATAR
-    
+        print("####enterWorld: party=%s simPort=%s simPassword=%s" % (party, simPort, simPassword))
+
         #zone is an instance
-        
+
         #if we are logging in with all dead characters, it's back to our bind point for us
         alldead = True
-        
+
         chars = []
         for p in party:
             c = Character.byName(p)
@@ -1217,7 +1228,9 @@ class PlayerAvatar(Avatar):
                 self.player.logZone = self.player.bindZone
         
         zone = self.world.playerSelectZone(self,simPort,simPassword)
+        print("####enterWorld: playerSelectZone returned %s (liveZones=%s)" % (zone, [z.name for z in self.world.liveZoneInstances]))
         if not zone:
+            print("####enterWorld: ERROR - no zone returned from playerSelectZone!")
             return
         
         print("EnterWorld",zone.ip,self.mind.broker.transport.getPeer().host)
@@ -1257,7 +1270,9 @@ class PlayerAvatar(Avatar):
         #if we are logging in with all dead character
         
         self.player.rootInfo = RootInfo(self.player,self.player.party.charInfos)
-        self.mind.callRemote("setRootInfo",self.player.rootInfo,time()-self.player.world.pauseTime)
+        print("####enterWorld: calling setRootInfo on client mind")
+        d = self.mind.callRemote("setRootInfo",self.player.rootInfo,time()-self.player.world.pauseTime)
+        d.addErrback(lambda f: print("####enterWorld: setRootInfo FAILED: %s" % f))
         
         if self.player.cursorItem:
             self.mind.callRemote("setCursorItem",self.player.cursorItem.itemInfo)
