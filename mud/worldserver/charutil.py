@@ -296,16 +296,6 @@ def InstallCharacterBuffer(playerID,cname,buffer):
         traceback.print_exc(file=_logf)
         dstCursor.execute('ROLLBACK TRANSACTION;')
 
-    dstCursor.execute('BEGIN TRANSACTION;')
-
-    # Verify again after BEGIN TRANSACTION
-    verifyCursor2 = dstConn.cursor()
-    verifyCursor2.execute("SELECT id, spawn_id FROM character WHERE name = ?;", (cname,))
-    verifyRow2 = verifyCursor2.fetchone()
-    _logf.write("####ICB: FINAL verify character row: %s\n" % (verifyRow2,))
-    verifyCursor2.close()
-    _logf.flush()
-
     dstCursor.close()
     #dstConn.close()
     cursor.close()
