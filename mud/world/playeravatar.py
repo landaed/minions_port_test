@@ -1085,14 +1085,22 @@ class PlayerAvatar(Avatar):
             
             
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
-        print("####gotCharacterBuffer: cbuffer=%s party=%s" % (bool(cbuffer), party))
+        _lf = open("/tmp/enterworld_debug.log", "a")
+        _lf.write("####gotCharacterBuffer: cbuffer=%s party=%s\n" % (bool(cbuffer), party))
+        _lf.flush()
         if cbuffer:
             cbuffer = loads(decodebytes(cbuffer))
             error = InstallCharacterBuffer(self.player.id,party[0],cbuffer)
             if error:
+                _lf.write("####gotCharacterBuffer: InstallCharacterBuffer ERROR: %s\n" % error)
+                _lf.flush()
+                _lf.close()
                 self.mind.callRemote("messageBox","Transfer Error",
                     "Unable to install transferred character data. Please try again.")
                 return
+        _lf.write("####gotCharacterBuffer: calling enterWorld\n")
+        _lf.flush()
+        _lf.close()
         self.enterWorld(party,simPort,simPassword)
         
     def playerJumped(self,result):        
@@ -1157,7 +1165,8 @@ class PlayerAvatar(Avatar):
         for c in self.charInfos:
             if cname == c.name:
                 newc = c.newCharacter
-                print("####perspective_enterWorld: found char %s realm=%s newChar=%s" % (cname, c.realm, newc))
+                _logf.write("####perspective_enterWorld: found char %s realm=%s newChar=%s\n" % (cname, c.realm, newc))
+                _logf.flush()
                 if c.realm == RPG_REALM_DARKNESS:
                     zone = self.player.darknessLogZone.name
                 elif c.realm == RPG_REALM_MONSTER:
@@ -1165,9 +1174,14 @@ class PlayerAvatar(Avatar):
                 elif c.realm == RPG_REALM_LIGHT:
                     zone = self.player.logZone.name
                 else:
+                    _logf.write("####perspective_enterWorld: Unknown realm %s!\n" % c.realm)
+                    _logf.flush()
+                    _logf.close()
                     raise Exception("Unknown Realm!")
 
                 if self.world.staticZoneNames and zone not in self.world.staticZoneNames:
+                    _logf.write("####perspective_enterWorld: zone %s not in staticZoneNames, using startZone\n" % zone)
+                    _logf.flush()
                     if c.realm == RPG_REALM_DARKNESS:
                         zone = self.world.dstartZone
                     elif c.realm == RPG_REALM_MONSTER:
@@ -1176,20 +1190,42 @@ class PlayerAvatar(Avatar):
                         zone = self.world.startZone
 
         if zone is None:
-            print("####perspective_enterWorld: ERROR - character '%s' not found in charInfos!" % cname)
+            _logf.write("####perspective_enterWorld: ERROR - character '%s' not found in charInfos!\n" % cname)
+            _logf.flush()
+            _logf.close()
             return (-1, "Character not found")
 
-        print("####perspective_enterWorld: zone=%s staticZoneNames=%s" % (zone, self.world.staticZoneNames))
+        _logf.write("####perspective_enterWorld: zone=%s staticZoneNames=%s\n" % (zone, self.world.staticZoneNames))
+        _logf.flush()
         if zone in self.world.staticZoneNames:
-            #we're on the right world server already            
+            #we're on the right world server already
+            _logf.write("####perspective_enterWorld: zone IS in staticZoneNames, calling getCharacterBuffer\n")
+            _logf.write("####perspective_enterWorld: AVATAR.mind=%s\n" % AVATAR.mind)
+            _logf.flush()
+            def _gotBuffer(result):
+                _lf = open("/tmp/enterworld_debug.log", "a")
+                _lf.write("####getCharacterBuffer callback: result=%s\n" % (bool(result),))
+                _lf.flush()
+                _lf.close()
+                return self.gotCharacterBuffer(result, party, simPort, simPassword)
+            def _bufferErr(failure):
+                _lf = open("/tmp/enterworld_debug.log", "a")
+                _lf.write("####getCharacterBuffer ERRBACK: %s\n" % failure)
+                _lf.flush()
+                _lf.close()
+                return failure
             d = AVATAR.mind.callRemote("getCharacterBuffer",self.player.publicName,party[0])
-            d.addCallback(self.gotCharacterBuffer,party,simPort,simPassword)
+            d.addCallback(_gotBuffer)
+            d.addErrback(_bufferErr)
+            _logf.write("####perspective_enterWorld: getCharacterBuffer deferred created, returning\n")
+            _logf.flush()
+            _logf.close()
             return d
-        
+
         #we need to transfer to another server
-        # New characters have already been exported to the character server and
-        # cleaned up from the local world DB, so always fetch the character
-        # buffer from the character server for cross-server transfers.
+        _logf.write("####perspective_enterWorld: zone NOT in staticZoneNames, doing transfer\n")
+        _logf.flush()
+        _logf.close()
         d = AVATAR.mind.callRemote("getCharacterBuffer",self.player.publicName,party[0])
         d.addCallback(self.gotTransferCharacterBuffer,party,zone)
         return d
