@@ -526,17 +526,20 @@ class ProxyProtocol(WebSocketServerProtocol):
 
     @staticmethod
     def _character_info_to_dict(cinfo):
+        from mud.world import defines as world_defines
+
         klass = cinfo.klasses[0] if getattr(cinfo, "klasses", None) else ""
         level = cinfo.levels[0] if getattr(cinfo, "levels", None) else 0
+        realm_labels = {
+            int(getattr(world_defines, "RPG_REALM_LIGHT", 1)): "Light",
+            int(getattr(world_defines, "RPG_REALM_DARKNESS", 2)): "Darkness",
+            int(getattr(world_defines, "RPG_REALM_MONSTER", 3)): "Monster",
+        }
         return {
             "name": cinfo.name,
             "race": cinfo.race,
             "realm": cinfo.realm,
-            "realm_name": {
-                RPG_REALM_LIGHT: "Light",
-                RPG_REALM_DARKNESS: "Darkness",
-                RPG_REALM_MONSTER: "Monster",
-            }.get(cinfo.realm, str(cinfo.realm)),
+            "realm_name": realm_labels.get(cinfo.realm, str(cinfo.realm)),
             "klass": klass,
             "level": level,
             "status": cinfo.status,
