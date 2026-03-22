@@ -34,12 +34,144 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
-from mud.world.defines import (
-    RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
-    RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
-    RPG_RACE_STATS, RPG_DEFAULT_STATS, RPG_STATS,
-)
 
+
+def _get_first_attr(obj, *names, default=None):
+    if obj is None:
+        return default
+    for name in names:
+        if hasattr(obj, name):
+            value = getattr(obj, name)
+            if value is not None:
+                return value
+    return default
+
+
+def _serialize_rapid_mob_info(rapid_info):
+    if not rapid_info:
+        return {}
+    fields = (
+        "HEALTH", "MAXHEALTH", "MANA", "MAXMANA", "STAMINA", "MAXSTAMINA",
+        "TGT", "TGTID", "TGTHEALTH", "PETNAME", "PETHEALTH", "AUTOATTACK", "CASTING",
+    )
+    data = {}
+    for field in fields:
+        value = _get_first_attr(rapid_info, field, field.lower())
+        if value is not None:
+            data[field.lower()] = value
+    return data
+
+
+def _serialize_character_cache(char_info):
+    if not char_info:
+        return {}
+
+    fields = (
+        ("name", ("NAME", "name")),
+        ("race", ("RACE", "race")),
+        ("sex", ("SEX", "sex")),
+        ("realm", ("REALM", "realm")),
+        ("pclass", ("PCLASS", "pclass")),
+        ("sclass", ("SCLASS", "sclass")),
+        ("tclass", ("TCLASS", "tclass")),
+        ("plevel", ("PLEVEL", "plevel")),
+        ("slevel", ("SLEVEL", "slevel")),
+        ("tlevel", ("TLEVEL", "tlevel")),
+        ("spawnid", ("SPAWNID", "spawnid")),
+        ("charid", ("CHARID", "charid")),
+        ("mobid", ("MOBID", "mobid")),
+        ("dead", ("DEAD", "dead")),
+        ("portraitpic", ("PORTRAITPIC", "portraitpic")),
+        ("position", ("POSITION", "position")),
+    )
+    data = {}
+    for output_name, attr_names in fields:
+        value = _get_first_attr(char_info, *attr_names)
+        if value is not None:
+            data[output_name] = value
+
+    skills = _get_first_attr(char_info, "SKILLS", "skills", default={}) or {}
+    skill_reuse = _get_first_attr(char_info, "SKILLREUSE", "skillReuse", "skill_reuse", default={}) or {}
+
+    abilities = []
+    for name in sorted(skills.keys(), key=lambda value: str(value))[:8]:
+        key = str(name)
+        reuse_value = skill_reuse.get(key.upper(), skill_reuse.get(key))
+        cooldown_seconds = 0
+        if reuse_value is not None:
+            try:
+                cooldown_seconds = int(reuse_value)
+            except (TypeError, ValueError):
+                cooldown_seconds = 0
+        abilities.append({
+            "name": key,
+            "rank": skills[name],
+            "cooldown_active": key.upper() in skill_reuse or key in skill_reuse,
+            "cooldown_seconds": cooldown_seconds,
+            "source": "server",
+        })
+
+    rapid_info = _get_first_attr(char_info, "RAPIDMOBINFO", "rapidMobInfo")
+    if rapid_info is None and hasattr(char_info, "character") and getattr(char_info.character, "mob", None):
+        rapid_info = getattr(char_info, "rapidMobInfo", None) or getattr(char_info.character, "rapidMobInfo", None)
+
+    data["abilities"] = abilities
+    data["rapid_mob_info"] = _serialize_rapid_mob_info(rapid_info)
+    data["name"] = data.get("name") or _get_first_attr(char_info, "NAME", "name", default="")
+    data["pclass"] = data.get("pclass") or _get_first_attr(char_info, "PCLASS", "pclass", default="")
+    data["level"] = data.get("plevel") or _get_first_attr(char_info, "PLEVEL", "plevel", default=1)
+    return data
+
+
+def _serialize_root_info(root_info, session):
+    if not root_info:
+        return {}
+
+    char_info_map = _get_first_attr(root_info, "CHARINFOS", "charInfos", default={}) or {}
+    if hasattr(char_info_map, "items"):
+        sorted_infos = [value for _, value in sorted(char_info_map.items(), key=lambda item: item[0])]
+    else:
+        sorted_infos = list(char_info_map)
+
+    char_infos = [_serialize_character_cache(value) for value in sorted_infos if value]
+
+    position = _get_first_attr(root_info, "POSITION", "position")
+    if position is None:
+        player = _get_first_attr(root_info, "player")
+        if player is not None:
+            sim_object = getattr(player, "simObject", None)
+            position = getattr(sim_object, "position", None)
+    position = list(position or (0, 0, 0))
+
+    player_name = _get_first_attr(root_info, "PLAYERNAME", default=None)
+    guild_name = _get_first_attr(root_info, "GUILDNAME", default=None)
+    tin = _get_first_attr(root_info, "TIN", default=None)
+    paused = _get_first_attr(root_info, "PAUSED", default=None)
+    if any(value is None for value in (player_name, guild_name, tin, paused)):
+        player = _get_first_attr(root_info, "player")
+        if player is not None:
+            if player_name is None:
+                player_name = getattr(player, "name", "")
+            if guild_name is None:
+                guild_name = getattr(player, "guildName", "")
+            if tin is None:
+                tin = int(getattr(player, "tin", 0))
+                tin += getattr(player, "copper", 0) * 100
+                tin += getattr(player, "silver", 0) * 10000
+                tin += getattr(player, "gold", 0) * 1000000
+                tin += getattr(player, "platinum", 0) * 100000000
+            if paused is None:
+                paused = bool(getattr(getattr(player, "world", None), "paused", False))
+
+    return {
+        "player_name": player_name or "",
+        "guild_name": guild_name or "",
+        "tin": tin or 0,
+        "paused": bool(paused),
+        "position": position,
+        "char_infos": char_infos,
+        "world_name": session.current_world.get("name", "") if session.current_world else "",
+    }
 
 def _local_world_access_password(world_name):
     """Best-effort lookup for locally hosted player-world access passwords."""
@@ -84,12 +216,42 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setRootInfo(self, rootInfo, *args):
-        self.session.send(
+        self.session.root_info_cache = rootInfo
+        payload = _serialize_root_info(rootInfo, self.session)
+        payload.update(
             {
                 "type": "root_info",
-                "message": "Received root info from world server.",
+                "message": "Received root info from world server. Launching the local greybox test scene.",
             }
         )
+        self.session.send(payload)
+        self.session.start_gameplay_sync()
+        self.session.start_entity_sync()
+        return True
+
+    def remote_receiveTextList(self, messages):
+        text_messages = [str(message) for message in messages]
+        self.session.send({
+            "type": "text_messages",
+            "messages": text_messages,
+        })
+        return True
+
+    def remote_receiveGameText(self, textCode, text, stripML):
+        self.session.send({
+            "type": "game_text",
+            "text_code": textCode,
+            "text": str(text),
+            "strip_ml": bool(stripML),
+        })
+        return True
+
+    def remote_setTgtDesc(self, infoDict):
+        payload = {str(key).lower(): value for key, value in dict(infoDict).items()}
+        self.session.send({
+            "type": "target_description",
+            "target": payload,
+        })
         return True
 
     def remote_setCursorItem(self, itemInfo):
@@ -159,6 +321,11 @@ class GodotClientSession:
         self.current_world = None
         self.cached_characters = []
         self.world_password = ""
+        self.root_info_cache = None
+        self.gameplay_sync_call = None
+        self.entity_sync_call = None
+        self.last_gameplay_payload = None
+        self.last_entity_payload = None
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
@@ -170,6 +337,15 @@ class GodotClientSession:
 
     def cleanup(self):
         """Disconnect any PB connections."""
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            self.gameplay_sync_call.cancel()
+        if self.entity_sync_call and self.entity_sync_call.active():
+            self.entity_sync_call.cancel()
+        self.gameplay_sync_call = None
+        self.entity_sync_call = None
+        self.root_info_cache = None
+        self.last_gameplay_payload = None
+        self.last_entity_payload = None
         for attr in ("master_perspective", "new_world_perspective", "player_perspective"):
             perspective = getattr(self, attr, None)
             if perspective:
@@ -179,6 +355,47 @@ class GodotClientSession:
                     pass
                 setattr(self, attr, None)
         self.player_mind = None
+
+    def start_gameplay_sync(self):
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            return
+        self.gameplay_sync_call = reactor.callLater(0.25, self._emit_gameplay_sync)
+
+    def start_entity_sync(self):
+        if self.entity_sync_call and self.entity_sync_call.active():
+            return
+        self.entity_sync_call = reactor.callLater(0.25, self._emit_entity_sync)
+
+    def _emit_gameplay_sync(self):
+        self.gameplay_sync_call = None
+        if not self.root_info_cache:
+            return
+        payload = _serialize_root_info(self.root_info_cache, self)
+        if payload != self.last_gameplay_payload:
+            self.last_gameplay_payload = payload.copy()
+            self.send({"type": "gameplay_state", **payload})
+        self.start_gameplay_sync()
+
+    def _emit_entity_sync(self):
+        self.entity_sync_call = None
+        if not self.player_perspective or not self.root_info_cache:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getVisibleEntities", 0)
+        d.addCallback(self._on_entity_snapshot)
+        d.addErrback(self._on_entity_snapshot_failed)
+
+    def _on_entity_snapshot(self, entities):
+        if entities != self.last_entity_payload:
+            self.last_entity_payload = entities
+            self.send({"type": "entity_snapshot", "entities": entities})
+        self.start_entity_sync()
+
+    def _on_entity_snapshot_failed(self, reason):
+        self.send({
+            "type": "game_text",
+            "text": "Entity replication snapshot failed: %s" % (str(reason.value) if hasattr(reason, "value") else str(reason)),
+        })
+        self.start_entity_sync()
 
 
 class ProxyProtocol(WebSocketServerProtocol):
@@ -217,6 +434,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             "create_character": self.handle_create_character,
             "enter_world": self.handle_enter_world,
             "direct_connect": self.handle_direct_connect,
+            "gameplay_command": self.handle_gameplay_command,
         }.get(msg_type)
 
         if handler:
@@ -243,6 +461,61 @@ class ProxyProtocol(WebSocketServerProtocol):
             })
             return False
         return True
+
+    def _send_gameplay_command_result(self, success, command, message=""):
+        self.session.send({
+            "type": "gameplay_command_result",
+            "success": bool(success),
+            "command": command,
+            "message": message,
+        })
+
+    def handle_gameplay_command(self, msg):
+        if not self._ensure_player_logged_in():
+            return
+
+        command = str(msg.get("command", "")).strip().lower()
+        if not command:
+            self._send_gameplay_command_result(False, command, "Missing gameplay command.")
+            return
+
+        command_map = {
+            "cycle_target": ("CYCLETARGET", ["0"]),
+            "target_nearest": ("TARGETNEAREST", ["0"]),
+            "interact": ("INTERACT", ["0"]),
+            "attack_toggle": ("ATTACK", ["0", "TOGGLE"]),
+        }
+
+        payload = command_map.get(command)
+        if payload is None and command == "use_ability":
+            ability_name = str(msg.get("ability_name", "")).strip()
+            if not ability_name:
+                self._send_gameplay_command_result(False, command, "Missing ability name.")
+                return
+            payload = ("SKILL", ["0", *ability_name.split()])
+
+        if payload is None and command == "target_entity":
+            entity_id = int(msg.get("entity_id", 0) or 0)
+            if entity_id <= 0:
+                self._send_gameplay_command_result(False, command, "Missing entity id.")
+                return
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "targetEntity", entity_id, 0)
+            d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Targeted replicated entity {entity_id} on legacy world server."))
+            d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
+            return
+
+        if payload is None:
+            self._send_gameplay_command_result(False, command, f"Unsupported gameplay command: {command}")
+            return
+
+        world_command, args = payload
+        d = self.session.player_perspective.callRemote("PlayerAvatar", "doCommand", world_command, args)
+        d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Sent {world_command} to legacy world server."))
+        d.addErrback(self._on_gameplay_command_failed, command, world_command)
+
+    def _on_gameplay_command_failed(self, reason, command, world_command):
+        msg = str(reason.value) if hasattr(reason, "value") else str(reason)
+        self._send_gameplay_command_result(False, command, f"{world_command} failed: {msg}")
 
     @staticmethod
     def _character_info_to_dict(cinfo):
