@@ -1005,6 +1005,9 @@ class ProxyProtocol(WebSocketServerProtocol):
         realm_races = dict(getattr(world_defines, "RPG_REALM_RACES", {}))
         realm_classes = dict(getattr(world_defines, "RPG_REALM_CLASSES", {}))
         race_classes = dict(getattr(world_defines, "RPG_RACE_CLASSES", {}))
+        race_stats = dict(getattr(world_defines, "RPG_RACE_STATS", {}))
+        default_stats = dict(getattr(world_defines, "RPG_DEFAULT_STATS", {}))
+        stats = tuple(getattr(world_defines, "RPG_STATS", ()))
 
         name = str(msg.get("name", "")).strip().capitalize()
         race = str(msg.get("race", "Human")).strip() or "Human"
@@ -1075,13 +1078,13 @@ class ProxyProtocol(WebSocketServerProtocol):
         newchar.realm = realm
         newchar.ptsRemaining = 0
 
-        rstat = RPG_RACE_STATS[race]
-        for stat in RPG_STATS:
+        rstat = race_stats[race]
+        for stat in stats:
             newchar.scores[stat] = getattr(rstat, stat)
             newchar.adjs[stat] = 0
 
-        if klass in RPG_DEFAULT_STATS:
-            for stat, value in zip(RPG_STATS, RPG_DEFAULT_STATS[klass]):
+        if klass in default_stats:
+            for stat, value in zip(stats, default_stats[klass]):
                 newchar.adjs[stat] = value
 
         d = self.session.player_perspective.callRemote("PlayerAvatar", "newCharacter", newchar)
