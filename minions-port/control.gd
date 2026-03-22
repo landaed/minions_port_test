@@ -1,8 +1,13 @@
 extends Control
 
+const GAMEPLAY_VIEW_SCENE := preload("res://gameplay_view.tscn")
+
 var socket := WebSocketPeer.new()
 var connected := false
+var gameplay_view: Control = null
+var world_time := {"hour": 0, "minute": 0}
 
+@onready var login_panel := $VBoxContainer
 @onready var username_field := $VBoxContainer/UsernameField
 @onready var password_field := $VBoxContainer/PasswordField
 @onready var login_button := $VBoxContainer/LoginButton
@@ -90,21 +95,21 @@ func _send(msg: Dictionary):
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		socket.send_text(JSON.stringify(msg))
 
-func _set_world_ui_visible(visible: bool):
-	world_password_field.visible = visible
-	fantasy_name_field.visible = visible
-	world_access_password_field.visible = visible and bool(selected_world.get("has_password", false))
-	create_world_account_button.visible = visible
-	login_world_button.visible = visible
+func _set_world_ui_visible(is_visible: bool):
+	world_password_field.visible = is_visible
+	fantasy_name_field.visible = is_visible
+	world_access_password_field.visible = is_visible and bool(selected_world.get("has_password", false))
+	create_world_account_button.visible = is_visible
+	login_world_button.visible = is_visible
 
-func _set_character_ui_visible(visible: bool):
-	character_list.visible = visible
-	character_name_field.visible = visible
-	race_option.visible = visible
-	class_option.visible = visible
-	sex_option.visible = visible
-	create_character_button.visible = visible
-	enter_world_button.visible = visible
+func _set_character_ui_visible(is_visible: bool):
+	character_list.visible = is_visible
+	character_name_field.visible = is_visible
+	race_option.visible = is_visible
+	class_option.visible = is_visible
+	sex_option.visible = is_visible
+	create_character_button.visible = is_visible
+	enter_world_button.visible = is_visible
 
 func _selected_character_name() -> String:
 	var selected_items = character_list.get_selected_items()
@@ -114,6 +119,32 @@ func _selected_character_name() -> String:
 	if idx < 0 or idx >= characters.size():
 		return ""
 	return str(characters[idx].get("name", ""))
+
+func _ensure_gameplay_view() -> Control:
+	if gameplay_view == null:
+		gameplay_view = GAMEPLAY_VIEW_SCENE.instantiate()
+		gameplay_view.visible = false
+		if gameplay_view.has_signal("command_requested"):
+			gameplay_view.command_requested.connect(_on_gameplay_view_command_requested)
+		add_child(gameplay_view)
+	return gameplay_view
+
+func _on_gameplay_view_command_requested(command_type: String, payload: Dictionary = {}):
+	var msg := {"type": "gameplay_command", "command": command_type}
+	for key in payload.keys():
+		msg[key] = payload[key]
+	_send(msg)
+
+func _show_gameplay_view(payload: Dictionary):
+	var view := _ensure_gameplay_view()
+	login_panel.visible = false
+	view.visible = true
+	if view.has_method("apply_world_state"):
+		view.apply_world_state(payload, selected_world, world_time)
+
+func _update_gameplay_clock():
+	if gameplay_view and gameplay_view.visible and gameplay_view.has_method("set_world_time"):
+		gameplay_view.set_world_time(world_time)
 
 func _on_login_button_pressed():
 	var user = username_field.text.strip_edges()
@@ -248,7 +279,6 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "World error: " + data.get("message", "")
 
-
 		"world_access_password_result":
 			if data.get("success", false):
 				var access_pw: String = data.get("world_access_password", "")
@@ -306,12 +336,45 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "Enter world failed: " + data.get("message", "")
 
+		"root_info", "gameplay_state":
+			_show_gameplay_view(data)
+
 		"zone_transfer":
-			status_label.text = "Zone handoff received. Next: bridge zone protocol / gameplay streaming."
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_zone_transfer"):
+				gameplay_view.set_zone_transfer(data)
+
+		"target_description":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_target_description"):
+				gameplay_view.set_target_description(data.get("target", {}))
+
+		"entity_snapshot":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_entities"):
+				gameplay_view.set_entities(data.get("entities", []))
+
+		"game_text":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_game_text"):
+				gameplay_view.append_game_text(str(data.get("text", "")))
+
+		"text_messages":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_text_messages"):
+				gameplay_view.append_text_messages(data.get("messages", []))
 
 		"world_time":
-			# Useful as a signal that player login is fully alive.
-			pass
+			world_time = {
+				"hour": int(data.get("hour", 0)),
+				"minute": int(data.get("minute", 0)),
+			}
+			_update_gameplay_clock()
+
+		"gameplay_command_result":
+			status_label.text = data.get("message", "Gameplay command sent.")
+			if gameplay_view and gameplay_view.has_method("append_game_text"):
+				gameplay_view.append_game_text(str(data.get("message", "")))
 
 		"error":
 			create_world_account_button.disabled = false
@@ -331,10 +394,10 @@ func _populate_world_list():
 		return
 
 	for w in worlds:
-		var name: String = w.get("name", "???")
+		var world_name: String = w.get("name", "???")
 		var players: int = w.get("num_players", 0)
 		var max_p: int = w.get("max_players", 0)
-		var label := "%s  (%d/%d players)" % [name, players, max_p]
+		var label := "%s  (%d/%d players)" % [world_name, players, max_p]
 		world_list.add_item(label)
 
 	status_label.text = "Found %d world(s). Select one and click Join." % worlds.size()
