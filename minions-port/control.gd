@@ -1,8 +1,13 @@
 extends Control
 
+const GAMEPLAY_VIEW_SCENE := preload("res://gameplay_view.tscn")
+
 var socket := WebSocketPeer.new()
 var connected := false
+var gameplay_view: Control = null
+var world_time := {"hour": 0, "minute": 0}
 
+@onready var login_panel := $VBoxContainer
 @onready var username_field := $VBoxContainer/UsernameField
 @onready var password_field := $VBoxContainer/PasswordField
 @onready var login_button := $VBoxContainer/LoginButton
@@ -114,6 +119,24 @@ func _selected_character_name() -> String:
 	if idx < 0 or idx >= characters.size():
 		return ""
 	return str(characters[idx].get("name", ""))
+
+func _ensure_gameplay_view() -> Control:
+	if gameplay_view == null:
+		gameplay_view = GAMEPLAY_VIEW_SCENE.instantiate()
+		gameplay_view.visible = false
+		add_child(gameplay_view)
+	return gameplay_view
+
+func _show_gameplay_view(payload: Dictionary):
+	var view := _ensure_gameplay_view()
+	login_panel.visible = false
+	view.visible = true
+	if view.has_method("apply_world_state"):
+		view.apply_world_state(payload, selected_world, world_time)
+
+func _update_gameplay_clock():
+	if gameplay_view and gameplay_view.visible and gameplay_view.has_method("set_world_time"):
+		gameplay_view.set_world_time(world_time)
 
 func _on_login_button_pressed():
 	var user = username_field.text.strip_edges()
@@ -248,7 +271,6 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "World error: " + data.get("message", "")
 
-
 		"world_access_password_result":
 			if data.get("success", false):
 				var access_pw: String = data.get("world_access_password", "")
@@ -306,12 +328,35 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "Enter world failed: " + data.get("message", "")
 
+		"root_info", "gameplay_state":
+			_show_gameplay_view(data)
+
 		"zone_transfer":
-			status_label.text = "Zone handoff received. Next: bridge zone protocol / gameplay streaming."
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_zone_transfer"):
+				gameplay_view.set_zone_transfer(data)
+
+		"target_description":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_target_description"):
+				gameplay_view.set_target_description(data.get("target", {}))
+
+		"game_text":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_game_text"):
+				gameplay_view.append_game_text(str(data.get("text", "")))
+
+		"text_messages":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_text_messages"):
+				gameplay_view.append_text_messages(data.get("messages", []))
 
 		"world_time":
-			# Useful as a signal that player login is fully alive.
-			pass
+			world_time = {
+				"hour": int(data.get("hour", 0)),
+				"minute": int(data.get("minute", 0)),
+			}
+			_update_gameplay_clock()
 
 		"error":
 			create_world_account_button.disabled = false
