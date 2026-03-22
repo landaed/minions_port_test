@@ -25,7 +25,7 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
 	var position: Vector3 = _payload_position()
-	player_body.global_position = position
+	player_body.global_position = Vector3(position.x, max(position.y, 2.0), position.z)
 	camera.current = true
 	visible = true
 	_update_labels()
@@ -65,13 +65,15 @@ func _update_labels():
 	var time_text := "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
 	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
 	var paused_text := "yes" if bool(current_payload.get("paused", false)) else "no"
-	detail_label.text = "Guild: %s\nParty: %s\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nWASD move, mouse look, Esc release cursor." % [
+	var grounded_text := "yes" if player_body.is_on_floor() else "no"
+	detail_label.text = "Guild: %s\nParty: %s\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, left click captures mouse look, Esc releases cursor." % [
 		guild_name if not guild_name.is_empty() else "<none>",
 		_character_summary(),
 		pos.x,
 		pos.y,
 		pos.z,
 		paused_text,
+		grounded_text,
 	]
 	var transfer = current_payload.get("zone_transfer", {})
 	if transfer.is_empty():

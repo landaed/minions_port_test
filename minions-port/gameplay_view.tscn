@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cn8y7evfl1pgq"]
+[gd_scene load_steps=12 format=3 uid="uid://cn8y7evfl1pgq"]
 
 [ext_resource type="Script" path="res://gameplay_view.gd" id="1_slyo1"]
 
@@ -21,6 +21,18 @@ material = SubResource("3_box_mat")
 [sub_resource type="CapsuleShape3D" id="6_capsule_shape"]
 radius = 0.5
 height = 1.8
+
+[sub_resource type="BoxShape3D" id="7_floor_shape"]
+size = Vector3(60, 0.5, 60)
+
+[sub_resource type="BoxShape3D" id="8_box_a_shape"]
+size = Vector3(4, 4, 4)
+
+[sub_resource type="BoxShape3D" id="9_box_b_shape"]
+size = Vector3(4, 2, 12)
+
+[sub_resource type="BoxShape3D" id="10_box_c_shape"]
+size = Vector3(8, 6, 8)
 
 [node name="GameplayView" type="Control"]
 layout_mode = 3
@@ -53,26 +65,48 @@ rotation = Vector3(-0.959931, 0.610865, 0)
 light_energy = 1.5
 shadow_enabled = true
 
-[node name="Floor" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
+[node name="FloorBody" type="StaticBody3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
+position = Vector3(0, -0.25, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/WorldRoot/FloorBody"]
+shape = SubResource("7_floor_shape")
+
+[node name="Floor" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot/FloorBody"]
+position = Vector3(0, 0.25, 0)
 mesh = SubResource("2_floor_mesh")
 surface_material_override/0 = SubResource("1_floor_mat")
 
-[node name="BoxA" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
+[node name="BoxA" type="StaticBody3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
 position = Vector3(0, 2, -12)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxA"]
+shape = SubResource("8_box_a_shape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxA"]
 mesh = SubResource("4_box_mesh")
 
-[node name="BoxB" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
+[node name="BoxB" type="StaticBody3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
 position = Vector3(8, 1, -4)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxB"]
+shape = SubResource("9_box_b_shape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxB"]
 scale = Vector3(1, 0.5, 3)
 mesh = SubResource("4_box_mesh")
 
-[node name="BoxC" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
+[node name="BoxC" type="StaticBody3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
 position = Vector3(-10, 3, 6)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxC"]
+shape = SubResource("10_box_c_shape")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/WorldRoot/BoxC"]
 scale = Vector3(2, 1.5, 2)
 mesh = SubResource("4_box_mesh")
 
 [node name="PlayerBody" type="CharacterBody3D" parent="SubViewportContainer/SubViewport/WorldRoot"]
-position = Vector3(0, 1, 0)
+position = Vector3(0, 2, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/WorldRoot/PlayerBody"]
 shape = SubResource("6_capsule_shape")
