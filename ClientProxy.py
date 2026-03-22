@@ -998,7 +998,14 @@ class ProxyProtocol(WebSocketServerProtocol):
         if not self._ensure_player_logged_in():
             return
 
-        default_realm = globals().get("RPG_REALM_LIGHT", 1)
+        from mud.world import defines as world_defines
+
+        default_realm = int(getattr(world_defines, "RPG_REALM_LIGHT", 1))
+        pc_races = tuple(getattr(world_defines, "RPG_PC_RACES", ()))
+        realm_races = dict(getattr(world_defines, "RPG_REALM_RACES", {}))
+        realm_classes = dict(getattr(world_defines, "RPG_REALM_CLASSES", {}))
+        race_classes = dict(getattr(world_defines, "RPG_RACE_CLASSES", {}))
+
         name = str(msg.get("name", "")).strip().capitalize()
         race = str(msg.get("race", "Human")).strip() or "Human"
         klass = str(msg.get("klass", "Warrior")).strip() or "Warrior"
@@ -1027,7 +1034,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             )
             return
 
-        if race not in RPG_PC_RACES:
+        if race not in pc_races:
             self.session.send({
                 "type": "create_character_result",
                 "success": False,
@@ -1035,7 +1042,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             })
             return
 
-        if race not in RPG_REALM_RACES.get(realm, []):
+        if race not in realm_races.get(realm, []):
             self.session.send({
                 "type": "create_character_result",
                 "success": False,
@@ -1043,7 +1050,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             })
             return
 
-        if klass not in RPG_RACE_CLASSES.get(race, []):
+        if klass not in race_classes.get(race, []):
             self.session.send({
                 "type": "create_character_result",
                 "success": False,
@@ -1051,7 +1058,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             })
             return
 
-        if klass not in RPG_REALM_CLASSES.get(realm, []):
+        if klass not in realm_classes.get(realm, []):
             self.session.send({
                 "type": "create_character_result",
                 "success": False,
