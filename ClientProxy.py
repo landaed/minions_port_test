@@ -998,12 +998,24 @@ class ProxyProtocol(WebSocketServerProtocol):
         if not self._ensure_player_logged_in():
             return
 
-        name = msg.get("name", "").strip().capitalize()
-        race = msg.get("race", "Human").strip() or "Human"
-        klass = msg.get("klass", "Warrior").strip() or "Warrior"
-        sex = msg.get("sex", "Male").strip() or "Male"
-        look = int(msg.get("look", 0))
-        realm = int(msg.get("realm", RPG_REALM_LIGHT))
+        default_realm = globals().get("RPG_REALM_LIGHT", 1)
+        name = str(msg.get("name", "")).strip().capitalize()
+        race = str(msg.get("race", "Human")).strip() or "Human"
+        klass = str(msg.get("klass", "Warrior")).strip() or "Warrior"
+        sex = str(msg.get("sex", "Male")).strip() or "Male"
+        try:
+            look = int(msg.get("look", 0))
+        except (TypeError, ValueError):
+            look = 0
+        try:
+            realm = int(msg.get("realm", default_realm))
+        except (TypeError, ValueError):
+            self.session.send({
+                "type": "create_character_result",
+                "success": False,
+                "message": f"Invalid realm: {msg.get('realm')}",
+            })
+            return
 
         if len(name) < 4 or len(name) > 11 or not name.isalpha():
             self.session.send(
