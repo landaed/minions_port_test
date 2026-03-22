@@ -34,6 +34,78 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
+
+
+def _serialize_rapid_mob_info(rapid_info):
+    if not rapid_info:
+        return {}
+    fields = (
+        "HEALTH", "MAXHEALTH", "MANA", "MAXMANA", "STAMINA", "MAXSTAMINA",
+        "TGT", "TGTID", "TGTHEALTH", "PETNAME", "PETHEALTH", "AUTOATTACK", "CASTING",
+    )
+    return {
+        field.lower(): getattr(rapid_info, field, None)
+        for field in fields
+        if hasattr(rapid_info, field)
+    }
+
+
+def _serialize_character_cache(char_info):
+    if not char_info:
+        return {}
+    fields = (
+        "NAME", "RACE", "SEX", "REALM", "PCLASS", "SCLASS", "TCLASS", "PLEVEL", "SLEVEL", "TLEVEL",
+        "SPAWNID", "CHARID", "MOBID", "DEAD", "PORTRAITPIC", "POSITION",
+    )
+    data = {
+        field.lower(): getattr(char_info, field, None)
+        for field in fields
+        if hasattr(char_info, field)
+    }
+    skills = getattr(char_info, "SKILLS", {}) or {}
+    skill_reuse = getattr(char_info, "SKILLREUSE", {}) or {}
+    abilities = []
+    for name in sorted(skills.keys(), key=lambda value: str(value))[:8]:
+        key = str(name)
+        reuse_value = skill_reuse.get(key.upper())
+        cooldown_seconds = 0
+        if reuse_value is not None:
+            try:
+                cooldown_seconds = int(reuse_value)
+            except (TypeError, ValueError):
+                cooldown_seconds = 0
+        abilities.append({
+            "name": key,
+            "rank": skills[name],
+            "cooldown_active": key.upper() in skill_reuse,
+            "cooldown_seconds": cooldown_seconds,
+            "source": "server",
+        })
+    data["abilities"] = abilities
+    data["rapid_mob_info"] = _serialize_rapid_mob_info(getattr(char_info, "RAPIDMOBINFO", None))
+    data["name"] = data.get("name") or getattr(char_info, "NAME", "")
+    data["pclass"] = data.get("pclass") or getattr(char_info, "PCLASS", "")
+    data["level"] = data.get("plevel") or getattr(char_info, "PLEVEL", 1)
+    return data
+
+
+def _serialize_root_info(root_info, session):
+    if not root_info:
+        return {}
+    char_infos = []
+    for _, value in sorted(getattr(root_info, "CHARINFOS", {}).items(), key=lambda item: item[0]):
+        char_infos.append(_serialize_character_cache(value))
+
+    position = list(getattr(root_info, "POSITION", (0, 0, 0)))
+    return {
+        "player_name": getattr(root_info, "PLAYERNAME", ""),
+        "guild_name": getattr(root_info, "GUILDNAME", ""),
+        "tin": getattr(root_info, "TIN", 0),
+        "paused": bool(getattr(root_info, "PAUSED", False)),
+        "position": position,
+        "char_infos": char_infos,
+        "world_name": session.current_world.get("name", "") if session.current_world else "",
+    }
 from mud.world.defines import (
     RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
     RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
@@ -84,12 +156,42 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setRootInfo(self, rootInfo, *args):
-        self.session.send(
+        self.session.root_info_cache = rootInfo
+        payload = _serialize_root_info(rootInfo, self.session)
+        payload.update(
             {
                 "type": "root_info",
-                "message": "Received root info from world server.",
+                "message": "Received root info from world server. Launching the local greybox test scene.",
             }
         )
+        self.session.send(payload)
+        self.session.start_gameplay_sync()
+        self.session.start_entity_sync()
+        return True
+
+    def remote_receiveTextList(self, messages):
+        text_messages = [str(message) for message in messages]
+        self.session.send({
+            "type": "text_messages",
+            "messages": text_messages,
+        })
+        return True
+
+    def remote_receiveGameText(self, textCode, text, stripML):
+        self.session.send({
+            "type": "game_text",
+            "text_code": textCode,
+            "text": str(text),
+            "strip_ml": bool(stripML),
+        })
+        return True
+
+    def remote_setTgtDesc(self, infoDict):
+        payload = {str(key).lower(): value for key, value in dict(infoDict).items()}
+        self.session.send({
+            "type": "target_description",
+            "target": payload,
+        })
         return True
 
     def remote_setCursorItem(self, itemInfo):
@@ -159,6 +261,11 @@ class GodotClientSession:
         self.current_world = None
         self.cached_characters = []
         self.world_password = ""
+        self.root_info_cache = None
+        self.gameplay_sync_call = None
+        self.entity_sync_call = None
+        self.last_gameplay_payload = None
+        self.last_entity_payload = None
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
@@ -170,6 +277,15 @@ class GodotClientSession:
 
     def cleanup(self):
         """Disconnect any PB connections."""
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            self.gameplay_sync_call.cancel()
+        if self.entity_sync_call and self.entity_sync_call.active():
+            self.entity_sync_call.cancel()
+        self.gameplay_sync_call = None
+        self.entity_sync_call = None
+        self.root_info_cache = None
+        self.last_gameplay_payload = None
+        self.last_entity_payload = None
         for attr in ("master_perspective", "new_world_perspective", "player_perspective"):
             perspective = getattr(self, attr, None)
             if perspective:
@@ -179,6 +295,47 @@ class GodotClientSession:
                     pass
                 setattr(self, attr, None)
         self.player_mind = None
+
+    def start_gameplay_sync(self):
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            return
+        self.gameplay_sync_call = reactor.callLater(0.25, self._emit_gameplay_sync)
+
+    def start_entity_sync(self):
+        if self.entity_sync_call and self.entity_sync_call.active():
+            return
+        self.entity_sync_call = reactor.callLater(0.25, self._emit_entity_sync)
+
+    def _emit_gameplay_sync(self):
+        self.gameplay_sync_call = None
+        if not self.root_info_cache:
+            return
+        payload = _serialize_root_info(self.root_info_cache, self)
+        if payload != self.last_gameplay_payload:
+            self.last_gameplay_payload = payload.copy()
+            self.send({"type": "gameplay_state", **payload})
+        self.start_gameplay_sync()
+
+    def _emit_entity_sync(self):
+        self.entity_sync_call = None
+        if not self.player_perspective or not self.root_info_cache:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getVisibleEntities", 0)
+        d.addCallback(self._on_entity_snapshot)
+        d.addErrback(self._on_entity_snapshot_failed)
+
+    def _on_entity_snapshot(self, entities):
+        if entities != self.last_entity_payload:
+            self.last_entity_payload = entities
+            self.send({"type": "entity_snapshot", "entities": entities})
+        self.start_entity_sync()
+
+    def _on_entity_snapshot_failed(self, reason):
+        self.send({
+            "type": "game_text",
+            "text": "Entity replication snapshot failed: %s" % (str(reason.value) if hasattr(reason, "value") else str(reason)),
+        })
+        self.start_entity_sync()
 
 
 class ProxyProtocol(WebSocketServerProtocol):
@@ -217,6 +374,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             "create_character": self.handle_create_character,
             "enter_world": self.handle_enter_world,
             "direct_connect": self.handle_direct_connect,
+            "gameplay_command": self.handle_gameplay_command,
         }.get(msg_type)
 
         if handler:
@@ -243,6 +401,51 @@ class ProxyProtocol(WebSocketServerProtocol):
             })
             return False
         return True
+
+    def _send_gameplay_command_result(self, success, command, message=""):
+        self.session.send({
+            "type": "gameplay_command_result",
+            "success": bool(success),
+            "command": command,
+            "message": message,
+        })
+
+    def handle_gameplay_command(self, msg):
+        if not self._ensure_player_logged_in():
+            return
+
+        command = str(msg.get("command", "")).strip().lower()
+        if not command:
+            self._send_gameplay_command_result(False, command, "Missing gameplay command.")
+            return
+
+        command_map = {
+            "cycle_target": ("CYCLETARGET", ["0"]),
+            "target_nearest": ("TARGETNEAREST", ["0"]),
+            "interact": ("INTERACT", ["0"]),
+            "attack_toggle": ("ATTACK", ["0", "TOGGLE"]),
+        }
+
+        payload = command_map.get(command)
+        if payload is None and command == "use_ability":
+            ability_name = str(msg.get("ability_name", "")).strip()
+            if not ability_name:
+                self._send_gameplay_command_result(False, command, "Missing ability name.")
+                return
+            payload = ("SKILL", ["0", *ability_name.split()])
+
+        if payload is None:
+            self._send_gameplay_command_result(False, command, f"Unsupported gameplay command: {command}")
+            return
+
+        world_command, args = payload
+        d = self.session.player_perspective.callRemote("PlayerAvatar", "doCommand", world_command, args)
+        d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Sent {world_command} to legacy world server."))
+        d.addErrback(self._on_gameplay_command_failed, command, world_command)
+
+    def _on_gameplay_command_failed(self, reason, command, world_command):
+        msg = str(reason.value) if hasattr(reason, "value") else str(reason)
+        self._send_gameplay_command_result(False, command, f"{world_command} failed: {msg}")
 
     @staticmethod
     def _character_info_to_dict(cinfo):
