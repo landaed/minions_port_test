@@ -1,10 +1,11 @@
 extends Control
 
+signal command_requested(command_type: String, payload: Dictionary)
+
 const MOVE_SPEED := 8.0
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
-const NPC_INTERACT_RANGE := 5.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 
 var world_time := {"hour": 0, "minute": 0}
@@ -15,8 +16,7 @@ var mouse_captured := false
 var jump_requested := false
 var interaction_message := ""
 var placeholder_npcs: Array = []
-var nearest_npc_index := -1
-var current_target_index := -1
+var replicated_entities: Array = []
 var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
 var combat_log: Array = []
@@ -62,9 +62,13 @@ func set_zone_transfer(payload: Dictionary):
 	current_payload["zone_transfer"] = payload.duplicate(true)
 	_update_labels()
 
-
 func set_target_description(target: Dictionary):
 	server_target_description = target.duplicate(true)
+	_update_labels()
+
+func set_entities(entities: Array):
+	replicated_entities = entities.duplicate(true)
+	_rebuild_entity_markers()
 	_update_labels()
 
 func append_game_text(message: String):
@@ -79,8 +83,8 @@ func _push_log(message: String):
 	if clean.is_empty():
 		return
 	combat_log.append(clean)
-	if combat_log.size() > 6:
-		combat_log = combat_log.slice(combat_log.size() - 6, combat_log.size())
+	if combat_log.size() > 8:
+		combat_log = combat_log.slice(combat_log.size() - 8, combat_log.size())
 	combat_log_label.text = "Combat / server log:\n" + "\n".join(combat_log)
 
 func _capture_mouse():
@@ -115,13 +119,15 @@ func _rapid_info() -> Dictionary:
 func _abilities() -> Array:
 	var abilities = _player_char_info().get("abilities", [])
 	if abilities is Array and not abilities.is_empty():
-		return abilities
+		return abilities.slice(0, min(abilities.size(), 8))
 	var fallback: Array = []
-	for i in range(DEFAULT_ABILITY_NAMES.size()):
+	for ability_name in DEFAULT_ABILITY_NAMES:
 		fallback.append({
-			"name": DEFAULT_ABILITY_NAMES[i],
+			"name": ability_name,
 			"rank": 1,
 			"cooldown_active": false,
+			"cooldown_seconds": 0,
+			"source": "fallback",
 		})
 	return fallback
 
@@ -145,13 +151,22 @@ func _set_bar(bar: ProgressBar, value: float, maximum: float, label: String):
 	bar.show_percentage = true
 	bar.tooltip_text = "%s %.0f / %.0f" % [label, bar.value, bar.max_value]
 
+func _clear_npc_root():
+	for child in npc_root.get_children():
+		child.queue_free()
+
+func _world_position_from_server(position_data) -> Vector3:
+	if position_data is Array and position_data.size() >= 3:
+		return Vector3(float(position_data[0]), float(position_data[2]), float(-position_data[1]))
+	return Vector3.ZERO
+
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
 		return
 	var specs := [
-		{"name": "Trainer Rowan", "position": Vector3(4, 0, -6), "dialogue": "Placeholder trainer: movement and camera work; next we wire in real NPC replication."},
-		{"name": "Quartermaster Venn", "position": Vector3(-6, 0, -2), "dialogue": "Placeholder vendor: next step is server-backed inventory and interaction windows."},
-		{"name": "Scout Ilya", "position": Vector3(9, 0, 5), "dialogue": "Placeholder scout: once zone data exists, this should become a real replicated spawn."},
+		{"name": "Trainer Rowan", "position": Vector3(4, 0, -6), "color": Color(0.45, 0.82, 0.55, 1.0), "label": "visual placeholder trainer"},
+		{"name": "Quartermaster Venn", "position": Vector3(-6, 0, -2), "color": Color(0.55, 0.62, 0.78, 1.0), "label": "visual placeholder vendor"},
+		{"name": "Scout Ilya", "position": Vector3(9, 0, 5), "color": Color(0.78, 0.58, 0.32, 1.0), "label": "visual placeholder scout"},
 	]
 	for spec in specs:
 		var body := StaticBody3D.new()
@@ -171,12 +186,12 @@ func _spawn_placeholder_npcs():
 		mesh.height = 1.4
 		mesh_instance.mesh = mesh
 		var mesh_material := StandardMaterial3D.new()
-		mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
+		mesh_material.albedo_color = spec["color"]
 		mesh_instance.material_override = mesh_material
 		body.add_child(mesh_instance)
 
 		var label := Label3D.new()
-		label.text = spec["name"]
+		label.text = "%s (%s)" % [spec["name"], spec["label"]]
 		label.position = Vector3(0, 1.6, 0)
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		body.add_child(label)
@@ -186,18 +201,75 @@ func _spawn_placeholder_npcs():
 			"node": body,
 			"mesh": mesh_instance,
 			"label": label,
-			"dialogue": spec["dialogue"],
 			"name": spec["name"],
-			"health": 100.0,
-			"max_health": 100.0,
 		})
 
+
+func _rebuild_entity_markers():
+	_clear_npc_root()
+	if replicated_entities.is_empty():
+		_spawn_placeholder_npcs()
+		return
+	for entity in replicated_entities:
+		if not (entity is Dictionary):
+			continue
+		if bool(entity.get("is_self", false)):
+			continue
+		var body := StaticBody3D.new()
+		body.name = str(entity.get("name", "Entity"))
+		body.position = _world_position_from_server(entity.get("position", []))
+
+		var collider := CollisionShape3D.new()
+		var shape := CapsuleShape3D.new()
+		shape.radius = 0.55
+		shape.height = 1.4
+		collider.shape = shape
+		body.add_child(collider)
+
+		var mesh_instance := MeshInstance3D.new()
+		var mesh := CapsuleMesh.new()
+		mesh.radius = 0.55
+		mesh.height = 1.4
+		mesh_instance.mesh = mesh
+		var mesh_material := StandardMaterial3D.new()
+		if bool(entity.get("attacking", false)):
+			mesh_material.albedo_color = Color(0.85, 0.35, 0.35, 1.0)
+		elif bool(entity.get("is_enemy", false)):
+			mesh_material.albedo_color = Color(0.78, 0.58, 0.32, 1.0)
+		elif bool(entity.get("is_player", false)):
+			mesh_material.albedo_color = Color(0.35, 0.65, 0.95, 1.0)
+		else:
+			mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
+		mesh_instance.material_override = mesh_material
+		body.add_child(mesh_instance)
+
+		var label := Label3D.new()
+		var label_name := str(entity.get("public_name", entity.get("name", "Entity")))
+		label.text = "%s Lv%s %s" % [label_name, str(entity.get("level", "?")), str(entity.get("pclass", entity.get("race", "")))]
+		label.position = Vector3(0, 1.6, 0)
+		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		body.add_child(label)
+
+		npc_root.add_child(body)
 func _ability_signature() -> String:
 	var names: Array = []
 	for ability in _abilities():
 		if ability is Dictionary:
-			names.append("%s:%s:%s" % [ability.get("name", ""), ability.get("rank", 0), ability.get("cooldown_active", false)])
+			names.append("%s:%s:%s:%s" % [
+				ability.get("name", ""),
+				ability.get("rank", 0),
+				ability.get("cooldown_active", false),
+				ability.get("cooldown_seconds", 0),
+			])
 	return "|".join(names)
+
+func _button_label(slot_index: int, ability: Dictionary) -> String:
+	var name := str(ability.get("name", DEFAULT_ABILITY_NAMES[min(slot_index, DEFAULT_ABILITY_NAMES.size() - 1)]))
+	var prefix := "%d: %s" % [slot_index + 1, name]
+	var cooldown_seconds := int(ability.get("cooldown_seconds", 0))
+	if bool(ability.get("cooldown_active", false)):
+		prefix += " (%ds)" % max(cooldown_seconds, 1)
+	return prefix
 
 func _rebuild_ability_bar():
 	var signature := _ability_signature()
@@ -213,46 +285,27 @@ func _rebuild_ability_bar():
 		button.custom_minimum_size = Vector2(120, 48)
 		if i < abilities.size() and abilities[i] is Dictionary:
 			var ability: Dictionary = abilities[i]
-			button.text = "%d: %s" % [i + 1, str(ability.get("name", DEFAULT_ABILITY_NAMES[i]))]
+			button.text = _button_label(i, ability)
 			button.disabled = bool(ability.get("cooldown_active", false))
+			button.tooltip_text = _ability_tooltip(ability)
 		else:
 			button.text = "%d: -" % [i + 1]
 			button.disabled = true
 		button.pressed.connect(_on_ability_pressed.bind(i))
 		ability_bar.add_child(button)
 
-func _nearest_npc_text() -> String:
-	if nearest_npc_index == -1:
-		return "No placeholder NPC nearby"
-	var npc: Dictionary = placeholder_npcs[nearest_npc_index]
-	return "Press E to hail %s" % npc.get("name", "NPC")
+func _ability_tooltip(ability: Dictionary) -> String:
+	var source := str(ability.get("source", "server"))
+	var name := str(ability.get("name", "Ability"))
+	var tooltip := "%s\nRank: %s\nSource: %s" % [name, str(ability.get("rank", 1)), source]
+	if source == "server":
+		tooltip += "\nUses the legacy server skill list from RootInfo."
+	else:
+		tooltip += "\nFallback only because no server skills were available."
+	return tooltip
 
-func _targeted_npc() -> Dictionary:
-	if current_target_index < 0 or current_target_index >= placeholder_npcs.size():
-		return {}
-	return placeholder_npcs[current_target_index]
-
-func _update_target_visuals():
-	for i in range(placeholder_npcs.size()):
-		var npc: Dictionary = placeholder_npcs[i]
-		var mesh_instance: MeshInstance3D = npc.get("mesh")
-		var label: Label3D = npc.get("label")
-		if mesh_instance == null or label == null:
-			continue
-		var mesh_material: StandardMaterial3D = mesh_instance.material_override
-		if mesh_material == null:
-			mesh_material = StandardMaterial3D.new()
-		var health_pct: float = float(npc.get("health", 0.0)) / max(float(npc.get("max_health", 1.0)), 1.0)
-		if health_pct <= 0.0:
-			mesh_material.albedo_color = Color(0.25, 0.25, 0.25, 1.0)
-			label.text = "%s (defeated)" % npc.get("name", "NPC")
-		elif i == current_target_index:
-			mesh_material.albedo_color = Color(1.0, 0.75, 0.35, 1.0)
-			label.text = "[%s] %d%%" % [npc.get("name", "NPC"), int(health_pct * 100.0)]
-		else:
-			mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
-			label.text = "%s %d%%" % [npc.get("name", "NPC"), int(health_pct * 100.0)]
-		mesh_instance.material_override = mesh_material
+func _bridge_status_text() -> String:
+	return "Bridge status: abilities, attack toggle, target cycling, and interact now go back to the legacy world server via PlayerAvatar.doCommand. NPC aggro/position/rotation/combat are server-authoritative in MoM, but this Godot bridge still lacks full zone/sim replication for rendering those entities live."
 
 func _update_labels():
 	var char_info := _player_char_info()
@@ -264,11 +317,18 @@ func _update_labels():
 	var time_text := "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
 	var paused_text := "yes" if bool(current_payload.get("paused", false)) else "no"
 	var grounded_text := "yes" if player_body.is_on_floor() else "no"
+	var autoattack_text := "on" if bool(rapid_info.get("autoattack", false)) else "off"
+	var server_abilities = _player_char_info().get("abilities", [])
+	var ability_source_text := "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
+	var entity_count := max(replicated_entities.size() - 1, 0)
 	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
-	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, Tab cycles targets, 1-8 uses abilities, E interacts, left click captures mouse, Esc releases cursor." % [
+	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nAbility source: %s\nAuto-attack: %s\nReplicated entities: %d\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, Tab cycles server targets, Q toggles server auto-attack, 1-8 uses server abilities, E interacts, left click captures mouse, Esc releases cursor." % [
 		guild_name if not guild_name.is_empty() else "<none>",
 		_character_summary(),
 		str(char_info.get("pclass", "Unknown")),
+		ability_source_text,
+		autoattack_text,
+		entity_count,
 		pos.x,
 		pos.y,
 		pos.z,
@@ -280,14 +340,7 @@ func _update_labels():
 	_set_bar(stamina_bar, float(rapid_info.get("stamina", 0.0)), float(rapid_info.get("maxstamina", 100.0)), "Stamina")
 	var server_target_name := str(rapid_info.get("tgt", ""))
 	var server_target_health: float = float(rapid_info.get("tgthealth", -1.0))
-	var local_target := _targeted_npc()
-	if not local_target.is_empty():
-		target_label.text = "Local target: %s (%.0f / %.0f HP)" % [
-			str(local_target.get("name", "NPC")),
-			float(local_target.get("health", 0.0)),
-			float(local_target.get("max_health", 100.0)),
-		]
-	elif not server_target_description.is_empty():
+	if not server_target_description.is_empty():
 		target_label.text = "Server target: %s Lv%s %s | %s" % [
 			str(server_target_description.get("name", "Unknown")),
 			str(server_target_description.get("plevel", "?")),
@@ -297,57 +350,32 @@ func _update_labels():
 	elif not server_target_name.is_empty():
 		target_label.text = "Server target: %s (%.0f%% health)" % [server_target_name, server_target_health * 100.0]
 	else:
-		target_label.text = "No current target"
-	interaction_label.text = "%s\n%s" % [_nearest_npc_text(), interaction_message]
+		target_label.text = "No current server target"
+	interaction_label.text = "Replicated entities are rendered from the MoM server snapshot when available; otherwise greybox placeholders are shown.\n%s" % interaction_message
 	var transfer = current_payload.get("zone_transfer", {})
 	if transfer is Dictionary and not transfer.is_empty():
-		transfer_label.text = "Zone handoff prepared: zone port %s, party %s" % [
+		transfer_label.text = "Zone handoff prepared: zone port %s, party %s\n%s" % [
 			str(transfer.get("zone_port", "?")),
 			str(transfer.get("party", [])),
+			_bridge_status_text(),
 		]
 	else:
-		transfer_label.text = "Gameplay bridge status: root_info/gameplay_state synced from the legacy server. Placeholder NPC combat remains local until real zone entity replication is implemented."
-	_update_target_visuals()
+		transfer_label.text = _bridge_status_text()
 
-func _update_nearest_npc():
-	nearest_npc_index = -1
-	var nearest_distance: float = INF
-	for i in range(placeholder_npcs.size()):
-		var npc: Dictionary = placeholder_npcs[i]
-		if float(npc.get("health", 0.0)) <= 0.0:
-			continue
-		var node: StaticBody3D = npc.get("node")
-		if node == null:
-			continue
-		var distance: float = player_body.global_position.distance_to(node.global_position)
-		if distance < NPC_INTERACT_RANGE and distance < nearest_distance:
-			nearest_distance = distance
-			nearest_npc_index = i
+func _request_server_command(command_type: String, payload: Dictionary = {}):
+	command_requested.emit(command_type, payload)
+
+func _send_interact_command():
+	interaction_message = "Sent INTERACT to the legacy world server."
+	_request_server_command("interact")
 
 func _cycle_target():
-	var alive_indices: Array = []
-	for i in range(placeholder_npcs.size()):
-		if float(placeholder_npcs[i].get("health", 0.0)) > 0.0:
-			alive_indices.append(i)
-	if alive_indices.is_empty():
-		current_target_index = -1
-		interaction_message = "No living placeholder targets remain."
-		return
-	var next_slot := 0
-	if current_target_index != -1:
-		var current_pos: int = alive_indices.find(current_target_index)
-		if current_pos != -1:
-			next_slot = (current_pos + 1) % alive_indices.size()
-	current_target_index = alive_indices[next_slot]
-	var target := _targeted_npc()
-	interaction_message = "Targeted %s." % target.get("name", "NPC")
+	interaction_message = "Sent CYCLETARGET to the legacy world server."
+	_request_server_command("cycle_target")
 
-func _interact_with_npc():
-	if nearest_npc_index == -1:
-		interaction_message = "No placeholder NPC close enough to interact with."
-		return
-	var npc: Dictionary = placeholder_npcs[nearest_npc_index]
-	interaction_message = "%s says: %s" % [npc.get("name", "NPC"), npc.get("dialogue", "...")]
+func _toggle_autoattack():
+	interaction_message = "Sent ATTACK toggle to the legacy world server."
+	_request_server_command("attack_toggle")
 
 func _activate_ability(slot_index: int):
 	var abilities := _abilities()
@@ -355,20 +383,12 @@ func _activate_ability(slot_index: int):
 		interaction_message = "That ability slot is empty."
 		return
 	var ability: Dictionary = abilities[slot_index]
-	var target := _targeted_npc()
-	if target.is_empty():
-		interaction_message = "%s fizzles because nothing is targeted." % ability.get("name", "Ability")
+	var ability_name := str(ability.get("name", "Ability"))
+	if str(ability.get("source", "server")) != "server":
+		interaction_message = "%s is only a fallback placeholder because no server skill data was available." % ability_name
 		return
-	var target_health: float = float(target.get("health", 0.0))
-	if target_health <= 0.0:
-		interaction_message = "%s is already defeated." % target.get("name", "NPC")
-		return
-	var damage: float = 8.0 + float(slot_index * 3)
-	var new_health: float = max(0.0, target_health - damage)
-	placeholder_npcs[current_target_index]["health"] = new_health
-	interaction_message = "Used %s on %s for %.0f damage." % [ability.get("name", "Ability"), target.get("name", "NPC"), damage]
-	if new_health <= 0.0:
-		interaction_message += " Target defeated."
+	interaction_message = "Sent SKILL %s to the legacy world server." % ability_name
+	_request_server_command("use_ability", {"ability_name": ability_name})
 
 func _on_ability_pressed(slot_index: int):
 	_activate_ability(slot_index)
@@ -385,7 +405,9 @@ func _input(event):
 			KEY_SPACE:
 				jump_requested = true
 			KEY_E:
-				_interact_with_npc()
+				_send_interact_command()
+			KEY_Q:
+				_toggle_autoattack()
 			KEY_TAB:
 				_cycle_target()
 			KEY_1, KEY_KP_1:
@@ -437,5 +459,4 @@ func _physics_process(delta):
 	jump_requested = false
 	player_body.velocity = velocity
 	player_body.move_and_slide()
-	_update_nearest_npc()
 	_update_labels()

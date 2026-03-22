@@ -124,8 +124,16 @@ func _ensure_gameplay_view() -> Control:
 	if gameplay_view == null:
 		gameplay_view = GAMEPLAY_VIEW_SCENE.instantiate()
 		gameplay_view.visible = false
+		if gameplay_view.has_signal("command_requested"):
+			gameplay_view.command_requested.connect(_on_gameplay_view_command_requested)
 		add_child(gameplay_view)
 	return gameplay_view
+
+func _on_gameplay_view_command_requested(command_type: String, payload: Dictionary = {}):
+	var msg := {"type": "gameplay_command", "command": command_type}
+	for key in payload.keys():
+		msg[key] = payload[key]
+	_send(msg)
 
 func _show_gameplay_view(payload: Dictionary):
 	var view := _ensure_gameplay_view()
@@ -341,6 +349,11 @@ func handle_response(data: Dictionary):
 			if gameplay_view and gameplay_view.has_method("set_target_description"):
 				gameplay_view.set_target_description(data.get("target", {}))
 
+		"entity_snapshot":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_entities"):
+				gameplay_view.set_entities(data.get("entities", []))
+
 		"game_text":
 			_show_gameplay_view(data)
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
@@ -357,6 +370,11 @@ func handle_response(data: Dictionary):
 				"minute": int(data.get("minute", 0)),
 			}
 			_update_gameplay_clock()
+
+		"gameplay_command_result":
+			status_label.text = data.get("message", "Gameplay command sent.")
+			if gameplay_view and gameplay_view.has_method("append_game_text"):
+				gameplay_view.append_game_text(str(data.get("message", "")))
 
 		"error":
 			create_world_account_button.disabled = false
