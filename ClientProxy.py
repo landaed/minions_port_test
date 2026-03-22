@@ -434,6 +434,16 @@ class ProxyProtocol(WebSocketServerProtocol):
                 return
             payload = ("SKILL", ["0", *ability_name.split()])
 
+        if payload is None and command == "target_entity":
+            entity_id = int(msg.get("entity_id", 0) or 0)
+            if entity_id <= 0:
+                self._send_gameplay_command_result(False, command, "Missing entity id.")
+                return
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "targetEntity", entity_id, 0)
+            d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Targeted replicated entity {entity_id} on legacy world server."))
+            d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
+            return
+
         if payload is None:
             self._send_gameplay_command_result(False, command, f"Unsupported gameplay command: {command}")
             return

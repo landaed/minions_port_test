@@ -7,6 +7,8 @@ const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
+const ENTITY_INTERPOLATION_SPEED := 8.0
+const ENTITY_SELECTION_DISTANCE := 150.0
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -17,6 +19,7 @@ var jump_requested := false
 var interaction_message := ""
 var placeholder_npcs: Array = []
 var replicated_entities: Array = []
+var replicated_entity_nodes: Dictionary = {}
 var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
 var combat_log: Array = []
@@ -68,7 +71,7 @@ func set_target_description(target: Dictionary):
 
 func set_entities(entities: Array):
 	replicated_entities = entities.duplicate(true)
-	_rebuild_entity_markers()
+	_sync_entity_markers()
 	_update_labels()
 
 func append_game_text(message: String):
@@ -154,6 +157,7 @@ func _set_bar(bar: ProgressBar, value: float, maximum: float, label: String):
 func _clear_npc_root():
 	for child in npc_root.get_children():
 		child.queue_free()
+	replicated_entity_nodes.clear()
 
 func _world_position_from_server(position_data) -> Vector3:
 	if position_data is Array and position_data.size() >= 3:
@@ -204,53 +208,112 @@ func _spawn_placeholder_npcs():
 			"name": spec["name"],
 		})
 
+func _entity_key(entity: Dictionary) -> String:
+	return str(entity.get("id", entity.get("sim_id", 0)))
 
-func _rebuild_entity_markers():
-	_clear_npc_root()
+func _entity_color(entity: Dictionary) -> Color:
+	if bool(entity.get("attacking", false)):
+		return Color(0.85, 0.35, 0.35, 1.0)
+	if bool(entity.get("is_enemy", false)):
+		return Color(0.78, 0.58, 0.32, 1.0)
+	if bool(entity.get("is_player", false)):
+		return Color(0.35, 0.65, 0.95, 1.0)
+	return Color(0.55, 0.62, 0.78, 1.0)
+
+func _entity_label_text(entity: Dictionary) -> String:
+	var label_name := str(entity.get("public_name", entity.get("name", "Entity")))
+	var health: float = float(entity.get("health", 0.0))
+	var max_health: float = float(entity.get("max_health", 1.0))
+	var health_pct := int(round((health / max(max_health, 1.0)) * 100.0))
+	return "%s Lv%s %s [%d%%]" % [
+		label_name,
+		str(entity.get("level", "?")),
+		str(entity.get("standing", entity.get("pclass", entity.get("race", "")))),
+		health_pct,
+	]
+
+func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = str(entity.get("name", "Entity"))
+	body.collision_layer = 1
+	body.collision_mask = 1
+
+	var collider := CollisionShape3D.new()
+	var shape := CapsuleShape3D.new()
+	shape.radius = 0.55
+	shape.height = 1.4
+	collider.shape = shape
+	body.add_child(collider)
+
+	var mesh_instance := MeshInstance3D.new()
+	var mesh := CapsuleMesh.new()
+	mesh.radius = 0.55
+	mesh.height = 1.4
+	mesh_instance.mesh = mesh
+	body.add_child(mesh_instance)
+
+	var label := Label3D.new()
+	label.position = Vector3(0, 1.6, 0)
+	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	body.add_child(label)
+
+	body.set_meta("mesh", mesh_instance)
+	body.set_meta("label", label)
+	body.set_meta("entity_id", int(entity.get("id", 0)))
+	body.set_meta("target_position", _world_position_from_server(entity.get("position", [])))
+	body.position = body.get_meta("target_position")
+	_update_entity_marker(body, entity, true)
+	npc_root.add_child(body)
+	return body
+
+func _update_entity_marker(body: StaticBody3D, entity: Dictionary, snap := false):
+	var target_position := _world_position_from_server(entity.get("position", []))
+	body.set_meta("entity", entity.duplicate(true))
+	body.set_meta("entity_id", int(entity.get("id", 0)))
+	body.set_meta("target_position", target_position)
+	if snap:
+		body.position = target_position
+	var mesh_instance: MeshInstance3D = body.get_meta("mesh")
+	var mesh_material := StandardMaterial3D.new()
+	mesh_material.albedo_color = _entity_color(entity)
+	mesh_instance.material_override = mesh_material
+	var label: Label3D = body.get_meta("label")
+	label.text = _entity_label_text(entity)
+
+func _sync_entity_markers():
 	if replicated_entities.is_empty():
+		_clear_npc_root()
 		_spawn_placeholder_npcs()
 		return
+
+	if not placeholder_npcs.is_empty():
+		_clear_npc_root()
+		placeholder_npcs.clear()
+
+	var incoming_keys: Dictionary = {}
 	for entity in replicated_entities:
 		if not (entity is Dictionary):
 			continue
 		if bool(entity.get("is_self", false)):
 			continue
-		var body := StaticBody3D.new()
-		body.name = str(entity.get("name", "Entity"))
-		body.position = _world_position_from_server(entity.get("position", []))
-
-		var collider := CollisionShape3D.new()
-		var shape := CapsuleShape3D.new()
-		shape.radius = 0.55
-		shape.height = 1.4
-		collider.shape = shape
-		body.add_child(collider)
-
-		var mesh_instance := MeshInstance3D.new()
-		var mesh := CapsuleMesh.new()
-		mesh.radius = 0.55
-		mesh.height = 1.4
-		mesh_instance.mesh = mesh
-		var mesh_material := StandardMaterial3D.new()
-		if bool(entity.get("attacking", false)):
-			mesh_material.albedo_color = Color(0.85, 0.35, 0.35, 1.0)
-		elif bool(entity.get("is_enemy", false)):
-			mesh_material.albedo_color = Color(0.78, 0.58, 0.32, 1.0)
-		elif bool(entity.get("is_player", false)):
-			mesh_material.albedo_color = Color(0.35, 0.65, 0.95, 1.0)
+		var entity_dict: Dictionary = entity
+		var key := _entity_key(entity_dict)
+		incoming_keys[key] = true
+		var body: StaticBody3D = replicated_entity_nodes.get(key)
+		if body == null:
+			body = _create_entity_marker(entity_dict)
+			replicated_entity_nodes[key] = body
 		else:
-			mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
-		mesh_instance.material_override = mesh_material
-		body.add_child(mesh_instance)
+			_update_entity_marker(body, entity_dict)
 
-		var label := Label3D.new()
-		var label_name := str(entity.get("public_name", entity.get("name", "Entity")))
-		label.text = "%s Lv%s %s" % [label_name, str(entity.get("level", "?")), str(entity.get("pclass", entity.get("race", "")))]
-		label.position = Vector3(0, 1.6, 0)
-		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		body.add_child(label)
+	for key in replicated_entity_nodes.keys():
+		if incoming_keys.has(key):
+			continue
+		var old_body: Node = replicated_entity_nodes[key]
+		if is_instance_valid(old_body):
+			old_body.queue_free()
+		replicated_entity_nodes.erase(key)
 
-		npc_root.add_child(body)
 func _ability_signature() -> String:
 	var names: Array = []
 	for ability in _abilities():
@@ -305,7 +368,7 @@ func _ability_tooltip(ability: Dictionary) -> String:
 	return tooltip
 
 func _bridge_status_text() -> String:
-	return "Bridge status: abilities, attack toggle, target cycling, and interact now go back to the legacy world server via PlayerAvatar.doCommand. NPC aggro/position/rotation/combat are server-authoritative in MoM, but this Godot bridge still lacks full zone/sim replication for rendering those entities live."
+	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
 
 func _update_labels():
 	var char_info := _player_char_info()
@@ -322,7 +385,7 @@ func _update_labels():
 	var ability_source_text: String = "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
 	var entity_count: int = max(replicated_entities.size() - 1, 0)
 	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
-	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nAbility source: %s\nAuto-attack: %s\nReplicated entities: %d\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, Tab cycles server targets, Q toggles server auto-attack, 1-8 uses server abilities, E interacts, left click captures mouse, Esc releases cursor." % [
+	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nAbility source: %s\nAuto-attack: %s\nReplicated entities: %d\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, left click selects replicated targets and captures mouse, Tab cycles server targets, Q toggles server auto-attack, 1-8 uses server abilities, E interacts, Esc releases cursor." % [
 		guild_name if not guild_name.is_empty() else "<none>",
 		_character_summary(),
 		str(char_info.get("pclass", "Unknown")),
@@ -341,11 +404,16 @@ func _update_labels():
 	var server_target_name: String = str(rapid_info.get("tgt", ""))
 	var server_target_health: float = float(rapid_info.get("tgthealth", -1.0))
 	if not server_target_description.is_empty():
-		target_label.text = "Server target: %s Lv%s %s | %s" % [
+		var desc_health: float = float(server_target_description.get("health", -1.0))
+		var desc_max_health: float = float(server_target_description.get("max_health", server_target_description.get("maxhealth", 1.0)))
+		var desc_health_pct := int(round((desc_health / max(desc_max_health, 1.0)) * 100.0)) if desc_health >= 0.0 else -1
+		var health_suffix := " | %d%% health" % desc_health_pct if desc_health_pct >= 0 else ""
+		target_label.text = "Server target: %s Lv%s %s | %s%s" % [
 			str(server_target_description.get("name", "Unknown")),
 			str(server_target_description.get("plevel", "?")),
 			str(server_target_description.get("race", "Unknown")),
 			str(server_target_description.get("standing", "")),
+			health_suffix,
 		]
 	elif not server_target_name.is_empty():
 		target_label.text = "Server target: %s (%.0f%% health)" % [server_target_name, server_target_health * 100.0]
@@ -390,6 +458,28 @@ func _activate_ability(slot_index: int):
 	interaction_message = "Sent SKILL %s to the legacy world server." % ability_name
 	_request_server_command("use_ability", {"ability_name": ability_name})
 
+func _target_entity_from_click(screen_position: Vector2) -> bool:
+	if camera == null:
+		return false
+	var from := camera.project_ray_origin(screen_position)
+	var to := from + camera.project_ray_normal(screen_position) * ENTITY_SELECTION_DISTANCE
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	var result := player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	if result.is_empty():
+		return false
+	var collider = result.get("collider")
+	if collider == null or not (collider is Node3D):
+		return false
+	var entity_id := int(collider.get_meta("entity_id", 0))
+	if entity_id <= 0:
+		return false
+	var entity: Dictionary = collider.get_meta("entity", {})
+	interaction_message = "Targeted %s on the legacy world server." % str(entity.get("public_name", entity.get("name", "entity")))
+	_request_server_command("target_entity", {"entity_id": entity_id})
+	return true
+
 func _on_ability_pressed(slot_index: int):
 	_activate_ability(slot_index)
 
@@ -397,7 +487,10 @@ func _input(event):
 	if not visible:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var selected := _target_entity_from_click(event.position)
 		_capture_mouse()
+		if selected:
+			_update_labels()
 	elif event.is_action_pressed("ui_cancel"):
 		_release_mouse()
 	elif event is InputEventKey and event.pressed and not event.echo:
@@ -459,4 +552,11 @@ func _physics_process(delta):
 	jump_requested = false
 	player_body.velocity = velocity
 	player_body.move_and_slide()
+
+	for body in replicated_entity_nodes.values():
+		if body == null or not is_instance_valid(body):
+			continue
+		var target_position: Vector3 = body.get_meta("target_position", body.position)
+		body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+
 	_update_labels()
