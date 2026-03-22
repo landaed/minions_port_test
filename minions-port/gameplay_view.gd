@@ -46,8 +46,8 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	current_payload = payload.duplicate(true)
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
-	var position: Vector3 = _payload_position()
-	player_body.global_position = Vector3(position.x, max(position.y, 2.0), position.z)
+	var spawn_position: Vector3 = _payload_position()
+	player_body.global_position = Vector3(spawn_position.x, max(spawn_position.y, 2.0), spawn_position.z)
 	camera.current = true
 	visible = true
 	_capture_mouse()
@@ -168,11 +168,11 @@ func _spawn_placeholder_npcs():
 		var mesh_instance := MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
 		mesh.radius = 0.55
-		mesh.mid_height = 1.4
+		mesh.height = 1.4
 		mesh_instance.mesh = mesh
-		var material := StandardMaterial3D.new()
-		material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
-		mesh_instance.material_override = material
+		var mesh_material := StandardMaterial3D.new()
+		mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
+		mesh_instance.material_override = mesh_material
 		body.add_child(mesh_instance)
 
 		var label := Label3D.new()
@@ -239,20 +239,20 @@ func _update_target_visuals():
 		var label: Label3D = npc.get("label")
 		if mesh_instance == null or label == null:
 			continue
-		var material: StandardMaterial3D = mesh_instance.material_override
-		if material == null:
-			material = StandardMaterial3D.new()
+		var mesh_material: StandardMaterial3D = mesh_instance.material_override
+		if mesh_material == null:
+			mesh_material = StandardMaterial3D.new()
 		var health_pct: float = float(npc.get("health", 0.0)) / max(float(npc.get("max_health", 1.0)), 1.0)
 		if health_pct <= 0.0:
-			material.albedo_color = Color(0.25, 0.25, 0.25, 1.0)
+			mesh_material.albedo_color = Color(0.25, 0.25, 0.25, 1.0)
 			label.text = "%s (defeated)" % npc.get("name", "NPC")
 		elif i == current_target_index:
-			material.albedo_color = Color(1.0, 0.75, 0.35, 1.0)
+			mesh_material.albedo_color = Color(1.0, 0.75, 0.35, 1.0)
 			label.text = "[%s] %d%%" % [npc.get("name", "NPC"), int(health_pct * 100.0)]
 		else:
-			material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
+			mesh_material.albedo_color = Color(0.55, 0.62, 0.78, 1.0)
 			label.text = "%s %d%%" % [npc.get("name", "NPC"), int(health_pct * 100.0)]
-		mesh_instance.material_override = material
+		mesh_instance.material_override = mesh_material
 
 func _update_labels():
 	var char_info := _player_char_info()

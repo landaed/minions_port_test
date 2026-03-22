@@ -95,21 +95,21 @@ func _send(msg: Dictionary):
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		socket.send_text(JSON.stringify(msg))
 
-func _set_world_ui_visible(visible: bool):
-	world_password_field.visible = visible
-	fantasy_name_field.visible = visible
-	world_access_password_field.visible = visible and bool(selected_world.get("has_password", false))
-	create_world_account_button.visible = visible
-	login_world_button.visible = visible
+func _set_world_ui_visible(is_visible: bool):
+	world_password_field.visible = is_visible
+	fantasy_name_field.visible = is_visible
+	world_access_password_field.visible = is_visible and bool(selected_world.get("has_password", false))
+	create_world_account_button.visible = is_visible
+	login_world_button.visible = is_visible
 
-func _set_character_ui_visible(visible: bool):
-	character_list.visible = visible
-	character_name_field.visible = visible
-	race_option.visible = visible
-	class_option.visible = visible
-	sex_option.visible = visible
-	create_character_button.visible = visible
-	enter_world_button.visible = visible
+func _set_character_ui_visible(is_visible: bool):
+	character_list.visible = is_visible
+	character_name_field.visible = is_visible
+	race_option.visible = is_visible
+	class_option.visible = is_visible
+	sex_option.visible = is_visible
+	create_character_button.visible = is_visible
+	enter_world_button.visible = is_visible
 
 func _selected_character_name() -> String:
 	var selected_items = character_list.get_selected_items()
@@ -376,10 +376,10 @@ func _populate_world_list():
 		return
 
 	for w in worlds:
-		var name: String = w.get("name", "???")
+		var world_name: String = w.get("name", "???")
 		var players: int = w.get("num_players", 0)
 		var max_p: int = w.get("max_players", 0)
-		var label := "%s  (%d/%d players)" % [name, players, max_p]
+		var label := "%s  (%d/%d players)" % [world_name, players, max_p]
 		world_list.add_item(label)
 
 	status_label.text = "Found %d world(s). Select one and click Join." % worlds.size()
