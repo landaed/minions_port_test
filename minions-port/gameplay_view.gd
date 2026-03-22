@@ -96,7 +96,7 @@ func _release_mouse():
 	mouse_captured = false
 
 func _payload_position() -> Vector3:
-	var pos = current_payload.get("position", [0.0, 0.0, 0.0])
+	var pos: Variant = current_payload.get("position", [0.0, 0.0, 0.0])
 	if pos is Array and pos.size() >= 3:
 		return Vector3(float(pos[0]), float(pos[2]) + 1.0, float(-pos[1]))
 	return Vector3(0.0, 1.0, 0.0)
@@ -111,13 +111,13 @@ func _player_char_info() -> Dictionary:
 	return {}
 
 func _rapid_info() -> Dictionary:
-	var info = _player_char_info().get("rapid_mob_info", {})
+	var info: Variant = _player_char_info().get("rapid_mob_info", {})
 	if info is Dictionary:
 		return info
 	return {}
 
 func _abilities() -> Array:
-	var abilities = _player_char_info().get("abilities", [])
+	var abilities: Variant = _player_char_info().get("abilities", [])
 	if abilities is Array and not abilities.is_empty():
 		return abilities.slice(0, min(abilities.size(), 8))
 	var fallback: Array = []
@@ -310,17 +310,17 @@ func _bridge_status_text() -> String:
 func _update_labels():
 	var char_info := _player_char_info()
 	var rapid_info := _rapid_info()
-	var world_name := str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
-	var player_name := str(current_payload.get("player_name", "Unknown Player"))
-	var guild_name := str(current_payload.get("guild_name", ""))
+	var world_name: String = str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
+	var player_name: String = str(current_payload.get("player_name", "Unknown Player"))
+	var guild_name: String = str(current_payload.get("guild_name", ""))
 	var pos: Vector3 = player_body.global_position
-	var time_text := "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
-	var paused_text := "yes" if bool(current_payload.get("paused", false)) else "no"
-	var grounded_text := "yes" if player_body.is_on_floor() else "no"
-	var autoattack_text := "on" if bool(rapid_info.get("autoattack", false)) else "off"
-	var server_abilities = _player_char_info().get("abilities", [])
-	var ability_source_text := "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
-	var entity_count := max(replicated_entities.size() - 1, 0)
+	var time_text: String = "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
+	var paused_text: String = "yes" if bool(current_payload.get("paused", false)) else "no"
+	var grounded_text: String = "yes" if player_body.is_on_floor() else "no"
+	var autoattack_text: String = "on" if bool(rapid_info.get("autoattack", false)) else "off"
+	var server_abilities: Variant = _player_char_info().get("abilities", [])
+	var ability_source_text: String = "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
+	var entity_count: int = max(replicated_entities.size() - 1, 0)
 	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
 	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nAbility source: %s\nAuto-attack: %s\nReplicated entities: %d\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, Tab cycles server targets, Q toggles server auto-attack, 1-8 uses server abilities, E interacts, left click captures mouse, Esc releases cursor." % [
 		guild_name if not guild_name.is_empty() else "<none>",
@@ -338,7 +338,7 @@ func _update_labels():
 	_set_bar(health_bar, float(rapid_info.get("health", 0.0)), float(rapid_info.get("maxhealth", 100.0)), "Health")
 	_set_bar(mana_bar, float(rapid_info.get("mana", 0.0)), float(rapid_info.get("maxmana", 100.0)), "Mana")
 	_set_bar(stamina_bar, float(rapid_info.get("stamina", 0.0)), float(rapid_info.get("maxstamina", 100.0)), "Stamina")
-	var server_target_name := str(rapid_info.get("tgt", ""))
+	var server_target_name: String = str(rapid_info.get("tgt", ""))
 	var server_target_health: float = float(rapid_info.get("tgthealth", -1.0))
 	if not server_target_description.is_empty():
 		target_label.text = "Server target: %s Lv%s %s | %s" % [
@@ -352,7 +352,7 @@ func _update_labels():
 	else:
 		target_label.text = "No current server target"
 	interaction_label.text = "Replicated entities are rendered from the MoM server snapshot when available; otherwise greybox placeholders are shown.\n%s" % interaction_message
-	var transfer = current_payload.get("zone_transfer", {})
+	var transfer: Variant = current_payload.get("zone_transfer", {})
 	if transfer is Dictionary and not transfer.is_empty():
 		transfer_label.text = "Zone handoff prepared: zone port %s, party %s\n%s" % [
 			str(transfer.get("zone_port", "?")),
