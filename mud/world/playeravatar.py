@@ -1428,6 +1428,69 @@ class PlayerAvatar(Avatar):
             print_exc()
     
     
+    def perspective_getVisibleEntities(self, char_index=0):
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return []
+
+        char = self.player.party.members[char_index]
+        if not char or char.dead or not char.mob or not char.mob.zone or not char.mob.simObject:
+            return []
+
+        mob = char.mob
+        zone = mob.zone
+        sim_avatar = zone.simAvatar
+        if not sim_avatar:
+            return []
+
+        sim_lookup = sim_avatar.simLookup
+        mob_lookup = zone.mobLookup
+        entities = []
+        seen_sim_ids = set()
+
+        def append_entity(other_mob):
+            if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
+                return
+            seen_sim_ids.add(other_mob.simObject.id)
+            position = list(other_mob.simObject.position) if other_mob.simObject.position else [0.0, 0.0, 0.0]
+            rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
+            entities.append({
+                "id": int(other_mob.id),
+                "sim_id": int(other_mob.simObject.id),
+                "name": str(other_mob.name),
+                "public_name": str(other_mob.player.charName) if other_mob.player and other_mob.player.charName else str(other_mob.name),
+                "position": position,
+                "rotation": rotation,
+                "target_id": int(other_mob.target.id) if other_mob.target else 0,
+                "attacking": bool(other_mob.attacking),
+                "detached": bool(other_mob.detached),
+                "dead": bool(other_mob.character.dead) if other_mob.character else bool(other_mob.detached),
+                "is_player": bool(other_mob.player),
+                "is_enemy": bool(IsKOS(other_mob, mob)) if other_mob != mob else False,
+                "is_self": bool(other_mob == mob),
+                "realm": int(other_mob.realm),
+                "race": str(other_mob.race.name),
+                "pclass": str(other_mob.pclass.name),
+                "level": int(other_mob.plevel),
+            })
+
+        append_entity(mob)
+
+        for sim_id in mob.simObject.canSee:
+            try:
+                sim_object = sim_lookup[sim_id]
+                other_mob = mob_lookup[sim_object]
+            except KeyError:
+                continue
+            append_entity(other_mob)
+
+        return entities
+    
+    
     #cast or memorize spell, empty spell slot should be caught on client
     def perspective_onSpellSlot(self,cid,slot):
         party = self.player.party
