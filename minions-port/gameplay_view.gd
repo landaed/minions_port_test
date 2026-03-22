@@ -242,7 +242,7 @@ func _update_target_visuals():
 		var material: StandardMaterial3D = mesh_instance.material_override
 		if material == null:
 			material = StandardMaterial3D.new()
-		var health_pct := float(npc.get("health", 0.0)) / max(float(npc.get("max_health", 1.0)), 1.0)
+		var health_pct: float = float(npc.get("health", 0.0)) / max(float(npc.get("max_health", 1.0)), 1.0)
 		if health_pct <= 0.0:
 			material.albedo_color = Color(0.25, 0.25, 0.25, 1.0)
 			label.text = "%s (defeated)" % npc.get("name", "NPC")
@@ -279,7 +279,7 @@ func _update_labels():
 	_set_bar(mana_bar, float(rapid_info.get("mana", 0.0)), float(rapid_info.get("maxmana", 100.0)), "Mana")
 	_set_bar(stamina_bar, float(rapid_info.get("stamina", 0.0)), float(rapid_info.get("maxstamina", 100.0)), "Stamina")
 	var server_target_name := str(rapid_info.get("tgt", ""))
-	var server_target_health := float(rapid_info.get("tgthealth", -1.0))
+	var server_target_health: float = float(rapid_info.get("tgthealth", -1.0))
 	var local_target := _targeted_npc()
 	if not local_target.is_empty():
 		target_label.text = "Local target: %s (%.0f / %.0f HP)" % [
@@ -311,7 +311,7 @@ func _update_labels():
 
 func _update_nearest_npc():
 	nearest_npc_index = -1
-	var nearest_distance := INF
+	var nearest_distance: float = INF
 	for i in range(placeholder_npcs.size()):
 		var npc: Dictionary = placeholder_npcs[i]
 		if float(npc.get("health", 0.0)) <= 0.0:
@@ -319,7 +319,7 @@ func _update_nearest_npc():
 		var node: StaticBody3D = npc.get("node")
 		if node == null:
 			continue
-		var distance := player_body.global_position.distance_to(node.global_position)
+		var distance: float = player_body.global_position.distance_to(node.global_position)
 		if distance < NPC_INTERACT_RANGE and distance < nearest_distance:
 			nearest_distance = distance
 			nearest_npc_index = i
@@ -335,7 +335,7 @@ func _cycle_target():
 		return
 	var next_slot := 0
 	if current_target_index != -1:
-		var current_pos := alive_indices.find(current_target_index)
+		var current_pos: int = alive_indices.find(current_target_index)
 		if current_pos != -1:
 			next_slot = (current_pos + 1) % alive_indices.size()
 	current_target_index = alive_indices[next_slot]
@@ -359,12 +359,12 @@ func _activate_ability(slot_index: int):
 	if target.is_empty():
 		interaction_message = "%s fizzles because nothing is targeted." % ability.get("name", "Ability")
 		return
-	var target_health := float(target.get("health", 0.0))
+	var target_health: float = float(target.get("health", 0.0))
 	if target_health <= 0.0:
 		interaction_message = "%s is already defeated." % target.get("name", "NPC")
 		return
-	var damage := 8.0 + float(slot_index * 3)
-	var new_health := max(0.0, target_health - damage)
+	var damage: float = 8.0 + float(slot_index * 3)
+	var new_health: float = max(0.0, target_health - damage)
 	placeholder_npcs[current_target_index]["health"] = new_health
 	interaction_message = "Used %s on %s for %.0f damage." % [ability.get("name", "Ability"), target.get("name", "NPC"), damage]
 	if new_health <= 0.0:
