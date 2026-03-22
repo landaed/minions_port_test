@@ -34,6 +34,58 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
+
+
+def _serialize_rapid_mob_info(rapid_info):
+    if not rapid_info:
+        return {}
+    fields = (
+        "HEALTH", "MAXHEALTH", "MANA", "MAXMANA", "STAMINA", "MAXSTAMINA",
+        "TGT", "TGTID", "TGTHEALTH", "PETNAME", "PETHEALTH", "AUTOATTACK", "CASTING",
+    )
+    return {
+        field.lower(): getattr(rapid_info, field, None)
+        for field in fields
+        if hasattr(rapid_info, field)
+    }
+
+
+def _serialize_character_cache(char_info):
+    if not char_info:
+        return {}
+    fields = (
+        "NAME", "RACE", "SEX", "REALM", "PCLASS", "SCLASS", "TCLASS", "PLEVEL", "SLEVEL", "TLEVEL",
+        "SPAWNID", "CHARID", "MOBID", "DEAD", "PORTRAITPIC", "POSITION",
+    )
+    data = {
+        field.lower(): getattr(char_info, field, None)
+        for field in fields
+        if hasattr(char_info, field)
+    }
+    data["rapid_mob_info"] = _serialize_rapid_mob_info(getattr(char_info, "RAPIDMOBINFO", None))
+    data["name"] = data.get("name") or getattr(char_info, "NAME", "")
+    data["pclass"] = data.get("pclass") or getattr(char_info, "PCLASS", "")
+    data["level"] = data.get("plevel") or getattr(char_info, "PLEVEL", 1)
+    return data
+
+
+def _serialize_root_info(root_info, session):
+    if not root_info:
+        return {}
+    char_infos = []
+    for _, value in sorted(getattr(root_info, "CHARINFOS", {}).items(), key=lambda item: item[0]):
+        char_infos.append(_serialize_character_cache(value))
+
+    position = list(getattr(root_info, "POSITION", (0, 0, 0)))
+    return {
+        "player_name": getattr(root_info, "PLAYERNAME", ""),
+        "guild_name": getattr(root_info, "GUILDNAME", ""),
+        "tin": getattr(root_info, "TIN", 0),
+        "paused": bool(getattr(root_info, "PAUSED", False)),
+        "position": position,
+        "char_infos": char_infos,
+        "world_name": session.current_world.get("name", "") if session.current_world else "",
+    }
 from mud.world.defines import (
     RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
     RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
@@ -84,12 +136,14 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setRootInfo(self, rootInfo, *args):
-        self.session.send(
+        payload = _serialize_root_info(rootInfo, self.session)
+        payload.update(
             {
                 "type": "root_info",
-                "message": "Received root info from world server.",
+                "message": "Received root info from world server. Launching the local greybox test scene.",
             }
         )
+        self.session.send(payload)
         return True
 
     def remote_setCursorItem(self, itemInfo):
