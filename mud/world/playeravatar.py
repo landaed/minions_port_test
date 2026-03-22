@@ -1428,6 +1428,120 @@ class PlayerAvatar(Avatar):
             print_exc()
     
     
+    def perspective_getVisibleEntities(self, char_index=0):
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return []
+
+        char = self.player.party.members[char_index]
+        if not char or char.dead or not char.mob or not char.mob.zone or not char.mob.simObject:
+            return []
+
+        mob = char.mob
+        zone = mob.zone
+        sim_avatar = zone.simAvatar
+        if not sim_avatar:
+            return []
+
+        sim_lookup = sim_avatar.simLookup
+        mob_lookup = zone.mobLookup
+        entities = []
+        seen_sim_ids = set()
+
+        def append_entity(other_mob, visibility_source="unknown"):
+            if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
+                return
+            seen_sim_ids.add(other_mob.simObject.id)
+            position = list(other_mob.simObject.position) if other_mob.simObject.position else [0.0, 0.0, 0.0]
+            rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
+            health = float(other_mob.health) if other_mob.health is not None else 0.0
+            max_health = float(other_mob.maxHealth) if other_mob.maxHealth is not None else 0.0
+            range_to_player = float(GetRange(mob, other_mob)) if other_mob != mob else 0.0
+            is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
+            if other_mob.player or (other_mob.master and other_mob.master.player):
+                is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
+            entities.append({
+                "id": int(other_mob.id),
+                "sim_id": int(other_mob.simObject.id),
+                "name": str(other_mob.name),
+                "public_name": str(other_mob.player.charName) if other_mob.player and other_mob.player.charName else str(other_mob.name),
+                "position": position,
+                "rotation": rotation,
+                "target_id": int(other_mob.target.id) if other_mob.target else 0,
+                "attacking": bool(other_mob.attacking),
+                "detached": bool(other_mob.detached),
+                "dead": bool(other_mob.character.dead) if other_mob.character else bool(other_mob.detached),
+                "is_player": bool(other_mob.player),
+                "is_enemy": is_enemy,
+                "is_self": bool(other_mob == mob),
+                "realm": int(other_mob.realm),
+                "race": str(other_mob.race.name),
+                "pclass": str(other_mob.pclass.name),
+                "level": int(other_mob.plevel),
+                "health": health,
+                "max_health": max(max_health, 1.0),
+                "health_ratio": max(0.0, min(health / max(max_health, 1.0), 1.0)),
+                "in_combat": bool(other_mob.combatGroup),
+                "standing": "Hostile" if is_enemy else ("Player" if other_mob.player else "Neutral"),
+                "distance": range_to_player,
+                "visibility_source": visibility_source,
+            })
+
+        append_entity(mob, "self")
+
+        visible_ids = list(getattr(mob.simObject, "canSee", []) or [])
+        for sim_id in visible_ids:
+            try:
+                sim_object = sim_lookup[sim_id]
+                other_mob = mob_lookup[sim_object]
+            except KeyError:
+                continue
+            append_entity(other_mob, "canSee")
+
+        if len(entities) <= 1:
+            fallback_range = 80.0
+            for other_mob in zone.activeMobs:
+                if not other_mob or other_mob == mob or not other_mob.simObject or other_mob.detached:
+                    continue
+                try:
+                    in_range = GetRange(mob, other_mob) <= fallback_range
+                except Exception:
+                    in_range = False
+                if not in_range:
+                    continue
+                append_entity(other_mob, "activeMobs")
+
+            if mob.target:
+                append_entity(mob.target, "target")
+
+        return entities
+
+    def perspective_targetEntity(self, entity_id, char_index=0):
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+
+        try:
+            entity_id = int(entity_id)
+        except Exception:
+            entity_id = 0
+
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return False
+
+        char = self.player.party.members[char_index]
+        if not char or char.dead or not char.mob or not char.mob.zone:
+            return False
+
+        char.mob.zone.setTargetById(char.mob, entity_id)
+        return True
+    
+    
     #cast or memorize spell, empty spell slot should be caught on client
     def perspective_onSpellSlot(self,cid,slot):
         party = self.player.party
