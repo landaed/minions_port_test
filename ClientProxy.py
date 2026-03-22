@@ -36,6 +36,17 @@ from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, Cha
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
 
 
+def _get_first_attr(obj, *names, default=None):
+    if obj is None:
+        return default
+    for name in names:
+        if hasattr(obj, name):
+            value = getattr(obj, name)
+            if value is not None:
+                return value
+    return default
+
+
 def _serialize_rapid_mob_info(rapid_info):
     if not rapid_info:
         return {}
@@ -43,31 +54,49 @@ def _serialize_rapid_mob_info(rapid_info):
         "HEALTH", "MAXHEALTH", "MANA", "MAXMANA", "STAMINA", "MAXSTAMINA",
         "TGT", "TGTID", "TGTHEALTH", "PETNAME", "PETHEALTH", "AUTOATTACK", "CASTING",
     )
-    return {
-        field.lower(): getattr(rapid_info, field, None)
-        for field in fields
-        if hasattr(rapid_info, field)
-    }
+    data = {}
+    for field in fields:
+        value = _get_first_attr(rapid_info, field, field.lower())
+        if value is not None:
+            data[field.lower()] = value
+    return data
 
 
 def _serialize_character_cache(char_info):
     if not char_info:
         return {}
+
     fields = (
-        "NAME", "RACE", "SEX", "REALM", "PCLASS", "SCLASS", "TCLASS", "PLEVEL", "SLEVEL", "TLEVEL",
-        "SPAWNID", "CHARID", "MOBID", "DEAD", "PORTRAITPIC", "POSITION",
+        ("name", ("NAME", "name")),
+        ("race", ("RACE", "race")),
+        ("sex", ("SEX", "sex")),
+        ("realm", ("REALM", "realm")),
+        ("pclass", ("PCLASS", "pclass")),
+        ("sclass", ("SCLASS", "sclass")),
+        ("tclass", ("TCLASS", "tclass")),
+        ("plevel", ("PLEVEL", "plevel")),
+        ("slevel", ("SLEVEL", "slevel")),
+        ("tlevel", ("TLEVEL", "tlevel")),
+        ("spawnid", ("SPAWNID", "spawnid")),
+        ("charid", ("CHARID", "charid")),
+        ("mobid", ("MOBID", "mobid")),
+        ("dead", ("DEAD", "dead")),
+        ("portraitpic", ("PORTRAITPIC", "portraitpic")),
+        ("position", ("POSITION", "position")),
     )
-    data = {
-        field.lower(): getattr(char_info, field, None)
-        for field in fields
-        if hasattr(char_info, field)
-    }
-    skills = getattr(char_info, "SKILLS", {}) or {}
-    skill_reuse = getattr(char_info, "SKILLREUSE", {}) or {}
+    data = {}
+    for output_name, attr_names in fields:
+        value = _get_first_attr(char_info, *attr_names)
+        if value is not None:
+            data[output_name] = value
+
+    skills = _get_first_attr(char_info, "SKILLS", "skills", default={}) or {}
+    skill_reuse = _get_first_attr(char_info, "SKILLREUSE", "skillReuse", "skill_reuse", default={}) or {}
+
     abilities = []
     for name in sorted(skills.keys(), key=lambda value: str(value))[:8]:
         key = str(name)
-        reuse_value = skill_reuse.get(key.upper())
+        reuse_value = skill_reuse.get(key.upper(), skill_reuse.get(key))
         cooldown_seconds = 0
         if reuse_value is not None:
             try:
@@ -77,41 +106,72 @@ def _serialize_character_cache(char_info):
         abilities.append({
             "name": key,
             "rank": skills[name],
-            "cooldown_active": key.upper() in skill_reuse,
+            "cooldown_active": key.upper() in skill_reuse or key in skill_reuse,
             "cooldown_seconds": cooldown_seconds,
             "source": "server",
         })
+
+    rapid_info = _get_first_attr(char_info, "RAPIDMOBINFO", "rapidMobInfo")
+    if rapid_info is None and hasattr(char_info, "character") and getattr(char_info.character, "mob", None):
+        rapid_info = getattr(char_info, "rapidMobInfo", None) or getattr(char_info.character, "rapidMobInfo", None)
+
     data["abilities"] = abilities
-    data["rapid_mob_info"] = _serialize_rapid_mob_info(getattr(char_info, "RAPIDMOBINFO", None))
-    data["name"] = data.get("name") or getattr(char_info, "NAME", "")
-    data["pclass"] = data.get("pclass") or getattr(char_info, "PCLASS", "")
-    data["level"] = data.get("plevel") or getattr(char_info, "PLEVEL", 1)
+    data["rapid_mob_info"] = _serialize_rapid_mob_info(rapid_info)
+    data["name"] = data.get("name") or _get_first_attr(char_info, "NAME", "name", default="")
+    data["pclass"] = data.get("pclass") or _get_first_attr(char_info, "PCLASS", "pclass", default="")
+    data["level"] = data.get("plevel") or _get_first_attr(char_info, "PLEVEL", "plevel", default=1)
     return data
 
 
 def _serialize_root_info(root_info, session):
     if not root_info:
         return {}
-    char_infos = []
-    for _, value in sorted(getattr(root_info, "CHARINFOS", {}).items(), key=lambda item: item[0]):
-        char_infos.append(_serialize_character_cache(value))
 
-    position = list(getattr(root_info, "POSITION", (0, 0, 0)))
+    char_info_map = _get_first_attr(root_info, "CHARINFOS", "charInfos", default={}) or {}
+    if hasattr(char_info_map, "items"):
+        sorted_infos = [value for _, value in sorted(char_info_map.items(), key=lambda item: item[0])]
+    else:
+        sorted_infos = list(char_info_map)
+
+    char_infos = [_serialize_character_cache(value) for value in sorted_infos if value]
+
+    position = _get_first_attr(root_info, "POSITION", "position")
+    if position is None:
+        player = _get_first_attr(root_info, "player")
+        if player is not None:
+            sim_object = getattr(player, "simObject", None)
+            position = getattr(sim_object, "position", None)
+    position = list(position or (0, 0, 0))
+
+    player_name = _get_first_attr(root_info, "PLAYERNAME", default=None)
+    guild_name = _get_first_attr(root_info, "GUILDNAME", default=None)
+    tin = _get_first_attr(root_info, "TIN", default=None)
+    paused = _get_first_attr(root_info, "PAUSED", default=None)
+    if any(value is None for value in (player_name, guild_name, tin, paused)):
+        player = _get_first_attr(root_info, "player")
+        if player is not None:
+            if player_name is None:
+                player_name = getattr(player, "name", "")
+            if guild_name is None:
+                guild_name = getattr(player, "guildName", "")
+            if tin is None:
+                tin = int(getattr(player, "tin", 0))
+                tin += getattr(player, "copper", 0) * 100
+                tin += getattr(player, "silver", 0) * 10000
+                tin += getattr(player, "gold", 0) * 1000000
+                tin += getattr(player, "platinum", 0) * 100000000
+            if paused is None:
+                paused = bool(getattr(getattr(player, "world", None), "paused", False))
+
     return {
-        "player_name": getattr(root_info, "PLAYERNAME", ""),
-        "guild_name": getattr(root_info, "GUILDNAME", ""),
-        "tin": getattr(root_info, "TIN", 0),
-        "paused": bool(getattr(root_info, "PAUSED", False)),
+        "player_name": player_name or "",
+        "guild_name": guild_name or "",
+        "tin": tin or 0,
+        "paused": bool(paused),
         "position": position,
         "char_infos": char_infos,
         "world_name": session.current_world.get("name", "") if session.current_world else "",
     }
-from mud.world.defines import (
-    RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
-    RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
-    RPG_RACE_STATS, RPG_DEFAULT_STATS, RPG_STATS,
-)
-
 
 def _local_world_access_password(world_name):
     """Best-effort lookup for locally hosted player-world access passwords."""
