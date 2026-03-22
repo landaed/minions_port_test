@@ -62,6 +62,17 @@ def _serialize_character_cache(char_info):
         for field in fields
         if hasattr(char_info, field)
     }
+    skills = getattr(char_info, "SKILLS", {}) or {}
+    skill_reuse = getattr(char_info, "SKILLREUSE", {}) or {}
+    abilities = []
+    for name in sorted(skills.keys(), key=lambda value: str(value))[:8]:
+        key = str(name)
+        abilities.append({
+            "name": key,
+            "rank": skills[name],
+            "cooldown_active": key.upper() in skill_reuse,
+        })
+    data["abilities"] = abilities
     data["rapid_mob_info"] = _serialize_rapid_mob_info(getattr(char_info, "RAPIDMOBINFO", None))
     data["name"] = data.get("name") or getattr(char_info, "NAME", "")
     data["pclass"] = data.get("pclass") or getattr(char_info, "PCLASS", "")
@@ -136,6 +147,7 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setRootInfo(self, rootInfo, *args):
+        self.session.root_info_cache = rootInfo
         payload = _serialize_root_info(rootInfo, self.session)
         payload.update(
             {
@@ -144,6 +156,32 @@ class ProxyPlayerMind(pb.Referenceable):
             }
         )
         self.session.send(payload)
+        self.session.start_gameplay_sync()
+        return True
+
+    def remote_receiveTextList(self, messages):
+        text_messages = [str(message) for message in messages]
+        self.session.send({
+            "type": "text_messages",
+            "messages": text_messages,
+        })
+        return True
+
+    def remote_receiveGameText(self, textCode, text, stripML):
+        self.session.send({
+            "type": "game_text",
+            "text_code": textCode,
+            "text": str(text),
+            "strip_ml": bool(stripML),
+        })
+        return True
+
+    def remote_setTgtDesc(self, infoDict):
+        payload = {str(key).lower(): value for key, value in dict(infoDict).items()}
+        self.session.send({
+            "type": "target_description",
+            "target": payload,
+        })
         return True
 
     def remote_setCursorItem(self, itemInfo):
@@ -213,6 +251,9 @@ class GodotClientSession:
         self.current_world = None
         self.cached_characters = []
         self.world_password = ""
+        self.root_info_cache = None
+        self.gameplay_sync_call = None
+        self.last_gameplay_payload = None
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
@@ -224,6 +265,11 @@ class GodotClientSession:
 
     def cleanup(self):
         """Disconnect any PB connections."""
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            self.gameplay_sync_call.cancel()
+        self.gameplay_sync_call = None
+        self.root_info_cache = None
+        self.last_gameplay_payload = None
         for attr in ("master_perspective", "new_world_perspective", "player_perspective"):
             perspective = getattr(self, attr, None)
             if perspective:
@@ -233,6 +279,21 @@ class GodotClientSession:
                     pass
                 setattr(self, attr, None)
         self.player_mind = None
+
+    def start_gameplay_sync(self):
+        if self.gameplay_sync_call and self.gameplay_sync_call.active():
+            return
+        self.gameplay_sync_call = reactor.callLater(0.25, self._emit_gameplay_sync)
+
+    def _emit_gameplay_sync(self):
+        self.gameplay_sync_call = None
+        if not self.root_info_cache:
+            return
+        payload = _serialize_root_info(self.root_info_cache, self)
+        if payload != self.last_gameplay_payload:
+            self.last_gameplay_payload = payload.copy()
+            self.send({"type": "gameplay_state", **payload})
+        self.start_gameplay_sync()
 
 
 class ProxyProtocol(WebSocketServerProtocol):

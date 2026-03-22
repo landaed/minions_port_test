@@ -328,13 +328,28 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "Enter world failed: " + data.get("message", "")
 
-		"root_info":
+		"root_info", "gameplay_state":
 			_show_gameplay_view(data)
 
 		"zone_transfer":
 			_show_gameplay_view(data)
 			if gameplay_view and gameplay_view.has_method("set_zone_transfer"):
 				gameplay_view.set_zone_transfer(data)
+
+		"target_description":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("set_target_description"):
+				gameplay_view.set_target_description(data.get("target", {}))
+
+		"game_text":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_game_text"):
+				gameplay_view.append_game_text(str(data.get("text", "")))
+
+		"text_messages":
+			_show_gameplay_view(data)
+			if gameplay_view and gameplay_view.has_method("append_text_messages"):
+				gameplay_view.append_text_messages(data.get("messages", []))
 
 		"world_time":
 			world_time = {
