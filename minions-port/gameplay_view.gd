@@ -9,12 +9,12 @@ var selected_world: Dictionary = {}
 var velocity := Vector3.ZERO
 var mouse_captured := false
 
-@onready var info_label := $MarginContainer/VBoxContainer/InfoLabel
-@onready var detail_label := $MarginContainer/VBoxContainer/DetailLabel
-@onready var transfer_label := $MarginContainer/VBoxContainer/TransferLabel
-@onready var player_body := $SubViewportContainer/SubViewport/WorldRoot/PlayerBody
-@onready var camera_pivot := $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraPivot
-@onready var camera := $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraPivot/Camera3D
+@onready var info_label: Label = $MarginContainer/VBoxContainer/InfoLabel
+@onready var detail_label: Label = $MarginContainer/VBoxContainer/DetailLabel
+@onready var transfer_label: Label = $MarginContainer/VBoxContainer/TransferLabel
+@onready var player_body: CharacterBody3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody
+@onready var camera_pivot: Node3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraPivot
+@onready var camera: Camera3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraPivot/Camera3D
 
 func _ready():
 	set_process_unhandled_input(true)
@@ -24,7 +24,7 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	current_payload = payload.duplicate(true)
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
-	var position = _payload_position()
+	var position: Vector3 = _payload_position()
 	player_body.global_position = position
 	camera.current = true
 	visible = true
@@ -61,7 +61,7 @@ func _update_labels():
 	var world_name := str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
 	var player_name := str(current_payload.get("player_name", "Unknown Player"))
 	var guild_name := str(current_payload.get("guild_name", ""))
-	var pos := player_body.global_position
+	var pos: Vector3 = player_body.global_position
 	var time_text := "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
 	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
 	var paused_text := "yes" if bool(current_payload.get("paused", false)) else "no"
@@ -106,8 +106,8 @@ func _physics_process(delta):
 		input_vec.y += 1.0
 	if Input.is_key_pressed(KEY_S):
 		input_vec.y -= 1.0
-	var basis := player_body.global_transform.basis
-	var move_dir := (basis.x * input_vec.x) + (-basis.z * input_vec.y)
+	var basis: Basis = player_body.global_transform.basis
+	var move_dir: Vector3 = (basis.x * input_vec.x) + (-basis.z * input_vec.y)
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
 	velocity.x = move_dir.x * MOVE_SPEED
