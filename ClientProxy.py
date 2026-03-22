@@ -438,7 +438,14 @@ class ProxyProtocol(WebSocketServerProtocol):
         }.get(msg_type)
 
         if handler:
-            handler(msg)
+            try:
+                handler(msg)
+            except Exception as exc:
+                traceback.print_exc()
+                self.session.send({
+                    "type": "error",
+                    "message": f"{msg_type} failed: {exc}",
+                })
         else:
             self.session.send(
                 {"type": "error", "message": f"Unknown message type: {msg_type}"}
