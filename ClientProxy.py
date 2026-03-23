@@ -470,6 +470,11 @@ class GodotClientSession:
         d.addErrback(self._on_entity_snapshot_failed)
 
     def _on_entity_snapshot(self, entities):
+        if not isinstance(entities, (list, tuple)):
+            print(f"[Proxy] entity_snapshot: unexpected type {type(entities).__name__}: {entities!r}")
+            self.start_entity_sync()
+            return
+        entities = list(entities)
         if entities != self.last_entity_payload:
             self.last_entity_payload = entities
             self.send({"type": "entity_snapshot", "entities": entities})

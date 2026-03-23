@@ -357,7 +357,11 @@ func handle_response(data: Dictionary):
 
 		"entity_snapshot":
 			if gameplay_view and gameplay_view.has_method("set_entities"):
-				gameplay_view.set_entities(data.get("entities", []))
+				var entities_val = data.get("entities", [])
+				if entities_val is Array:
+					gameplay_view.set_entities(entities_val)
+				else:
+					print("entity_snapshot: entities is not Array: ", typeof(entities_val))
 
 		"game_text":
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
