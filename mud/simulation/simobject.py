@@ -331,6 +331,8 @@ class SimObject(pb.Cacheable):
         self.wanderGroup = wanderGroup
         self.tgeObject = TGEObject(id)
         self.tgeObject.wanderGroup = wanderGroup
+        if hasattr(self.tgeObject, 'setTransform'):
+            self.tgeObject.setTransform(list(transform))
         self.isPlayer = isPlayer
         self.spawnInfo = spawnInfo
         self.mobInfo = mobInfo
