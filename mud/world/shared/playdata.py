@@ -328,9 +328,12 @@ class RapidMobInfoGhost(pb.RemoteCache):
     
     def observe_updateChanged(self,changed):
         self.__dict__.update(changed)
-        
-        from mud.client.gui.partyWnd import PARTYWND
-        from mud.client.gui.macro import MACROMASTER
+
+        try:
+            from mud.client.gui.partyWnd import PARTYWND
+            from mud.client.gui.macro import MACROMASTER
+        except (ImportError, ModuleNotFoundError):
+            return
         for charIndex,cinfo in PARTYWND.charInfos.items():
             if cinfo.RAPIDMOBINFO == self:
                 break
@@ -975,17 +978,20 @@ class ItemInfoGhost(pb.RemoteCache):
         
         # If this item info is a container and the player is currently
         #  viewing the same, update the item container window.
-        if 'CONTENT' in changed:
-            from mud.client.gui.itemContainerWnd import ItemContainerWnd
-            ItemContainerWnd = ItemContainerWnd.instance
-            if ItemContainerWnd.container == self:
-                ItemContainerWnd.openContainer(self)
-        
-        if 'REUSETIMER' in changed:
-            from mud.client.gui.macro import MACROMASTER
-            MACROMASTER.updateItemUsingMacros(self.NAME)
-        
-        self.generateItemText()
+        try:
+            if 'CONTENT' in changed:
+                from mud.client.gui.itemContainerWnd import ItemContainerWnd
+                ItemContainerWnd = ItemContainerWnd.instance
+                if ItemContainerWnd.container == self:
+                    ItemContainerWnd.openContainer(self)
+
+            if 'REUSETIMER' in changed:
+                from mud.client.gui.macro import MACROMASTER
+                MACROMASTER.updateItemUsingMacros(self.NAME)
+
+            self.generateItemText()
+        except (ImportError, ModuleNotFoundError):
+            pass
 
 
 
@@ -1333,26 +1339,29 @@ class CharacterInfoGhost(pb.RemoteCache):
     def observe_updateChanged(self,changed):
         global DIRTY,SKILLS_DIRTY,ADVANCEMENTS_DIRTY
         self.__dict__.update(changed)
-        
+
         DIRTY = True
-        
+
         if 'SKILLS' in changed or 'SKILLREUSE' in changed:
             SKILLS_DIRTY.append(self)
             try:
                 from mud.client.gui.macro import MACROMASTER
                 MACROMASTER.updateSkillUsingMacros(iterableSkills=changed['SKILLREUSE'])
-            except KeyError:
+            except (KeyError, ImportError, ModuleNotFoundError):
                 pass
-        
+
         if 'DEAD' in changed:
             if changed['DEAD']:
-                from mud.client.gui.partyWnd import PARTYWND
-                from mud.client.gui.macro import MACROMASTER
-                for charIndex,cinfo in PARTYWND.charInfos.items():
-                    if cinfo == self:
-                        break
-                MACROMASTER.stopMacrosForChar(charIndex)
-        
+                try:
+                    from mud.client.gui.partyWnd import PARTYWND
+                    from mud.client.gui.macro import MACROMASTER
+                    for charIndex,cinfo in PARTYWND.charInfos.items():
+                        if cinfo == self:
+                            break
+                    MACROMASTER.stopMacrosForChar(charIndex)
+                except (ImportError, ModuleNotFoundError):
+                    pass
+
         if 'ADVANCE' in changed or 'ADVANCEMENTS' in changed or 'PLEVEL' in changed or 'SLEVEL' in changed or 'TLEVEL' in changed or 'TCLASS' in changed or 'SCLASS' in changed or 'PCLASS' in changed:
             ADVANCEMENTS_DIRTY = True
 
@@ -1444,8 +1453,11 @@ class CharSpellInfoGhost(pb.RemoteCache):
     def observe_updateChanged(self,changed):
         self.__dict__.update(changed)
         if 'RECASTTIMER' in changed:
-            from mud.client.gui.macro import MACROMASTER
-            MACROMASTER.updateSpellUsingMacros(self.SPELLINFO.BASENAME)
+            try:
+                from mud.client.gui.macro import MACROMASTER
+                MACROMASTER.updateSpellUsingMacros(self.SPELLINFO.BASENAME)
+            except (ImportError, ModuleNotFoundError):
+                pass
 
 
 
@@ -1724,12 +1736,15 @@ class AllianceInfoGhost(pb.RemoteCache):
             
     def observe_updateChanged(self,changed):
         self.__dict__.update(changed)
-        
+
         #breakin' the law, breakin' the law
-        from mud.client.gui.allianceWnd import ALLIANCEWND
-        from mud.client.gui.leaderWnd import LEADERWND
-        ALLIANCEWND.setAllianceInfo(self)
-        LEADERWND.setAllianceInfo(self)
+        try:
+            from mud.client.gui.allianceWnd import ALLIANCEWND
+            from mud.client.gui.leaderWnd import LEADERWND
+            ALLIANCEWND.setAllianceInfo(self)
+            LEADERWND.setAllianceInfo(self)
+        except (ImportError, ModuleNotFoundError):
+            pass
 
 
 pb.setUnjellyableForClass(AllianceInfo, AllianceInfoGhost)
@@ -1824,9 +1839,12 @@ class TradeInfoGhost(pb.RemoteCache):
             
     def observe_updateChanged(self,changed):
         self.__dict__.update(changed)
-            
-        from mud.client.gui.tradeWnd import TRADEWND
-        TRADEWND.setFromTradeInfo(self)
+
+        try:
+            from mud.client.gui.tradeWnd import TRADEWND
+            TRADEWND.setFromTradeInfo(self)
+        except (ImportError, ModuleNotFoundError):
+            pass
 
 pb.setUnjellyableForClass(TradeInfo, TradeInfoGhost)     
         

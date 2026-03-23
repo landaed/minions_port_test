@@ -407,10 +407,15 @@ class SimMind(pb.Root):
         
         self.simLookup = SimLookup()
         self.simObjects = []
-        
+
+        try:
+            TGERegisterSimLookup(self.simLookup)
+        except NameError:
+            pass
+
         self.updateSimObjects()
         self.tickBrains()
-        
+
         self.updateCanSee()
         
         self.passwords = {}
