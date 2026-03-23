@@ -90,6 +90,32 @@ func set_entities(entities: Array):
 	_sync_entity_markers()
 	_update_labels()
 
+func on_server_selection(tgt_sim_id: int, char_index: int):
+	if tgt_sim_id == 0:
+		server_target_description = {}
+		_update_labels()
+		return
+	for entity in replicated_entities:
+		if int(entity.get("sim_id", 0)) == tgt_sim_id:
+			server_target_description = entity.duplicate(true)
+			_update_labels()
+			return
+	server_target_description = {"name": "Target (sim %d)" % tgt_sim_id}
+	_update_labels()
+
+func on_server_selection_by_mob(target_id: int, char_index: int):
+	if target_id == 0:
+		server_target_description = {}
+		_update_labels()
+		return
+	for entity in replicated_entities:
+		if int(entity.get("id", 0)) == target_id:
+			server_target_description = entity.duplicate(true)
+			_update_labels()
+			return
+	server_target_description = {"name": "Target (mob %d)" % target_id}
+	_update_labels()
+
 func append_game_text(message: String):
 	_push_log(message)
 

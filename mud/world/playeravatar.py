@@ -1447,49 +1447,60 @@ class PlayerAvatar(Avatar):
         if not sim_avatar:
             return []
 
-        sim_lookup = sim_avatar.simLookup
-        mob_lookup = zone.mobLookup
+        try:
+            sim_lookup = sim_avatar.simLookup
+            mob_lookup = zone.mobLookup
+        except AttributeError:
+            print_exc()
+            return []
+
         entities = []
         seen_sim_ids = set()
 
         def append_entity(other_mob, visibility_source="unknown"):
-            if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
-                return
-            seen_sim_ids.add(other_mob.simObject.id)
-            position = list(other_mob.simObject.position) if other_mob.simObject.position else [0.0, 0.0, 0.0]
-            rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
-            health = float(other_mob.health) if other_mob.health is not None else 0.0
-            max_health = float(other_mob.maxHealth) if other_mob.maxHealth is not None else 0.0
-            range_to_player = float(GetRange(mob, other_mob)) if other_mob != mob else 0.0
-            is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
-            if other_mob.player or (other_mob.master and other_mob.master.player):
-                is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
-            entities.append({
-                "id": int(other_mob.id),
-                "sim_id": int(other_mob.simObject.id),
-                "name": str(other_mob.name),
-                "public_name": str(other_mob.player.charName) if other_mob.player and other_mob.player.charName else str(other_mob.name),
-                "position": position,
-                "rotation": rotation,
-                "target_id": int(other_mob.target.id) if other_mob.target else 0,
-                "attacking": bool(other_mob.attacking),
-                "detached": bool(other_mob.detached),
-                "dead": bool(other_mob.character.dead) if other_mob.character else bool(other_mob.detached),
-                "is_player": bool(other_mob.player),
-                "is_enemy": is_enemy,
-                "is_self": bool(other_mob == mob),
-                "realm": int(other_mob.realm),
-                "race": str(other_mob.race.name),
-                "pclass": str(other_mob.pclass.name),
-                "level": int(other_mob.plevel),
-                "health": health,
-                "max_health": max(max_health, 1.0),
-                "health_ratio": max(0.0, min(health / max(max_health, 1.0), 1.0)),
-                "in_combat": bool(other_mob.combatGroup),
-                "standing": "Hostile" if is_enemy else ("Player" if other_mob.player else "Neutral"),
-                "distance": range_to_player,
-                "visibility_source": visibility_source,
-            })
+            try:
+                if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
+                    return
+                seen_sim_ids.add(other_mob.simObject.id)
+                position = list(other_mob.simObject.position) if other_mob.simObject.position else [0.0, 0.0, 0.0]
+                rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
+                health = float(other_mob.health) if hasattr(other_mob, 'health') and other_mob.health is not None else 0.0
+                max_health = float(other_mob.maxHealth) if hasattr(other_mob, 'maxHealth') and other_mob.maxHealth is not None else 0.0
+                range_to_player = float(GetRange(mob, other_mob)) if other_mob != mob else 0.0
+                is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
+                if other_mob.player or (hasattr(other_mob, 'master') and other_mob.master and other_mob.master.player):
+                    is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
+                race_name = str(other_mob.race.name) if other_mob.race and hasattr(other_mob.race, 'name') else "Unknown"
+                pclass_name = str(other_mob.pclass.name) if other_mob.pclass and hasattr(other_mob.pclass, 'name') else "Unknown"
+                entities.append({
+                    "id": int(other_mob.id),
+                    "sim_id": int(other_mob.simObject.id),
+                    "name": str(other_mob.name),
+                    "public_name": str(other_mob.player.charName) if other_mob.player and hasattr(other_mob.player, 'charName') and other_mob.player.charName else str(other_mob.name),
+                    "position": position,
+                    "rotation": rotation,
+                    "target_id": int(other_mob.target.id) if other_mob.target else 0,
+                    "attacking": bool(getattr(other_mob, 'attacking', False)),
+                    "detached": bool(other_mob.detached),
+                    "dead": bool(other_mob.character.dead) if hasattr(other_mob, 'character') and other_mob.character else bool(other_mob.detached),
+                    "is_player": bool(other_mob.player),
+                    "is_enemy": is_enemy,
+                    "is_self": bool(other_mob == mob),
+                    "realm": int(getattr(other_mob, 'realm', 0)),
+                    "race": race_name,
+                    "pclass": pclass_name,
+                    "level": int(getattr(other_mob, 'plevel', 0)),
+                    "health": health,
+                    "max_health": max(max_health, 1.0),
+                    "health_ratio": max(0.0, min(health / max(max_health, 1.0), 1.0)),
+                    "in_combat": bool(getattr(other_mob, 'combatGroup', None)),
+                    "standing": "Hostile" if is_enemy else ("Player" if other_mob.player else "Neutral"),
+                    "distance": range_to_player,
+                    "visibility_source": visibility_source,
+                })
+            except Exception:
+                print("####getVisibleEntities: failed to build entity for mob %s (source=%s)" % (getattr(other_mob, 'name', '?'), visibility_source))
+                print_exc()
 
         append_entity(mob, "self")
 

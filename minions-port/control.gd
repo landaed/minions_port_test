@@ -378,6 +378,20 @@ func handle_response(data: Dictionary):
 			}
 			_update_gameplay_clock()
 
+		"set_selection":
+			if gameplay_view and gameplay_view.has_method("on_server_selection"):
+				gameplay_view.on_server_selection(
+					int(data.get("tgt_sim_id", 0)),
+					int(data.get("char_index", 0))
+				)
+
+		"mouse_select":
+			if gameplay_view and gameplay_view.has_method("on_server_selection_by_mob"):
+				gameplay_view.on_server_selection_by_mob(
+					int(data.get("target_id", 0)),
+					int(data.get("char_index", 0))
+				)
+
 		"gameplay_command_result":
 			status_label.text = data.get("message", "Gameplay command sent.")
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
