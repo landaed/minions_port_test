@@ -346,6 +346,12 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setSelection(self, srcId, tgtId, charIndex):
+        self.session.send({
+            "type": "set_selection",
+            "src_sim_id": srcId,
+            "tgt_sim_id": tgtId,
+            "char_index": charIndex,
+        })
         return True
 
     def remote_setAllianceInfo(self, *args):
