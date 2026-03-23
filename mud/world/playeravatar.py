@@ -1505,8 +1505,6 @@ class PlayerAvatar(Avatar):
         append_entity(mob, "self")
 
         visible_ids = list(getattr(mob.simObject, "canSee", []) or [])
-        print("####getVisibleEntities: mob=%s pos=%s canSee=%s activeMobs=%d" % (
-            mob.name, getattr(mob.simObject, 'position', '?'), visible_ids[:5], len(zone.activeMobs)))
         for sim_id in visible_ids:
             try:
                 sim_object = sim_lookup[sim_id]
@@ -1516,30 +1514,32 @@ class PlayerAvatar(Avatar):
             append_entity(other_mob, "canSee")
 
         if len(entities) <= 1:
-            fallback_range = 80.0
-            fallback_checked = 0
-            fallback_in_range = 0
+            fallback_range = 500.0
+            closest_name = None
+            closest_dist = 999999
             for other_mob in zone.activeMobs:
                 if not other_mob or other_mob == mob or not other_mob.simObject or other_mob.detached:
                     continue
-                fallback_checked += 1
                 try:
                     dist = GetRange(mob, other_mob)
-                    in_range = dist <= fallback_range
-                except Exception as e:
-                    print("####getVisibleEntities: GetRange failed for %s: %s" % (getattr(other_mob, 'name', '?'), e))
-                    in_range = False
-                    dist = -1
-                if not in_range:
-                    continue
-                fallback_in_range += 1
-                append_entity(other_mob, "activeMobs")
+                except Exception:
+                    dist = 999999
+                if dist < closest_dist:
+                    closest_dist = dist
+                    closest_name = getattr(other_mob, 'name', '?')
+                if dist <= fallback_range:
+                    append_entity(other_mob, "activeMobs")
 
             if mob.target:
                 append_entity(mob.target, "target")
 
-            print("####getVisibleEntities: fallback checked=%d in_range=%d total_entities=%d" % (
-                fallback_checked, fallback_in_range, len(entities)))
+            # Inject debug info into the self entity so we can see it client-side
+            if entities:
+                entities[0]["_debug"] = "canSee=%d activeMobs=%d nearest=%s(%.0f) found=%d pos=%s" % (
+                    len(visible_ids), len(zone.activeMobs),
+                    closest_name or "none", closest_dist,
+                    len(entities) - 1,
+                    str(getattr(mob.simObject, 'position', '?')))
 
         return entities
 
