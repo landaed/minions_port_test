@@ -120,7 +120,7 @@ class RootInfo(pb.Cacheable):
             changed['BANK'] = state['BANK'] = bank
             self.forceBankUpdate = False
         
-        position = player.simObject.position
+        position = player.simObject.position if player.simObject else (0,0,0)
         if state['POSITION'] != position:
             changed['POSITION'] = state['POSITION'] = position
         

@@ -185,8 +185,16 @@ class ZoneInstance:
     def connectPlayer(self,result,player,zconnect):
         #XXX fixme, we are passing the avatar name (fantasyName) here to client
         #and client is responsible for passing this to simulation zone
-        #client shouldn't be responsible for this... 
-        player.mind.callRemote("connect",zconnect,player.fantasyName)
+        #client shouldn't be responsible for this...
+        from mud.world.stubsim import StubSimAvatar
+        if isinstance(self.simAvatar, StubSimAvatar):
+            # Headless stub mode: no zone server process to connect to.
+            # Defer to next reactor tick so that enterWorld() finishes
+            # assembling the party and rootInfo first.
+            from mud.world.stubsim import create_player_sim_object
+            reactor.callLater(0, create_player_sim_object, player, self)
+        else:
+            player.mind.callRemote("connect",zconnect,player.fantasyName)
     
     
     def connectQueuedPlayers(self, result):
