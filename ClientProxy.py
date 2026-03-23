@@ -481,7 +481,12 @@ class GodotClientSession:
             self.start_entity_sync()
             return
         entities = list(entities)
-        print(f"[Proxy] entity_snapshot: received {len(entities)} entities")
+        debug_info = entities[0].get("_debug", "") if entities and isinstance(entities[0], dict) else ""
+        if debug_info:
+            print(f"[Proxy] entity_snapshot: {len(entities)} entities | {debug_info}")
+        elif len(entities) != getattr(self, '_last_entity_count', -1):
+            print(f"[Proxy] entity_snapshot: received {len(entities)} entities")
+            self._last_entity_count = len(entities)
         if entities != self.last_entity_payload:
             self.last_entity_payload = entities
             self.send({"type": "entity_snapshot", "entities": entities})
