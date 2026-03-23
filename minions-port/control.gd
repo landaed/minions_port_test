@@ -336,8 +336,14 @@ func handle_response(data: Dictionary):
 			else:
 				status_label.text = "Enter world failed: " + data.get("message", "")
 
-		"root_info", "gameplay_state":
+		"root_info":
 			_show_gameplay_view(data)
+
+		"gameplay_state":
+			if gameplay_view and gameplay_view.visible and gameplay_view.has_method("update_state"):
+				gameplay_view.update_state(data)
+			else:
+				_show_gameplay_view(data)
 
 		"zone_transfer":
 			_show_gameplay_view(data)
@@ -350,17 +356,14 @@ func handle_response(data: Dictionary):
 				gameplay_view.set_target_description(data.get("target", {}))
 
 		"entity_snapshot":
-			_show_gameplay_view(data)
 			if gameplay_view and gameplay_view.has_method("set_entities"):
 				gameplay_view.set_entities(data.get("entities", []))
 
 		"game_text":
-			_show_gameplay_view(data)
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
 				gameplay_view.append_game_text(str(data.get("text", "")))
 
 		"text_messages":
-			_show_gameplay_view(data)
 			if gameplay_view and gameplay_view.has_method("append_text_messages"):
 				gameplay_view.append_text_messages(data.get("messages", []))
 
