@@ -481,6 +481,7 @@ class GodotClientSession:
             self.start_entity_sync()
             return
         entities = list(entities)
+        print(f"[Proxy] entity_snapshot: received {len(entities)} entities")
         if entities != self.last_entity_payload:
             self.last_entity_payload = entities
             self.send({"type": "entity_snapshot", "entities": entities})
