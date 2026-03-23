@@ -576,6 +576,10 @@ func _physics_process(delta):
 	jump_requested = false
 	player_body.velocity = velocity
 	player_body.move_and_slide()
+	# Safety net: teleport back to origin if player falls below the floor
+	if player_body.global_position.y < -20.0:
+		player_body.global_position = Vector3(0.0, 3.0, 0.0)
+		velocity = Vector3.ZERO
 
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
