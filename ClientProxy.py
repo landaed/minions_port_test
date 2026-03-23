@@ -354,6 +354,14 @@ class ProxyPlayerMind(pb.Referenceable):
         })
         return True
 
+    def remote_startSelectron(self, ghostid):
+        print(f"[Proxy] startSelectron: ghostid={ghostid}")
+        return True
+
+    def remote_stopSelectron(self):
+        print(f"[Proxy] stopSelectron")
+        return True
+
     def remote_setAllianceInfo(self, *args):
         self.session.send(
             {

@@ -1029,42 +1029,59 @@ def CmdWave(mob,args):
     CmdEmote(mob, args)   
 
 
+def _getCycleTargetCandidates(mob, zone, simAvatar):
+    """Get targetable mobs from canSee, falling back to activeMobs if canSee is empty."""
+    candidates = []
+    can_see = list(getattr(mob.simObject, 'canSee', []) or [])
+
+    if can_see:
+        for id in can_see:
+            try:
+                otherMob = zone.mobLookup[simAvatar.simLookup[id]]
+            except KeyError:
+                continue
+            candidates.append((id, otherMob))
+    else:
+        # Fallback: use activeMobs within range when canSee is not populated
+        for otherMob in zone.activeMobs:
+            if not otherMob or otherMob == mob or not otherMob.simObject or otherMob.detached:
+                continue
+            candidates.append((otherMob.simObject.id, otherMob))
+
+    return candidates
+
+
 def CmdCycleTarget(mob,args,doMouse=True,useInputMob = False,reverse = False):
     if not useInputMob:
         #curchar
         mob = mob.player.curChar.mob
-    
+
     zone = mob.zone
     simAvatar = zone.simAvatar
-    
+
     targets = []
-    for id in mob.simObject.canSee:
-        try:
-            otherMob = zone.mobLookup[simAvatar.simLookup[id]]
-        except KeyError:
-            continue #not spawned yet, though in cansee
-        
+    for id, otherMob in _getCycleTargetCandidates(mob, zone, simAvatar):
         kos = IsKOS(otherMob, mob)
         if otherMob.player or (otherMob.master and otherMob.master.player):
             kos = kos or AllowHarmful(mob, otherMob)
         if not kos or otherMob.detached:
             continue
-        
+
         # If the othermob is not visible, skip it.
         if not IsVisible(mob, otherMob):
             continue
-        
+
         if GetRange(otherMob,mob) < 100:
             targets.append(id)
-    
+
     if not len(targets):
         return
-    
+
     if not mob.target or mob.target.simObject.id not in targets or len(targets) == 1:
         tid = targets[0]
     else:
         index = targets.index(mob.target.simObject.id)
-        
+
         if reverse:
             index -= 1
             if index < 0:
@@ -1073,9 +1090,9 @@ def CmdCycleTarget(mob,args,doMouse=True,useInputMob = False,reverse = False):
             index += 1
             if index == len(targets):
                 index = 0
-        
+
         tid = targets[index]
-    
+
     tmob = zone.mobLookup[simAvatar.simLookup[tid]]
     zone.setTarget(mob,tmob)
     if doMouse:
@@ -1090,27 +1107,23 @@ def CmdTargetNearest(mob,args,doMouse=True,useInputMob = False):
     if not useInputMob:
         #curchar
         mob = mob.player.curChar.mob
-    
+
     zone = mob.zone
     simAvatar = zone.simAvatar
-    
+
     target = -1
     best = 999999
-    for id in mob.simObject.canSee:
-        try:
-            otherMob = zone.mobLookup[simAvatar.simLookup[id]]
-        except KeyError:
-            continue #not spawned yet, though in cansee
+    for id, otherMob in _getCycleTargetCandidates(mob, zone, simAvatar):
         kos = IsKOS(otherMob,mob)
         if otherMob.player or (otherMob.master and otherMob.master.player):
             kos = kos or AllowHarmful(mob, otherMob)
         if not kos or otherMob.detached:
             continue
-        
+
         # If the othermob is not visible, skip it.
         if not IsVisible(mob, otherMob):
             continue
-        
+
         r = GetRange(otherMob,mob)
         if  r < best:
             # Only target mobs that are infront of us.

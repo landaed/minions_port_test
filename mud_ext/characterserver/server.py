@@ -133,7 +133,7 @@ class WorldConnection(pb.Root):
         
         # Immediately remove this player from active players if logging out.
         if logout:
-            del ACTIVE_PLAYER_TIMES[publicName]
+            ACTIVE_PLAYER_TIMES.pop(publicName, None)
     
     
     def remote_checkCharacterName(self, cname):

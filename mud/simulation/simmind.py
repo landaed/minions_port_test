@@ -696,13 +696,24 @@ class SimMind(pb.Root):
         try:
             cansee = TGEGenerateCanSee()
             if cansee:
+                non_empty = sum(1 for cs in cansee.values() if cs)
+                if non_empty and not getattr(self, '_cansee_logged', False):
+                    print("####updateCanSee: %d objects, %d with visible neighbors" % (len(cansee), non_empty))
+                    self._cansee_logged = True
                 for id,cs in cansee.items():
                     so = self.simLookup[id]
                     if int(so.tgeObject.isSimZombie()):
                         continue
                     so.updateCanSee(cs)
-        except:
-            pass
+            elif not getattr(self, '_cansee_empty_logged', False):
+                print("####updateCanSee: TGEGenerateCanSee returned empty/None, simLookup has %d objects" % len(self.simLookup))
+                self._cansee_empty_logged = True
+        except Exception as e:
+            if not getattr(self, '_cansee_error_logged', False):
+                print("####updateCanSee ERROR: %s" % e)
+                import traceback
+                traceback.print_exc()
+                self._cansee_error_logged = True
         self.canSeeTick = reactor.callLater(1,self.updateCanSee)
     
     
