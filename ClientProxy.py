@@ -34,11 +34,6 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
-from mud.world.defines import (
-    RPG_REALM_LIGHT, RPG_REALM_DARKNESS, RPG_REALM_MONSTER,
-    RPG_PC_RACES, RPG_REALM_RACES, RPG_REALM_CLASSES, RPG_RACE_CLASSES,
-    RPG_RACE_STATS, RPG_DEFAULT_STATS, RPG_STATS,
-)
 
 
 def _extract_state_mapping(obj):
