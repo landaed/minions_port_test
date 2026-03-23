@@ -36,12 +36,37 @@ from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, Cha
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
 
 
+def _extract_state_mapping(obj):
+    if obj is None:
+        return {}
+    if isinstance(obj, dict):
+        return obj
+    state = getattr(obj, "state", None)
+    if isinstance(state, dict) and state:
+        return state
+    data = getattr(obj, "__dict__", None)
+    if isinstance(data, dict) and data:
+        return data
+    return {}
+
+
 def _get_first_attr(obj, *names, default=None):
     if obj is None:
         return default
+
+    state = _extract_state_mapping(obj)
     for name in names:
+        if name in state and state[name] is not None:
+            return state[name]
+        lname = name.lower()
+        if lname in state and state[lname] is not None:
+            return state[lname]
         if hasattr(obj, name):
             value = getattr(obj, name)
+            if value is not None:
+                return value
+        if hasattr(obj, lname):
+            value = getattr(obj, lname)
             if value is not None:
                 return value
     return default
