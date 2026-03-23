@@ -23,6 +23,7 @@ var replicated_entity_nodes: Dictionary = {}
 var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
 var combat_log: Array = []
+var _has_spawned := false
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var info_label: Label = $HUDMargin/HUDVBox/InfoLabel
@@ -49,11 +50,26 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	current_payload = payload.duplicate(true)
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
-	var spawn_position: Vector3 = _payload_position()
-	player_body.global_position = Vector3(spawn_position.x, max(spawn_position.y, 2.0), spawn_position.z)
+	# Only reposition player on initial root_info, not on periodic updates.
+	# Server sim coordinates are in a different space than the Godot greybox.
+	if not _has_spawned:
+		_has_spawned = true
+		var spawn_position: Vector3 = _payload_position()
+		# Clamp to reasonable greybox bounds; server coords may be thousands of units away.
+		var clamped := Vector3(
+			clamp(spawn_position.x, -200.0, 200.0),
+			max(clamp(spawn_position.y, 0.0, 50.0), 2.0),
+			clamp(spawn_position.z, -200.0, 200.0),
+		)
+		player_body.global_position = clamped
 	camera.current = true
 	visible = true
 	_capture_mouse()
+	_rebuild_ability_bar()
+	_update_labels()
+
+func update_state(payload: Dictionary):
+	current_payload = payload.duplicate(true)
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -232,7 +248,7 @@ func _entity_label_text(entity: Dictionary) -> String:
 		health_pct,
 	]
 
-func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
+func _create_entity_marker(entity: Dictionary, server_origin := Vector3.ZERO) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = str(entity.get("name", "Entity"))
 	body.collision_layer = 1
@@ -260,14 +276,15 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	body.set_meta("mesh", mesh_instance)
 	body.set_meta("label", label)
 	body.set_meta("entity_id", int(entity.get("id", 0)))
-	body.set_meta("target_position", _world_position_from_server(entity.get("position", [])))
-	body.position = body.get_meta("target_position")
-	_update_entity_marker(body, entity, true)
+	var rel_pos := _world_position_from_server(entity.get("position", [])) - server_origin
+	body.set_meta("target_position", rel_pos)
+	body.position = rel_pos
+	_update_entity_marker(body, entity, true, server_origin)
 	npc_root.add_child(body)
 	return body
 
-func _update_entity_marker(body: StaticBody3D, entity: Dictionary, snap := false):
-	var target_position := _world_position_from_server(entity.get("position", []))
+func _update_entity_marker(body: StaticBody3D, entity: Dictionary, snap := false, server_origin := Vector3.ZERO):
+	var target_position := _world_position_from_server(entity.get("position", [])) - server_origin
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	body.set_meta("target_position", target_position)
@@ -290,6 +307,13 @@ func _sync_entity_markers():
 		_clear_npc_root()
 		placeholder_npcs.clear()
 
+	# Find the self entity to get the player's server position as origin offset.
+	var self_server_pos := Vector3.ZERO
+	for entity in replicated_entities:
+		if entity is Dictionary and bool(entity.get("is_self", false)):
+			self_server_pos = _world_position_from_server(entity.get("position", []))
+			break
+
 	var incoming_keys: Dictionary = {}
 	for entity in replicated_entities:
 		if not (entity is Dictionary):
@@ -301,10 +325,10 @@ func _sync_entity_markers():
 		incoming_keys[key] = true
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
-			body = _create_entity_marker(entity_dict)
+			body = _create_entity_marker(entity_dict, self_server_pos)
 			replicated_entity_nodes[key] = body
 		else:
-			_update_entity_marker(body, entity_dict)
+			_update_entity_marker(body, entity_dict, false, self_server_pos)
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
@@ -552,6 +576,10 @@ func _physics_process(delta):
 	jump_requested = false
 	player_body.velocity = velocity
 	player_body.move_and_slide()
+	# Safety net: teleport back to origin if player falls below the floor
+	if player_body.global_position.y < -20.0:
+		player_body.global_position = Vector3(0.0, 3.0, 0.0)
+		velocity = Vector3.ZERO
 
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):

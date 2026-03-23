@@ -36,6 +36,15 @@ from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, Cha
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
 
 
+def _json_fallback(obj):
+    """Fallback for json.dumps when encountering non-serializable objects."""
+    if hasattr(obj, "__dict__"):
+        return repr(obj)
+    if isinstance(obj, bytes):
+        return obj.decode("utf-8", errors="replace")
+    return str(obj)
+
+
 def _extract_state_mapping(obj):
     if obj is None:
         return {}
@@ -226,6 +235,14 @@ class ProxyPlayerMind(pb.Referenceable):
     def __init__(self, session):
         self.session = session
 
+    def remoteMessageReceived(self, broker, message, args, kw):
+        """Catch-all for unhandled remote_ methods to prevent NoSuchMethod errors."""
+        method = getattr(self, "remote_%s" % message, None)
+        if method is not None:
+            return method(*broker.unserialize(args), **broker.unserialize(kw))
+        # Silently accept unknown calls instead of raising NoSuchMethod
+        return True
+
     def remote_syncTime(self, hour, minute):
         self.session.send({"type": "world_time", "hour": hour, "minute": minute})
         return True
@@ -349,6 +366,15 @@ class ProxyPlayerMind(pb.Referenceable):
         )
         return True
 
+    def remote_setTracking(self, tracking):
+        # Tracking data maps mob IDs to (name, position, range, type) tuples.
+        # Just acknowledge receipt; the Godot client doesn't have a tracking window yet.
+        return True
+
+    def remote_setMuteTime(self, t):
+        # Mute time for chat. Just acknowledge receipt.
+        return True
+
     def remote_jumpServer(self, wip, wport, wpassword, zport, zpassword, party):
         self.session.send(
             {
@@ -389,7 +415,7 @@ class GodotClientSession:
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
         try:
-            payload = json.dumps(msg_dict)
+            payload = json.dumps(msg_dict, default=_json_fallback)
             self.ws.sendMessage(payload.encode("utf-8"), isBinary=False)
         except Exception:
             traceback.print_exc()
