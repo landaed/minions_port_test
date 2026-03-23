@@ -297,6 +297,40 @@ class ProxyPlayerMind(pb.Referenceable):
         )
         return True
 
+    def remote_connect(self, zconnect, fantasyName):
+        # In stub/headless mode the world server creates the player's
+        # simObject directly, so there is no zone server to connect to.
+        # Just acknowledge receipt.
+        self.session.send({
+            "type": "zone_connect",
+            "message": "Zone connection established (headless stub).",
+        })
+        return True
+
+    def remote_checkEncounterSetting(self, *args):
+        return True
+
+    def remote_createServer(self, *args):
+        return True
+
+    def remote_setLoot(self, loot):
+        self.session.send({
+            "type": "loot",
+            "message": "Received loot from world server.",
+        })
+        return True
+
+    def remote_mouseSelect(self, charIndex, targetId):
+        self.session.send({
+            "type": "mouse_select",
+            "char_index": charIndex,
+            "target_id": targetId,
+        })
+        return True
+
+    def remote_setSelection(self, srcId, tgtId, charIndex):
+        return True
+
     def remote_setAllianceInfo(self, *args):
         self.session.send(
             {

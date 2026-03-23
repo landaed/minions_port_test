@@ -699,19 +699,59 @@ try:
         world.zoneIP = ip
         perspective.broker.transport.loseConnection()
         if len(STATICZONES):
-            SpawnZones()
-            # Fallback: if zones don't come live (stub engine), connect to daemon after 35s
-            def _fallback_connect_daemon():
-                if ZONECOUNT != -1:  # zones never all came live
-                    print("####Fallback: Connecting to daemon (zones not fully live after 35s)")
-                    ConnectToDaemon()
-            reactor.callLater(35, _fallback_connect_daemon)
+            from mud.world.stubsim import _is_stub_engine
+            if _is_stub_engine():
+                # Headless stub mode: bring zones live directly with
+                # StubSimAvatars instead of spawning zone server processes
+                # that can't run without the Torque engine.
+                print("####Stub engine detected: starting zones headless")
+                _start_zones_headless(world, STATICZONES)
+            else:
+                SpawnZones()
+                # Fallback: if zones don't come live (real engine), connect to daemon after 35s
+                def _fallback_connect_daemon():
+                    if ZONECOUNT != -1:  # zones never all came live
+                        print("####Fallback: Connecting to daemon (zones not fully live after 35s)")
+                        ConnectToDaemon()
+                reactor.callLater(35, _fallback_connect_daemon)
         else:
             # if not CoreSettings.PGSERVER:
             #     THESERVER.allowConnections = True
             #     AnnounceWorld()
             # else:
             ConnectToDaemon()
+
+
+    def _start_zones_headless(world, static_zones):
+        """Create zone instances with StubSimAvatars and bring them live."""
+        from mud.world.stubsim import StubSimAvatar
+        from mud.world.zone import Zone, ZoneInstance
+
+        for zone_name in static_zones:
+            # Allocate a port (even though there's no zone process)
+            port = None
+            for x in range(world.zoneStartPort, world.zoneStartPort + 100):
+                if x in world.usedZonePorts:
+                    continue
+                port = x
+                world.usedZonePorts.append(x)
+                break
+
+            if port is None:
+                print("####Headless: no port for zone %s" % zone_name)
+                continue
+
+            zone_obj = Zone.byName(zone_name)
+            ip = world.zoneIP
+            z = ZoneInstance(zone_obj, ip, port, "", None)
+            z.world = world
+            z.time = world.time
+            z.dynamic = False
+            world.waitingZoneInstances.append(z)
+
+            # Create a stub sim avatar and bring the zone live
+            stub = StubSimAvatar(world)
+            stub.startZone(z.name, pid=0)
 
     def LaunchWorldConnected(perspective):
         print("####Connected to Master Running launchWorld")
