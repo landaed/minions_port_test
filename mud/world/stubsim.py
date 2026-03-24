@@ -274,6 +274,7 @@ class StubSimAvatar:
         try:
             from math import sqrt
             dt = self._MOVE_INTERVAL
+            moved = 0
             for so in list(self.simObjects):
                 tgt = getattr(so, 'moveTarget', None)
                 if not tgt or so.isPlayer:
@@ -295,6 +296,10 @@ class StubSimAvatar:
                     so.position[1] + dy * factor,
                     so.position[2] + dz * factor,
                 )
+                moved += 1
+            if moved and not getattr(self, '_move_logged', False):
+                self._move_logged = True
+                print("[StubSimAvatar] _updateMovement: moved %d NPCs" % moved)
         except Exception:
             traceback.print_exc()
         self._moveTick = reactor.callLater(self._MOVE_INTERVAL, self._updateMovement)
