@@ -1060,11 +1060,9 @@ def CmdCycleTarget(mob,args,doMouse=True,useInputMob = False,reverse = False):
     simAvatar = zone.simAvatar
 
     targets = []
+    all_in_range = []
     for id, otherMob in _getCycleTargetCandidates(mob, zone, simAvatar):
-        kos = IsKOS(otherMob, mob)
-        if otherMob.player or (otherMob.master and otherMob.master.player):
-            kos = kos or AllowHarmful(mob, otherMob)
-        if not kos or otherMob.detached:
+        if otherMob.detached:
             continue
 
         # If the othermob is not visible, skip it.
@@ -1072,7 +1070,16 @@ def CmdCycleTarget(mob,args,doMouse=True,useInputMob = False,reverse = False):
             continue
 
         if GetRange(otherMob,mob) < 100:
-            targets.append(id)
+            kos = IsKOS(otherMob, mob)
+            if otherMob.player or (otherMob.master and otherMob.master.player):
+                kos = kos or AllowHarmful(mob, otherMob)
+            if kos:
+                targets.append(id)
+            all_in_range.append(id)
+
+    # Fallback: if no hostile targets, allow targeting any mob in range
+    if not targets:
+        targets = all_in_range
 
     if not len(targets):
         return
