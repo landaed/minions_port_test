@@ -205,6 +205,7 @@ class StubSimAvatar:
         """Periodically compute distance-based canSee for all sim objects."""
         try:
             objects = list(self.simObjects)
+            player_count = 0
             for so in objects:
                 if not so or not hasattr(so, 'position') or so.position is None:
                     continue
@@ -217,7 +218,12 @@ class StubSimAvatar:
                     dz = so.position[2] - other.position[2]
                     if dx * dx + dy * dy + dz * dz <= self._VISIBILITY_RANGE_SQ:
                         visible.append(other.id)
+                if so.isPlayer and visible:
+                    player_count += 1
                 so.canSee = visible
+            if not getattr(self, '_cansee_logged', False) and objects:
+                print("[StubSimAvatar] _updateCanSee: %d objects, %d players with visible neighbors" % (len(objects), player_count))
+                self._cansee_logged = True
         except Exception:
             traceback.print_exc()
         self._canSeeTick = reactor.callLater(2, self._updateCanSee)
@@ -296,3 +302,54 @@ def create_player_sim_object(player, zone):
 
     # Now officially enter the zone
     zone.playerEnterZone(player)
+
+    # Spawn test mobs near the player after a short delay so zone is ready
+    from twisted.internet import reactor
+    reactor.callLater(2, spawn_test_mobs, zone, pos)
+
+
+def spawn_test_mobs(zone, player_pos):
+    """Spawn 3 aggressive test mobs near a player position for combat testing."""
+    from mud.world.spawn import Spawn
+    import traceback
+
+    # Offsets from the player position (x, y, z) — place them ~10 units away
+    offsets = [
+        (8.0, 0.0, 0.0),
+        (-5.0, 7.0, 0.0),
+        (-5.0, -7.0, 0.0),
+    ]
+
+    try:
+        # "Skeleton" is level 3, realm=Monster(3), flags=128(AGGRESSIVE), aggroRange=20
+        con = Spawn._connection.getConnection()
+        row = con.execute(
+            "SELECT id FROM spawn WHERE lower(name)='skeleton' LIMIT 1;"
+        ).fetchone()
+        if not row:
+            print("[spawn_test_mobs] WARNING: Spawn 'Skeleton' not found in DB")
+            return
+        spawn = Spawn.get(row[0])
+        print("[spawn_test_mobs] Using spawn: %s (level=%d, realm=%d, flags=%d, aggroRange=%d)" % (
+            spawn.name, spawn.plevel, spawn.realm, spawn.flags, spawn.aggroRange))
+    except Exception:
+        traceback.print_exc()
+        return
+
+    spawned = 0
+    for i, (ox, oy, oz) in enumerate(offsets):
+        try:
+            x = player_pos[0] + ox
+            y = player_pos[1] + oy
+            z = player_pos[2] + oz
+            transform = (x, y, z, 0.0, 0.0, 0.0, 1.0)
+
+            mob = zone.spawnMob(spawn, transform, -1)
+            spawned += 1
+            print("[spawn_test_mobs] Spawned '%s' #%d at (%.1f, %.1f, %.1f)" % (
+                spawn.name, mob.id, x, y, z))
+        except Exception:
+            traceback.print_exc()
+
+    print("[spawn_test_mobs] Spawned %d/3 test mobs near player at (%.1f, %.1f, %.1f)" % (
+        spawned, player_pos[0], player_pos[1], player_pos[2]))

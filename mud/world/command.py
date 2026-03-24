@@ -1069,7 +1069,7 @@ def CmdCycleTarget(mob,args,doMouse=True,useInputMob = False,reverse = False):
         if not IsVisible(mob, otherMob):
             continue
 
-        if GetRange(otherMob,mob) < 100:
+        if GetRange(otherMob,mob) < 500:
             kos = IsKOS(otherMob, mob)
             if otherMob.player or (otherMob.master and otherMob.master.player):
                 kos = kos or AllowHarmful(mob, otherMob)
