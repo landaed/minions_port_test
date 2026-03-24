@@ -8,7 +8,7 @@ const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 8.0
-const ENTITY_MAX_DISPLAY_DISTANCE := 40.0
+const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
 
@@ -25,6 +25,7 @@ var replicated_entity_nodes: Dictionary = {}
 var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
 var combat_log: Array = []
+var _highlighted_entity_key: String = ""
 var _has_spawned := false
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
@@ -95,11 +96,13 @@ func set_entities(entities: Array):
 func on_server_selection(tgt_sim_id: int, char_index: int):
 	if tgt_sim_id == 0:
 		server_target_description = {}
+		_highlight_entity("")
 		_update_labels()
 		return
 	for entity in replicated_entities:
 		if int(entity.get("sim_id", 0)) == tgt_sim_id:
 			server_target_description = entity.duplicate(true)
+			_highlight_entity(_entity_key(entity))
 			_update_labels()
 			return
 	server_target_description = {"name": "Target (sim %d)" % tgt_sim_id}
@@ -108,15 +111,42 @@ func on_server_selection(tgt_sim_id: int, char_index: int):
 func on_server_selection_by_mob(target_id: int, char_index: int):
 	if target_id == 0:
 		server_target_description = {}
+		_highlight_entity("")
 		_update_labels()
 		return
 	for entity in replicated_entities:
 		if int(entity.get("id", 0)) == target_id:
 			server_target_description = entity.duplicate(true)
+			_highlight_entity(_entity_key(entity))
 			_update_labels()
 			return
 	server_target_description = {"name": "Target (mob %d)" % target_id}
 	_update_labels()
+
+func _highlight_entity(key: String):
+	# Remove highlight from previous target
+	if not _highlighted_entity_key.is_empty() and replicated_entity_nodes.has(_highlighted_entity_key):
+		var prev: StaticBody3D = replicated_entity_nodes[_highlighted_entity_key]
+		if is_instance_valid(prev):
+			var prev_entity: Dictionary = prev.get_meta("entity", {})
+			var mesh: MeshInstance3D = prev.get_meta("mesh")
+			if mesh:
+				var mat := StandardMaterial3D.new()
+				mat.albedo_color = _entity_color(prev_entity)
+				mesh.material_override = mat
+	_highlighted_entity_key = key
+	# Apply highlight to new target
+	if not key.is_empty() and replicated_entity_nodes.has(key):
+		var body: StaticBody3D = replicated_entity_nodes[key]
+		if is_instance_valid(body):
+			var mesh: MeshInstance3D = body.get_meta("mesh")
+			if mesh:
+				var mat := StandardMaterial3D.new()
+				mat.albedo_color = Color(1.0, 1.0, 0.2, 1.0)  # bright yellow highlight
+				mat.emission_enabled = true
+				mat.emission = Color(1.0, 1.0, 0.2, 1.0)
+				mat.emission_energy_multiplier = 0.5
+				mesh.material_override = mat
 
 func append_game_text(message: String):
 	_push_log(message)
@@ -327,13 +357,7 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary, snap := false
 
 func _sync_entity_markers():
 	if replicated_entities.is_empty():
-		_clear_npc_root()
-		_spawn_placeholder_npcs()
 		return
-
-	if not placeholder_npcs.is_empty():
-		_clear_npc_root()
-		placeholder_npcs.clear()
 
 	# Find the self entity to get the player's server position as origin offset.
 	var self_server_pos := Vector3.ZERO
