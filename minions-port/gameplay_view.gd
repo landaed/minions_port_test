@@ -645,6 +645,9 @@ func _physics_process(delta):
 		player_body.global_position = Vector3(0.0, 3.0, 0.0)
 		velocity = Vector3.ZERO
 
+	# Keep NpcRoot centered on the player so entity offsets stay correct
+	npc_root.global_position = Vector3(player_body.global_position.x, 0.0, player_body.global_position.z)
+
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
