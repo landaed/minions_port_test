@@ -7,6 +7,7 @@
 from twisted.internet import defer, reactor
 from mud.world.core import CoreSettings
 import traceback
+from math import sqrt
 
 
 _next_stub_id = 90000
@@ -196,10 +197,42 @@ class StubSimAvatar:
         if spawnpoints:
             self.zone.createSpawnpoints(spawnpoints)
 
+    # ---- visibility updates (replaces SimMind.updateCanSee) ----
+
+    _VISIBILITY_RANGE_SQ = 500.0 * 500.0
+
+    def _updateCanSee(self):
+        """Periodically compute distance-based canSee for all sim objects."""
+        try:
+            objects = list(self.simObjects)
+            for so in objects:
+                if not so or not hasattr(so, 'position') or so.position is None:
+                    continue
+                visible = []
+                for other in objects:
+                    if other is so or not other or not hasattr(other, 'position') or other.position is None:
+                        continue
+                    dx = so.position[0] - other.position[0]
+                    dy = so.position[1] - other.position[1]
+                    dz = so.position[2] - other.position[2]
+                    if dx * dx + dy * dy + dz * dz <= self._VISIBILITY_RANGE_SQ:
+                        visible.append(other.id)
+                so.canSee = visible
+        except Exception:
+            traceback.print_exc()
+        self._canSeeTick = reactor.callLater(2, self._updateCanSee)
+
     # ---- callRemote compatibility (when code calls self.mind.callRemote) ----
 
     def callRemote(self, method, *args, **kwargs):
-        """No-op remote call – returns an immediately-succeeded deferred."""
+        """Handle remote calls locally."""
+        # setSelection: route to the sim brain (for NPC AI target setting)
+        if method == "setSelection":
+            srcId, tgtId, charIndex = args[0], args[1], args[2] if len(args) > 2 else 0
+            src = self.simLookup.get(srcId)
+            tgt = self.simLookup.get(tgtId) if tgtId else None
+            if src and hasattr(src, 'brain'):
+                src.brain.setTarget(tgt)
         return defer.succeed(None)
 
     # ---- start the zone ----
@@ -218,6 +251,8 @@ class StubSimAvatar:
 
         zinst.start()
         print("[StubSimAvatar] Zone %s is live (headless stub)" % zoneInstanceName)
+        # Start periodic canSee updates
+        self._canSeeTick = reactor.callLater(3, self._updateCanSee)
 
 
 def _is_stub_engine():

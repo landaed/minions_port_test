@@ -34,6 +34,7 @@ var characters: Array = []
 var selected_world: Dictionary = {}
 
 func _ready():
+	socket.inbound_buffer_size = 1048576  # 1MB - entity snapshots can be large
 	socket.connect_to_url("ws://localhost:9000")
 	status_label.text = "Connecting to proxy..."
 	_setup_options()
@@ -356,12 +357,11 @@ func handle_response(data: Dictionary):
 				gameplay_view.set_target_description(data.get("target", {}))
 
 		"entity_snapshot":
-			if gameplay_view and gameplay_view.has_method("set_entities"):
+			var view := _ensure_gameplay_view()
+			if view.has_method("set_entities"):
 				var entities_val = data.get("entities", [])
 				if entities_val is Array:
-					gameplay_view.set_entities(entities_val)
-				else:
-					print("entity_snapshot: entities is not Array: ", typeof(entities_val))
+					view.set_entities(entities_val)
 
 		"game_text":
 			if gameplay_view and gameplay_view.has_method("append_game_text"):

@@ -3,6 +3,7 @@
 # This stub provides no-op implementations for server-side usage
 
 import sys
+import builtins
 
 
 # --- Core TGE Functions ---
@@ -203,3 +204,18 @@ def TGEGetRealTime():
     """Get the current real time in milliseconds."""
     import time
     return int(time.time() * 1000)
+
+
+# --- Register functions as builtins (mimicking original C extension behavior) ---
+# The original tgenative C extension registered these as Python builtins.
+# Code in simmind.py etc. uses them as bare names without importing.
+builtins.TGEGetGlobal = TGEGetGlobal
+builtins.TGESetGlobal = TGESetGlobal
+builtins.TGECall = TGECall
+builtins.TGEEval = TGEEval
+builtins.TGENativeExport = TGENativeExport
+builtins.TGEGetSimTime = TGEGetSimTime
+builtins.TGEGetRealTime = TGEGetRealTime
+builtins.TGEGenerateCanSee = TGEGenerateCanSee
+builtins.TGERegisterSimLookup = TGERegisterSimLookup
+builtins.NumPlayersInZone = NumPlayersInZone

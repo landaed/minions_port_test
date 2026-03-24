@@ -489,15 +489,29 @@ class GodotClientSession:
             self.start_entity_sync()
             return
         entities = list(entities)
-        debug_info = entities[0].get("_debug", "") if entities and isinstance(entities[0], dict) else ""
+
+        # Keep self entity + up to 50 nearest non-self entities to limit payload size.
+        self_entity = None
+        others = []
+        for e in entities:
+            if isinstance(e, dict) and e.get("is_self"):
+                self_entity = e
+            else:
+                others.append(e)
+        others.sort(key=lambda e: float(e.get("distance", 999999)) if isinstance(e, dict) else 999999)
+        capped = others[:50]
+        if self_entity:
+            capped.insert(0, self_entity)
+
+        debug_info = capped[0].get("_debug", "") if capped and isinstance(capped[0], dict) else ""
         if debug_info:
-            print(f"[Proxy] entity_snapshot: {len(entities)} entities | {debug_info}")
-        elif len(entities) != getattr(self, '_last_entity_count', -1):
-            print(f"[Proxy] entity_snapshot: received {len(entities)} entities")
-            self._last_entity_count = len(entities)
-        if entities != self.last_entity_payload:
-            self.last_entity_payload = entities
-            self.send({"type": "entity_snapshot", "entities": entities})
+            print(f"[Proxy] entity_snapshot: {len(entities)} total, sending {len(capped)} | {debug_info}")
+        elif len(capped) != getattr(self, '_last_entity_count', -1):
+            print(f"[Proxy] entity_snapshot: {len(entities)} total, sending {len(capped)}")
+            self._last_entity_count = len(capped)
+        if capped != self.last_entity_payload:
+            self.last_entity_payload = capped
+            self.send({"type": "entity_snapshot", "entities": capped})
         self.start_entity_sync()
 
     def _on_entity_snapshot_failed(self, reason):
