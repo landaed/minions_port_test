@@ -388,12 +388,9 @@ func _sync_entity_markers():
 			replicated_entity_nodes[key] = body
 		else:
 			_update_entity_marker(body, entity_dict, false, self_server_pos)
-		# Place in concentric rings: 8 per ring, inner at 5 units, +4 each ring
-		var ring := int(i / 8)
-		var slot := i % 8
-		var radius: float = 5.0 + ring * 4.0
-		var angle: float = (slot / 8.0) * TAU + ring * 0.3
-		var rel := Vector3(cos(angle) * radius, ENTITY_CAPSULE_HALF_HEIGHT, sin(angle) * radius)
+		# Use actual server position relative to player
+		var rel := _world_position_from_server(entity_dict.get("position", [])) - self_server_pos
+		rel.y = ENTITY_CAPSULE_HALF_HEIGHT
 		body.set_meta("target_position", rel)
 		body.position = rel
 
