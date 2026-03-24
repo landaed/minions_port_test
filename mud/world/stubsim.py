@@ -33,6 +33,8 @@ class StubSimObject:
         self.rangedAttack = False
         self.dyingMob = None
         self.isPlayer = False
+        self.moveTarget = None   # StubSimObject to chase
+        self.moveSpeed = 5.0     # units per second
 
     def __repr__(self):
         return "StubSimObject(id=%s, pos=%s)" % (self.id, self.position)
@@ -89,16 +91,16 @@ class StubSimAvatar:
         pass
 
     def setTarget(self, simObject, targetSimObject):
-        pass
+        simObject.moveTarget = targetSimObject
 
     def setFollowTarget(self, simObject, targetSimObject):
-        pass
+        simObject.moveTarget = targetSimObject
 
     def clearTarget(self, simObject):
-        pass
+        simObject.moveTarget = None
 
     def immobilize(self, simObject):
-        pass
+        simObject.moveTarget = None
 
     def deleteObject(self, simObject):
         try:
@@ -259,6 +261,43 @@ class StubSimAvatar:
         print("[StubSimAvatar] Zone %s is live (headless stub)" % zoneInstanceName)
         # Start periodic canSee updates
         self._canSeeTick = reactor.callLater(3, self._updateCanSee)
+        # Start NPC movement simulation
+        self._moveTick = reactor.callLater(3, self._updateMovement)
+
+    # ---- NPC movement simulation ----
+
+    _MOVE_INTERVAL = 0.5   # seconds between movement ticks
+    _ARRIVE_DIST = 2.5     # stop this far from target (melee range)
+
+    def _updateMovement(self):
+        """Move NPCs toward their movement targets."""
+        try:
+            from math import sqrt
+            dt = self._MOVE_INTERVAL
+            for so in list(self.simObjects):
+                tgt = getattr(so, 'moveTarget', None)
+                if not tgt or so.isPlayer:
+                    continue
+                if not hasattr(tgt, 'position') or tgt.position is None:
+                    continue
+                dx = tgt.position[0] - so.position[0]
+                dy = tgt.position[1] - so.position[1]
+                dz = tgt.position[2] - so.position[2]
+                dist = sqrt(dx * dx + dy * dy + dz * dz)
+                if dist <= self._ARRIVE_DIST:
+                    continue
+                # Move toward target at moveSpeed units/sec
+                speed = getattr(so, 'moveSpeed', 5.0)
+                step = min(speed * dt, dist - self._ARRIVE_DIST)
+                factor = step / dist
+                so.position = (
+                    so.position[0] + dx * factor,
+                    so.position[1] + dy * factor,
+                    so.position[2] + dz * factor,
+                )
+        except Exception:
+            traceback.print_exc()
+        self._moveTick = reactor.callLater(self._MOVE_INTERVAL, self._updateMovement)
 
 
 def _is_stub_engine():

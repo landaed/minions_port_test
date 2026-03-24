@@ -499,7 +499,9 @@ class GodotClientSession:
             else:
                 others.append(e)
         others.sort(key=lambda e: float(e.get("distance", 999999)) if isinstance(e, dict) else 999999)
-        capped = others[:50]
+        # Only send entities within 50 units to focus on nearby/relevant mobs
+        nearby = [e for e in others if isinstance(e, dict) and float(e.get("distance", 999999)) <= 50.0]
+        capped = nearby[:50]
         if self_entity:
             capped.insert(0, self_entity)
 
