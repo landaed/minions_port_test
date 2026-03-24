@@ -367,12 +367,19 @@ func _sync_entity_markers():
 			break
 
 	var incoming_keys: Dictionary = {}
+	var entity_list: Array = []
 	for entity in replicated_entities:
 		if not (entity is Dictionary):
 			continue
 		if bool(entity.get("is_self", false)):
 			continue
-		var entity_dict: Dictionary = entity
+		entity_list.append(entity)
+
+	# Sort by server distance so closest NPCs are in the inner ring
+	entity_list.sort_custom(func(a, b): return float(a.get("distance", 999999)) < float(b.get("distance", 999999)))
+
+	for i in range(entity_list.size()):
+		var entity_dict: Dictionary = entity_list[i]
 		var key := _entity_key(entity_dict)
 		incoming_keys[key] = true
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
@@ -381,13 +388,12 @@ func _sync_entity_markers():
 			replicated_entity_nodes[key] = body
 		else:
 			_update_entity_marker(body, entity_dict, false, self_server_pos)
-		# Clamp distant entities to max display distance and lift above ground
-		var rel: Vector3 = body.get_meta("target_position", body.position)
-		var flat_dist := Vector2(rel.x, rel.z).length()
-		if flat_dist > ENTITY_MAX_DISPLAY_DISTANCE:
-			var scale_factor := ENTITY_MAX_DISPLAY_DISTANCE / flat_dist
-			rel = Vector3(rel.x * scale_factor, 0.0, rel.z * scale_factor)
-		rel.y = ENTITY_CAPSULE_HALF_HEIGHT
+		# Place in concentric rings: 8 per ring, inner at 5 units, +4 each ring
+		var ring := int(i / 8)
+		var slot := i % 8
+		var radius: float = 5.0 + ring * 4.0
+		var angle: float = (slot / 8.0) * TAU + ring * 0.3
+		var rel := Vector3(cos(angle) * radius, ENTITY_CAPSULE_HALF_HEIGHT, sin(angle) * radius)
 		body.set_meta("target_position", rel)
 		body.position = rel
 

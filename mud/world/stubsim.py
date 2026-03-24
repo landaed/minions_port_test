@@ -205,6 +205,7 @@ class StubSimAvatar:
         """Periodically compute distance-based canSee for all sim objects."""
         try:
             objects = list(self.simObjects)
+            player_count = 0
             for so in objects:
                 if not so or not hasattr(so, 'position') or so.position is None:
                     continue
@@ -217,7 +218,12 @@ class StubSimAvatar:
                     dz = so.position[2] - other.position[2]
                     if dx * dx + dy * dy + dz * dz <= self._VISIBILITY_RANGE_SQ:
                         visible.append(other.id)
+                if so.isPlayer and visible:
+                    player_count += 1
                 so.canSee = visible
+            if not getattr(self, '_cansee_logged', False) and objects:
+                print("[StubSimAvatar] _updateCanSee: %d objects, %d players with visible neighbors" % (len(objects), player_count))
+                self._cansee_logged = True
         except Exception:
             traceback.print_exc()
         self._canSeeTick = reactor.callLater(2, self._updateCanSee)
