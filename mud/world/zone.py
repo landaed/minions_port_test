@@ -429,8 +429,11 @@ class ZoneInstance:
                     break
             if target:
                 self.simAvatar.mind.callRemote("setSelection",mob.simObject.id,target.simObject.id,index)
+                # Also notify the player client directly (for proxy/non-TGE clients)
+                mob.player.mind.callRemote("setSelection",mob.simObject.id,target.simObject.id,index)
             else:
                 self.simAvatar.mind.callRemote("setSelection",mob.simObject.id,0,index)
+                mob.player.mind.callRemote("setSelection",mob.simObject.id,0,index)
     
     
     def setFollowTarget(self,mob,target):

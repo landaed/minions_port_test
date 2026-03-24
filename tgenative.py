@@ -150,7 +150,7 @@ def TGERegisterCallbacks(obj):
 # --- Visibility / canSee ---
 
 _sim_lookup_registry = None
-_VISIBILITY_RANGE = 100.0
+_VISIBILITY_RANGE = 500.0
 _VISIBILITY_RANGE_SQ = _VISIBILITY_RANGE * _VISIBILITY_RANGE
 
 

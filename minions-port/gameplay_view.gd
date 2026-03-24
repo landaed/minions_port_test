@@ -203,7 +203,8 @@ func _clear_npc_root():
 
 func _world_position_from_server(position_data) -> Vector3:
 	if position_data is Array and position_data.size() >= 3:
-		return Vector3(float(position_data[0]), float(position_data[2]), float(-position_data[1]))
+		# +0.7 Y offset: capsule height is 1.4, center needs to be at half-height above ground
+		return Vector3(float(position_data[0]), float(position_data[2]) + 0.7, float(-position_data[1]))
 	return Vector3.ZERO
 
 func _spawn_placeholder_npcs():
