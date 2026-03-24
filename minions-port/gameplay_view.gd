@@ -8,6 +8,8 @@ const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 8.0
+const ENTITY_MAX_DISPLAY_DISTANCE := 40.0
+const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
 
 var world_time := {"hour": 0, "minute": 0}
@@ -203,8 +205,7 @@ func _clear_npc_root():
 
 func _world_position_from_server(position_data) -> Vector3:
 	if position_data is Array and position_data.size() >= 3:
-		# +0.7 Y offset: capsule height is 1.4, center needs to be at half-height above ground
-		return Vector3(float(position_data[0]), float(position_data[2]) + 0.7, float(-position_data[1]))
+		return Vector3(float(position_data[0]), float(position_data[2]), float(-position_data[1]))
 	return Vector3.ZERO
 
 func _spawn_placeholder_npcs():
@@ -356,6 +357,15 @@ func _sync_entity_markers():
 			replicated_entity_nodes[key] = body
 		else:
 			_update_entity_marker(body, entity_dict, false, self_server_pos)
+		# Clamp distant entities to max display distance and lift above ground
+		var rel: Vector3 = body.get_meta("target_position", body.position)
+		var flat_dist := Vector2(rel.x, rel.z).length()
+		if flat_dist > ENTITY_MAX_DISPLAY_DISTANCE:
+			var scale_factor := ENTITY_MAX_DISPLAY_DISTANCE / flat_dist
+			rel = Vector3(rel.x * scale_factor, 0.0, rel.z * scale_factor)
+		rel.y = ENTITY_CAPSULE_HALF_HEIGHT
+		body.set_meta("target_position", rel)
+		body.position = rel
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
