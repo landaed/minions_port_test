@@ -27,6 +27,7 @@ var server_target_description: Dictionary = {}
 var combat_log: Array = []
 var _highlighted_entity_key: String = ""
 var _has_spawned := false
+var _server_to_godot_offset := Vector3.ZERO  # added once at spawn: godot_pos - server_pos
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var info_label: Label = $HUDMargin/HUDVBox/InfoLabel
@@ -45,7 +46,6 @@ var _has_spawned := false
 
 func _ready():
 	set_process_input(true)
-	_spawn_placeholder_npcs()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -57,14 +57,11 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	# Server sim coordinates are in a different space than the Godot greybox.
 	if not _has_spawned:
 		_has_spawned = true
-		var spawn_position: Vector3 = _payload_position()
-		# Clamp to reasonable greybox bounds; server coords may be thousands of units away.
-		var clamped := Vector3(
-			clamp(spawn_position.x, -200.0, 200.0),
-			max(clamp(spawn_position.y, 0.0, 50.0), 2.0),
-			clamp(spawn_position.z, -200.0, 200.0),
-		)
-		player_body.global_position = clamped
+		var server_pos: Vector3 = _world_position_from_server(current_payload.get("position", [0,0,0]))
+		# Player starts near the Godot origin; compute a fixed offset from server coords
+		var godot_spawn := Vector3(0.0, 2.0, 0.0)
+		_server_to_godot_offset = godot_spawn - server_pos
+		player_body.global_position = godot_spawn
 	camera.current = true
 	visible = true
 	_capture_mouse()
@@ -238,6 +235,10 @@ func _world_position_from_server(position_data) -> Vector3:
 		return Vector3(float(position_data[0]), float(position_data[2]), float(-position_data[1]))
 	return Vector3.ZERO
 
+func _server_to_godot(position_data) -> Vector3:
+	"""Convert server position to absolute Godot world position."""
+	return _world_position_from_server(position_data) + _server_to_godot_offset
+
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
 		return
@@ -306,7 +307,7 @@ func _entity_label_text(entity: Dictionary) -> String:
 		health_pct,
 	]
 
-func _create_entity_marker(entity: Dictionary, server_origin := Vector3.ZERO) -> StaticBody3D:
+func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = str(entity.get("name", "Entity"))
 	body.collision_layer = 1
@@ -334,20 +335,13 @@ func _create_entity_marker(entity: Dictionary, server_origin := Vector3.ZERO) ->
 	body.set_meta("mesh", mesh_instance)
 	body.set_meta("label", label)
 	body.set_meta("entity_id", int(entity.get("id", 0)))
-	var rel_pos := _world_position_from_server(entity.get("position", [])) - server_origin
-	body.set_meta("target_position", rel_pos)
-	body.position = rel_pos
-	_update_entity_marker(body, entity, true, server_origin)
+	_update_entity_marker(body, entity)
 	npc_root.add_child(body)
 	return body
 
-func _update_entity_marker(body: StaticBody3D, entity: Dictionary, snap := false, server_origin := Vector3.ZERO):
-	var target_position := _world_position_from_server(entity.get("position", [])) - server_origin
+func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
-	body.set_meta("target_position", target_position)
-	if snap:
-		body.position = target_position
 	var mesh_instance: MeshInstance3D = body.get_meta("mesh")
 	var mesh_material := StandardMaterial3D.new()
 	mesh_material.albedo_color = _entity_color(entity)
@@ -359,13 +353,6 @@ func _sync_entity_markers():
 	if replicated_entities.is_empty():
 		return
 
-	# Find the self entity to get the player's server position as origin offset.
-	var self_server_pos := Vector3.ZERO
-	for entity in replicated_entities:
-		if entity is Dictionary and bool(entity.get("is_self", false)):
-			self_server_pos = _world_position_from_server(entity.get("position", []))
-			break
-
 	var incoming_keys: Dictionary = {}
 	var entity_list: Array = []
 	for entity in replicated_entities:
@@ -375,24 +362,25 @@ func _sync_entity_markers():
 			continue
 		entity_list.append(entity)
 
-	# Sort by server distance so closest NPCs are in the inner ring
-	entity_list.sort_custom(func(a, b): return float(a.get("distance", 999999)) < float(b.get("distance", 999999)))
-
 	for i in range(entity_list.size()):
 		var entity_dict: Dictionary = entity_list[i]
 		var key := _entity_key(entity_dict)
 		incoming_keys[key] = true
+		# Convert server position to absolute Godot world position
+		var godot_pos := _server_to_godot(entity_dict.get("position", []))
+		godot_pos.y = ENTITY_CAPSULE_HALF_HEIGHT
+		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
-			body = _create_entity_marker(entity_dict, self_server_pos)
+			is_new = true
+			body = _create_entity_marker(entity_dict)
 			replicated_entity_nodes[key] = body
 		else:
-			_update_entity_marker(body, entity_dict, false, self_server_pos)
-		# Use actual server position relative to player
-		var rel := _world_position_from_server(entity_dict.get("position", [])) - self_server_pos
-		rel.y = ENTITY_CAPSULE_HALF_HEIGHT
-		body.set_meta("target_position", rel)
-		body.position = rel
+			_update_entity_marker(body, entity_dict)
+		# Set interpolation target; only snap position on first appearance
+		body.set_meta("target_position", godot_pos)
+		if is_new:
+			body.position = godot_pos
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
@@ -644,9 +632,6 @@ func _physics_process(delta):
 	if player_body.global_position.y < -20.0:
 		player_body.global_position = Vector3(0.0, 3.0, 0.0)
 		velocity = Vector3.ZERO
-
-	# Keep NpcRoot centered on the player so entity offsets stay correct
-	npc_root.global_position = Vector3(player_body.global_position.x, 0.0, player_body.global_position.z)
 
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
