@@ -338,6 +338,7 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_mouseSelect(self, charIndex, targetId):
+        print(f"[Proxy] mouseSelect: char={charIndex}, mob_id={targetId}")
         self.session.send({
             "type": "mouse_select",
             "char_index": charIndex,
@@ -346,6 +347,7 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setSelection(self, srcId, tgtId, charIndex):
+        print(f"[Proxy] setSelection: src_sim={srcId}, tgt_sim={tgtId}, char={charIndex}")
         self.session.send({
             "type": "set_selection",
             "src_sim_id": srcId,
@@ -584,7 +586,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             return
 
         msg_type = msg.get("type", "")
-        print(f"[Proxy] Received: {msg_type}")
+        # Suppress high-frequency player_input logging
+        if msg_type != "gameplay_command" or msg.get("command") != "player_input":
+            print(f"[Proxy] Received: {msg_type}")
 
         handler = {
             "login": self.handle_login,
