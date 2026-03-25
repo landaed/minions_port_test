@@ -389,6 +389,43 @@ class ProxyPlayerMind(pb.Referenceable):
         # Mute time for chat. Just acknowledge receipt.
         return True
 
+    def remote_disturbEncounterSetting(self):
+        # Called after skill/spell use. No-op for proxy client.
+        return True
+
+    def remote_playSound(self, sound, *args):
+        # Sound playback request from server. Forward to Godot.
+        self.session.send({"type": "play_sound", "sound": str(sound)})
+        return True
+
+    def remote_beginCasting(self, charIndex, castTime):
+        # Cast bar notification. Forward to Godot.
+        self.session.send({"type": "begin_casting", "char_index": int(charIndex), "cast_time": float(castTime)})
+        return True
+
+    def remote_setCurCharIndex(self, index):
+        # Switch active character in party. Just acknowledge.
+        return True
+
+    def remote_openNPCWnd(self, name, *args):
+        self.session.send({"type": "npc_window", "name": str(name)})
+        return True
+
+    def remote_setVendorStock(self, *args):
+        return True
+
+    def remote_setInitialInteraction(self, *args):
+        return True
+
+    def remote_openPetWindow(self):
+        return True
+
+    def remote_openAuction(self, *args):
+        return True
+
+    def remote_setItemSlot(self, *args):
+        return True
+
     def remote_jumpServer(self, wip, wport, wpassword, zport, zpassword, party):
         self.session.send(
             {
@@ -463,7 +500,7 @@ class GodotClientSession:
     def start_entity_sync(self):
         if self.entity_sync_call and self.entity_sync_call.active():
             return
-        self.entity_sync_call = reactor.callLater(0.25, self._emit_entity_sync)
+        self.entity_sync_call = reactor.callLater(0.1, self._emit_entity_sync)
 
     def _emit_gameplay_sync(self):
         self.gameplay_sync_call = None

@@ -342,10 +342,13 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
+	var key := _entity_key(entity)
 	var mesh_instance: MeshInstance3D = body.get_meta("mesh")
-	var mesh_material := StandardMaterial3D.new()
-	mesh_material.albedo_color = _entity_color(entity)
-	mesh_instance.material_override = mesh_material
+	# Preserve yellow highlight if this entity is the current target
+	if key != _highlighted_entity_key:
+		var mesh_material := StandardMaterial3D.new()
+		mesh_material.albedo_color = _entity_color(entity)
+		mesh_instance.material_override = mesh_material
 	var label: Label3D = body.get_meta("label")
 	label.text = _entity_label_text(entity)
 

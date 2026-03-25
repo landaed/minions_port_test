@@ -266,7 +266,7 @@ class StubSimAvatar:
 
     # ---- NPC movement simulation ----
 
-    _MOVE_INTERVAL = 0.5   # seconds between movement ticks
+    _MOVE_INTERVAL = 0.1   # seconds between movement ticks (was 0.5, too bursty)
     _ARRIVE_DIST = 2.5     # stop this far from target (melee range)
 
     def _updateMovement(self):
