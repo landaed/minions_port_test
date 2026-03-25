@@ -136,6 +136,7 @@ func _on_gameplay_view_command_requested(command_type: String, payload: Dictiona
 		msg[key] = payload[key]
 	_send(msg)
 
+
 func _show_gameplay_view(payload: Dictionary):
 	var view := _ensure_gameplay_view()
 	login_panel.visible = false

@@ -633,6 +633,8 @@ class ProxyProtocol(WebSocketServerProtocol):
         return True
 
     def _send_gameplay_command_result(self, success, command, message=""):
+        if command in ("cycle_target", "attack_toggle", "use_ability", "target_entity"):
+            print(f"[Proxy] gameplay_command_result: {command} success={success} msg={message}")
         self.session.send({
             "type": "gameplay_command_result",
             "success": bool(success),
@@ -672,6 +674,18 @@ class ProxyProtocol(WebSocketServerProtocol):
             d = self.session.player_perspective.callRemote("PlayerAvatar", "targetEntity", entity_id, 0)
             d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Targeted replicated entity {entity_id} on legacy world server."))
             d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
+            return
+
+        if payload is None and command == "player_input":
+            # Forward movement input state to the server for authoritative movement.
+            move_x = float(msg.get("move_x", 0))
+            move_y = float(msg.get("move_y", 0))
+            forward = msg.get("forward", [0, 0, 0])
+            jump = bool(msg.get("jump", False))
+            d = self.session.player_perspective.callRemote(
+                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0
+            )
+            d.addErrback(lambda f: None)  # silently ignore errors on high-frequency input
             return
 
         if payload is None:

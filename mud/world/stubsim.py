@@ -35,6 +35,7 @@ class StubSimObject:
         self.isPlayer = False
         self.moveTarget = None   # StubSimObject to chase
         self.moveSpeed = 5.0     # units per second
+        self._client_input = None  # movement input from Godot client (player only)
 
     def __repr__(self):
         return "StubSimObject(id=%s, pos=%s)" % (self.id, self.position)
@@ -269,15 +270,20 @@ class StubSimAvatar:
     _MOVE_INTERVAL = 0.1   # seconds between movement ticks (was 0.5, too bursty)
     _ARRIVE_DIST = 2.5     # stop this far from target (melee range)
 
+    _PLAYER_MOVE_SPEED = 8.0  # units/sec, should match Godot client MOVE_SPEED
+
     def _updateMovement(self):
-        """Move NPCs toward their movement targets."""
+        """Move NPCs toward their targets and process player input."""
         try:
-            from math import sqrt
             dt = self._MOVE_INTERVAL
             moved = 0
             for so in list(self.simObjects):
+                if so.isPlayer:
+                    # Process player movement from client inputs
+                    self._processPlayerInput(so, dt)
+                    continue
                 tgt = getattr(so, 'moveTarget', None)
-                if not tgt or so.isPlayer:
+                if not tgt:
                     continue
                 if not hasattr(tgt, 'position') or tgt.position is None:
                     continue
@@ -303,6 +309,46 @@ class StubSimAvatar:
         except Exception:
             traceback.print_exc()
         self._moveTick = reactor.callLater(self._MOVE_INTERVAL, self._updateMovement)
+
+    def _processPlayerInput(self, so, dt):
+        """Process client movement inputs and update player simObject position.
+
+        Server is authoritative — it applies movement based on the input
+        state received from the Godot client.
+        """
+        client_input = getattr(so, '_client_input', None)
+        if not client_input:
+            return
+        move_x = client_input.get("move_x", 0.0)
+        move_y = client_input.get("move_y", 0.0)
+        if abs(move_x) < 0.01 and abs(move_y) < 0.01:
+            return
+        forward = client_input.get("forward", (0, 0, 0))
+        # forward is the player's facing direction in server coords (x, y, z)
+        fx, fy, fz = float(forward[0]), float(forward[1]), float(forward[2])
+        # Compute right vector (cross product of forward with up=[0,0,1])
+        rx, ry = fy, -fx  # simplified cross for 2D (ignoring Z/up component)
+        # Normalize forward and right in XY plane
+        f_len = sqrt(fx * fx + fy * fy)
+        if f_len > 0.001:
+            fx, fy = fx / f_len, fy / f_len
+        r_len = sqrt(rx * rx + ry * ry)
+        if r_len > 0.001:
+            rx, ry = rx / r_len, ry / r_len
+        # Combine: move_y is forward/back, move_x is strafe left/right
+        dx = fx * move_y + rx * move_x
+        dy = fy * move_y + ry * move_x
+        # Normalize diagonal movement
+        mag = sqrt(dx * dx + dy * dy)
+        if mag > 1.0:
+            dx /= mag
+            dy /= mag
+        speed = self._PLAYER_MOVE_SPEED
+        so.position = (
+            so.position[0] + dx * speed * dt,
+            so.position[1] + dy * speed * dt,
+            so.position[2],  # Z (up) stays the same — no server-side gravity yet
+        )
 
 
 def _is_stub_engine():
