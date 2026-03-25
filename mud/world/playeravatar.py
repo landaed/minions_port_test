@@ -1513,6 +1513,10 @@ class PlayerAvatar(Avatar):
                 continue
             append_entity(other_mob, "canSee")
 
+        # Always include the player's current target in the snapshot
+        if mob.target:
+            append_entity(mob.target, "target")
+
         if len(entities) <= 1:
             fallback_range = 500.0
             closest_name = None
