@@ -1543,6 +1543,30 @@ class PlayerAvatar(Avatar):
 
         return entities
 
+    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0):
+        """Receive movement input from the Godot client for server-authoritative movement.
+
+        The server processes inputs and updates simObject.position directly.
+        """
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return
+        char = self.player.party.members[char_index]
+        if not char or char.dead or not char.mob or not char.mob.simObject:
+            return
+        so = char.mob.simObject
+        # Store the input state on the simObject for the movement tick to process
+        so._client_input = {
+            "move_x": float(move_x),
+            "move_y": float(move_y),
+            "forward": tuple(float(v) for v in (forward or [0, 0, 0])[:3]),
+            "jump": bool(jump),
+        }
+
     def perspective_targetEntity(self, entity_id, char_index=0):
         try:
             char_index = int(char_index)

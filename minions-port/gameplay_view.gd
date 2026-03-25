@@ -3,6 +3,7 @@ extends Control
 signal command_requested(command_type: String, payload: Dictionary)
 
 const MOVE_SPEED := 8.0
+const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
@@ -27,7 +28,8 @@ var server_target_description: Dictionary = {}
 var combat_log: Array = []
 var _highlighted_entity_key: String = ""
 var _has_spawned := false
-var _server_to_godot_offset := Vector3.ZERO  # added once at spawn: godot_pos - server_pos
+var _input_sync_timer := 0.0
+var _last_sent_input: Dictionary = {}
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var info_label: Label = $HUDMargin/HUDVBox/InfoLabel
@@ -54,14 +56,12 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
 	# Only reposition player on initial root_info, not on periodic updates.
-	# Server sim coordinates are in a different space than the Godot greybox.
+	# Player spawns at the server's position (converted to Godot coords).
 	if not _has_spawned:
 		_has_spawned = true
 		var server_pos: Vector3 = _world_position_from_server(current_payload.get("position", [0,0,0]))
-		# Player starts near the Godot origin; compute a fixed offset from server coords
-		var godot_spawn := Vector3(0.0, 2.0, 0.0)
-		_server_to_godot_offset = godot_spawn - server_pos
-		player_body.global_position = godot_spawn
+		# Place player at server position, slightly above ground
+		player_body.global_position = Vector3(server_pos.x, server_pos.y + 2.0, server_pos.z)
 	camera.current = true
 	visible = true
 	_capture_mouse()
@@ -236,8 +236,12 @@ func _world_position_from_server(position_data) -> Vector3:
 	return Vector3.ZERO
 
 func _server_to_godot(position_data) -> Vector3:
-	"""Convert server position to absolute Godot world position."""
-	return _world_position_from_server(position_data) + _server_to_godot_offset
+	"""Convert server position to Godot world position (direct mapping, no offset)."""
+	return _world_position_from_server(position_data)
+
+func _godot_to_server_pos(godot_pos: Vector3) -> Array:
+	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
+	return [godot_pos.x, -godot_pos.z, godot_pos.y]
 
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
@@ -356,15 +360,20 @@ func _sync_entity_markers():
 	if replicated_entities.is_empty():
 		return
 
-	# Find the self entity's server position and update server-to-godot offset
-	var self_server_pos := Vector3.ZERO
+	# Reconcile player position with server-authoritative position
 	for entity in replicated_entities:
 		if entity is Dictionary and bool(entity.get("is_self", false)):
-			self_server_pos = _world_position_from_server(entity.get("position", []))
+			var server_pos := _server_to_godot(entity.get("position", []))
+			if server_pos != Vector3.ZERO:
+				# Smoothly correct toward server position to avoid jitter
+				var current_pos := player_body.global_position
+				var diff := server_pos - Vector3(current_pos.x, server_pos.y, current_pos.z)
+				# Only correct in XZ plane; keep client Y (gravity/jumping is local)
+				if diff.length() > 0.5:
+					# Significant desync — lerp toward server position
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.15)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.15)
 			break
-	# Update offset: maps server coords to Godot world coords at the player's current position
-	if self_server_pos != Vector3.ZERO:
-		_server_to_godot_offset = player_body.global_position - self_server_pos
 
 	var incoming_keys: Dictionary = {}
 	var entity_list: Array = []
@@ -616,6 +625,7 @@ func _input(event):
 func _physics_process(delta):
 	if not visible:
 		return
+	# Gather movement inputs
 	var input_vec := Vector2.ZERO
 	if Input.is_key_pressed(KEY_A):
 		input_vec.x -= 1.0
@@ -625,6 +635,8 @@ func _physics_process(delta):
 		input_vec.y += 1.0
 	if Input.is_key_pressed(KEY_S):
 		input_vec.y -= 1.0
+
+	# Local prediction: move CharacterBody3D so movement feels responsive
 	var basis: Basis = player_body.global_transform.basis
 	var move_dir: Vector3 = (basis.x * input_vec.x) + (-basis.z * input_vec.y)
 	if move_dir.length() > 1.0:
@@ -646,6 +658,24 @@ func _physics_process(delta):
 		player_body.global_position = Vector3(0.0, 3.0, 0.0)
 		velocity = Vector3.ZERO
 
+	# Send movement inputs to server periodically
+	_input_sync_timer += delta
+	if _input_sync_timer >= INPUT_SYNC_INTERVAL:
+		_input_sync_timer = 0.0
+		# Convert facing direction to server coords for the server movement sim
+		var forward_dir := -basis.z  # Godot forward is -Z
+		var server_forward := _godot_to_server_pos(forward_dir)
+		var input_state := {
+			"move_x": input_vec.x,
+			"move_y": input_vec.y,
+			"forward": server_forward,
+			"jump": jump_requested,
+		}
+		if input_state != _last_sent_input:
+			_last_sent_input = input_state.duplicate()
+			_request_server_command("player_input", input_state)
+
+	# Interpolate replicated entity positions toward server targets
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
