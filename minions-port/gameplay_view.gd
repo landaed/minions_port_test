@@ -30,6 +30,7 @@ var _highlighted_entity_key: String = ""
 var _has_spawned := false
 var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
+var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var info_label: Label = $HUDMargin/HUDVBox/InfoLabel
@@ -56,12 +57,14 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
 	# Only reposition player on initial root_info, not on periodic updates.
-	# Player spawns at the server's position (converted to Godot coords).
 	if not _has_spawned:
 		_has_spawned = true
 		var server_pos: Vector3 = _world_position_from_server(current_payload.get("position", [0,0,0]))
-		# Place player at server position, slightly above ground
-		player_body.global_position = Vector3(server_pos.x, server_pos.y + 2.0, server_pos.z)
+		# Compute a fixed offset that maps the server spawn point to Godot origin.
+		# This offset is applied to ALL entities (including self) so the server
+		# world appears centered on the Godot greybox scene.
+		_server_origin_offset = Vector3(0.0, 2.0, 0.0) - server_pos
+		player_body.global_position = Vector3(0.0, 2.0, 0.0)
 	camera.current = true
 	visible = true
 	_capture_mouse()
@@ -90,7 +93,7 @@ func set_entities(entities: Array):
 	_sync_entity_markers()
 	_update_labels()
 
-func on_server_selection(tgt_sim_id: int, char_index: int):
+func on_server_selection(tgt_sim_id: int, _char_index: int):
 	if tgt_sim_id == 0:
 		server_target_description = {}
 		_highlight_entity("")
@@ -105,7 +108,7 @@ func on_server_selection(tgt_sim_id: int, char_index: int):
 	server_target_description = {"name": "Target (sim %d)" % tgt_sim_id}
 	_update_labels()
 
-func on_server_selection_by_mob(target_id: int, char_index: int):
+func on_server_selection_by_mob(target_id: int, _char_index: int):
 	if target_id == 0:
 		server_target_description = {}
 		_highlight_entity("")
@@ -117,6 +120,9 @@ func on_server_selection_by_mob(target_id: int, char_index: int):
 			_highlight_entity(_entity_key(entity))
 			_update_labels()
 			return
+	# Don't overwrite if setSelection already provided a good description
+	if not server_target_description.is_empty():
+		return
 	server_target_description = {"name": "Target (mob %d)" % target_id}
 	_update_labels()
 
@@ -236,8 +242,8 @@ func _world_position_from_server(position_data) -> Vector3:
 	return Vector3.ZERO
 
 func _server_to_godot(position_data) -> Vector3:
-	"""Convert server position to Godot world position (direct mapping, no offset)."""
-	return _world_position_from_server(position_data)
+	"""Convert server position to Godot world position using fixed origin offset."""
+	return _world_position_from_server(position_data) + _server_origin_offset
 
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
@@ -364,15 +370,19 @@ func _sync_entity_markers():
 	for entity in replicated_entities:
 		if entity is Dictionary and bool(entity.get("is_self", false)):
 			var server_pos := _server_to_godot(entity.get("position", []))
-			if server_pos != Vector3.ZERO:
-				# Smoothly correct toward server position to avoid jitter
+			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:
 				var current_pos := player_body.global_position
-				var diff := server_pos - Vector3(current_pos.x, server_pos.y, current_pos.z)
-				# Only correct in XZ plane; keep client Y (gravity/jumping is local)
-				if diff.length() > 0.5:
-					# Significant desync — lerp toward server position
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.15)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.15)
+				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
+				var desync := diff_xz.length()
+				if desync > 5.0:
+					# Large desync — snap to server position
+					player_body.global_position.x = server_pos.x
+					player_body.global_position.z = server_pos.z
+				elif desync > 1.0:
+					# Moderate desync — gently nudge toward server (5% per sync)
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.05)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.05)
+				# else: within tolerance, trust client prediction
 			break
 
 	var incoming_keys: Dictionary = {}
@@ -653,9 +663,9 @@ func _physics_process(delta):
 	jump_requested = false
 	player_body.velocity = velocity
 	player_body.move_and_slide()
-	# Safety net: teleport back to origin if player falls below the floor
-	if player_body.global_position.y < -20.0:
-		player_body.global_position = Vector3(0.0, 3.0, 0.0)
+	# Safety net: teleport back above the platform if player falls
+	if player_body.global_position.y < -50.0:
+		player_body.global_position = Vector3(player_body.global_position.x, 5.0, player_body.global_position.z)
 		velocity = Vector3.ZERO
 
 	# Send movement inputs to server periodically
