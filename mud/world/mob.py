@@ -2098,8 +2098,8 @@ class Mob:
     
     
 #Passes the Ghost ID back to the client so we can start the selectron
-    def setSelectron(self,ghostid): 
-        if ghostid > 0:
+    def setSelectron(self,ghostid):
+        if ghostid and ghostid > 0:
             self.player.mind.callRemote("startSelectron",ghostid)    
 
     def setTarget(self,target):
