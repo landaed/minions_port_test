@@ -353,6 +353,16 @@ func _sync_entity_markers():
 	if replicated_entities.is_empty():
 		return
 
+	# Find the self entity's server position and update server-to-godot offset
+	var self_server_pos := Vector3.ZERO
+	for entity in replicated_entities:
+		if entity is Dictionary and bool(entity.get("is_self", false)):
+			self_server_pos = _world_position_from_server(entity.get("position", []))
+			break
+	# Update offset: maps server coords to Godot world coords at the player's current position
+	if self_server_pos != Vector3.ZERO:
+		_server_to_godot_offset = player_body.global_position - self_server_pos
+
 	var incoming_keys: Dictionary = {}
 	var entity_list: Array = []
 	for entity in replicated_entities:
@@ -366,7 +376,7 @@ func _sync_entity_markers():
 		var entity_dict: Dictionary = entity_list[i]
 		var key := _entity_key(entity_dict)
 		incoming_keys[key] = true
-		# Convert server position to absolute Godot world position
+		# Convert entity server position to absolute Godot world position
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
 		godot_pos.y = ENTITY_CAPSULE_HALF_HEIGHT
 		var is_new := false
