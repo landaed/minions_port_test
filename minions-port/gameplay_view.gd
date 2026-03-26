@@ -249,6 +249,17 @@ func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
 	return [godot_pos.x, -godot_pos.z, godot_pos.y]
 
+func _server_rotation_to_godot_y(rotation_data) -> float:
+	"""Extract Y-axis rotation (yaw) from server quaternion for Godot.
+	Server quaternion (x,y,z,w) rotates around Z-up axis.
+	Godot needs rotation around Y-up axis."""
+	if not (rotation_data is Array) or rotation_data.size() < 4:
+		return 0.0
+	var qz: float = float(rotation_data[2])
+	var qw: float = float(rotation_data[3])
+	# Server Z-rotation = Godot Y-rotation (both are yaw)
+	return atan2(2.0 * qz * qw, 1.0 - 2.0 * qz * qz)
+
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
 		return
@@ -337,12 +348,27 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	mesh_instance.mesh = mesh
 	body.add_child(mesh_instance)
 
+	# Facing indicator (small cone pointing forward)
+	var nose := MeshInstance3D.new()
+	var cone := CylinderMesh.new()
+	cone.top_radius = 0.0
+	cone.bottom_radius = 0.2
+	cone.height = 0.4
+	nose.mesh = cone
+	nose.position = Vector3(0, 0.6, -0.55)
+	nose.rotation_degrees = Vector3(90, 0, 0)
+	var nose_mat := StandardMaterial3D.new()
+	nose_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.9)
+	nose.material_override = nose_mat
+	body.add_child(nose)
+
 	var label := Label3D.new()
 	label.position = Vector3(0, 1.6, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	body.add_child(label)
 
 	body.set_meta("mesh", mesh_instance)
+	body.set_meta("nose", nose)
 	body.set_meta("label", label)
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	_update_entity_marker(body, entity)
@@ -413,6 +439,9 @@ func _sync_entity_markers():
 		body.set_meta("target_position", godot_pos)
 		if is_new:
 			body.position = godot_pos
+		# Apply rotation from server (yaw only)
+		var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
+		body.rotation.y = yaw
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):

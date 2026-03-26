@@ -7,7 +7,17 @@
 from twisted.internet import defer, reactor
 from mud.world.core import CoreSettings
 import traceback
-from math import sqrt
+from math import sqrt, atan2, sin, cos
+
+
+def _yaw_toward(dx, dy):
+    """Compute a quaternion rotation facing direction (dx, dy) in server XY plane.
+
+    Returns a Torque-style quaternion (x, y, z, w) for rotation around Z-up axis.
+    """
+    angle = atan2(dx, dy)  # angle from +Y axis (server forward)
+    half = angle * 0.5
+    return (0.0, 0.0, sin(half), cos(half))
 
 
 _next_stub_id = 90000
@@ -302,6 +312,8 @@ class StubSimAvatar:
                     so.position[1] + dy * factor,
                     so.position[2] + dz * factor,
                 )
+                # Update rotation to face target (yaw around Z axis in server coords)
+                so.rotation = _yaw_toward(dx, dy)
                 moved += 1
             if moved and not getattr(self, '_move_logged', False):
                 self._move_logged = True
@@ -319,25 +331,23 @@ class StubSimAvatar:
         client_input = getattr(so, '_client_input', None)
         if not client_input:
             return
+        forward = client_input.get("forward", (0, 0, 0))
+        # Always update rotation from facing direction (player can turn in place)
+        fx, fy, fz = float(forward[0]), float(forward[1]), float(forward[2])
+        f_len = sqrt(fx * fx + fy * fy)
+        if f_len > 0.001:
+            so.rotation = _yaw_toward(fx / f_len, fy / f_len)
         move_x = client_input.get("move_x", 0.0)
         move_y = client_input.get("move_y", 0.0)
         if abs(move_x) < 0.01 and abs(move_y) < 0.01:
             return
-        forward = client_input.get("forward", (0, 0, 0))
-        # forward is the player's facing direction in server coords (x, y, z)
-        fx, fy, fz = float(forward[0]), float(forward[1]), float(forward[2])
-        # Compute right vector (cross product of forward with up=[0,0,1])
-        rx, ry = fy, -fx  # simplified cross for 2D (ignoring Z/up component)
-        # Normalize forward and right in XY plane
-        f_len = sqrt(fx * fx + fy * fy)
-        if f_len > 0.001:
-            fx, fy = fx / f_len, fy / f_len
-        r_len = sqrt(rx * rx + ry * ry)
-        if r_len > 0.001:
-            rx, ry = rx / r_len, ry / r_len
+        # fx, fy already normalized above; compute right vector for strafing
+        nfx = fx / f_len if f_len > 0.001 else 0.0
+        nfy = fy / f_len if f_len > 0.001 else 0.0
+        rx, ry = nfy, -nfx  # cross product of forward with up=[0,0,1]
         # Combine: move_y is forward/back, move_x is strafe left/right
-        dx = fx * move_y + rx * move_x
-        dy = fy * move_y + ry * move_x
+        dx = nfx * move_y + rx * move_x
+        dy = nfy * move_y + ry * move_x
         # Normalize diagonal movement
         mag = sqrt(dx * dx + dy * dy)
         if mag > 1.0:
