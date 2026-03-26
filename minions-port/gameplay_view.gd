@@ -27,6 +27,8 @@ var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
 var combat_log: Array = []
 var _highlighted_entity_key: String = ""
+var _pending_target_sim_id: int = 0  # deferred highlight if entity not yet in snapshot
+var _pending_target_mob_id: int = 0
 var _has_spawned := false
 var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
@@ -58,12 +60,8 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	world_time = time_info.duplicate(true)
 	# Only reposition player on initial root_info, not on periodic updates.
 	if not _has_spawned:
-		_has_spawned = true
-		var server_pos: Vector3 = _world_position_from_server(current_payload.get("position", [0,0,0]))
-		# Compute a fixed offset that maps the server spawn point to Godot origin.
-		# This offset is applied to ALL entities (including self) so the server
-		# world appears centered on the Godot greybox scene.
-		_server_origin_offset = Vector3(0.0, 2.0, 0.0) - server_pos
+		# Don't compute offset from root_info — it may have stale/zero position.
+		# Instead, offset will be computed from the first entity_snapshot with is_self.
 		player_body.global_position = Vector3(0.0, 2.0, 0.0)
 	camera.current = true
 	visible = true
@@ -94,30 +92,38 @@ func set_entities(entities: Array):
 	_update_labels()
 
 func on_server_selection(tgt_sim_id: int, _char_index: int):
+	_pending_target_mob_id = 0
 	if tgt_sim_id == 0:
+		_pending_target_sim_id = 0
 		server_target_description = {}
 		_highlight_entity("")
 		_update_labels()
 		return
+	_pending_target_sim_id = tgt_sim_id
 	for entity in replicated_entities:
 		if int(entity.get("sim_id", 0)) == tgt_sim_id:
 			server_target_description = entity.duplicate(true)
 			_highlight_entity(_entity_key(entity))
+			_pending_target_sim_id = 0
 			_update_labels()
 			return
 	server_target_description = {"name": "Target (sim %d)" % tgt_sim_id}
 	_update_labels()
 
 func on_server_selection_by_mob(target_id: int, _char_index: int):
+	_pending_target_sim_id = 0
 	if target_id == 0:
+		_pending_target_mob_id = 0
 		server_target_description = {}
 		_highlight_entity("")
 		_update_labels()
 		return
+	_pending_target_mob_id = target_id
 	for entity in replicated_entities:
 		if int(entity.get("id", 0)) == target_id:
 			server_target_description = entity.duplicate(true)
 			_highlight_entity(_entity_key(entity))
+			_pending_target_mob_id = 0
 			_update_labels()
 			return
 	# Don't overwrite if setSelection already provided a good description
@@ -392,23 +398,32 @@ func _sync_entity_markers():
 	if replicated_entities.is_empty():
 		return
 
-	# Reconcile player position with server-authoritative position
+	# Find self entity and reconcile player position with server
 	for entity in replicated_entities:
 		if entity is Dictionary and bool(entity.get("is_self", false)):
-			var server_pos := _server_to_godot(entity.get("position", []))
+			var raw_pos = entity.get("position", [])
+			# Compute spawn offset from first entity snapshot (more reliable than root_info)
+			if not _has_spawned:
+				_has_spawned = true
+				var server_pos_raw := _world_position_from_server(raw_pos)
+				_server_origin_offset = Vector3(0.0, 2.0, 0.0) - server_pos_raw
+				player_body.global_position = Vector3(0.0, 2.0, 0.0)
+				print("[Godot] SPAWN from entity snapshot: raw=%s  converted=%s  offset=%s" % [str(raw_pos), str(server_pos_raw), str(_server_origin_offset)])
+				break
+			var server_pos := _server_to_godot(raw_pos)
 			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 5.0:
-					# Large desync — snap to server position
+				if desync > 8.0:
+					# Very large desync — snap to server position
 					player_body.global_position.x = server_pos.x
 					player_body.global_position.z = server_pos.z
-				elif desync > 1.0:
-					# Moderate desync — gently nudge toward server (5% per sync)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.05)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.05)
-				# else: within tolerance, trust client prediction
+				elif desync > 2.0:
+					# Moderate desync — blend toward server (20% per sync tick)
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.2)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.2)
+				# else: within 2 units tolerance, trust client prediction
 			break
 
 	var incoming_keys: Dictionary = {}
@@ -450,6 +465,21 @@ func _sync_entity_markers():
 		if is_instance_valid(old_body):
 			old_body.queue_free()
 		replicated_entity_nodes.erase(key)
+
+	# Resolve pending target highlight if entity just appeared in snapshot
+	if _pending_target_sim_id != 0 or _pending_target_mob_id != 0:
+		for entity_dict2 in entity_list:
+			var matched := false
+			if _pending_target_sim_id != 0 and int(entity_dict2.get("sim_id", 0)) == _pending_target_sim_id:
+				matched = true
+			elif _pending_target_mob_id != 0 and int(entity_dict2.get("id", 0)) == _pending_target_mob_id:
+				matched = true
+			if matched:
+				server_target_description = entity_dict2.duplicate(true)
+				_highlight_entity(_entity_key(entity_dict2))
+				_pending_target_sim_id = 0
+				_pending_target_mob_id = 0
+				break
 
 func _ability_signature() -> String:
 	var names: Array = []
