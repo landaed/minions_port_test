@@ -11,13 +11,17 @@ from math import sqrt, atan2, sin, cos
 
 
 def _yaw_toward(dx, dy):
-    """Compute a quaternion rotation facing direction (dx, dy) in server XY plane.
+    """Compute a TGE axis-angle rotation facing direction (dx, dy) in server XY plane.
 
-    Returns a Torque-style quaternion (x, y, z, w) for rotation around Z-up axis.
+    Returns a Torque-style axis-angle (ax, ay, az, angle) for rotation around Z-up axis.
+    TGE stores rotations as (axis_x, axis_y, axis_z, angle_radians), NOT quaternions.
     """
     angle = atan2(dx, dy)  # angle from +Y axis (server forward)
-    half = angle * 0.5
-    return (0.0, 0.0, sin(half), cos(half))
+    # Axis is always Z (0, 0, 1) for yaw; sign of axis encodes direction
+    if angle >= 0:
+        return (0.0, 0.0, 1.0, angle)
+    else:
+        return (0.0, 0.0, -1.0, -angle)
 
 
 _next_stub_id = 90000
@@ -301,6 +305,9 @@ class StubSimAvatar:
                 dy = tgt.position[1] - so.position[1]
                 dz = tgt.position[2] - so.position[2]
                 dist = sqrt(dx * dx + dy * dy + dz * dz)
+                # Always face target, even when arrived
+                if abs(dx) > 0.01 or abs(dy) > 0.01:
+                    so.rotation = _yaw_toward(dx, dy)
                 if dist <= self._ARRIVE_DIST:
                     continue
                 # Move toward target at moveSpeed units/sec
@@ -312,8 +319,6 @@ class StubSimAvatar:
                     so.position[1] + dy * factor,
                     so.position[2] + dz * factor,
                 )
-                # Update rotation to face target (yaw around Z axis in server coords)
-                so.rotation = _yaw_toward(dx, dy)
                 moved += 1
             if moved and not getattr(self, '_move_logged', False):
                 self._move_logged = True
