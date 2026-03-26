@@ -256,15 +256,18 @@ func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	return [godot_pos.x, -godot_pos.z, godot_pos.y]
 
 func _server_rotation_to_godot_y(rotation_data) -> float:
-	"""Extract Y-axis rotation (yaw) from server quaternion for Godot.
-	Server quaternion (x,y,z,w) rotates around Z-up axis.
-	Godot needs rotation around Y-up axis."""
+	"""Extract Y-axis rotation (yaw) from TGE axis-angle for Godot.
+	TGE stores rotation as (axis_x, axis_y, axis_z, angle_radians).
+	For yaw: axis is (0,0,+/-1) and angle is the rotation amount.
+	Server Z-rotation = Godot Y-rotation (both are yaw)."""
 	if not (rotation_data is Array) or rotation_data.size() < 4:
 		return 0.0
-	var qz: float = float(rotation_data[2])
-	var qw: float = float(rotation_data[3])
-	# Server Z-rotation = Godot Y-rotation (both are yaw)
-	return atan2(2.0 * qz * qw, 1.0 - 2.0 * qz * qz)
+	var axis_z: float = float(rotation_data[2])
+	var angle_rad: float = float(rotation_data[3])
+	# Reconstruct signed angle: axis_z sign indicates direction
+	if absf(axis_z) < 0.001:
+		return 0.0
+	return angle_rad * signf(axis_z)
 
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
@@ -415,15 +418,15 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 8.0:
+				if desync > 10.0:
 					# Very large desync — snap to server position
 					player_body.global_position.x = server_pos.x
 					player_body.global_position.z = server_pos.z
-				elif desync > 2.0:
-					# Moderate desync — blend toward server (20% per sync tick)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.2)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.2)
-				# else: within 2 units tolerance, trust client prediction
+				elif desync > 3.0:
+					# Moderate desync — gently blend toward server (10% per sync tick)
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.1)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.1)
+				# else: within 3 units tolerance, trust client prediction
 			break
 
 	var incoming_keys: Dictionary = {}

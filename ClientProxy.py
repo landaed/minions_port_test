@@ -550,9 +550,8 @@ class GodotClientSession:
         elif len(capped) != getattr(self, '_last_entity_count', -1):
             print(f"[Proxy] entity_snapshot: {len(entities)} total, sending {len(capped)}")
             self._last_entity_count = len(capped)
-        if capped != self.last_entity_payload:
-            self.last_entity_payload = capped
-            self.send({"type": "entity_snapshot", "entities": capped})
+        # Always send — dedup was suppressing position/rotation updates
+        self.send({"type": "entity_snapshot", "entities": capped})
         self.start_entity_sync()
 
     def _on_entity_snapshot_failed(self, reason):
