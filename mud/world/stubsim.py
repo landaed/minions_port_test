@@ -277,7 +277,7 @@ class StubSimAvatar:
 
     # ---- NPC movement simulation ----
 
-    _MOVE_INTERVAL = 0.1   # seconds between movement ticks (was 0.5, too bursty)
+    _MOVE_INTERVAL = 0.05  # seconds between movement ticks (50ms, matches client input sync)
     _ARRIVE_DIST = 2.5     # stop this far from target (melee range)
 
     _PLAYER_MOVE_SPEED = 8.0  # units/sec, should match Godot client MOVE_SPEED
