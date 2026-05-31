@@ -122,7 +122,9 @@ class MobSpells:
         self.healTimer = 0
         
         self.harmful = tuple(harmful)
-        self.healing = tuple(sorted(healing,cmp=SpellSort))
+        # Python 3 dropped the `cmp=` kwarg; wrap the legacy 3-way comparator.
+        from functools import cmp_to_key
+        self.healing = tuple(sorted(healing, key=cmp_to_key(SpellSort)))
         self.beneficial = tuple(beneficial)
         self.harmfulSpawnSpells = tuple(harmfulSpawnSpells)
         self.slow = tuple(slow)

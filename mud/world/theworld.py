@@ -276,20 +276,34 @@ class World(Persistent):
     
     
     def commit(self, commitOnly=False):
-        if self.tickTransaction:
+        # tickTransaction may have already fired or been cancelled — only
+        # cancel if still pending, otherwise Twisted raises
+        # AlreadyCancelled/AlreadyCalled and Player.logout used to crash
+        # here, leaving newly created world accounts un-flushed.
+        if self.tickTransaction and self.tickTransaction.active():
             self.tickTransaction.cancel()
         self.transactionTick(commitOnly)
-    
-    
+
+
     def transactionTick(self, commitOnly=False):
         print("... Commit World Database ...")
-        
+
         conn = Persistent._connection.getConnection()
         cursor = conn.cursor()
-        
+
         if self.transaction:
-            cursor.execute("END;")
-        
+            try:
+                cursor.execute("END;")
+            except Exception:
+                # Python 3 sqlite3 may have already auto-committed the
+                # implicit transaction so "END;" errors with "no
+                # transaction is active". Ignore.
+                pass
+            try:
+                conn.commit()
+            except Exception:
+                pass
+
         if self.dbFile and not commitOnly:
             self.backupTick -= 1
             if not self.backupTick:
@@ -299,12 +313,16 @@ class World(Persistent):
                     BackupWorld(self.dbFile)
                 except:
                     traceback.print_exc()
-        
+
         self.transaction = True
-        
-        cursor.execute("BEGIN;")
+
+        try:
+            cursor.execute("BEGIN;")
+        except Exception:
+            # Already inside a transaction implicitly — safe to ignore.
+            pass
         cursor.close()
-        
+
         self.tickTransaction = reactor.callLater(60,self.transactionTick)
     
     

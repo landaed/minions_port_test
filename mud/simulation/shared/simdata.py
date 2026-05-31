@@ -351,9 +351,9 @@ class SimMobInfo(pb.Cacheable):
             if mob.zombie != state['ZOMBIE']:
                 changed['ZOMBIE'] = state['ZOMBIE'] = mob.zombie
             
-            if not mob.target and state['TGTID']:
+            if (not mob.target or not mob.target.simObject) and state['TGTID']:
                 changed['TGTID'] = state['TGTID'] = 0
-            elif mob.target:
+            elif mob.target and mob.target.simObject:
                 if mob.target.simObject.id != state['TGTID']:
                     state['TGTID'] = changed['TGTID'] = mob.target.simObject.id
             

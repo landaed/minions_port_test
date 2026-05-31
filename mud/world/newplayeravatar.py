@@ -76,14 +76,19 @@ class NewPlayerAvatar(Avatar):
             
             user = User(name=publicName,password=password)
             user.addRole(Role.byName("Player"))
-            
-            if publicName == NewPlayerAvatar.ownerPublicName: 
+
+            try:
+                self.world.commit(True)
+            except Exception:
+                traceback.print_exc()
+
+            if publicName == NewPlayerAvatar.ownerPublicName:
                 user.addRole(Role.byName("Immortal"))
                 user.addRole(Role.byName("Guardian"))
-                
+
                 return (0,"Immortal Account Created.\nYour password is %s"%password,password)
-            
-            
+
+
             return (0,"Account Created.\nYour password is %s"%password,password)
         except Exception as exc:
             traceback.print_exc()

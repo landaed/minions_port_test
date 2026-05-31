@@ -1043,12 +1043,14 @@ class ProxyProtocol(WebSocketServerProtocol):
         d.addCallback(self._on_create_world_account_result, fantasy_name)
         d.addErrback(self._on_world_connect_failed)
 
-    def _request_world_password(self, world_name):
+    def _request_world_password(self, world_name, retries_left=4):
+        if not self.session.master_perspective:
+            return
         d = self.session.master_perspective.callRemote("EnumWorldsAvatar", "requestWorldPassword", world_name)
-        d.addCallback(self._on_world_password_result, world_name)
-        d.addErrback(self._on_world_password_failed, world_name)
+        d.addCallback(self._on_world_password_result, world_name, retries_left)
+        d.addErrback(self._on_world_password_failed, world_name, retries_left)
 
-    def _on_world_password_result(self, result, world_name):
+    def _on_world_password_result(self, result, world_name, retries_left=0):
         print(f"[Proxy] World password lookup for {world_name}: {result}")
         if not isinstance(result, (tuple, list)) or len(result) < 2:
             self.session.send({
@@ -1060,6 +1062,15 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         success = result[0] == 0
         password = result[2] if success and len(result) > 2 else ""
+        # Master only learns about new players when the world server next
+        # announces (every 60s). If the player just created a world account
+        # we may need to wait through one announce before the lookup works,
+        # so retry a few times with a short delay rather than telling the
+        # client "Please try again later."
+        if not success and retries_left > 0:
+            print(f"[Proxy] World password not ready yet, retrying in 15s ({retries_left} retries left)")
+            reactor.callLater(15, self._request_world_password, world_name, retries_left - 1)
+            return
         if success:
             self.session.world_password = password
         self.session.send({
@@ -1070,9 +1081,12 @@ class ProxyProtocol(WebSocketServerProtocol):
             "message": result[1],
         })
 
-    def _on_world_password_failed(self, reason, world_name):
+    def _on_world_password_failed(self, reason, world_name, retries_left=0):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
         print(f"[Proxy] World password lookup failed for {world_name}: {msg}")
+        if retries_left > 0:
+            reactor.callLater(15, self._request_world_password, world_name, retries_left - 1)
+            return
         self.session.send({
             "type": "world_password_result",
             "success": False,

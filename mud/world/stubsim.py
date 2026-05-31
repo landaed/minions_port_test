@@ -168,6 +168,13 @@ class StubSimAvatar:
         """Create a stub sim object for a spawned mob."""
         pos, rot = _parse_transform(transform)
         so = StubSimObject(position=pos, rotation=rot)
+        # spawn.move is the relative speed multiplier (default 1.0 = normal).
+        # Convert to absolute units/sec the same way the player does, so a
+        # default-speed mob can actually keep up with the player.
+        try:
+            so.moveSpeed = self._PLAYER_MOVE_SPEED * float(getattr(spawn, "move", 1.0) or 1.0)
+        except (TypeError, ValueError):
+            so.moveSpeed = self._PLAYER_MOVE_SPEED
         self.addSimObject(so)
         return defer.succeed(so)
 
