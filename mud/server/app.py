@@ -19,6 +19,7 @@ from mud.common.permission import Role,User,BannedUser,BannedIP
 from hashlib import md5
 from time import time as sysTime
 import traceback
+import os
 
 
 
@@ -216,10 +217,20 @@ class MasterPerspective(pb.Avatar):
     
     
     def perspective_call(self,*args):
-        import sys as _sys
-        print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
-        _sys.stdout.flush()
-        if THESERVER.throttleUsage and self.throttle:
+        # This fires on every remote call (e.g. ~20/sec of updateInput while a
+        # client is moving), so only log it when explicitly debugging.  Set
+        # MUD_DEBUG_PB=1 to re-enable.  Error cases below still always log.
+        if os.environ.get("MUD_DEBUG_PB"):
+            import sys as _sys
+            print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
+            _sys.stdout.flush()
+        # The Godot proxy replaces Torque's automatic object ghosting with a
+        # high-frequency getVisibleEntities poll plus updateInput for movement.
+        # Those must NOT be rate-limited by the per-player CPU throttle (that was
+        # capping entity replication to ~5/sec); the throttle still applies to
+        # real player commands (skills, etc.).
+        _UNTHROTTLED = ("getVisibleEntities", "updateInput")
+        if THESERVER.throttleUsage and self.throttle and (not args or args[0] not in _UNTHROTTLED):
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]
                 d = defer.Deferred()

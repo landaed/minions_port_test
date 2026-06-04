@@ -863,7 +863,7 @@ class Mob:
             return
 
         # Scan items for wearability conflicts.
-        for iitem in self.worn.itervalues():
+        for iitem in self.worn.values():
             # If there is already a secondary weapon, a shield or
             # a 2H weapon equipped then don't wear another 2H weapon.
             if (iitem.slot == RPG_SLOT_SECONDARY) or (iitem.slot == RPG_SLOT_SHIELD) or \
@@ -2428,8 +2428,8 @@ class Mob:
         if player:
             #to specific client only
             player.mind.callRemote("playSound",sound)
-        else:
-            #otherwise 3d
+        elif self.simObject is not None:
+            #otherwise 3d (skip if detached/despawned — no position to anchor to)
             bigSound = 4 < self.spawn.modifiedScale
             self.zone.simAvatar.mind.callRemote("playSound",sound,self.simObject.position,bigSound)
     

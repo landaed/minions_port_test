@@ -18,6 +18,36 @@ import os
 import sys
 import shutil
 
+# Auto-use the project virtualenv if present, so `python3 setup_databases.py`
+# works even when the venv isn't manually activated (creating the master DB needs
+# sqlobject/twisted, which live in the venv). Re-exec ourselves with the venv's
+# python before doing anything destructive.
+def _reexec_in_venv():
+    for venv in ("venv", ".venv"):
+        vpy = os.path.join(os.getcwd(), venv, "bin", "python3")
+        if os.path.exists(vpy) and os.path.realpath(vpy) != os.path.realpath(sys.executable):
+            print(f"[setup] Using virtualenv interpreter: {vpy}")
+            os.execv(vpy, [vpy] + sys.argv)
+_reexec_in_venv()
+
+
+def _check_deps():
+    """Fail early (BEFORE deleting anything) if the packages needed to rebuild
+    the databases aren't importable, so --reset can't leave a half-wiped tree."""
+    missing = []
+    for mod in ("sqlobject", "twisted"):
+        try:
+            __import__(mod)
+        except Exception:
+            missing.append(mod)
+    if missing:
+        print("ERROR: missing required package(s): %s" % ", ".join(missing))
+        print("Activate your virtualenv, or install deps, e.g.:")
+        print("  pip install Twisted sqlobject pyopenssl service_identity bcrypt")
+        print("Nothing was deleted.")
+        sys.exit(1)
+
+
 # Add current dir to path
 sys.path.insert(0, os.getcwd())
 
@@ -183,7 +213,51 @@ def add_missing_columns(db_path):
     return added
 
 
+def _master_db_is_valid(db_path):
+    """A master DB is only usable if it exists, is non-empty, and actually has
+    the `user` table the MasterServer needs at startup."""
+    if not os.path.exists(db_path) or os.path.getsize(db_path) == 0:
+        return False
+    try:
+        conn = sqlite3.connect(db_path)
+        try:
+            row = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='user';"
+            ).fetchone()
+            return row is not None
+        finally:
+            conn.close()
+    except Exception:
+        return False
+
+
+def reset_runtime():
+    """Delete all generated runtime data so the next setup rebuilds from the
+    pristine MoMReborn baseline. Use when accounts/characters/world DBs have
+    drifted out of sync across code changes (symptom: 'won't load into world')."""
+    import glob
+    targets = [GAMEROOT, "common", "data/master", "data/character", "data/tmp",
+               "mom.cfg", "main.cs.dso"]
+    targets += glob.glob("*export*.db")
+    for t in targets:
+        if os.path.isdir(t):
+            print(f"  removing dir  {t}/")
+            shutil.rmtree(t, ignore_errors=True)
+        elif os.path.exists(t):
+            print(f"  removing file {t}")
+            try:
+                os.remove(t)
+            except OSError:
+                pass
+    print("Runtime data reset. Rebuilding from baseline...\n")
+
+
 def setup():
+    # Verify we can rebuild BEFORE removing anything (avoids a half-wiped tree).
+    _check_deps()
+    if "--reset" in sys.argv:
+        print("Resetting runtime databases (--reset)...")
+        reset_runtime()
     if not os.path.exists(BASELINE_WORLD_DB):
         print(f"Error: Could not find baseline world.db at {BASELINE_WORLD_DB}")
         print("Make sure the MoMReborn client directory exists in the repo root.")
@@ -249,7 +323,13 @@ def setup():
 
     # Step 5: Create master database
     master_db = "./data/master/master.db"
-    if not os.path.exists(master_db):
+    if not _master_db_is_valid(master_db):
+        # Remove a leftover empty/corrupt file (a 0-byte master.db from a failed
+        # run still "exists", which previously caused this step to be skipped and
+        # the MasterServer to crash with "no such table: user").
+        if os.path.exists(master_db):
+            print("Existing master.db is empty/invalid; recreating...")
+            os.remove(master_db)
         print("Creating master database...")
         sys.argv.append('database=data/master')
         sys.argv.append('gameconfig=mom.cfg')

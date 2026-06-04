@@ -9,6 +9,7 @@ from mud.world.career import ClassProto
 from mud.world.spell import SpellProto
 from mud.world.advancement import *
 from collections import defaultdict
+from functools import cmp_to_key
 
 
 
@@ -92,7 +93,7 @@ def GenAdvancementText(c):
     
     atable = "| *Advancement* | *Level* | *Cost* | *Max Rank* | *Description*| *Requirements* | *Exclusion* |\n"
     
-    for a in sorted(advances,cmp=SortAdvancement):
+    for a in sorted(advances,key=cmp_to_key(SortAdvancement)):
         reqtext = []
         for r in a.requirements:
             if r.rank > 1:

@@ -12,6 +12,8 @@ import os
 import json
 import traceback
 import runpy
+import random
+import string
 
 sys.path.append(os.getcwd())
 
@@ -23,6 +25,7 @@ from autobahn.twisted.websocket import (
     WebSocketServerFactory,
     WebSocketServerProtocol,
 )
+from autobahn.exception import Disconnected
 
 from hashlib import md5
 
@@ -464,17 +467,26 @@ class GodotClientSession:
         self.entity_sync_call = None
         self.last_gameplay_payload = None
         self.last_entity_payload = None
+        self._closed = False
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
+        if self._closed:
+            return
         try:
             payload = json.dumps(msg_dict, default=_json_fallback)
             self.ws.sendMessage(payload.encode("utf-8"), isBinary=False)
+        except Disconnected:
+            # Client went away (a sync callback can fire between close and
+            # cleanup). Stop quietly instead of spewing a traceback.
+            self._closed = True
+            self.cleanup()
         except Exception:
             traceback.print_exc()
 
     def cleanup(self):
         """Disconnect any PB connections."""
+        self._closed = True
         if self.gameplay_sync_call and self.gameplay_sync_call.active():
             self.gameplay_sync_call.cancel()
         if self.entity_sync_call and self.entity_sync_call.active():
@@ -502,7 +514,9 @@ class GodotClientSession:
     def start_entity_sync(self):
         if self.entity_sync_call and self.entity_sync_call.active():
             return
-        self.entity_sync_call = reactor.callLater(0.1, self._emit_entity_sync)
+        # Poll quickly; the effective rate is bounded by how long
+        # getVisibleEntities takes, but a short delay keeps replication snappy.
+        self.entity_sync_call = reactor.callLater(0.03, self._emit_entity_sync)
 
     def _emit_gameplay_sync(self):
         self.gameplay_sync_call = None
@@ -552,6 +566,17 @@ class GodotClientSession:
             self._last_entity_count = len(capped)
         # Always send — dedup was suppressing position/rotation updates
         self.send({"type": "entity_snapshot", "entities": capped})
+        # Lightweight send-rate meter (logs every 5s) so it's clear how fast
+        # entity replication is actually running.
+        import time as _t
+        _now = _t.time()
+        self._snap_n = getattr(self, "_snap_n", 0) + 1
+        if not hasattr(self, "_snap_t0"):
+            self._snap_t0 = _now
+        if _now - self._snap_t0 >= 5.0:
+            print("[Proxy] entity replication rate: %.1f snapshots/sec" % (self._snap_n / (_now - self._snap_t0)))
+            self._snap_n = 0
+            self._snap_t0 = _now
         self.start_entity_sync()
 
     def _on_entity_snapshot_failed(self, reason):
@@ -777,6 +802,9 @@ class ProxyProtocol(WebSocketServerProtocol):
     def handle_register(self, msg):
         email = msg.get("email", "").strip()
         username = msg.get("username", "").strip()
+        # Optional: let the player choose their own account password. If empty,
+        # the master server assigns a random one (legacy behaviour).
+        desired_password = msg.get("password", "").strip()
 
         if not email or not username:
             self.session.send(
@@ -791,11 +819,11 @@ class ProxyProtocol(WebSocketServerProtocol):
         cred = UsernamePassword("Registration-Registration", hashed_pw)
 
         d = factory.login(cred, pb.Referenceable())
-        d.addCallback(self._on_reg_connected, email, username)
+        d.addCallback(self._on_reg_connected, email, username, desired_password)
         d.addErrback(self._on_reg_failed)
 
-    def _on_reg_connected(self, perspective, email, username):
-        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username, "MOM")
+    def _on_reg_connected(self, perspective, email, username, desired_password=""):
+        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username, "MOM", desired_password)
         d.addCallback(self._on_reg_result, perspective)
         d.addErrback(self._on_reg_failed)
 
@@ -980,32 +1008,62 @@ class ProxyProtocol(WebSocketServerProtocol):
     def _on_query_player_result(self, has_account, world_name):
         self.session.world_account_ready = bool(has_account)
         print(f"[Proxy] World account exists for {self.session.username} on {world_name}: {bool(has_account)}")
-        message = "Existing world account found. Retrieving saved world password from Master Server..." if has_account else "No world account yet. Create one to continue."
-        self.session.send(
-            {
-                "type": "world_connected",
-                "success": True,
-                "world_name": world_name,
-                "has_world_account": bool(has_account),
-                "requires_world_access_password": bool(self.session.current_world and self.session.current_world.get("has_password")),
-                "message": message,
-            }
-        )
+        # Auto-handle the world account so the player never has to deal with the
+        # separate "fantasy name" + world-account password. Selecting a world
+        # now goes straight to character selection.
+        self.session.send({
+            "type": "world_connected",
+            "success": True,
+            "world_name": world_name,
+            "has_world_account": bool(has_account),
+            "auto": True,
+            "message": "Setting up your world character slot...",
+        })
         if has_account and self.session.master_perspective:
+            # Recover the saved world password from master, then auto-login.
             self._request_world_password(world_name)
+        else:
+            self._auto_create_world_account(world_name)
 
-        if self.session.current_world and self.session.current_world.get("has_password"):
-            access_password = self.session.current_world.get("local_access_password", "") or _local_world_access_password(world_name)
-            if access_password:
-                self.session.current_world["local_access_password"] = access_password
-                print(f"[Proxy] Local world access password discovered for {world_name}.")
-                self.session.send({
-                    "type": "world_access_password_result",
-                    "success": True,
-                    "world_name": world_name,
-                    "world_access_password": access_password,
-                    "message": "Recovered local world access password from serverconfig.",
-                })
+    def _derive_fantasy_name(self, salt=""):
+        """A world 'avatar name' is required (>=4 alpha chars, unique per world)
+        but the player shouldn't care about it — derive one from the username."""
+        import re as _re
+        base = _re.sub(r'[^A-Za-z]', '', self.session.username or "") or "Hero"
+        base = (base + "hero")[:10] if len(base) < 4 else base
+        name = (base + salt)[:16]
+        return name.capitalize()
+
+    def _auto_create_world_account(self, world_name, attempt=0):
+        perspective = self.session.new_world_perspective
+        if not perspective:
+            self.session.send({"type": "player_login_result", "success": False,
+                               "message": "Lost world connection before creating account."})
+            return
+        access_pw = (self.session.current_world.get("local_access_password", "")
+                     or _local_world_access_password(world_name) or "")
+        salt = "".join(random.choice(string.ascii_lowercase) for _ in range(3)) if attempt else ""
+        fantasy = self._derive_fantasy_name(salt)
+        print(f"[Proxy] Auto-creating world account for {self.session.username} as '{fantasy}'")
+        d = perspective.callRemote("NewPlayerAvatar", "newPlayer", self.session.username, fantasy, access_pw)
+        d.addCallback(self._on_auto_world_account, world_name, attempt)
+        d.addErrback(self._on_world_connect_failed)
+
+    def _on_auto_world_account(self, result, world_name, attempt):
+        ok = isinstance(result, (tuple, list)) and len(result) >= 2 and result[0] == 0
+        if ok:
+            self.session.world_account_ready = True
+            self.session.world_password = result[2] if len(result) > 2 else ""
+            print(f"[Proxy] Auto world account created; logging into world.")
+            self._do_world_login(self.session.world_password)
+            return
+        # Public name taken -> retry with a random suffix a few times.
+        msg = result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else str(result)
+        if "taken" in str(msg).lower() and attempt < 4:
+            self._auto_create_world_account(world_name, attempt + 1)
+            return
+        self.session.send({"type": "player_login_result", "success": False,
+                           "message": f"Could not set up world character slot: {msg}"})
 
     def handle_create_world_account(self, msg):
         perspective = self.session.new_world_perspective
@@ -1060,15 +1118,15 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         success = result[0] == 0
         password = result[2] if success and len(result) > 2 else ""
-        if success:
+        if success and password:
+            # Auto-login with the recovered world password.
             self.session.world_password = password
-        self.session.send({
-            "type": "world_password_result",
-            "success": success,
-            "world_name": world_name,
-            "world_password": password,
-            "message": result[1],
-        })
+            self._do_world_login(password)
+        else:
+            # Account record exists but no saved password (inconsistent state) —
+            # set one up automatically rather than dead-ending the player.
+            print(f"[Proxy] No saved world password for {world_name}; auto-creating slot.")
+            self._auto_create_world_account(world_name)
 
     def _on_world_password_failed(self, reason, world_name):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
@@ -1118,7 +1176,9 @@ class ProxyProtocol(WebSocketServerProtocol):
                 {"type": "player_login_result", "success": False, "message": "Missing world password."}
             )
             return
+        self._do_world_login(world_password, role)
 
+    def _do_world_login(self, world_password, role="Player"):
         self._close_perspective("player_perspective")
         self.session.player_mind = ProxyPlayerMind(self.session)
 

@@ -274,7 +274,7 @@ class RegistrationAvatar(Avatar):
         
         return (0,"Success!")    
     
-    def perspective_submitKey(self, regkey, emailaddress, publicName, fromProduct=""):
+    def perspective_submitKey(self, regkey, emailaddress, publicName, fromProduct="", desiredPassword=""):
         # TODO: should have some logging here that can be linked to fail2ban
         # TODO: Can use: self.mind.broker.transport.getPeer() to get ip address of connection
         emailaddress = emailaddress.lower()
@@ -325,9 +325,16 @@ class RegistrationAvatar(Avatar):
         else:
             return (-1, "That public name is taken.\n\nPlease choose another name.", None, None)
             
-        password = GenPasswd().upper()
+        # Let the player choose their own account password instead of being
+        # assigned a random one they have to memorise.  Anything shorter than 4
+        # chars (or empty, e.g. legacy clients) falls back to a generated one.
+        desiredPassword = (desiredPassword or "").strip()
+        if len(desiredPassword) >= 4:
+            password = desiredPassword
+        else:
+            password = GenPasswd().upper()
         key = RegKey(key=regkey)
-                
+
         user = User(name=publicName, password = password)
         user.addRole(Role.byName("Player"))
         user.addRole(Role.byName("World"))

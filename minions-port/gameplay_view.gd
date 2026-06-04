@@ -267,7 +267,10 @@ func _server_rotation_to_godot_y(rotation_data) -> float:
 	# Reconstruct signed angle: axis_z sign indicates direction
 	if absf(axis_z) < 0.001:
 		return 0.0
-	return angle_rad * signf(axis_z)
+	# Negate: server yaw is measured +X-from-+Y around Z-up; converting to
+	# Godot's Y-up frame (where -Z is forward) flips the horizontal sense, so
+	# a raw copy would mirror facing left<->right. Negating cancels the mirror.
+	return -angle_rad * signf(axis_z)
 
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:
@@ -418,15 +421,18 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 10.0:
+				if desync > 25.0:
 					# Very large desync — snap to server position
 					player_body.global_position.x = server_pos.x
 					player_body.global_position.z = server_pos.z
-				elif desync > 3.0:
+				elif desync > 8.0:
 					# Moderate desync — gently blend toward server (10% per sync tick)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.1)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.1)
-				# else: within 3 units tolerance, trust client prediction
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.08)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.08)
+				# else: within 8 units, TRUST client prediction. The server
+				# snapshot always lags prediction by a few units (input latency +
+				# snapshot interval), so a tight tolerance yanks the player back
+				# every snapshot. That tight tolerance was the rubber-band.
 			break
 
 	var incoming_keys: Dictionary = {}

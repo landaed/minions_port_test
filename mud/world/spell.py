@@ -379,17 +379,21 @@ class Spell(Process):
             
             hasTP = self.hasTeleport()
             zone = self.src.zone
-            
-            if proto.afxSpellEffectBegin and not hasTP and self.doParticles and doEffects:
-                zone.simAvatar.mind.callRemote("newSpellEffect",self.dst.simObject.id,proto.afxSpellEffectBegin,False)
+            # The target can lose its simObject when detached/despawned mid-fight;
+            # these are visual-only effect calls (no-ops headless), so skip them
+            # rather than crash the zone tick every frame on None.simObject.id.
+            dst_so = self.dst.simObject if self.dst else None
 
-            if proto.explosionBegin and not hasTP and self.doParticles and doEffects:
-                zone.simAvatar.mind.callRemote("spawnExplosion",self.dst.simObject.id,proto.explosionBegin,0)
-            
-            if proto.particleBegin and not hasTP and self.doParticles and doEffects:
+            if proto.afxSpellEffectBegin and not hasTP and self.doParticles and doEffects and dst_so:
+                zone.simAvatar.mind.callRemote("newSpellEffect",dst_so.id,proto.afxSpellEffectBegin,False)
+
+            if proto.explosionBegin and not hasTP and self.doParticles and doEffects and dst_so:
+                zone.simAvatar.mind.callRemote("spawnExplosion",dst_so.id,proto.explosionBegin,0)
+
+            if proto.particleBegin and not hasTP and self.doParticles and doEffects and dst_so:
                 t = 3000 #base this on emitter?
                 #base this on failed time if necessary
-                zone.simAvatar.mind.callRemote("newParticleSystem",self.dst.simObject.id,"SpellBeginEmitter",proto.particleTextureBegin,t)
+                zone.simAvatar.mind.callRemote("newParticleSystem",dst_so.id,"SpellBeginEmitter",proto.particleTextureBegin,t)
             
             if proto.sndBegin and not hasTP and self.doParticles:
                 if not proto.sndBeginDuration: #hack for dragons, atm
