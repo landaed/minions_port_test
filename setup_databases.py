@@ -18,6 +18,36 @@ import os
 import sys
 import shutil
 
+# Auto-use the project virtualenv if present, so `python3 setup_databases.py`
+# works even when the venv isn't manually activated (creating the master DB needs
+# sqlobject/twisted, which live in the venv). Re-exec ourselves with the venv's
+# python before doing anything destructive.
+def _reexec_in_venv():
+    for venv in ("venv", ".venv"):
+        vpy = os.path.join(os.getcwd(), venv, "bin", "python3")
+        if os.path.exists(vpy) and os.path.realpath(vpy) != os.path.realpath(sys.executable):
+            print(f"[setup] Using virtualenv interpreter: {vpy}")
+            os.execv(vpy, [vpy] + sys.argv)
+_reexec_in_venv()
+
+
+def _check_deps():
+    """Fail early (BEFORE deleting anything) if the packages needed to rebuild
+    the databases aren't importable, so --reset can't leave a half-wiped tree."""
+    missing = []
+    for mod in ("sqlobject", "twisted"):
+        try:
+            __import__(mod)
+        except Exception:
+            missing.append(mod)
+    if missing:
+        print("ERROR: missing required package(s): %s" % ", ".join(missing))
+        print("Activate your virtualenv, or install deps, e.g.:")
+        print("  pip install Twisted sqlobject pyopenssl service_identity bcrypt")
+        print("Nothing was deleted.")
+        sys.exit(1)
+
+
 # Add current dir to path
 sys.path.insert(0, os.getcwd())
 
@@ -223,6 +253,8 @@ def reset_runtime():
 
 
 def setup():
+    # Verify we can rebuild BEFORE removing anything (avoids a half-wiped tree).
+    _check_deps()
     if "--reset" in sys.argv:
         print("Resetting runtime databases (--reset)...")
         reset_runtime()

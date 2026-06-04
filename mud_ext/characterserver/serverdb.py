@@ -4,7 +4,9 @@
 
 from sqlite3 import dbapi2 as sqlite
 import shutil
-from twisted.internet import reactor
+# reactor is imported lazily inside the methods that use it (transactionTick) so
+# this module's constants (CREATE_PLAYER_BUFFER_SQL, used by setup_databases.py)
+# can be imported without Twisted installed.
 import traceback
 import hashlib
 import sys
@@ -107,9 +109,10 @@ class CharDB:
         cursor.execute("BEGIN TRANSACTION;")
             
         cursor.close()
-        
+
+        from twisted.internet import reactor
         self.tickTransaction = reactor.callLater(120,self.transactionTick)
-        
+
         self.backupCounter = 40 #once every 80 minutes
     
     
@@ -142,9 +145,10 @@ class CharDB:
         cursor.execute("BEGIN TRANSACTION;")
         cursor.close()
 
+        from twisted.internet import reactor
         self.tickTransaction = reactor.callLater(120,self.transactionTick)
-    
-    
+
+
     def checkIntegrity(self):
         print("... Checking Database Integrity ...")
         cursor = self.conn.cursor()
