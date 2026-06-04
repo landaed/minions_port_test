@@ -267,7 +267,10 @@ func _server_rotation_to_godot_y(rotation_data) -> float:
 	# Reconstruct signed angle: axis_z sign indicates direction
 	if absf(axis_z) < 0.001:
 		return 0.0
-	return angle_rad * signf(axis_z)
+	# Negate: server yaw is measured +X-from-+Y around Z-up; converting to
+	# Godot's Y-up frame (where -Z is forward) flips the horizontal sense, so
+	# a raw copy would mirror facing left<->right. Negating cancels the mirror.
+	return -angle_rad * signf(axis_z)
 
 func _spawn_placeholder_npcs():
 	if npc_root.get_child_count() > 0:

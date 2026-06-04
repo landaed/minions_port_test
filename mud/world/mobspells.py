@@ -8,6 +8,7 @@ from mud.world.spell import SpellClass,SpellProto
 from mud.world.defines import *
 from mud.world.core import *
 import random
+from functools import cmp_to_key
 
 #we need spell lines, for casting logic! (ie best pet, etc)
 #todo, healing logic
@@ -122,7 +123,7 @@ class MobSpells:
         self.healTimer = 0
         
         self.harmful = tuple(harmful)
-        self.healing = tuple(sorted(healing,cmp=SpellSort))
+        self.healing = tuple(sorted(healing,key=cmp_to_key(SpellSort)))
         self.beneficial = tuple(beneficial)
         self.harmfulSpawnSpells = tuple(harmfulSpawnSpells)
         self.slow = tuple(slow)

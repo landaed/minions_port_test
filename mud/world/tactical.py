@@ -210,7 +210,10 @@ class Tactical:
                         initial = not mob.aggro.get(otherMob,0)
                         # Run through all the players mobs.
                         for c in otherMob.player.party.members:
-                            if c.mob.detached:
+                            # A party slot can exist without a spawned mob
+                            # (member not yet in-zone / dead); skip those so the
+                            # tactical tick doesn't crash and abort aggro.
+                            if not c.mob or c.mob.detached:
                                 continue
                             # Consider the other mob for addition to our aggro list.
                             self.doMob(c.mob)

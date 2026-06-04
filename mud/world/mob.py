@@ -863,7 +863,7 @@ class Mob:
             return
 
         # Scan items for wearability conflicts.
-        for iitem in self.worn.itervalues():
+        for iitem in self.worn.values():
             # If there is already a secondary weapon, a shield or
             # a 2H weapon equipped then don't wear another 2H weapon.
             if (iitem.slot == RPG_SLOT_SECONDARY) or (iitem.slot == RPG_SLOT_SHIELD) or \

@@ -19,6 +19,7 @@ from mud.common.permission import Role,User,BannedUser,BannedIP
 from hashlib import md5
 from time import time as sysTime
 import traceback
+import os
 
 
 
@@ -216,9 +217,13 @@ class MasterPerspective(pb.Avatar):
     
     
     def perspective_call(self,*args):
-        import sys as _sys
-        print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
-        _sys.stdout.flush()
+        # This fires on every remote call (e.g. ~20/sec of updateInput while a
+        # client is moving), so only log it when explicitly debugging.  Set
+        # MUD_DEBUG_PB=1 to re-enable.  Error cases below still always log.
+        if os.environ.get("MUD_DEBUG_PB"):
+            import sys as _sys
+            print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
+            _sys.stdout.flush()
         if THESERVER.throttleUsage and self.throttle:
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]

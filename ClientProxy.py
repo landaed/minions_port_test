@@ -777,6 +777,9 @@ class ProxyProtocol(WebSocketServerProtocol):
     def handle_register(self, msg):
         email = msg.get("email", "").strip()
         username = msg.get("username", "").strip()
+        # Optional: let the player choose their own account password. If empty,
+        # the master server assigns a random one (legacy behaviour).
+        desired_password = msg.get("password", "").strip()
 
         if not email or not username:
             self.session.send(
@@ -791,11 +794,11 @@ class ProxyProtocol(WebSocketServerProtocol):
         cred = UsernamePassword("Registration-Registration", hashed_pw)
 
         d = factory.login(cred, pb.Referenceable())
-        d.addCallback(self._on_reg_connected, email, username)
+        d.addCallback(self._on_reg_connected, email, username, desired_password)
         d.addErrback(self._on_reg_failed)
 
-    def _on_reg_connected(self, perspective, email, username):
-        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username, "MOM")
+    def _on_reg_connected(self, perspective, email, username, desired_password=""):
+        d = perspective.callRemote("RegistrationAvatar", "submitKey", "", email, username, "MOM", desired_password)
         d.addCallback(self._on_reg_result, perspective)
         d.addErrback(self._on_reg_failed)
 

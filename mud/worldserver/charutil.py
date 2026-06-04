@@ -168,6 +168,54 @@ def InstallItemList(cursor, dstCursor, itemList, playerID, characterID, spawnID,
                 print("Probably a database that didn't yet hear of the introduction of item containers.")
 
 
+def RemoveInstalledCharacter(dstCursor, cname):
+    """Remove any rows for *cname* already present in the world-instance DB.
+
+    The world-instance database is long-lived, but InstallCharacterBuffer
+    re-installs the character every time the player enters the world.  Without
+    this cleanup the second entry hits ``UNIQUE constraint failed:
+    character.name`` (surfaced to the client as a "Transfer Error") and the
+    fresh character data is silently dropped.  Deleting the previous copy first
+    makes re-entry idempotent.  Each statement is guarded so a schema that
+    lacks one of these tables does not abort the whole install.
+    """
+    try:
+        dstCursor.execute("SELECT id, spawn_id FROM character WHERE name = '%s' LIMIT 1;" % cname)
+        row = dstCursor.fetchone()
+    except Exception:
+        return
+    if not row:
+        return
+    cid, sid = row[0], row[1]
+
+    stmts = [
+        "DELETE FROM item_variant WHERE item_id IN (SELECT id FROM item WHERE character_id = %i);" % cid,
+        "DELETE FROM item_container_content WHERE item_id IN (SELECT id FROM item WHERE character_id = %i);" % cid,
+        "DELETE FROM item WHERE character_id = %i;" % cid,
+        "DELETE FROM character_vault_item WHERE character_id = %i;" % cid,
+        "DELETE FROM character_spell WHERE character_id = %i;" % cid,
+        "DELETE FROM character_skill WHERE character_id = %i;" % cid,
+        "DELETE FROM character_advancement WHERE character_id = %i;" % cid,
+        "DELETE FROM character_dialog_choice WHERE character_id = %i;" % cid,
+        "DELETE FROM spell_store WHERE character_id = %i;" % cid,
+        "DELETE FROM character_faction WHERE character_id = %i;" % cid,
+    ]
+    if sid is not None:
+        stmts += [
+            "DELETE FROM spawn_skill WHERE spawn_id = %i;" % sid,
+            "DELETE FROM spawn_resistance WHERE spawn_id = %i;" % sid,
+            "DELETE FROM spawn_spell WHERE spawn_id = %i;" % sid,
+            "DELETE FROM spawn_stat WHERE spawn_id = %i;" % sid,
+            "DELETE FROM spawn WHERE id = %i;" % sid,
+        ]
+    stmts.append("DELETE FROM character WHERE id = %i;" % cid)
+    for sql in stmts:
+        try:
+            dstCursor.execute(sql)
+        except Exception:
+            pass
+
+
 def InstallCharacterBuffer(playerID,cname,buffer):
     from mud.world.player import Player
     tm = time.time()
@@ -202,6 +250,10 @@ def InstallCharacterBuffer(playerID,cname,buffer):
 
     try:
         #character tables
+
+        # Drop any previous copy of this character from the world-instance DB so
+        # re-entering the world is idempotent (avoids UNIQUE name collisions).
+        RemoveInstalledCharacter(dstCursor, cname)
 
         #character name and spawn name in buffer can be at odds based on rename
         #in fact rename doesn't check spawn names and must

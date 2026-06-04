@@ -160,11 +160,16 @@ func _on_login_button_pressed():
 func _on_register_button_pressed():
 	var user = username_field.text.strip_edges()
 	var email = email_field.text.strip_edges()
+	var pw = password_field.text.strip_edges()
 	if user.is_empty() or email.is_empty():
-		status_label.text = "Enter username and email to register. Registration ignores the login password box and the server assigns one."
+		status_label.text = "Enter username and email to register. Optionally type a password (4+ chars) to choose your own; leave it blank to have one assigned."
 		return
-	status_label.text = "Registering... the server will assign your master-account password."
-	_send({"type": "register", "username": user, "email": email})
+	if pw.is_empty():
+		status_label.text = "Registering... no password typed, so the server will assign one (it will be shown here)."
+	else:
+		status_label.text = "Registering with your chosen password..."
+	# password is optional: if blank, the server assigns a random one.
+	_send({"type": "register", "username": user, "email": email, "password": pw})
 
 func _on_join_world_button_pressed():
 	var selected_items = world_list.get_selected_items()
@@ -253,7 +258,7 @@ func handle_response(data: Dictionary):
 				if pw.is_empty():
 					status_label.text = "Registered! Check email for the master-account password."
 				else:
-					status_label.text = "Registered! Master-account password assigned by server: " + pw
+					status_label.text = "Registered! Your master-account password is: " + pw + "  (login is pre-filled)"
 					password_field.text = pw
 			else:
 				status_label.text = "Register failed: " + data.get("message", "")

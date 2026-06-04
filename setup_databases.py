@@ -183,6 +183,24 @@ def add_missing_columns(db_path):
     return added
 
 
+def _master_db_is_valid(db_path):
+    """A master DB is only usable if it exists, is non-empty, and actually has
+    the `user` table the MasterServer needs at startup."""
+    if not os.path.exists(db_path) or os.path.getsize(db_path) == 0:
+        return False
+    try:
+        conn = sqlite3.connect(db_path)
+        try:
+            row = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name='user';"
+            ).fetchone()
+            return row is not None
+        finally:
+            conn.close()
+    except Exception:
+        return False
+
+
 def setup():
     if not os.path.exists(BASELINE_WORLD_DB):
         print(f"Error: Could not find baseline world.db at {BASELINE_WORLD_DB}")
@@ -249,7 +267,13 @@ def setup():
 
     # Step 5: Create master database
     master_db = "./data/master/master.db"
-    if not os.path.exists(master_db):
+    if not _master_db_is_valid(master_db):
+        # Remove a leftover empty/corrupt file (a 0-byte master.db from a failed
+        # run still "exists", which previously caused this step to be skipped and
+        # the MasterServer to crash with "no such table: user").
+        if os.path.exists(master_db):
+            print("Existing master.db is empty/invalid; recreating...")
+            os.remove(master_db)
         print("Creating master database...")
         sys.argv.append('database=data/master')
         sys.argv.append('gameconfig=mom.cfg')

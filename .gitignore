@@ -2,6 +2,9 @@
 *.log
 log_*
 *backup*.db
+# Transient character-transfer dumps the world server writes to the repo root
+*export*.db
+data/tmp/
 
 
 venv
