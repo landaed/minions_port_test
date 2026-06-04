@@ -23,6 +23,7 @@ state = {
     "snapshots": [],             # (t, self_pos, nearest_mob_id, nearest_mob_pos, nearest_dist)
     "entered": False,
     "char_created": False,
+    "enter_sent": False,
 }
 
 def log(*a):
@@ -51,7 +52,7 @@ async def run():
         await send(ws, type="register", username=USER, email=EMAIL, password=CHOSEN_PASSWORD)
         move_task = None
         t0 = time.time()
-        deadline = t0 + 32
+        deadline = t0 + 20
         while time.time() < deadline:
             try:
                 raw = await asyncio.wait_for(ws.recv(), timeout=2.0)
@@ -119,16 +120,19 @@ async def run():
             elif mt == "character_list":
                 chars = data.get("characters", [])
                 log("CHARACTERS:", [c.get("name") for c in chars])
-                if chars:
+                if chars and not state["enter_sent"]:
+                    state["enter_sent"] = True
                     await send(ws, type="enter_world", character_name=chars[0]["name"])
-                elif not state["char_created"]:
+                elif not chars and not state["char_created"]:
                     state["char_created"] = True
                     await send(ws, type="create_character", name=CHARNAME,
                                race="Human", klass="Warrior", sex="Male", look=0, realm=1)
 
             elif mt == "create_character_result":
                 if data.get("success"):
-                    await send(ws, type="enter_world", character_name=CHARNAME)
+                    if not state["enter_sent"]:
+                        state["enter_sent"] = True
+                        await send(ws, type="enter_world", character_name=CHARNAME)
                 else:
                     log("create char failed:", data.get("message")); return
 
@@ -150,28 +154,27 @@ async def run():
         summarize()
 
 async def move_loop(ws):
-    """Move forward 5s (to provoke aggro/pursuit), then STOP and stand for 16s
-    so we can see whether mobs close the gap and reach the player."""
+    """Simulate the REAL Godot client: send player_input only when it CHANGES
+    (dedup). Press forward once, hold 6s without resending, then release."""
     await asyncio.sleep(3)
     forward = [0.0, 1.0, 0.0]   # server +Y forward
-    log(">>> MOVING FORWARD for 5s")
-    end = time.time() + 5
-    while time.time() < end:
-        await ws.send(json.dumps({"type": "gameplay_command", "command": "player_input",
-                                  "move_x": 0.0, "move_y": 1.0, "forward": forward, "jump": False}))
-        await asyncio.sleep(0.05)
-    log(">>> STOP; standing still to watch mobs close in")
-    end = time.time() + 16
-    while time.time() < end:
-        await ws.send(json.dumps({"type": "gameplay_command", "command": "player_input",
-                                  "move_x": 0.0, "move_y": 0.0, "forward": forward, "jump": False}))
-        await asyncio.sleep(0.05)
+    log(">>> PRESS forward (single dedup'd packet), hold 6s")
+    await ws.send(json.dumps({"type": "gameplay_command", "command": "player_input",
+                              "move_x": 0.0, "move_y": 1.0, "forward": forward, "jump": False}))
+    await asyncio.sleep(6)
+    log(">>> RELEASE forward (single dedup'd packet), hold 6s")
+    await ws.send(json.dumps({"type": "gameplay_command", "command": "player_input",
+                              "move_x": 0.0, "move_y": 0.0, "forward": forward, "jump": False}))
+    await asyncio.sleep(6)
 
 def summarize():
+    snaps = state["snapshots"]
+    if snaps:
+        span = snaps[-1][0] - snaps[0][0]
+        rate = (len(snaps) - 1) / span if span > 0 else 0
+        log("entity_snapshots: %d over %.1fs = %.1f/sec" % (len(snaps), span, rate))
     log("time | self_pos | nearest_mob | mob_pos | dist")
-    last = None
-    for t, sp, mid, mp, d in state["snapshots"]:
-        # Only print when something changed meaningfully
+    for t, sp, mid, mp, d in snaps:
         sp_s = "(%.1f,%.1f,%.1f)" % tuple(sp) if sp else "None"
         mp_s = "(%.1f,%.1f,%.1f)" % tuple(mp) if mp else "None"
         print("   %5.1f  self=%-22s mob#%s=%-22s d=%s" % (t, sp_s, mid, mp_s, d))

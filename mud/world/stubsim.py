@@ -219,31 +219,36 @@ class StubSimAvatar:
     _VISIBILITY_RANGE_SQ = 500.0 * 500.0
 
     def _updateCanSee(self):
-        """Periodically compute distance-based canSee for all sim objects."""
+        """Compute distance-based canSee for every sim object.
+
+        Both the player snapshot (getVisibleEntities) AND mob AI need this: the
+        tactical brain scans ``mob.simObject.canSee`` to find aggro targets, so
+        mobs with an empty canSee never aggro or chase. Kept O(n^2) but with a
+        squared-distance test and minimal attribute work."""
         try:
-            objects = list(self.simObjects)
-            player_count = 0
+            objects = [so for so in self.simObjects
+                       if so and getattr(so, 'position', None) is not None]
+            rng = self._VISIBILITY_RANGE_SQ
             for so in objects:
-                if not so or not hasattr(so, 'position') or so.position is None:
-                    continue
+                spos = so.position
+                sx, sy, sz = spos[0], spos[1], spos[2]
                 visible = []
                 for other in objects:
-                    if other is so or not other or not hasattr(other, 'position') or other.position is None:
+                    if other is so:
                         continue
-                    dx = so.position[0] - other.position[0]
-                    dy = so.position[1] - other.position[1]
-                    dz = so.position[2] - other.position[2]
-                    if dx * dx + dy * dy + dz * dz <= self._VISIBILITY_RANGE_SQ:
+                    opos = other.position
+                    dx = sx - opos[0]
+                    dy = sy - opos[1]
+                    dz = sz - opos[2]
+                    if dx * dx + dy * dy + dz * dz <= rng:
                         visible.append(other.id)
-                if so.isPlayer and visible:
-                    player_count += 1
                 so.canSee = visible
             if not getattr(self, '_cansee_logged', False) and objects:
-                print("[StubSimAvatar] _updateCanSee: %d objects, %d players with visible neighbors" % (len(objects), player_count))
+                print("[StubSimAvatar] _updateCanSee: %d objects scanned" % len(objects))
                 self._cansee_logged = True
         except Exception:
             traceback.print_exc()
-        self._canSeeTick = reactor.callLater(2, self._updateCanSee)
+        self._canSeeTick = reactor.callLater(1, self._updateCanSee)
 
     # ---- callRemote compatibility (when code calls self.mind.callRemote) ----
 
@@ -274,8 +279,8 @@ class StubSimAvatar:
 
         zinst.start()
         print("[StubSimAvatar] Zone %s is live (headless stub)" % zoneInstanceName)
-        # Start periodic canSee updates
-        self._canSeeTick = reactor.callLater(3, self._updateCanSee)
+        # Start periodic canSee updates (soon, so mobs become visible fast)
+        self._canSeeTick = reactor.callLater(0.5, self._updateCanSee)
         # Start NPC movement simulation
         self._moveTick = reactor.callLater(3, self._updateMovement)
 
@@ -408,15 +413,22 @@ def create_player_sim_object(player, zone):
     # Now officially enter the zone
     zone.playerEnterZone(player)
 
-    # Spawn test mobs near the player after a short delay so zone is ready
+    # Spawn test mobs near the player shortly after entry (kept brief so they
+    # don't "pop in" several seconds late).
     from twisted.internet import reactor
-    reactor.callLater(2, spawn_test_mobs, zone, pos)
+    reactor.callLater(0.5, spawn_test_mobs, zone, pos)
 
 
 def spawn_test_mobs(zone, player_pos):
     """Spawn 3 aggressive test mobs near a player position for combat testing."""
     from mud.world.spawn import Spawn
     import traceback
+
+    # Guard against double-spawn (e.g. if the player re-enters the zone) so we
+    # don't end up with overlapping duplicate skeletons.
+    if getattr(zone, '_test_mobs_spawned', False):
+        return
+    zone._test_mobs_spawned = True
 
     # Offsets from the player position (x, y, z) — place them ~10 units away
     offsets = [

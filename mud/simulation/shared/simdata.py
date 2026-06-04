@@ -351,11 +351,13 @@ class SimMobInfo(pb.Cacheable):
             if mob.zombie != state['ZOMBIE']:
                 changed['ZOMBIE'] = state['ZOMBIE'] = mob.zombie
             
-            if not mob.target and state['TGTID']:
-                changed['TGTID'] = state['TGTID'] = 0
-            elif mob.target:
-                if mob.target.simObject.id != state['TGTID']:
-                    state['TGTID'] = changed['TGTID'] = mob.target.simObject.id
+            # Treat a target whose simObject has gone away (detached/despawned)
+            # the same as having no target, rather than crashing on None.id.
+            if not mob.target or not mob.target.simObject:
+                if state['TGTID']:
+                    changed['TGTID'] = state['TGTID'] = 0
+            elif mob.target.simObject.id != state['TGTID']:
+                state['TGTID'] = changed['TGTID'] = mob.target.simObject.id
             
             shield = mob.worn.get(RPG_SLOT_SHIELD)
             if shield:

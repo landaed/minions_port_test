@@ -26,4 +26,11 @@ else
     done
 fi
 
+# Wait for the world server (the one that holds ports 2008/zone ports) to fully
+# exit so an immediate restart doesn't hit "Address already in use".
+for _ in $(seq 1 20); do
+    pgrep -f "WorldServer.py" >/dev/null 2>&1 || break
+    sleep 0.5
+done
+
 echo "[stop] Done."

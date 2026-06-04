@@ -1207,6 +1207,10 @@ class CharacterInfo(pb.Cacheable):
         state = self.state
         character = self.character
         mob = character.mob
+        if mob is None:
+            # Party slot without a spawned mob (e.g. mid login/logout) — nothing
+            # to refresh yet, and dereferencing mob.spawn would crash the tick.
+            return {}
         spawn = mob.spawn
 
         changed = self.refreshLite()

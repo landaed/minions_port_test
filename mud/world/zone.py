@@ -26,6 +26,27 @@ def GenPasswd(length=8, chars=string.ascii_letters + string.digits):
     return ''.join([choice(chars) for i in range(length)])
 
 
+# Background mobs can throw the same combat error hundreds of times per second
+# headless; printing a full traceback each time floods the log and starves the
+# reactor (causing client-side jitter). Throttle to one traceback every few
+# seconds plus a suppressed-count summary, so problems stay visible without the
+# flood.
+_tickErrLast = [0.0]
+_tickErrCount = [0]
+
+def _logTickError():
+    _tickErrCount[0] += 1
+    now = sysTime()
+    if now - _tickErrLast[0] >= 3.0:
+        suppressed = _tickErrCount[0] - 1
+        traceback.print_exc()
+        if suppressed > 0:
+            print("[zone.tick] (+%d more similar errors in the last %.0fs)" % (
+                suppressed, now - _tickErrLast[0]))
+        _tickErrLast[0] = now
+        _tickErrCount[0] = 0
+
+
 #--- Updated 9/19/07 by BellyFish
 #---    Modified code in 'def Tick()'
 #---    PURPOSE:
@@ -348,7 +369,7 @@ class ZoneInstance:
                         if not mob.detached and not mob.simObject.simZombie:
                             mob.tick()
                     except:
-                        traceback.print_exc()
+                        _logTickError()
             
             if self.weather.dirty and self.simAvatar:
                 self.simAvatar.sendWeather(self.weather)

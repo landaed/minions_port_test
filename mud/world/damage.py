@@ -520,10 +520,14 @@ def Damage(mob, inflictor, amount, dmgType, textDesc=None, doThorns=True, \
             # the sending the damage message to the Player.  Otherwise, a
             # Player may not receive the messagec with the damage information
             # that killed the Player's Character.
-            GameMessage(RPG_MSG_GAME_COMBAT,mob.zone,inflictor,mob,text,mob.simObject.position,20)
+            # A mob can lose its simObject mid-combat (detached/despawned); guard
+            # so the combat-message path doesn't crash the whole world tick.
+            if mob.simObject:
+                GameMessage(RPG_MSG_GAME_COMBAT,mob.zone,inflictor,mob,text,mob.simObject.position,20)
 
         # Play the pain animation.
-        mob.zone.simAvatar.mind.callRemote("pain",mob.simObject.id)
+        if mob.simObject:
+            mob.zone.simAvatar.mind.callRemote("pain",mob.simObject.id)
 
         # Get a random pain sound from the Spawn.
         snd = mob.spawn.getSound("sndPain")

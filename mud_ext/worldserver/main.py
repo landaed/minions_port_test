@@ -842,4 +842,9 @@ try:
 except:
     print_stack()
     print(format_exc())
-    input("Press Enter to terminate")
+    # Only block on input when attached to an interactive terminal; when the
+    # world server is spawned headless (by the WorldDaemon) stdin is closed and
+    # input() raises EOFError, masking the real startup error above.
+    import sys as _sys
+    if _sys.stdin and _sys.stdin.isatty():
+        input("Press Enter to terminate")

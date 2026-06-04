@@ -1456,17 +1456,27 @@ class PlayerAvatar(Avatar):
 
         entities = []
         seen_sim_ids = set()
+        # Only build full entity dicts for mobs near the player; the proxy caps
+        # the snapshot at 50u, so 60u gives a small margin for interpolation.
+        SNAPSHOT_MAX_RANGE = 60.0
 
-        def append_entity(other_mob, visibility_source="unknown"):
+        def append_entity(other_mob, visibility_source="unknown", force=False):
             try:
                 if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
+                    return
+                range_to_player = float(GetRange(mob, other_mob)) if other_mob != mob else 0.0
+                # Cheaply drop entities the client won't render anyway (the proxy
+                # only forwards mobs within ~50u). Skipping before the costly
+                # IsKOS/name lookups keeps the snapshot small and fast -> higher
+                # replication rate -> smoother motion. Self and the player's
+                # explicit target are always kept (force=True).
+                if not force and other_mob != mob and range_to_player > SNAPSHOT_MAX_RANGE:
                     return
                 seen_sim_ids.add(other_mob.simObject.id)
                 position = list(other_mob.simObject.position) if other_mob.simObject.position else [0.0, 0.0, 0.0]
                 rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
                 health = float(other_mob.health) if hasattr(other_mob, 'health') and other_mob.health is not None else 0.0
                 max_health = float(other_mob.maxHealth) if hasattr(other_mob, 'maxHealth') and other_mob.maxHealth is not None else 0.0
-                range_to_player = float(GetRange(mob, other_mob)) if other_mob != mob else 0.0
                 is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
                 if other_mob.player or (hasattr(other_mob, 'master') and other_mob.master and other_mob.master.player):
                     is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
@@ -1515,7 +1525,7 @@ class PlayerAvatar(Avatar):
 
         # Always include the player's current target in the snapshot
         if mob.target:
-            append_entity(mob.target, "target")
+            append_entity(mob.target, "target", force=True)
 
         if len(entities) <= 1:
             fallback_range = 500.0
@@ -1535,7 +1545,7 @@ class PlayerAvatar(Avatar):
                     append_entity(other_mob, "activeMobs")
 
             if mob.target:
-                append_entity(mob.target, "target")
+                append_entity(mob.target, "target", force=True)
 
             # Inject debug info into the self entity so we can see it client-side
             if entities:

@@ -47,6 +47,25 @@ if [ ! -s "data/master/master.db" ]; then
     exit 1
 fi
 
+# Wait until a TCP port can be bound (a just-killed WorldServer may still hold
+# it for a moment, which otherwise crashes the freshly spawned one).
+wait_port_free() {
+    local port="$1"
+    for _ in $(seq 1 30); do
+        if "$PYTHON" -c "import socket,sys
+s=socket.socket()
+try:
+    s.bind(('0.0.0.0',$port)); s.close()
+except OSError:
+    sys.exit(1)" 2>/dev/null; then
+            return 0
+        fi
+        echo "[run] waiting for port $port to free up..."
+        sleep 0.5
+    done
+    echo "[run] WARNING: port $port still in use after 15s"
+}
+
 # start_server <name> <readiness-substring> <command...>
 start_server() {
     local name="$1"; shift
@@ -74,6 +93,7 @@ start_server() {
 start_server MasterServer    "Server is up"            "$PYTHON" MasterServer.py    "$GAMECONFIG"
 start_server GMServer        "GM Server is up"         "$PYTHON" GMServer.py        "$GAMECONFIG"
 start_server CharacterServer "Character Server is up"  "$PYTHON" CharacterServer.py "$GAMECONFIG"
+wait_port_free 2008
 start_server WorldDaemon     "Zone Cluster 0 is live"  "$PYTHON" WorldDaemon.py     "$GAMECONFIG" \
     -worldname="$WORLDNAME" -publicname="$PUBLICNAME" -password="$WORLDPASS"
 start_server ClientProxy     "Proxy is up"             "$PYTHON" ClientProxy.py     "$GAMECONFIG"

@@ -2428,8 +2428,8 @@ class Mob:
         if player:
             #to specific client only
             player.mind.callRemote("playSound",sound)
-        else:
-            #otherwise 3d
+        elif self.simObject is not None:
+            #otherwise 3d (skip if detached/despawned — no position to anchor to)
             bigSound = 4 < self.spawn.modifiedScale
             self.zone.simAvatar.mind.callRemote("playSound",sound,self.simObject.position,bigSound)
     

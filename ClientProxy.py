@@ -23,6 +23,7 @@ from autobahn.twisted.websocket import (
     WebSocketServerFactory,
     WebSocketServerProtocol,
 )
+from autobahn.exception import Disconnected
 
 from hashlib import md5
 
@@ -464,17 +465,26 @@ class GodotClientSession:
         self.entity_sync_call = None
         self.last_gameplay_payload = None
         self.last_entity_payload = None
+        self._closed = False
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
+        if self._closed:
+            return
         try:
             payload = json.dumps(msg_dict, default=_json_fallback)
             self.ws.sendMessage(payload.encode("utf-8"), isBinary=False)
+        except Disconnected:
+            # Client went away (a sync callback can fire between close and
+            # cleanup). Stop quietly instead of spewing a traceback.
+            self._closed = True
+            self.cleanup()
         except Exception:
             traceback.print_exc()
 
     def cleanup(self):
         """Disconnect any PB connections."""
+        self._closed = True
         if self.gameplay_sync_call and self.gameplay_sync_call.active():
             self.gameplay_sync_call.cancel()
         if self.entity_sync_call and self.entity_sync_call.active():
@@ -502,7 +512,9 @@ class GodotClientSession:
     def start_entity_sync(self):
         if self.entity_sync_call and self.entity_sync_call.active():
             return
-        self.entity_sync_call = reactor.callLater(0.1, self._emit_entity_sync)
+        # Poll quickly; the effective rate is bounded by how long
+        # getVisibleEntities takes, but a short delay keeps replication snappy.
+        self.entity_sync_call = reactor.callLater(0.03, self._emit_entity_sync)
 
     def _emit_gameplay_sync(self):
         self.gameplay_sync_call = None
@@ -552,6 +564,17 @@ class GodotClientSession:
             self._last_entity_count = len(capped)
         # Always send — dedup was suppressing position/rotation updates
         self.send({"type": "entity_snapshot", "entities": capped})
+        # Lightweight send-rate meter (logs every 5s) so it's clear how fast
+        # entity replication is actually running.
+        import time as _t
+        _now = _t.time()
+        self._snap_n = getattr(self, "_snap_n", 0) + 1
+        if not hasattr(self, "_snap_t0"):
+            self._snap_t0 = _now
+        if _now - self._snap_t0 >= 5.0:
+            print("[Proxy] entity replication rate: %.1f snapshots/sec" % (self._snap_n / (_now - self._snap_t0)))
+            self._snap_n = 0
+            self._snap_t0 = _now
         self.start_entity_sync()
 
     def _on_entity_snapshot_failed(self, reason):

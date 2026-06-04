@@ -421,15 +421,18 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 10.0:
+				if desync > 25.0:
 					# Very large desync — snap to server position
 					player_body.global_position.x = server_pos.x
 					player_body.global_position.z = server_pos.z
-				elif desync > 3.0:
+				elif desync > 8.0:
 					# Moderate desync — gently blend toward server (10% per sync tick)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.1)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.1)
-				# else: within 3 units tolerance, trust client prediction
+					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.08)
+					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.08)
+				# else: within 8 units, TRUST client prediction. The server
+				# snapshot always lags prediction by a few units (input latency +
+				# snapshot interval), so a tight tolerance yanks the player back
+				# every snapshot. That tight tolerance was the rubber-band.
 			break
 
 	var incoming_keys: Dictionary = {}

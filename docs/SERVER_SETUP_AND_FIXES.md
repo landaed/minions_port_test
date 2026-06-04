@@ -103,7 +103,43 @@ more interpolation. NPC movement speed in the stub is currently a flat 5 u/s
 a faster player — acceptable for combat testing; raise it or wire it to
 `mob.move` if you want them to keep pace.
 
-## 5. Known remaining rough edges (not yet fixed)
+## 5b. Smoothness & combat-stability pass (in-client feedback round)
+
+After play-testing the real Godot client, a second round addressed jitter,
+rubber-banding, late/duplicate mobs, and combat instability:
+
+| Symptom | Fix |
+|---------|-----|
+| **Rubber-banded back while walking** | `gameplay_view.gd` reconciliation dead-zone widened 3u→8u. The server snapshot naturally *lags* client prediction by a few units; the old 3u tolerance yanked the player back every snapshot. Now: trust prediction <8u, gentle 8% correct 8–25u, snap >25u. |
+| **Mobs pop in several seconds late** | Test-mob spawn delay 2s→0.5s; canSee first pass 3s→0.5s, interval 2s→1s, so mobs appear and aggro faster. |
+| **All 3 mobs overlap / teleport together** | `spawn_test_mobs` now guards against double-spawn (a re-enter was spawning a second overlapping set). |
+| **Combat crash-loop (huge jitter)** | The zone's ~160 background mobs fight and despawn mid-combat; several paths dereferenced a gone `simObject` hundreds of times/sec (`spell.py`, `mob.playSound`, `damage.py`, `simdata.py` target id, `playdata.refresh`). All guarded → traceback flood went from ~1100/run to ~0. |
+| **Log unreadable** | `zone.tick` mob-loop errors are now throttled (one traceback + a suppressed-count every 3s) instead of a full stack per occurrence. |
+| **Proxy traceback on disconnect** | `ClientProxy` handles `autobahn ... Disconnected` quietly and stops the sync loops. |
+| **World server dies silently headless** | `worldserver/main.py` only `input("Press Enter…")` on an interactive TTY (was EOFError-crashing when spawned by the daemon, masking the real error — usually port 2008 still held during a fast restart). `run_servers.sh` now waits for port 2008 to free; `stop_servers.sh` waits for the world process to exit. |
+
+**Replication rate:** entity snapshots run at ~5/sec. `getVisibleEntities` itself
+is fast (<0.1s); the cap is the single-threaded world reactor being busy
+simulating all ~160 zone mobs, so the snapshot request waits its turn each tick.
+The Godot client interpolates between snapshots (`ENTITY_INTERPOLATION_SPEED`), so
+with the rubber-band fixed this is smooth for testing. For maximum smoothness a
+lighter/dedicated test zone (fewer background mobs) would push the rate up. The
+proxy now logs "entity replication rate: N snapshots/sec" every 5s.
+
+**Mob facts (for reference):** the 3 test mobs are **Skeletons** — level 3,
+realm Monster, **melee** (aggro range 20, follow range 60). You should see exactly
+3; the zone's other ~160 mobs are all >50u away so the proxy doesn't forward them.
+Mobs **do** re-orient to face their movement direction (server sends a yaw, the
+client applies it; the earlier mirror bug is fixed).
+
+## 5c. Login UI flow (Godot)
+
+`control.gd` now drives a clear 4-step flow (`_set_phase`): only the controls for
+the current step are shown, with a "Step N of 4" heading, so finished steps no
+longer linger on screen. Steps: 1 Log in/Register → 2 Choose world → 3 World
+character slot → 4 Pick/create character → in-game.
+
+## 6. Known remaining rough edges (not yet fixed)
 
 - **Disconnect cleanup:** when a client drops, the world keeps ticking the player
   briefly and logs `DeadReferenceError: Calling Stale Broker` (`player.py` mind

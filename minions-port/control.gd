@@ -8,6 +8,8 @@ var gameplay_view: Control = null
 var world_time := {"hour": 0, "minute": 0}
 
 @onready var login_panel := $VBoxContainer
+@onready var title_label := $VBoxContainer/TitleLabel
+@onready var hseparator := $VBoxContainer/HSeparator
 @onready var username_field := $VBoxContainer/UsernameField
 @onready var password_field := $VBoxContainer/PasswordField
 @onready var login_button := $VBoxContainer/LoginButton
@@ -33,13 +35,59 @@ var worlds: Array = []
 var characters: Array = []
 var selected_world: Dictionary = {}
 
+# --- Step-by-step login flow: only the controls for the current step show. ---
+const PHASE_LOGIN := "login"
+const PHASE_WORLD := "world"
+const PHASE_WORLD_ACCOUNT := "world_account"
+const PHASE_CHARACTER := "character"
+var _current_phase := ""
+
+func _phase_login_controls() -> Array:
+	return [username_field, password_field, email_field, login_button, register_button]
+
+func _phase_world_controls() -> Array:
+	return [world_list, join_button]
+
+func _phase_world_account_controls() -> Array:
+	return [fantasy_name_field, world_access_password_field, create_world_account_button, world_password_field, login_world_button]
+
+func _phase_character_controls() -> Array:
+	return [character_list, character_name_field, race_option, class_option, sex_option, create_character_button, enter_world_button]
+
+func _all_flow_controls() -> Array:
+	return _phase_login_controls() + _phase_world_controls() + _phase_world_account_controls() + _phase_character_controls()
+
+func _show_only(controls: Array):
+	for c in _all_flow_controls():
+		if c:
+			c.visible = controls.has(c)
+	if hseparator:
+		hseparator.visible = false
+
+func _set_phase(phase: String):
+	_current_phase = phase
+	match phase:
+		PHASE_LOGIN:
+			title_label.text = "Minions of Mirth\nStep 1 of 4 — Log In or Register"
+			_show_only(_phase_login_controls())
+		PHASE_WORLD:
+			title_label.text = "Step 2 of 4 — Choose a World"
+			_show_only(_phase_world_controls())
+		PHASE_WORLD_ACCOUNT:
+			title_label.text = "Step 3 of 4 — World Character Slot"
+			_show_only(_phase_world_account_controls())
+			# Access password only matters when the world is password-gated.
+			world_access_password_field.visible = bool(selected_world.get("has_password", false))
+		PHASE_CHARACTER:
+			title_label.text = "Step 4 of 4 — Pick or Create a Character"
+			_show_only(_phase_character_controls())
+
 func _ready():
 	socket.inbound_buffer_size = 1048576  # 1MB - entity snapshots can be large
 	socket.connect_to_url("ws://localhost:9000")
 	status_label.text = "Connecting to proxy..."
 	_setup_options()
-	_set_world_ui_visible(false)
-	_set_character_ui_visible(false)
+	_set_phase(PHASE_LOGIN)
 
 func _setup_options():
 	for race in ["Human", "Gnome", "Elf", "Halfling", "Dwarf", "Titan", "Drakken"]:
@@ -96,21 +144,7 @@ func _send(msg: Dictionary):
 	if socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
 		socket.send_text(JSON.stringify(msg))
 
-func _set_world_ui_visible(is_visible: bool):
-	world_password_field.visible = is_visible
-	fantasy_name_field.visible = is_visible
-	world_access_password_field.visible = is_visible and bool(selected_world.get("has_password", false))
-	create_world_account_button.visible = is_visible
-	login_world_button.visible = is_visible
-
-func _set_character_ui_visible(is_visible: bool):
-	character_list.visible = is_visible
-	character_name_field.visible = is_visible
-	race_option.visible = is_visible
-	class_option.visible = is_visible
-	sex_option.visible = is_visible
-	create_character_button.visible = is_visible
-	enter_world_button.visible = is_visible
+# (visibility is now driven by _set_phase / _show_only above)
 
 func _selected_character_name() -> String:
 	var selected_items = character_list.get_selected_items()
@@ -271,8 +305,8 @@ func handle_response(data: Dictionary):
 			if data.get("success", false):
 				if data.get("requires_world_access_password", false):
 					selected_world["has_password"] = true
-				_set_world_ui_visible(true)
-				_set_character_ui_visible(false)
+				_set_phase(PHASE_WORLD_ACCOUNT)
+				pass
 				create_world_account_button.disabled = false
 				login_world_button.disabled = false
 				world_access_password_field.visible = bool(selected_world.get("has_password", false))
@@ -320,7 +354,7 @@ func handle_response(data: Dictionary):
 			login_world_button.disabled = false
 			if data.get("success", false):
 				status_label.text = "World login ok. Loading characters..."
-				_set_character_ui_visible(true)
+				_set_phase(PHASE_CHARACTER)
 			else:
 				status_label.text = "World login failed: " + data.get("message", "")
 
@@ -411,9 +445,8 @@ func handle_response(data: Dictionary):
 			status_label.text = "Error: " + data.get("message", "")
 
 func _populate_world_list():
+	_set_phase(PHASE_WORLD)
 	world_list.clear()
-	world_list.visible = true
-	join_button.visible = true
 
 	if worlds.is_empty():
 		status_label.text = "No worlds online."
