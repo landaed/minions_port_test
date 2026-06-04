@@ -7,6 +7,7 @@
 from twisted.internet import defer, reactor
 from mud.world.core import CoreSettings
 import traceback
+import os
 from math import sqrt, atan2, sin, cos
 
 
@@ -186,6 +187,14 @@ class StubSimAvatar:
         """Load spawnpoints from the zone's SpawnGroups (DB) and feed them
         into the zone so it can start spawning mobs."""
         if not self.zone:
+            return
+
+        # Test-zone mode: skip the zone's ~160 DB-driven background spawns so the
+        # single-threaded reactor isn't saturated simulating them. You're left
+        # with just your player + the 3 test skeletons -> much higher replication
+        # rate / smoother. Enable with MOM_TEST_ZONE=1 (or ./run_servers.sh --test-zone).
+        if os.environ.get("MOM_TEST_ZONE"):
+            print("[StubSimAvatar] MOM_TEST_ZONE set: skipping background spawns for %s" % self.zone.name)
             return
 
         from mud.simulation.shared.simdata import SpawnpointInfo

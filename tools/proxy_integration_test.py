@@ -92,12 +92,8 @@ async def run():
             elif mt == "world_connected":
                 if not data.get("success"):
                     log("world connect failed:", data.get("message")); return
-                if data.get("has_world_account"):
-                    # will receive world_password_result; just wait
-                    pass
-                else:
-                    await send(ws, type="create_world_account",
-                               fantasy_name=FANTASY, player_password=WORLD_ACCESS_PW)
+                # Proxy auto-creates/logs-in the world slot now; just wait for
+                # player_login_result + character_list.
 
             elif mt == "world_account_result":
                 if data.get("success"):

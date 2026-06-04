@@ -139,6 +139,40 @@ the current step are shown, with a "Step N of 4" heading, so finished steps no
 longer linger on screen. Steps: 1 Log in/Register → 2 Choose world → 3 World
 character slot → 4 Pick/create character → in-game.
 
+## 5d. Smoothness root cause + login simplification (third round)
+
+- **THE smoothness fix — PB throttle.** `worldserver/main.py` sets
+  `THESERVER.throttleUsage = True`, and `app.py:perspective_call` *defers* every
+  Player remote call once that player has accrued any `cpuTime`, releasing them
+  slowly. The proxy's `getVisibleEntities` poll is a Player call, so entity
+  replication was capped at **~5 snapshots/sec** — that, not the mob count, was
+  the jitter. `getVisibleEntities` and `updateInput` are now exempt from the
+  throttle (they replace Torque's automatic ghosting/move events, not real player
+  commands). Result: **~5/sec → ~28/sec** on the *full* zone. The throttle still
+  applies to actual commands (skills, etc.).
+- **Multithreading?** Not worth it, and not needed. Twisted is single-threaded by
+  design and the whole world sim assumes it (no locking); threading it safely
+  would be a large, race-prone rewrite. The throttle exemption gave the win
+  instead.
+- **Optional light test zone.** `MOM_TEST_ZONE=1` (or `./run_servers.sh --test-zone`)
+  skips the zone's ~160 DB background spawns so you're left with just your player
+  + the 3 test skeletons. Useful for a clean combat sandbox, though after the
+  throttle fix it's no longer required for a smooth rate.
+- **Login simplified — world account is automatic.** Selecting a world now
+  auto-creates/recovers the per-world "character slot" and logs in behind the
+  scenes (proxy `_auto_create_world_account` / auto-login), so you go straight
+  from master login to character selection. You no longer type a "world avatar /
+  fantasy name" or juggle a separate world-account password. (For reference: the
+  fantasy name was the world account's display name — *not* a character name — and
+  it generated yet another password; both are now hidden.)
+- **"Won't load into world" / DB drift.** Accounts live in 3 SQLite DBs (master,
+  character, per-world) that can fall out of sync across code/schema changes
+  (symptom: world account "missing" yet an old character still listed, then enter
+  hangs at "waiting for zone transfer"). Fix: `python3 setup_databases.py --reset`
+  (or `./run_servers.sh --reset`) wipes the generated runtime data and rebuilds
+  from the pristine MoMReborn baseline. Verified: a clean slate logs in, creates,
+  enters, and re-enters correctly.
+
 ## 6. Known remaining rough edges (not yet fixed)
 
 - **Disconnect cleanup:** when a client drops, the world keeps ticking the player

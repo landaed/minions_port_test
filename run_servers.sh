@@ -34,10 +34,24 @@ mkdir -p logs
 PIDFILE="logs/servers.pids"
 : > "$PIDFILE"
 
-# Optional database (re)setup.
-if [ "${1:-}" = "--setup" ]; then
-    echo "[run] Setting up databases for world '$WORLDNAME'..."
-    "$PYTHON" setup_databases.py --worldname="$WORLDNAME" || { echo "[run] setup failed"; exit 1; }
+# Parse flags (order-independent): --setup [--reset], --test-zone
+DO_SETUP=""
+RESET_FLAG=""
+for arg in "$@"; do
+    case "$arg" in
+        --setup) DO_SETUP=1 ;;
+        --reset) DO_SETUP=1; RESET_FLAG="--reset" ;;
+        --test-zone) export MOM_TEST_ZONE=1 ;;
+    esac
+done
+
+if [ -n "$DO_SETUP" ]; then
+    echo "[run] Setting up databases for world '$WORLDNAME' $RESET_FLAG..."
+    "$PYTHON" setup_databases.py $RESET_FLAG --worldname="$WORLDNAME" || { echo "[run] setup failed"; exit 1; }
+fi
+
+if [ -n "${MOM_TEST_ZONE:-}" ]; then
+    echo "[run] MOM_TEST_ZONE=1 — running a light test zone (player + 3 skeletons, no background spawns)"
 fi
 
 # Bail out early if the master DB is missing/empty (common first-run mistake).

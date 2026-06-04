@@ -201,7 +201,31 @@ def _master_db_is_valid(db_path):
         return False
 
 
+def reset_runtime():
+    """Delete all generated runtime data so the next setup rebuilds from the
+    pristine MoMReborn baseline. Use when accounts/characters/world DBs have
+    drifted out of sync across code changes (symptom: 'won't load into world')."""
+    import glob
+    targets = [GAMEROOT, "common", "data/master", "data/character", "data/tmp",
+               "mom.cfg", "main.cs.dso"]
+    targets += glob.glob("*export*.db")
+    for t in targets:
+        if os.path.isdir(t):
+            print(f"  removing dir  {t}/")
+            shutil.rmtree(t, ignore_errors=True)
+        elif os.path.exists(t):
+            print(f"  removing file {t}")
+            try:
+                os.remove(t)
+            except OSError:
+                pass
+    print("Runtime data reset. Rebuilding from baseline...\n")
+
+
 def setup():
+    if "--reset" in sys.argv:
+        print("Resetting runtime databases (--reset)...")
+        reset_runtime()
     if not os.path.exists(BASELINE_WORLD_DB):
         print(f"Error: Could not find baseline world.db at {BASELINE_WORLD_DB}")
         print("Make sure the MoMReborn client directory exists in the repo root.")

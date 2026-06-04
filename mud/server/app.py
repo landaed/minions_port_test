@@ -224,7 +224,13 @@ class MasterPerspective(pb.Avatar):
             import sys as _sys
             print(f"####perspective_call: user={self.username} role={self.role.name} interface={self._interface} args={args}")
             _sys.stdout.flush()
-        if THESERVER.throttleUsage and self.throttle:
+        # The Godot proxy replaces Torque's automatic object ghosting with a
+        # high-frequency getVisibleEntities poll plus updateInput for movement.
+        # Those must NOT be rate-limited by the per-player CPU throttle (that was
+        # capping entity replication to ~5/sec); the throttle still applies to
+        # real player commands (skills, etc.).
+        _UNTHROTTLED = ("getVisibleEntities", "updateInput")
+        if THESERVER.throttleUsage and self.throttle and (not args or args[0] not in _UNTHROTTLED):
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]
                 d = defer.Deferred()

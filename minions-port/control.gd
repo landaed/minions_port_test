@@ -305,18 +305,18 @@ func handle_response(data: Dictionary):
 			if data.get("success", false):
 				if data.get("requires_world_access_password", false):
 					selected_world["has_password"] = true
-				_set_phase(PHASE_WORLD_ACCOUNT)
+				pass  # proxy auto-handles the world account; no manual step
 				pass
 				create_world_account_button.disabled = false
 				login_world_button.disabled = false
 				world_access_password_field.visible = bool(selected_world.get("has_password", false))
 				if data.get("has_world_account", false):
-					status_label.text = "World account found. Trying to recover its saved world password from master..."
+					status_label.text = "Setting up your character slot..."
 				else:
 					if bool(selected_world.get("has_password", false)):
-						status_label.text = "No world account yet. First enter the world access password (for this setup likely mmo), then create the world account."
+						status_label.text = "Setting up your character slot..."
 					else:
-						status_label.text = "No world account yet. Create one; it will get its own password separate from master login."
+						status_label.text = "Setting up your character slot..."
 			else:
 				status_label.text = "World error: " + data.get("message", "")
 
