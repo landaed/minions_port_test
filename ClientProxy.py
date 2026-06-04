@@ -172,6 +172,23 @@ def _serialize_root_info(root_info, session):
 
     char_infos = [_serialize_character_cache(value) for value in sorted_infos if value]
 
+    # Replace the passive-skill placeholder ability list with the character's
+    # real ACTIVE skills (Kick, Shield Bash, ...) fetched from the world server.
+    # Passive proficiencies (1H Slash, Block) do nothing when "used", so showing
+    # them on the ability bar made the hotkeys appear broken.
+    active_skills = getattr(session, "active_skills", None)
+    if char_infos and active_skills:
+        char_infos[0]["abilities"] = [
+            {
+                "name": s.get("name", ""),
+                "rank": s.get("rank", 1),
+                "cooldown_active": bool(s.get("cooldown_active", False)),
+                "cooldown_seconds": int(s.get("cooldown_seconds", 0) or 0),
+                "source": "server",
+            }
+            for s in active_skills[:8]
+        ]
+
     position = _get_first_attr(root_info, "POSITION", "position")
     if position is None:
         player = _get_first_attr(root_info, "player")
@@ -272,6 +289,7 @@ class ProxyPlayerMind(pb.Referenceable):
         self.session.send(payload)
         self.session.start_gameplay_sync()
         self.session.start_entity_sync()
+        self.session.start_skill_sync()
         return True
 
     def remote_receiveTextList(self, messages):
@@ -465,6 +483,8 @@ class GodotClientSession:
         self.root_info_cache = None
         self.gameplay_sync_call = None
         self.entity_sync_call = None
+        self.skill_sync_call = None
+        self.active_skills = []
         self.last_gameplay_payload = None
         self.last_entity_payload = None
         self._closed = False
@@ -491,8 +511,11 @@ class GodotClientSession:
             self.gameplay_sync_call.cancel()
         if self.entity_sync_call and self.entity_sync_call.active():
             self.entity_sync_call.cancel()
+        if self.skill_sync_call and self.skill_sync_call.active():
+            self.skill_sync_call.cancel()
         self.gameplay_sync_call = None
         self.entity_sync_call = None
+        self.skill_sync_call = None
         self.root_info_cache = None
         self.last_gameplay_payload = None
         self.last_entity_payload = None
@@ -517,6 +540,31 @@ class GodotClientSession:
         # Poll quickly; the effective rate is bounded by how long
         # getVisibleEntities takes, but a short delay keeps replication snappy.
         self.entity_sync_call = reactor.callLater(0.03, self._emit_entity_sync)
+
+    def start_skill_sync(self):
+        if self.skill_sync_call and self.skill_sync_call.active():
+            return
+        # Active skills change rarely (level up / training) but cooldowns tick,
+        # so a 1s poll keeps the ability bar's reuse timers reasonably fresh
+        # without much overhead.
+        self.skill_sync_call = reactor.callLater(1.0, self._emit_skill_sync)
+
+    def _emit_skill_sync(self):
+        self.skill_sync_call = None
+        if not self.player_perspective or not self.root_info_cache:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getActiveSkills", 0)
+        d.addCallback(self._on_active_skills)
+        d.addErrback(self._on_active_skills_failed)
+
+    def _on_active_skills(self, skills):
+        if isinstance(skills, (list, tuple)):
+            self.active_skills = list(skills)
+        self.start_skill_sync()
+
+    def _on_active_skills_failed(self, reason):
+        # Keep whatever we had; just keep polling.
+        self.start_skill_sync()
 
     def _emit_gameplay_sync(self):
         self.gameplay_sync_call = None
