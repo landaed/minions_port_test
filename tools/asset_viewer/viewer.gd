@@ -65,22 +65,30 @@ func _setup_environment() -> void:
 	add_child(sun)
 
 func _add_ground_grid() -> void:
-	var lines := ImmediateMesh.new()
+	# Large ground plane with a world-space 1 m grid shader (crisp under software
+	# rendering; thicker lines every 10 m).
+	var plane := PlaneMesh.new()
+	plane.size = Vector2(400, 400)
 	var mi := MeshInstance3D.new()
-	mi.mesh = lines
-	var mat := StandardMaterial3D.new()
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.vertex_color_use_as_albedo = true
-	lines.surface_begin(Mesh.PRIMITIVE_LINES, mat)
-	var n := 20
-	for i in range(-n, n + 1):
-		var c := 0.6 if i == 0 else 0.25
-		lines.surface_set_color(Color(c, c, c))
-		lines.surface_add_vertex(Vector3(-n, 0, i))
-		lines.surface_add_vertex(Vector3(n, 0, i))
-		lines.surface_add_vertex(Vector3(i, 0, -n))
-		lines.surface_add_vertex(Vector3(i, 0, n))
-	lines.surface_end()
+	mi.mesh = plane
+	var sh := Shader.new()
+	sh.code = """
+shader_type spatial;
+render_mode unshaded, cull_disabled;
+varying vec3 wpos;
+void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	vec2 g1 = abs(fract(wpos.xz) - 0.5);
+	float l1 = step(min(g1.x, g1.y), 0.02);
+	vec2 g10 = abs(fract(wpos.xz / 10.0) - 0.5);
+	float l10 = step(min(g10.x, g10.y), 0.004);
+	ALBEDO = mix(vec3(0.16, 0.18, 0.21), vec3(0.45, 0.48, 0.52), max(l1, l10));
+}
+"""
+	var smat := ShaderMaterial.new()
+	smat.shader = sh
+	mi.material_override = smat
+	mi.position = Vector3(0, -0.001, 0)
 	add_child(mi)
 
 func _add_scale_reference() -> void:
@@ -138,13 +146,13 @@ func _place_camera(aabb: AABB, orbit_deg: float) -> void:
 	var cam := Camera3D.new()
 	add_child(cam)
 	var center := aabb.position + aabb.size * 0.5
-	var radius := maxf(aabb.size.length(), 2.0)
+	var radius := maxf(aabb.size.length() * 0.5, 1.5)
 	if aabb.size == Vector3.ZERO:
 		center = Vector3(0, 1.0, 0)
 		radius = 4.0
-	var dist := radius * 1.6 + 1.0
+	var dist := radius * 1.7 + 1.5
 	var yaw := deg_to_rad(orbit_deg)
-	var off := Vector3(sin(yaw), 0.6, cos(yaw)).normalized() * dist
+	var off := Vector3(sin(yaw) * 0.85, 0.7, cos(yaw) * 0.85).normalized() * dist
 	cam.position = center + off
 	cam.look_at(center, Vector3.UP)
 	cam.far = maxf(dist * 4.0, 4000.0)

@@ -75,4 +75,14 @@ screenshots it. Use this to catch scale/orientation problems immediately.
 | `tools/cloud_setup.sh` | Reproducible cloud toolchain bring-up |
 | `tools/render.sh` | Headless screenshot of a .glb/.tscn (scale check) |
 | `tools/asset_viewer/` | Godot project used by `render.sh` |
+| `tools/dts/dts_reader.py` | Pure-Python DTS v24 reader (nodes/objects/meshes/materials) — **working** |
+| `tools/dts/dts_to_gltf.py` | DTS → `.glb` (Z-up→Y-up, node-transform baking) — **working** |
 | `tools/mom_asset_audit.py` | Existing asset inventory / `.mis` reference scanner |
+
+## Converter status
+
+- **DTS models → glTF: working.** Validated end-to-end (parse → `.glb` → Godot
+  render) on props, architecture, trees, and a character statue; geometry,
+  orientation, and real-world scale verified by screenshot. Pending: applying
+  material/texture maps, and skinned-mesh base geometry for animated characters.
+- Next: textures/materials, `.ter` → Terrain3D, `.mis` → Godot scene.
