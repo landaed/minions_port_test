@@ -1601,8 +1601,58 @@ class PlayerAvatar(Avatar):
 
         char.mob.zone.setTargetById(char.mob, entity_id)
         return True
-    
-    
+
+    def perspective_getActiveSkills(self, char_index=0):
+        """Return a character's ACTIVE (activatable) skills for the ability bar.
+
+        The client ability bar must show skills the player can actually USE.
+        Passive proficiencies (1H Slash, Block, Fists, ...) have no reuse time
+        and do nothing when 'used' (see skill.UseSkill), so they are excluded.
+        Crafting skills are excluded too. What remains are real abilities such
+        as Kick, Shield Bash, Disarm, Power Strike, etc., returned with their
+        current cooldown state so the bar can grey them out while on reuse.
+        """
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return []
+
+        char = self.player.party.members[char_index]
+        if not char or not char.mob:
+            return []
+
+        mob = char.mob
+        skills = []
+        try:
+            for name, profile in mob.mobSkillProfiles.items():
+                reuse = getattr(profile, "reuseTime", 0) or 0
+                if reuse <= 0:
+                    continue  # passive proficiency — not activatable
+                if name in RPG_CRAFT_SKILLS:
+                    continue  # crafting skill — not a combat ability
+                class_skill = getattr(profile, "classSkill", None)
+                reuse_key = getattr(class_skill, "skillname", name) if class_skill else name
+                cooldown = mob.skillReuse.get(reuse_key, 0)
+                skills.append({
+                    "name": name,
+                    "rank": int(mob.skillLevels.get(name, 1)),
+                    "reuse_time": int(reuse),
+                    "cooldown_active": bool(reuse_key in mob.skillReuse),
+                    "cooldown_seconds": int(cooldown),
+                    "has_spell": bool(getattr(class_skill, "spellProto", None)) if class_skill else False,
+                    "source": "server",
+                })
+        except Exception:
+            print_exc()
+            return []
+
+        skills.sort(key=lambda s: str(s["name"]))
+        return skills
+
+
     #cast or memorize spell, empty spell slot should be caught on client
     def perspective_onSpellSlot(self,cid,slot):
         party = self.player.party

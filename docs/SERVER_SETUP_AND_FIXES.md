@@ -173,6 +173,59 @@ character slot → 4 Pick/create character → in-game.
   from the pristine MoMReborn baseline. Verified: a clean slate logs in, creates,
   enters, and re-enters correctly.
 
+## 5e. Combat verification + ability bar fix (this pass)
+
+Play-testing reported: you get attacked and your health drops, but you can't tell
+if you can harm the mobs, and the ability-bar hotkeys "don't work". Investigated
+end-to-end (server combat code + proxy + client) and verified with a new headless
+combat test (`tools/proxy_combat_test.py`, drives the proxy like the Godot client:
+target → face → auto-attack → fire abilities, tracking both health bars).
+
+**Findings & fixes:**
+
+| Area | Finding | Fix |
+|------|---------|-----|
+| **Test mob count** | 3 skeletons made combat hard to read. | `stubsim.spawn_test_mobs` now spawns **1** by default; `MOM_TEST_MOB_COUNT=1..3` overrides. |
+| **"Can't harm the mob"** | You *can* — but melee is **inhibited unless you face the target** (`mob.isFacing`, server-side, ±60°) and have it targeted. A stationary player who never turns to the mob lands nothing while the mob (which turns to face you) hits freely. This is original MoM behaviour, not a port bug. | No code change needed for the mechanic — confirmed working: face + target the skeleton and its HP drops steadily to death. The server already sends "is facing the wrong way!" / "adversary is out of melee range!" to the combat log as feedback. |
+| **Ability hotkeys do nothing** | The ability bar was filled from `charInfo.SKILLS`, which is **every** skill including **passive weapon proficiencies** (1H Slash, 2H Cleave, Block…). `skill.UseSkill` returns immediately for any skill with no reuse time, so "using" a passive does nothing — the bar looked broken. | New `PlayerAvatar.perspective_getActiveSkills` returns only **activatable** skills (reuse time > 0, non-crafting): e.g. a L1 Warrior has **Kick**; later Shield Bash, Disarm, Power Strike, etc. The proxy polls it (1/s, throttle-exempt) and replaces the bar's ability list. Verified: the bar now shows **Kick**, and the hotkey lands a real hit (`"X kicks Skeleton!"`, ~20 dmg vs ~1-4 unarmed). |
+
+**Note on damage:** a fresh L1 character fights **unarmed** ("pummels … for 1-4
+damage"), so killing a 132-HP skeleton by auto-attack alone is slow; Kick and a
+real weapon speed it up a lot. Equipping starting weapons is a separate gameplay
+task (not done here).
+
+**Files:** `mud/world/stubsim.py` (mob count), `mud/world/playeravatar.py`
+(`getActiveSkills`), `mud/server/app.py` (throttle-exempt the poll),
+`ClientProxy.py` (poll + merge active skills into the ability bar),
+`tools/proxy_combat_test.py` (new test).
+
+## 5f. Combat HUD pass (Godot client)
+
+The greybox HUD was a single stacked debug dump (unlabeled bars + verbose text).
+Reworked `minions-port/gameplay_view.gd` (+ trimmed the HUD nodes out of
+`gameplay_view.tscn`, the HUD is now built in code) into a proper combat HUD:
+
+- **Dead mobs disappear.** `_sync_entity_markers` drops entities flagged
+  `dead` (or health <= 0): the 3D marker is freed and, if it was your target,
+  the target frame + highlight clear. Previously a killed mob lingered at 0%.
+- **Labeled, colored resource bars** — HP (red) / MP (blue) / SP (yellow), each
+  with a "cur / max" readout, in a top-left player frame with name/level/class.
+- **Target frame** (top-center) — target name, level, race, standing, and a
+  health bar; hidden when nothing is targeted.
+- **Crosshair** at screen center that recolors when you look at an entity
+  (yellow) or an enemy (red), via a camera-center raycast.
+- **Combat-state indicators** — "● IN COMBAT", "● AUTO-ATTACK ON/OFF (Q)", and
+  "● Enemy in sight" so the player can tell what's happening.
+- **Styled ability bar** + a one-line controls hint; the old verbose debug text
+  moved into an **F3-toggle** panel.
+
+Validated headless with Godot 4.6 (`--script` harness + an xvfb screenshot) so
+the scene loads, scripts parse, and the HUD builds/updates without errors.
+
+Note: auto-attack is a **toggle (Q)** — when ON you swing at your target each
+combat round automatically (facing + range permitting); Kick (1) is an extra
+on top. The HUD now shows that ON/OFF state explicitly.
+
 ## 6. Known remaining rough edges (not yet fixed)
 
 - **Disconnect cleanup:** when a client drops, the world keeps ticking the player

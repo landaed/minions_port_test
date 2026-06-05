@@ -429,9 +429,14 @@ def create_player_sim_object(player, zone):
 
 
 def spawn_test_mobs(zone, player_pos):
-    """Spawn 3 aggressive test mobs near a player position for combat testing."""
+    """Spawn aggressive test mob(s) near a player position for combat testing.
+
+    Defaults to a single skeleton so combat is easy to follow; set the
+    MOM_TEST_MOB_COUNT env var (1-3) to spawn more for stress testing.
+    """
     from mud.world.spawn import Spawn
     import traceback
+    import os
 
     # Guard against double-spawn (e.g. if the player re-enters the zone) so we
     # don't end up with overlapping duplicate skeletons.
@@ -439,12 +444,19 @@ def spawn_test_mobs(zone, player_pos):
         return
     zone._test_mobs_spawned = True
 
-    # Offsets from the player position (x, y, z) — place them ~10 units away
-    offsets = [
+    # Offsets from the player position (x, y, z) — place them ~8-10 units away.
+    # Only the first N (MOM_TEST_MOB_COUNT, default 1) are used.
+    all_offsets = [
         (8.0, 0.0, 0.0),
         (-5.0, 7.0, 0.0),
         (-5.0, -7.0, 0.0),
     ]
+    try:
+        mob_count = int(os.environ.get("MOM_TEST_MOB_COUNT", "1"))
+    except (TypeError, ValueError):
+        mob_count = 1
+    mob_count = max(1, min(mob_count, len(all_offsets)))
+    offsets = all_offsets[:mob_count]
 
     try:
         # "Skeleton" is level 3, realm=Monster(3), flags=128(AGGRESSIVE), aggroRange=20
@@ -477,5 +489,5 @@ def spawn_test_mobs(zone, player_pos):
         except Exception:
             traceback.print_exc()
 
-    print("[spawn_test_mobs] Spawned %d/3 test mobs near player at (%.1f, %.1f, %.1f)" % (
-        spawned, player_pos[0], player_pos[1], player_pos[2]))
+    print("[spawn_test_mobs] Spawned %d/%d test mob(s) near player at (%.1f, %.1f, %.1f)" % (
+        spawned, len(offsets), player_pos[0], player_pos[1], player_pos[2]))

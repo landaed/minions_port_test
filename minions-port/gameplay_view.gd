@@ -35,24 +35,285 @@ var _last_sent_input: Dictionary = {}
 var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
-@onready var info_label: Label = $HUDMargin/HUDVBox/InfoLabel
-@onready var summary_label: Label = $HUDMargin/HUDVBox/SummaryLabel
-@onready var target_label: Label = $HUDMargin/HUDVBox/TargetLabel
-@onready var health_bar: ProgressBar = $HUDMargin/HUDVBox/HealthBar
-@onready var mana_bar: ProgressBar = $HUDMargin/HUDVBox/ManaBar
-@onready var stamina_bar: ProgressBar = $HUDMargin/HUDVBox/StaminaBar
-@onready var ability_bar: HBoxContainer = $HUDMargin/HUDVBox/AbilityBar
-@onready var interaction_label: Label = $HUDMargin/HUDVBox/InteractionLabel
-@onready var transfer_label: Label = $HUDMargin/HUDVBox/TransferLabel
-@onready var combat_log_label: Label = $HUDMargin/HUDVBox/CombatLogLabel
+@onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
 @onready var player_body: CharacterBody3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody
 @onready var camera_pitch: Node3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraYaw/CameraPitch
 @onready var camera: Camera3D = $SubViewportContainer/SubViewport/WorldRoot/PlayerBody/CameraYaw/CameraPitch/Camera3D
 
+# --- HUD nodes (built in code by _build_hud) ---
+var player_name_label: Label
+var health_bar: ProgressBar
+var mana_bar: ProgressBar
+var stamina_bar: ProgressBar
+var health_value_label: Label
+var mana_value_label: Label
+var stamina_value_label: Label
+var combat_status_label: RichTextLabel
+var target_frame: PanelContainer
+var target_name_label: Label
+var target_health_bar: ProgressBar
+var target_health_value_label: Label
+var ability_bar: HBoxContainer
+var hint_label: Label
+var combat_log_label: Label
+var crosshair: Control
+var debug_panel: PanelContainer
+var debug_label: Label
+# Legacy verbose labels are folded into the toggleable debug panel.
+var info_label: Label
+var summary_label: Label
+var target_label: Label
+var interaction_label: Label
+var transfer_label: Label
+
+# --- combat-state UI ---
+var _crosshair_color := Color(1, 1, 1, 0.7)
+var _looking_at_entity := false
+var _looking_at_enemy := false
+var _looked_entity_id := 0
+var _debug_visible := false
+
 func _ready():
 	set_process_input(true)
+	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
+
+# ---------------------------------------------------------------------------
+# HUD construction (a clean combat HUD built entirely in code)
+# ---------------------------------------------------------------------------
+func _panel_style(accent: Color) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.07, 0.08, 0.10, 0.82)
+	sb.border_color = accent
+	sb.set_border_width_all(1)
+	sb.border_width_left = 3
+	sb.set_corner_radius_all(4)
+	sb.content_margin_left = 10
+	sb.content_margin_right = 10
+	sb.content_margin_top = 6
+	sb.content_margin_bottom = 6
+	return sb
+
+func _make_bar(color: Color) -> Array:
+	# Returns [ProgressBar, value_label] — a colored bar with a centered "cur / max".
+	var bar := ProgressBar.new()
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(190, 18)
+	bar.max_value = 100.0
+	bar.value = 100.0
+	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.03, 0.03, 0.04, 0.9)
+	bg.set_corner_radius_all(3)
+	var fill := StyleBoxFlat.new()
+	fill.bg_color = color
+	fill.set_corner_radius_all(3)
+	bar.add_theme_stylebox_override("background", bg)
+	bar.add_theme_stylebox_override("fill", fill)
+	var value_label := Label.new()
+	value_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	value_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	value_label.add_theme_font_size_override("font_size", 11)
+	value_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(value_label)
+	return [bar, value_label]
+
+func _make_resource_row(parent: VBoxContainer, tag: String, color: Color) -> Array:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	var tag_label := Label.new()
+	tag_label.text = tag
+	tag_label.custom_minimum_size = Vector2(26, 0)
+	tag_label.add_theme_color_override("font_color", color)
+	tag_label.add_theme_font_size_override("font_size", 12)
+	row.add_child(tag_label)
+	var made := _make_bar(color)
+	row.add_child(made[0])
+	parent.add_child(row)
+	return made
+
+func _build_hud():
+	# Player frame (top-left): name + HP/MP/SP bars + combat status.
+	var player_frame := PanelContainer.new()
+	player_frame.add_theme_stylebox_override("panel", _panel_style(Color(0.35, 0.65, 0.95)))
+	player_frame.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	player_frame.offset_left = 16
+	player_frame.offset_top = 16
+	player_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(player_frame)
+	var pv := VBoxContainer.new()
+	pv.add_theme_constant_override("separation", 3)
+	player_frame.add_child(pv)
+	player_name_label = Label.new()
+	player_name_label.add_theme_font_size_override("font_size", 15)
+	pv.add_child(player_name_label)
+	var hp_made := _make_resource_row(pv, "HP", Color(0.85, 0.25, 0.28))
+	health_bar = hp_made[0]; health_value_label = hp_made[1]
+	var mp_made := _make_resource_row(pv, "MP", Color(0.30, 0.55, 0.95))
+	mana_bar = mp_made[0]; mana_value_label = mp_made[1]
+	var sp_made := _make_resource_row(pv, "SP", Color(0.95, 0.80, 0.25))
+	stamina_bar = sp_made[0]; stamina_value_label = sp_made[1]
+	combat_status_label = RichTextLabel.new()
+	combat_status_label.bbcode_enabled = true
+	combat_status_label.fit_content = true
+	combat_status_label.scroll_active = false
+	combat_status_label.custom_minimum_size = Vector2(230, 38)
+	combat_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pv.add_child(combat_status_label)
+
+	# Target frame (top-center): only visible when a target is selected.
+	target_frame = PanelContainer.new()
+	target_frame.add_theme_stylebox_override("panel", _panel_style(Color(0.85, 0.35, 0.35)))
+	target_frame.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	target_frame.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	target_frame.offset_top = 18
+	target_frame.visible = false
+	target_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(target_frame)
+	var tv := VBoxContainer.new()
+	tv.add_theme_constant_override("separation", 3)
+	target_frame.add_child(tv)
+	target_name_label = Label.new()
+	target_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	target_name_label.add_theme_font_size_override("font_size", 14)
+	tv.add_child(target_name_label)
+	var t_made := _make_bar(Color(0.85, 0.30, 0.30))
+	target_health_bar = t_made[0]; target_health_value_label = t_made[1]
+	target_health_bar.custom_minimum_size = Vector2(230, 16)
+	tv.add_child(target_health_bar)
+
+	# Crosshair (screen center) — recolors when you look at an enemy.
+	crosshair = Control.new()
+	crosshair.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	crosshair.offset_left = -16
+	crosshair.offset_top = -16
+	crosshair.offset_right = 16
+	crosshair.offset_bottom = 16
+	crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	crosshair.draw.connect(_draw_crosshair)
+	add_child(crosshair)
+
+	# Ability bar + hint (bottom-center).
+	var bottom := VBoxContainer.new()
+	bottom.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	bottom.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	bottom.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	bottom.offset_bottom = -14
+	bottom.alignment = BoxContainer.ALIGNMENT_CENTER
+	bottom.add_theme_constant_override("separation", 4)
+	bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bottom)
+	hint_label = Label.new()
+	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hint_label.add_theme_font_size_override("font_size", 11)
+	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
+	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   F3: debug"
+	bottom.add_child(hint_label)
+	ability_bar = HBoxContainer.new()
+	ability_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	ability_bar.add_theme_constant_override("separation", 4)
+	bottom.add_child(ability_bar)
+
+	# Combat log (bottom-left).
+	var log_panel := PanelContainer.new()
+	log_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.45, 0.5, 0.6)))
+	log_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	log_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	log_panel.offset_left = 16
+	log_panel.offset_bottom = -88  # sit above the ability bar instead of overlapping it
+	log_panel.custom_minimum_size = Vector2(420, 0)
+	log_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(log_panel)
+	combat_log_label = Label.new()
+	combat_log_label.add_theme_font_size_override("font_size", 12)
+	combat_log_label.text = "Combat log:"
+	log_panel.add_child(combat_log_label)
+
+	# Debug panel (top-right, hidden by default, toggle with F3).
+	debug_panel = PanelContainer.new()
+	debug_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.4, 0.45, 0.55)))
+	debug_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	debug_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	debug_panel.offset_right = -16
+	debug_panel.offset_top = 16
+	debug_panel.custom_minimum_size = Vector2(520, 0)
+	debug_panel.visible = false
+	debug_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(debug_panel)
+	var dv := VBoxContainer.new()
+	debug_panel.add_child(dv)
+	info_label = Label.new()
+	info_label.add_theme_font_size_override("font_size", 11)
+	dv.add_child(info_label)
+	summary_label = Label.new()
+	summary_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	summary_label.add_theme_font_size_override("font_size", 11)
+	dv.add_child(summary_label)
+	target_label = Label.new()
+	target_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	target_label.add_theme_font_size_override("font_size", 11)
+	dv.add_child(target_label)
+	interaction_label = Label.new()
+	interaction_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	interaction_label.add_theme_font_size_override("font_size", 11)
+	dv.add_child(interaction_label)
+	transfer_label = Label.new()
+	transfer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	transfer_label.add_theme_font_size_override("font_size", 11)
+	dv.add_child(transfer_label)
+
+func _draw_crosshair():
+	var c := crosshair.size * 0.5
+	var col := _crosshair_color
+	var gap := 4.0
+	var length := 10.0
+	var w := 2.0
+	crosshair.draw_line(c + Vector2(-length, 0), c + Vector2(-gap, 0), col, w)
+	crosshair.draw_line(c + Vector2(gap, 0), c + Vector2(length, 0), col, w)
+	crosshair.draw_line(c + Vector2(0, -length), c + Vector2(0, -gap), col, w)
+	crosshair.draw_line(c + Vector2(0, gap), c + Vector2(0, length), col, w)
+	crosshair.draw_circle(c, 1.5, col)
+
+func _self_entity() -> Dictionary:
+	for entity in replicated_entities:
+		if entity is Dictionary and bool(entity.get("is_self", false)):
+			return entity
+	return {}
+
+func _update_look_at():
+	if camera == null or sub_viewport == null:
+		return
+	var looking := false
+	var enemy := false
+	var center := Vector2(sub_viewport.size) * 0.5
+	var from := camera.project_ray_origin(center)
+	var to := from + camera.project_ray_normal(center) * ENTITY_SELECTION_DISTANCE
+	var query := PhysicsRayQueryParameters3D.create(from, to)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	var result := player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	if not result.is_empty():
+		var collider = result.get("collider")
+		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
+			looking = true
+			var ent: Dictionary = collider.get_meta("entity", {})
+			enemy = bool(ent.get("is_enemy", false))
+			_looked_entity_id = int(collider.get_meta("entity_id", 0))
+	_looking_at_entity = looking
+	_looking_at_enemy = enemy
+	var new_col: Color
+	if enemy:
+		new_col = Color(1.0, 0.3, 0.3, 1.0)
+	elif looking:
+		new_col = Color(1.0, 0.85, 0.35, 1.0)
+	else:
+		new_col = Color(1.0, 1.0, 1.0, 0.7)
+	if new_col != _crosshair_color:
+		_crosshair_color = new_col
+		if crosshair:
+			crosshair.queue_redraw()
 
 func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictionary):
 	current_payload = payload.duplicate(true)
@@ -231,11 +492,12 @@ func _character_summary() -> String:
 			])
 	return ", ".join(bits)
 
-func _set_bar(bar: ProgressBar, value: float, maximum: float, label: String):
+func _set_bar(bar: ProgressBar, value: float, maximum: float, label: String, value_label: Label = null):
 	bar.max_value = max(maximum, 1.0)
 	bar.value = clamp(value, 0.0, bar.max_value)
-	bar.show_percentage = true
 	bar.tooltip_text = "%s %.0f / %.0f" % [label, bar.value, bar.max_value]
+	if value_label:
+		value_label.text = "%.0f / %.0f" % [bar.value, bar.max_value]
 
 func _clear_npc_root():
 	for child in npc_root.get_children():
@@ -442,6 +704,15 @@ func _sync_entity_markers():
 			continue
 		if bool(entity.get("is_self", false)):
 			continue
+		# Dead mobs disappear: skip them so their marker is freed below, and
+		# drop them as the current target so the target frame/highlight clears.
+		if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
+			var dead_key := _entity_key(entity)
+			if dead_key == _highlighted_entity_key:
+				_highlight_entity("")
+			if not server_target_description.is_empty() and _entity_key(server_target_description) == dead_key:
+				server_target_description = {}
+			continue
 		entity_list.append(entity)
 
 	for i in range(entity_list.size()):
@@ -511,6 +782,8 @@ func _button_label(slot_index: int, ability: Dictionary) -> String:
 	return prefix
 
 func _rebuild_ability_bar():
+	if ability_bar == null:
+		return
 	var signature := _ability_signature()
 	if signature == last_abilities_signature:
 		return
@@ -521,17 +794,36 @@ func _rebuild_ability_bar():
 	for i in range(8):
 		var button := Button.new()
 		button.focus_mode = Control.FOCUS_NONE
-		button.custom_minimum_size = Vector2(120, 48)
-		if i < abilities.size() and abilities[i] is Dictionary:
+		button.custom_minimum_size = Vector2(96, 44)
+		button.clip_text = true
+		var filled := i < abilities.size() and abilities[i] is Dictionary
+		if filled:
 			var ability: Dictionary = abilities[i]
 			button.text = _button_label(i, ability)
 			button.disabled = bool(ability.get("cooldown_active", false))
 			button.tooltip_text = _ability_tooltip(ability)
 		else:
-			button.text = "%d: -" % [i + 1]
+			button.text = "%d" % [i + 1]
 			button.disabled = true
+		_style_ability_button(button, filled)
 		button.pressed.connect(_on_ability_pressed.bind(i))
 		ability_bar.add_child(button)
+
+func _style_ability_button(button: Button, filled: bool):
+	var normal := StyleBoxFlat.new()
+	normal.bg_color = Color(0.13, 0.15, 0.19, 0.92) if filled else Color(0.08, 0.09, 0.11, 0.8)
+	normal.border_color = Color(0.45, 0.62, 0.85) if filled else Color(0.22, 0.24, 0.28)
+	normal.set_border_width_all(1)
+	normal.set_corner_radius_all(4)
+	var hover := normal.duplicate()
+	hover.bg_color = Color(0.20, 0.24, 0.30, 0.95)
+	button.add_theme_stylebox_override("normal", normal)
+	button.add_theme_stylebox_override("hover", hover)
+	button.add_theme_stylebox_override("pressed", hover)
+	button.add_theme_stylebox_override("disabled", normal)
+	button.add_theme_font_size_override("font_size", 12)
+	button.add_theme_color_override("font_color", Color(0.92, 0.94, 0.98) if filled else Color(0.45, 0.48, 0.54))
+	button.add_theme_color_override("font_disabled_color", Color(0.5, 0.54, 0.6) if filled else Color(0.35, 0.38, 0.43))
 
 func _ability_tooltip(ability: Dictionary) -> String:
 	var source := str(ability.get("source", "server"))
@@ -547,6 +839,8 @@ func _bridge_status_text() -> String:
 	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
 
 func _update_labels():
+	if health_bar == null:
+		return  # HUD not built yet
 	var char_info := _player_char_info()
 	var rapid_info := _rapid_info()
 	var world_name: String = str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
@@ -554,57 +848,79 @@ func _update_labels():
 	var guild_name: String = str(current_payload.get("guild_name", ""))
 	var pos: Vector3 = player_body.global_position
 	var time_text: String = "%02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))]
-	var paused_text: String = "yes" if bool(current_payload.get("paused", false)) else "no"
-	var grounded_text: String = "yes" if player_body.is_on_floor() else "no"
-	var autoattack_text: String = "on" if bool(rapid_info.get("autoattack", false)) else "off"
-	var server_abilities: Variant = _player_char_info().get("abilities", [])
-	var ability_source_text: String = "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
-	var entity_count: int = max(replicated_entities.size() - 1, 0)
-	info_label.text = "Greybox Test World\nWorld: %s\nPlayer: %s\nTime: %s" % [world_name, player_name, time_text]
-	summary_label.text = "Guild: %s\nParty: %s\nClass: %s\nAbility source: %s\nAuto-attack: %s\nReplicated entities: %d\nSpawn position: (%.1f, %.1f, %.1f)\nPaused: %s\nGrounded: %s\nWASD move, Space jumps, left click selects replicated targets and captures mouse, Tab cycles server targets, Q toggles server auto-attack, 1-8 uses server abilities, E interacts, Esc releases cursor." % [
-		guild_name if not guild_name.is_empty() else "<none>",
-		_character_summary(),
-		str(char_info.get("pclass", "Unknown")),
-		ability_source_text,
-		autoattack_text,
-		entity_count,
-		pos.x,
-		pos.y,
-		pos.z,
-		paused_text,
-		grounded_text,
-	]
-	_set_bar(health_bar, float(rapid_info.get("health", 0.0)), float(rapid_info.get("maxhealth", 100.0)), "Health")
-	_set_bar(mana_bar, float(rapid_info.get("mana", 0.0)), float(rapid_info.get("maxmana", 100.0)), "Mana")
-	_set_bar(stamina_bar, float(rapid_info.get("stamina", 0.0)), float(rapid_info.get("maxstamina", 100.0)), "Stamina")
-	var server_target_name: String = str(rapid_info.get("tgt", ""))
-	var server_target_health: float = float(rapid_info.get("tgthealth", -1.0))
+	var autoattack: bool = bool(rapid_info.get("autoattack", false))
+
+	# --- Player frame ---
+	var char_name: String = str(char_info.get("name", player_name))
+	var char_level: String = str(char_info.get("level", char_info.get("plevel", 1)))
+	var char_class: String = str(char_info.get("pclass", "Unknown"))
+	player_name_label.text = "%s   Lv%s %s" % [char_name, char_level, char_class]
+	_set_bar(health_bar, float(rapid_info.get("health", 0.0)), float(rapid_info.get("maxhealth", 100.0)), "Health", health_value_label)
+	_set_bar(mana_bar, float(rapid_info.get("mana", 0.0)), float(rapid_info.get("maxmana", 100.0)), "Mana", mana_value_label)
+	_set_bar(stamina_bar, float(rapid_info.get("stamina", 0.0)), float(rapid_info.get("maxstamina", 100.0)), "Stamina", stamina_value_label)
+
+	# --- Combat status (in-combat / auto-attack / looking-at) ---
+	var self_ent := _self_entity()
+	var has_target := not server_target_description.is_empty() or not str(rapid_info.get("tgt", "")).is_empty()
+	var in_combat: bool = bool(self_ent.get("in_combat", false)) or bool(self_ent.get("attacking", false)) or (autoattack and has_target)
+	var line1 := "[color=#ff5a5a]● IN COMBAT[/color]" if in_combat else "[color=#8a9099]○ Out of combat[/color]"
+	var line2 := "[color=#5ad17a]● AUTO-ATTACK ON[/color]" if autoattack else "[color=#8a9099]○ Auto-attack OFF — press Q[/color]"
+	var line3 := "\n[color=#ffcf5a]● Enemy in sight[/color]" if _looking_at_enemy else ""
+	combat_status_label.text = line1 + "\n" + line2 + line3
+
+	# --- Target frame ---
 	if not server_target_description.is_empty():
-		var desc_health: float = float(server_target_description.get("health", -1.0))
-		var desc_max_health: float = float(server_target_description.get("max_health", server_target_description.get("maxhealth", 1.0)))
-		var desc_health_pct := int(round((desc_health / max(desc_max_health, 1.0)) * 100.0)) if desc_health >= 0.0 else -1
-		var health_suffix := " | %d%% health" % desc_health_pct if desc_health_pct >= 0 else ""
-		target_label.text = "Server target: %s Lv%s %s | %s%s" % [
-			str(server_target_description.get("name", "Unknown")),
-			str(server_target_description.get("plevel", "?")),
-			str(server_target_description.get("race", "Unknown")),
-			str(server_target_description.get("standing", "")),
-			health_suffix,
-		]
-	elif not server_target_name.is_empty():
-		target_label.text = "Server target: %s (%.0f%% health)" % [server_target_name, server_target_health * 100.0]
+		var t_name: String = str(server_target_description.get("public_name", server_target_description.get("name", "Unknown")))
+		var t_level: String = str(server_target_description.get("plevel", server_target_description.get("level", "?")))
+		var t_race: String = str(server_target_description.get("race", ""))
+		var t_standing: String = str(server_target_description.get("standing", ""))
+		var t_dead: bool = bool(server_target_description.get("dead", false))
+		var t_health: float = float(server_target_description.get("health", -1.0))
+		var t_max_health: float = float(server_target_description.get("max_health", server_target_description.get("maxhealth", 1.0)))
+		var standing_txt := (" (%s)" % t_standing) if not t_standing.is_empty() else ""
+		target_name_label.text = "%s   Lv%s %s%s%s" % [t_name, t_level, t_race, standing_txt, "  [DEAD]" if t_dead else ""]
+		if t_health >= 0.0:
+			_set_bar(target_health_bar, t_health, t_max_health, "Target", target_health_value_label)
+			target_health_bar.visible = true
+		else:
+			target_health_bar.visible = false
+		target_frame.visible = true
 	else:
-		target_label.text = "No current server target"
-	interaction_label.text = "Replicated entities are rendered from the MoM server snapshot when available; otherwise greybox placeholders are shown.\n%s" % interaction_message
-	var transfer: Variant = current_payload.get("zone_transfer", {})
-	if transfer is Dictionary and not transfer.is_empty():
-		transfer_label.text = "Zone handoff prepared: zone port %s, party %s\n%s" % [
-			str(transfer.get("zone_port", "?")),
-			str(transfer.get("party", [])),
-			_bridge_status_text(),
+		var server_target_name: String = str(rapid_info.get("tgt", ""))
+		if not server_target_name.is_empty():
+			target_name_label.text = server_target_name
+			var sth: float = float(rapid_info.get("tgthealth", -1.0))
+			if sth >= 0.0:
+				_set_bar(target_health_bar, sth * 100.0, 100.0, "Target", target_health_value_label)
+				target_health_bar.visible = true
+			else:
+				target_health_bar.visible = false
+			target_frame.visible = true
+		else:
+			target_frame.visible = false
+
+	# --- Debug panel (toggle F3) ---
+	if _debug_visible:
+		var server_abilities: Variant = char_info.get("abilities", [])
+		var ability_source_text: String = "server skills" if server_abilities is Array and not server_abilities.is_empty() else "fallback placeholders"
+		var entity_count: int = max(replicated_entities.size() - 1, 0)
+		info_label.text = "Greybox Test World\nWorld: %s   Time: %s   Player: %s" % [world_name, time_text, player_name]
+		summary_label.text = "Guild: %s\nParty: %s\nAbility source: %s\nReplicated entities: %d\nPosition: (%.1f, %.1f, %.1f)   Grounded: %s   Paused: %s" % [
+			guild_name if not guild_name.is_empty() else "<none>",
+			_character_summary(),
+			ability_source_text,
+			entity_count,
+			pos.x, pos.y, pos.z,
+			"yes" if player_body.is_on_floor() else "no",
+			"yes" if bool(current_payload.get("paused", false)) else "no",
 		]
-	else:
-		transfer_label.text = _bridge_status_text()
+		target_label.text = "Looking at entity id: %d (enemy=%s)" % [_looked_entity_id if _looking_at_entity else 0, str(_looking_at_enemy)]
+		interaction_label.text = interaction_message
+		var transfer: Variant = current_payload.get("zone_transfer", {})
+		if transfer is Dictionary and not transfer.is_empty():
+			transfer_label.text = "Zone handoff: port %s, party %s" % [str(transfer.get("zone_port", "?")), str(transfer.get("party", []))]
+		else:
+			transfer_label.text = _bridge_status_text()
 
 func _request_server_command(command_type: String, payload: Dictionary = {}):
 	command_requested.emit(command_type, payload)
@@ -695,6 +1011,11 @@ func _input(event):
 				_activate_ability(6)
 			KEY_8, KEY_KP_8:
 				_activate_ability(7)
+			KEY_F3:
+				_debug_visible = not _debug_visible
+				if debug_panel:
+					debug_panel.visible = _debug_visible
+				_update_labels()
 	elif event is InputEventMouseMotion and mouse_captured:
 		player_body.rotate_y(-event.relative.x * LOOK_SENSITIVITY)
 		camera_pitch.rotate_x(-event.relative.y * LOOK_SENSITIVITY)
@@ -760,4 +1081,5 @@ func _physics_process(delta):
 		var target_position: Vector3 = body.get_meta("target_position", body.position)
 		body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
 
+	_update_look_at()
 	_update_labels()

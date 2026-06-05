@@ -229,7 +229,7 @@ class MasterPerspective(pb.Avatar):
         # Those must NOT be rate-limited by the per-player CPU throttle (that was
         # capping entity replication to ~5/sec); the throttle still applies to
         # real player commands (skills, etc.).
-        _UNTHROTTLED = ("getVisibleEntities", "updateInput")
+        _UNTHROTTLED = ("getVisibleEntities", "updateInput", "getActiveSkills")
         if THESERVER.throttleUsage and self.throttle and (not args or args[0] not in _UNTHROTTLED):
             if self.cpuTime > 0:
                 dc = MasterPerspective.deferredCalls[self]
