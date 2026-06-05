@@ -1,0 +1,10163 @@
+{
+ "mission": "city",
+ "terrain": {
+  "file": "./city.ter",
+  "squareSize": 8.0,
+  "pos": [
+   -1024.0,
+   0.0,
+   1024.0
+  ]
+ },
+ "sun": {
+  "azimuth": 15.0,
+  "elevation": 30.0,
+  "color": [
+   0.4,
+   0.4,
+   0.4,
+   1.0
+  ],
+  "ambient": [
+   0.3,
+   0.3,
+   0.3,
+   1.0
+  ],
+  "direction": [
+   0.57735,
+   0.57735,
+   -0.57735
+  ]
+ },
+ "sky": {
+  "materialList": "~/data/skies/sky_day.dml",
+  "fogDistance": 300.0,
+  "fogColor": [
+   0.6,
+   0.6,
+   0.6,
+   1.0
+  ],
+  "visibleDistance": 2048.0
+ },
+ "water": [
+  {
+   "pos": [
+    -224.0,
+    0.0,
+    80.0
+   ],
+   "scale": [
+    1024.0,
+    122.0,
+    1024.0
+   ],
+   "height": 0.0
+  }
+ ],
+ "statics": [
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    119.356,
+    134.917,
+    -61.3617
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "DoorUpperRoom",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_2.dts",
+   "pos": [
+    31.6632,
+    162.059,
+    255.088
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    122.613
+   ],
+   "scale": [
+    0.19,
+    0.19,
+    0.19
+   ],
+   "glb": "shapes/objects_door_2.glb"
+  },
+  {
+   "name": "DoorTower",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_2.dts",
+   "pos": [
+    31.2637,
+    162.059,
+    254.866
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    124.332
+   ],
+   "scale": [
+    0.19,
+    0.19,
+    0.19
+   ],
+   "glb": "shapes/objects_door_2.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    44.7452,
+    128.473,
+    267.221
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    34.1042
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    32.4505,
+    128.703,
+    255.447
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    55.8501
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    45.7252,
+    128.758,
+    247.711
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    124.059
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    -365.958,
+    177.874,
+    -233.976
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    186.329
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    -383.683,
+    177.589,
+    -225.765
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    96.3741
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    -378.982,
+    177.819,
+    -242.127
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    6.41984
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    118.259,
+    149.819,
+    -16.5066
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    0.689835
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    131.491,
+    149.707,
+    -16.517
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    0.689835
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    139.347,
+    162.653,
+    -26.3562
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    88.3524
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    106.965,
+    147.067,
+    -14.3907
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    108.156,
+    147.092,
+    -15.7623
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    57.8687
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    107.389,
+    148.172,
+    -15.2015
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodBarrel.dts",
+   "pos": [
+    106.513,
+    147.116,
+    -12.8244
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodBarrel.dts",
+   "pos": [
+    109.445,
+    147.633,
+    -13.8953
+   ],
+   "rot": [
+    0.775055,
+    -0.554249,
+    -0.303475,
+    236.294
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodBarrel.dts",
+   "pos": [
+    116.326,
+    147.178,
+    -14.3211
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodBarrel.dts",
+   "pos": [
+    118.988,
+    147.118,
+    -14.4058
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/woodtruck.dts",
+   "pos": [
+    109.513,
+    147.124,
+    -7.43425
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    141.521
+   ],
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ],
+   "glb": "shapes/objects_woodtruck.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    112.885,
+    147.126,
+    -10.7545
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/BigTable.dts",
+   "pos": [
+    136.647,
+    147.152,
+    -11.2602
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    81.9329
+   ],
+   "scale": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/BookOpen.dts",
+   "pos": [
+    136.363,
+    148.315,
+    -11.0932
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    79.0682
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/FeatherPen.dts",
+   "pos": [
+    137.115,
+    148.303,
+    -10.6372
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    14.3239
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    140.337,
+    147.092,
+    -14.2185
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    72.7656
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    142.644,
+    147.132,
+    -14.9117
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    131.937,
+    150.837,
+    14.9059
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    179.635
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    117.627,
+    150.917,
+    14.8776
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    179.635
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    133.284,
+    147.052,
+    5.48532
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    165.585
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    133.032,
+    147.032,
+    -0.415132
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    99.1219
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    116.073,
+    147.06,
+    -2.54681
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    117.184,
+    147.092,
+    0.536572
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    65.8901
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    113.264,
+    147.032,
+    5.05434
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    110.581
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    115.855,
+    147.052,
+    2.3423
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    10.3133
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    113.801,
+    147.052,
+    -0.112038
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    10.3133
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    136.544,
+    147.032,
+    1.43203
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    10.3133
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    135.602,
+    146.972,
+    -1.37684
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    87.0896
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    134.346,
+    147.052,
+    1.13657
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    87.0896
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    35.0373,
+    132.099,
+    -271.418
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    88.3524
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    27.2389,
+    132.429,
+    -320.517
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    6.9924
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    41.4437,
+    132.449,
+    -320.141
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    0.689835
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    30.3157,
+    132.42,
+    -287.55
+   ],
+   "rot": [
+    0.0130441,
+    -0.999783,
+    0.016236,
+    92.1417
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    9.7201,
+    132.44,
+    -290.581
+   ],
+   "rot": [
+    0.0130441,
+    -0.999783,
+    0.016236,
+    92.1417
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    57.497,
+    132.4,
+    -288.287
+   ],
+   "rot": [
+    -0.0167388,
+    0.99978,
+    0.012662,
+    91.2299
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    30.9037,
+    141.299,
+    -271.766
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    88.3011
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    -610.081,
+    246.241,
+    -422.638
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    117.705,
+    130.176,
+    -76.6401
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    132.138,
+    130.439,
+    -76.5252
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    140.094,
+    127.885,
+    -90.0701
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    73.9115
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    140.468,
+    127.174,
+    -102.213
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    107.143
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    108.623,
+    128.092,
+    -88.065
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    107.143
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "Tree",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    107.409,
+    127.493,
+    -103.427
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    138.656
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    74.0076,
+    131.272,
+    226.277
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.7,
+    1.7,
+    1.7
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    50.1755,
+    129.841,
+    223.259
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    88.2355
+   ],
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    80.056,
+    136.891,
+    193.775
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    71.6197
+   ],
+   "scale": [
+    1.7,
+    1.7,
+    1.7
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    91.4962,
+    135.714,
+    215.794
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    170.741
+   ],
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    120.329,
+    143.934,
+    191.117
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    170.741
+   ],
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    101.126,
+    144.178,
+    174.313
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    185.638
+   ],
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    114.051,
+    148.068,
+    149.098
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    132.547,
+    148.31,
+    149.21
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    119.358
+   ],
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    134.533,
+    151.677,
+    121.413
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    170.741
+   ],
+   "scale": [
+    1.4,
+    1.4,
+    1.4
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    112.494,
+    148.258,
+    116.755
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    170.741
+   ],
+   "scale": [
+    1.6,
+    1.6,
+    1.6
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    112.466,
+    148.141,
+    68.3182
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    185.638
+   ],
+   "scale": [
+    1.3,
+    1.3,
+    1.3
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    135.182,
+    148.9,
+    54.6944
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    185.638
+   ],
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    132.092,
+    129.158,
+    -114.923
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.1081
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Bed",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts",
+   "pos": [
+    95.6917,
+    131.08,
+    -123.854
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_1.glb"
+  },
+  {
+   "name": "bench",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bench_1.dts",
+   "pos": [
+    92.3326,
+    135.159,
+    -125.498
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/objects_bench_1.glb"
+  },
+  {
+   "name": "TABLE4",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_4.dts",
+   "pos": [
+    93.7679,
+    126.797,
+    -117.997
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_table_4.glb"
+  },
+  {
+   "name": "Drawers",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/drawers_1.dts",
+   "pos": [
+    96.8988,
+    131.132,
+    -120.341
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_drawers_1.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    93.9111,
+    128.306,
+    -117.935
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    96.8657,
+    132.779,
+    -120.349
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    88.1484,
+    131.147,
+    -124.576
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "BOOK",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/book_1.dts",
+   "pos": [
+    88.237,
+    132.265,
+    -124.504
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    56.1498
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_book_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    94.0269,
+    127.151,
+    -115.844
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    96.102,
+    127.123,
+    -116.695
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    40.107
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    89.4937,
+    130.655,
+    -115.804
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.48,
+    0.48,
+    0.48
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    95.0129,
+    130.634,
+    -120.252
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    92.0024,
+    128.499,
+    -126.137
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    71.8354,
+    128.674,
+    -126.625
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Bed2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+   "pos": [
+    73.2705,
+    131.438,
+    -122.503
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_2.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    72.0949,
+    131.47,
+    -119.698
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    45.8366
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    72.157,
+    132.578,
+    -119.778
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    74.5041,
+    126.55,
+    -120.383
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    59.5179,
+    128.859,
+    -126.937
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Bed",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts",
+   "pos": [
+    58.01,
+    127.065,
+    -121.125
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    60.5266,
+    126.647,
+    -121.088
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    56.8129,
+    127.066,
+    -117.492
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    50.4203
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    57.0622,
+    127.1,
+    -118.67
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    57.0994,
+    128.199,
+    -118.688
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    63.0553,
+    128.259,
+    -103.705
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    146.677
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    63.0765,
+    127.16,
+    -103.741
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    146.677
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    62.72,
+    127.126,
+    -105.13
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    197.097
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    63.744,
+    127.094,
+    -102.452
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    87.8449
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    61.916,
+    126.626,
+    -102.797
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    146.768
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    54.3964,
+    128.754,
+    -101.706
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.4727
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Bed2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+   "pos": [
+    60.4898,
+    131.146,
+    -105.342
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_2.glb"
+  },
+  {
+   "name": "Bed2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+   "pos": [
+    56.0143,
+    131.12,
+    -105.325
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_2.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    58.2677,
+    131.147,
+    -106.47
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.482
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    58.3093,
+    132.262,
+    -106.315
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    177.617
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    58.0513,
+    130.06,
+    -99.994
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    58.4388,
+    128.703,
+    -135.363
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    1.05498
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Bed",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts",
+   "pos": [
+    56.1876,
+    131.499,
+    -137.492
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_1.glb"
+  },
+  {
+   "name": "Drawers",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/drawers_1.dts",
+   "pos": [
+    57.9205,
+    131.475,
+    -142.094
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    37.8152
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_drawers_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    27.1709,
+    128.742,
+    -141.116
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    91.1912
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "TABLE4",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_4.dts",
+   "pos": [
+    33.9303,
+    127.088,
+    -142.77
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_4.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    33.8526,
+    127.051,
+    -143.931
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    181.628
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    34.8133,
+    127.076,
+    -142.651
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    91.8554
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    34.0162,
+    127.08,
+    -141.27
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    60.9157
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Rug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    31.8845,
+    130.006,
+    -141.172
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "Bed2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+   "pos": [
+    29.8546,
+    135.044,
+    -142.008
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_2.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    28.591,
+    135.013,
+    -139.827
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    147.25
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    28.7108,
+    136.128,
+    -139.72
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    144.385
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    14.4087,
+    128.641,
+    -126.864
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.573
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    15.0857,
+    131.493,
+    -125.213
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    138.656
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    15.2202,
+    132.608,
+    -125.125
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    135.791
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    16.7936,
+    131.501,
+    -125.349
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.482
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    14.8326,
+    131.503,
+    -123.681
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    88.8087
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Bed2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+   "pos": [
+    15.4662,
+    131.499,
+    -119.849
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_bed_single_2.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    17.9962,
+    129.205,
+    -144.449
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0456
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    6.67379,
+    127.086,
+    -144.943
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    140.948
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    15.937,
+    127.109,
+    -145.234
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    224.6
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    14.5961,
+    127.08,
+    -145.896
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.5275
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "BOOK",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/book_1.dts",
+   "pos": [
+    14.5862,
+    128.201,
+    -145.891
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    56.1498
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_book_1.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    8.17276,
+    128.473,
+    -161.909
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.2902
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    32.1858,
+    128.514,
+    -191.092
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    179.245
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    117.195,
+    129.022,
+    -120.031
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    89.6547
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    117.15,
+    128.876,
+    -141.206
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    89.6547
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    117.203,
+    129.021,
+    -163.81
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    89.6547
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    117.199,
+    128.983,
+    -176.162
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    89.6547
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    132.128,
+    128.987,
+    -156.08
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.1081
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "lantern",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+   "pos": [
+    132.135,
+    128.936,
+    -133.303
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.1081
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/lanterns_lantern.glb"
+  },
+  {
+   "name": "BOTTLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts",
+   "pos": [
+    182.97,
+    128.717,
+    -128.415
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_bottle_1.glb"
+  },
+  {
+   "name": "BOTTLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts",
+   "pos": [
+    183.209,
+    129.968,
+    -128.448
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_bottle_1.glb"
+  },
+  {
+   "name": "BOTTLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts",
+   "pos": [
+    184.185,
+    129.951,
+    -128.455
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_bottle_1.glb"
+  },
+  {
+   "name": "BOTTLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts",
+   "pos": [
+    183.858,
+    128.745,
+    -128.475
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_bottle_1.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -431.38,
+    155.577,
+    42.7696
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -434.167,
+    153.391,
+    42.0405
+   ],
+   "rot": [
+    0.558467,
+    0.527654,
+    -0.640075,
+    229.441
+   ],
+   "scale": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -430.538,
+    156.058,
+    42.9005
+   ],
+   "rot": [
+    -0.0474596,
+    0.998213,
+    0.0363144,
+    204.899
+   ],
+   "scale": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -433.661,
+    161.372,
+    42.1297
+   ],
+   "rot": [
+    -0.00548281,
+    0.972682,
+    0.232075,
+    182.633
+   ],
+   "scale": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -416.261,
+    155.207,
+    26.7546
+   ],
+   "rot": [
+    0.521126,
+    -0.832272,
+    -0.189078,
+    53.61
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -407.843,
+    154.104,
+    44.746
+   ],
+   "rot": [
+    0.0431349,
+    0.977615,
+    0.205935,
+    156.855
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -388.547,
+    148.921,
+    24.1046
+   ],
+   "rot": [
+    -0.692754,
+    -0.577844,
+    -0.431495,
+    61.7962
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "Rock",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+   "pos": [
+    -446.522,
+    170.855,
+    21.7458
+   ],
+   "rot": [
+    -0.12982,
+    0.327253,
+    -0.935977,
+    86.5769
+   ],
+   "scale": [
+    5.0,
+    5.0,
+    5.0
+   ],
+   "glb": "shapes/rocks_rock3.glb"
+  },
+  {
+   "name": "pipe",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/pipe_4.dts",
+   "pos": [
+    376.389,
+    147.895,
+    -291.752
+   ],
+   "rot": [
+    -0.0520826,
+    -0.0784665,
+    0.995555,
+    36.8558
+   ],
+   "scale": [
+    3.0,
+    3.0,
+    3.0
+   ],
+   "glb": "shapes/objects_pipe_4.glb"
+  },
+  {
+   "name": "GIANTROCKSNAKE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    557.884,
+    165.656,
+    76.3955
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "ZoustDoorOut",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts",
+   "pos": [
+    519.557,
+    145.575,
+    -402.135
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    75.0575
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/objects_door_1.glb"
+  },
+  {
+   "name": "ZoustDoorIn",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts",
+   "pos": [
+    519.421,
+    145.575,
+    -402.171
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    75.0575
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/objects_door_1.glb"
+  },
+  {
+   "name": "ShneerDoorOut",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts",
+   "pos": [
+    501.813,
+    149.841,
+    -580.405
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    116.883
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/objects_door_1.glb"
+  },
+  {
+   "name": "ShneerDoorIn",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts",
+   "pos": [
+    501.687,
+    149.841,
+    -580.341
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    116.883
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/objects_door_1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    109.819,
+    146.718,
+    233.727
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    67.8097,
+    150.33,
+    168.605
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    85.3769,
+    159.615,
+    107.498
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    166.083,
+    161.724,
+    102.858
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    80.9462,
+    154.339,
+    151.327
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    231.475
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    86.1608,
+    146.672,
+    252.914
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    231.475
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    166.961,
+    160.451,
+    136.078
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    231.475
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    133.105,
+    147.514,
+    3.10983
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    205.119
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    136.068,
+    147.314,
+    4.06823
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    114.154,
+    147.514,
+    2.17566
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    134.354,
+    147.314,
+    -0.973314
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    115.757,
+    147.314,
+    -0.351234
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    154.699
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    116.65,
+    147.514,
+    4.38631
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    238.351
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    -3.35657,
+    136.81,
+    239.47
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    238.351
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    -4.84541,
+    127.873,
+    260.411
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    238.351
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    -0.802752,
+    134.82,
+    246.232
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    65.4991
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    9.00503,
+    145.8,
+    207.15
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    35.1323
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    26.0115,
+    150.075,
+    204.247
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    35.1323
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    37.4595,
+    150.515,
+    179.337
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    35.1323
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    17.9394,
+    149.292,
+    193.567
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    35.1323
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    56.0584,
+    134.041,
+    304.334
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    35.1323
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    71.8561,
+    139.958,
+    291.489
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    53.1032
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    77.5274,
+    142.534,
+    274.084
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    100.086
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    100.477,
+    147.539,
+    255.728
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    100.086
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts",
+   "pos": [
+    66.3349,
+    138.443,
+    292.042
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    100.086
+   ],
+   "scale": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "glb": "shapes/trees_ftree04_ftree04.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    56.3771,
+    132.441,
+    279.104
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    72.1927
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    55.2607,
+    126.344,
+    264.668
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    72.1927
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    48.4279,
+    128.447,
+    284.628
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    72.1927
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    19.3477,
+    129.136,
+    252.696
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    127.77
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    18.0081,
+    134.638,
+    241.792
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    127.77
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+   "pos": [
+    24.2059,
+    129.449,
+    246.17
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    127.77
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/rocks_rock1.glb"
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    142.944,
+    147.136,
+    -24.4449
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    41.2533
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    138.144,
+    147.043,
+    -29.555
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    82.5059
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    139.12,
+    147.103,
+    -28.2513
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    50.9932
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    113.491,
+    147.136,
+    -25.7559
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    0.573347
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    138.436,
+    148.163,
+    -29.0424
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    50.9936
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    146.402,
+    160.316,
+    -32.5623
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    36.0967
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+   "pos": [
+    140.46,
+    147.136,
+    -22.1346
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    69.9012
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": null
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    118.56,
+    147.082,
+    -22.2711
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    5.54666
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "Table3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+   "pos": [
+    117.335,
+    147.116,
+    -23.6186
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    44.8734
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "shapes/objects_table_3.glb"
+  },
+  {
+   "name": "Chair",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+   "pos": [
+    116.342,
+    147.05,
+    -25.2412
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    80.6047
+   ],
+   "scale": [
+    0.4,
+    0.4,
+    0.4
+   ],
+   "glb": "shapes/objects_chair_1.glb"
+  },
+  {
+   "name": "CANDLE",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+   "pos": [
+    117.349,
+    148.215,
+    -23.6581
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    44.8734
+   ],
+   "scale": [
+    0.25,
+    0.25,
+    0.25
+   ],
+   "glb": "shapes/objects_candle_1.glb"
+  },
+  {
+   "name": "BWFlowerA1",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -249.273,
+    205.279,
+    -693.733
+   ],
+   "rot": [
+    0.0205123,
+    -0.999467,
+    0.025407,
+    99.9073
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -246.994,
+    205.475,
+    -690.622
+   ],
+   "rot": [
+    0.0246754,
+    -0.999371,
+    0.0254878,
+    89.6
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -246.426,
+    205.327,
+    -695.36
+   ],
+   "rot": [
+    0.0810083,
+    -0.99636,
+    0.0265393,
+    34.104
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA4",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -243.351,
+    205.566,
+    -690.326
+   ],
+   "rot": [
+    0.25825,
+    0.965891,
+    -0.0189909,
+    11.0795
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA5",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -243.031,
+    205.463,
+    -693.533
+   ],
+   "rot": [
+    0.0348871,
+    -0.999088,
+    -0.0246368,
+    89.6327
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA6",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -241.609,
+    205.627,
+    -688.878
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA7",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -239.899,
+    205.565,
+    -691.491
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerA8",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -239.127,
+    205.484,
+    -694.398
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB1",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -243.853,
+    205.19,
+    -708.712
+   ],
+   "rot": [
+    0.0181943,
+    -0.99914,
+    0.037264,
+    74.1416
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB2",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -242.134,
+    205.22,
+    -705.859
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB3",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -240.583,
+    205.138,
+    -708.935
+   ],
+   "rot": [
+    0.28276,
+    -0.943986,
+    0.170108,
+    8.68894
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB4",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -239.174,
+    205.136,
+    -707.165
+   ],
+   "rot": [
+    0.0526317,
+    -0.99838,
+    -0.0216263,
+    63.8807
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB5",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -237.314,
+    205.127,
+    -703.923
+   ],
+   "rot": [
+    0.0787093,
+    0.996825,
+    0.0120242,
+    36.5954
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB6",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -234.675,
+    205.111,
+    -705.654
+   ],
+   "rot": [
+    -0.040406,
+    -0.997142,
+    -0.0638342,
+    63.9258
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB7",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -234.936,
+    205.077,
+    -702.245
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWFlowerB8",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+   "pos": [
+    -237.191,
+    205.216,
+    -700.828
+   ],
+   "rot": [
+    0.0244778,
+    -0.998882,
+    0.0404485,
+    63.8384
+   ],
+   "scale": [
+    0.2,
+    0.2,
+    0.2
+   ],
+   "glb": "shapes/plants_weed_1.glb"
+  },
+  {
+   "name": "BWTable",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_1.dts",
+   "pos": [
+    -240.353,
+    206.142,
+    -701.398
+   ],
+   "rot": [
+    0.00155946,
+    0.999987,
+    0.00479293,
+    111.91
+   ],
+   "scale": [
+    0.5,
+    0.3,
+    0.5
+   ],
+   "glb": "shapes/objects_table_1.glb"
+  },
+  {
+   "name": "BWBook",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/BookOpen.dts",
+   "pos": [
+    -240.288,
+    207.07,
+    -701.64
+   ],
+   "rot": [
+    0.0169065,
+    0.999842,
+    -0.00540543,
+    111.89
+   ],
+   "scale": [
+    0.2,
+    0.25,
+    0.25
+   ],
+   "glb": null
+  },
+  {
+   "name": "BWRug",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+   "pos": [
+    -244.312,
+    205.144,
+    -700.86
+   ],
+   "rot": [
+    0.0526089,
+    0.998503,
+    0.0149516,
+    21.1549
+   ],
+   "scale": [
+    1.6,
+    1.0,
+    1.0
+   ],
+   "glb": "shapes/objects_rug_1.glb"
+  },
+  {
+   "name": "BWFeatherPen",
+   "shape": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/FeatherPen.dts",
+   "pos": [
+    -239.648,
+    207.069,
+    -701.497
+   ],
+   "rot": [
+    -0.0341901,
+    0.999405,
+    -0.00457075,
+    15.2381
+   ],
+   "scale": [
+    0.3,
+    0.3,
+    0.3
+   ],
+   "glb": null
+  }
+ ],
+ "interiors": [
+  {
+   "name": "tower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif",
+   "pos": [
+    -110.996,
+    147.81,
+    -301.139
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_tower1.glb"
+  },
+  {
+   "name": "tower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif",
+   "pos": [
+    271.736,
+    148.073,
+    -31.1675
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_tower1.glb"
+  },
+  {
+   "name": "tower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif",
+   "pos": [
+    333.848,
+    147.898,
+    -150.731
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_tower1.glb"
+  },
+  {
+   "name": "tower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif",
+   "pos": [
+    -21.6122,
+    147.918,
+    -32.7274
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_tower1.glb"
+  },
+  {
+   "name": "Entrance",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_castle.dif",
+   "pos": [
+    124.497,
+    146.067,
+    -5.66935
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "glb": "interiors/components_city_castle.glb"
+  },
+  {
+   "name": "WallsA",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsa.dif",
+   "pos": [
+    112.677,
+    148.006,
+    -224.744
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallsa.glb"
+  },
+  {
+   "name": "WallsC1",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc1.dif",
+   "pos": [
+    112.785,
+    148.006,
+    -224.13
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallsc1.glb"
+  },
+  {
+   "name": "WallsE",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallse.dif",
+   "pos": [
+    112.775,
+    148.006,
+    -224.13
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallse.glb"
+  },
+  {
+   "name": "WallsD",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsd.dif",
+   "pos": [
+    112.79,
+    148.006,
+    -224.12
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallsd.glb"
+  },
+  {
+   "name": "WallsB",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsb.dif",
+   "pos": [
+    114.105,
+    148.006,
+    -224.793
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallsb.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    126.695,
+    141.226,
+    -44.3245
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    122.695,
+    141.226,
+    -44.3245
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    126.695,
+    135.69,
+    -55.38
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    122.695,
+    135.69,
+    -55.38
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    122.699,
+    130.218,
+    -65.8579
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "stairs",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+   "pos": [
+    126.689,
+    130.218,
+    -65.8579
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stairs2a.glb"
+  },
+  {
+   "name": "WallsC2",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc2.dif",
+   "pos": [
+    112.785,
+    148.006,
+    -224.138
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_city_wallsc2.glb"
+  },
+  {
+   "name": "GuardTower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif",
+   "pos": [
+    40.982,
+    125.35,
+    254.041
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    34.1948
+   ],
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ],
+   "glb": "interiors/prefabs_tower1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    43.3589,
+    126.049,
+    252.973
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    16.6068,
+    125.929,
+    233.969
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    36.6692
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    55.5933,
+    126.049,
+    260.643
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    32.0856
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "GuardTower",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif",
+   "pos": [
+    -373.768,
+    174.466,
+    -235.229
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    96.4647
+   ],
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ],
+   "glb": "interiors/prefabs_tower1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    -371.716,
+    175.165,
+    -233.622
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    94.3555
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    -367.343,
+    175.045,
+    -266.144
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    98.9391
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+   "pos": [
+    -372.813,
+    175.165,
+    -219.224
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    94.3555
+   ],
+   "scale": [
+    1.2,
+    1.2,
+    1.2
+   ],
+   "glb": "interiors/prefabs_tower1wall.glb"
+  },
+  {
+   "name": "barracks",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/barracks.dif",
+   "pos": [
+    276.121,
+    129.91,
+    -259.235
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_small_barracks.glb"
+  },
+  {
+   "name": "Priest",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/greathall.dif",
+   "pos": [
+    221.475,
+    131.107,
+    -345.824
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_small_greathall.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif",
+   "pos": [
+    235.487,
+    128.809,
+    -304.004
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    46.4096
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_firept3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif",
+   "pos": [
+    206.949,
+    128.83,
+    -302.459
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    46.4096
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_firept3.glb"
+  },
+  {
+   "name": "CombatantSign",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/combat1.dif",
+   "pos": [
+    251.133,
+    138.77,
+    -265.29
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/signs_combat1.glb"
+  },
+  {
+   "name": "PriestSign",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/priest1.dif",
+   "pos": [
+    218.013,
+    136.215,
+    -298.087
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    89.9544
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/signs_priest1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    110.271,
+    126.901,
+    -162.568
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    110.271,
+    126.901,
+    -118.768
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    110.271,
+    126.941,
+    -180.568
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    139.036,
+    126.901,
+    -116.53
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    139.036,
+    126.891,
+    -134.53
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    139.036,
+    126.851,
+    -151.93
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "shop",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+   "pos": [
+    110.271,
+    126.931,
+    -145.368
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/shops_shoplrg1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/smallforge.dif",
+   "pos": [
+    128.59,
+    136.85,
+    -173.801
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    66.2809
+   ],
+   "scale": [
+    0.7,
+    0.7,
+    0.7
+   ],
+   "glb": "interiors/objects_smallforge.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/anvil.dif",
+   "pos": [
+    118.85,
+    140.964,
+    -176.595
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    2.29103
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_anvil.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/odstv.dif",
+   "pos": [
+    140.958,
+    141.541,
+    -194.384
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    185.821
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_odstv.glb"
+  },
+  {
+   "name": "Tent",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent_guard.dif",
+   "pos": [
+    198.808,
+    128.778,
+    -226.272
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "glb": "interiors/architecture_tent_guard.glb"
+  },
+  {
+   "name": "prisonerpole",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/prisonerpole.dif",
+   "pos": [
+    208.017,
+    127.47,
+    -222.868
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    0.75,
+    0.75,
+    0.75
+   ],
+   "glb": "interiors/architecture_prisonerpole.glb"
+  },
+  {
+   "name": "pit",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/pit1.dif",
+   "pos": [
+    234.337,
+    127.855,
+    -219.937
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_pit1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavernbig.dif",
+   "pos": [
+    188.092,
+    128.123,
+    -138.889
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.7098
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_large_tavernbig.glb"
+  },
+  {
+   "name": "Rogue",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/guild01.dif",
+   "pos": [
+    -29.824,
+    127.415,
+    -161.913
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_small_guild01.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif",
+   "pos": [
+    92.3136,
+    126.902,
+    -119.208
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif",
+   "pos": [
+    77.0939,
+    126.824,
+    -121.852
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse2.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif",
+   "pos": [
+    61.4337,
+    127.167,
+    -118.128
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    88.8085
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif",
+   "pos": [
+    53.0114,
+    126.864,
+    -140.125
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse2.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif",
+   "pos": [
+    61.2976,
+    126.912,
+    -101.952
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif",
+   "pos": [
+    37.126,
+    127.197,
+    -119.561
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif",
+   "pos": [
+    34.0976,
+    126.832,
+    -141.552
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif",
+   "pos": [
+    19.6477,
+    126.874,
+    -122.091
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse2.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif",
+   "pos": [
+    9.2593,
+    127.137,
+    -142.258
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif",
+   "pos": [
+    12.9093,
+    126.864,
+    -167.198
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse2.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif",
+   "pos": [
+    33.3967,
+    127.137,
+    -159.4
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif",
+   "pos": [
+    32.5996,
+    126.832,
+    -184.166
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    180.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/houses_cityhouse1.glb"
+  },
+  {
+   "name": "RogueSign",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/rogue1.dif",
+   "pos": [
+    -9.91404,
+    131.869,
+    -150.608
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/signs_rogue1.glb"
+  },
+  {
+   "name": "MageSign",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/mage1.dif",
+   "pos": [
+    35.1723,
+    141.682,
+    -261.28
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    90.0
+   ],
+   "scale": [
+    1.5,
+    1.5,
+    1.5
+   ],
+   "glb": "interiors/signs_mage1.glb"
+  },
+  {
+   "name": "MageGuild",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/guildhall.dif",
+   "pos": [
+    33.6826,
+    128.293,
+    -292.944
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    88.8084
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_large_guildhall.glb"
+  },
+  {
+   "name": "obelisk",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif",
+   "pos": [
+    -72.9657,
+    84.5764,
+    685.545
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_desert_obelisk.glb"
+  },
+  {
+   "name": "obelisk",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif",
+   "pos": [
+    -102.166,
+    84.5764,
+    685.545
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_desert_obelisk.glb"
+  },
+  {
+   "name": "obelisk",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif",
+   "pos": [
+    -68.0385,
+    102.407,
+    520.463
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    13.751
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_desert_obelisk.glb"
+  },
+  {
+   "name": "obelisk",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif",
+   "pos": [
+    -96.4018,
+    102.407,
+    513.523
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    13.751
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/components_desert_obelisk.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -220.929,
+    116.288,
+    415.334
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    91.6732
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -229.83,
+    116.327,
+    416.291
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    76.2033
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    161.086,
+    139.953,
+    594.519
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    13.7509
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    161.811,
+    139.807,
+    583.895
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    9.74035
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -258.689,
+    128.511,
+    87.935
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    37.2422
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -248.289,
+    128.518,
+    82.6218
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    81.9329
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -258.655,
+    128.668,
+    102.52
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    157.563
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif",
+   "pos": [
+    -250.971,
+    128.371,
+    94.0138
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_firept3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    385.844,
+    159.492,
+    82.3891
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    46.9825
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    395.006,
+    159.358,
+    73.6099
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    42.3985
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    523.953,
+    145.56,
+    -396.088
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    14.8965
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    523.657,
+    145.505,
+    -413.203
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    15.4703
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    516.558,
+    146.405,
+    -466.902
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    24.6376
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    596.743,
+    167.81,
+    -195.724
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    24.6376
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "DruidRing",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stonehenge.dif",
+   "pos": [
+    483.337,
+    148.02,
+    -0.0125737
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    40.107
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_stonehenge.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    596.708,
+    158.511,
+    -510.664
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    28.6483
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    585.533,
+    157.139,
+    -536.031
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    28.6483
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    508.881,
+    149.836,
+    -579.483
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    28.6483
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    500.86,
+    149.928,
+    -599.289
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    68.1824
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -534.861,
+    168.654,
+    431.26
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    81.9329
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -545.26,
+    168.707,
+    436.574
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    37.2422
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    -545.227,
+    168.244,
+    451.159
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    157.563
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif",
+   "pos": [
+    -537.543,
+    167.987,
+    442.652
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/objects_firept3.glb"
+  },
+  {
+   "name": "bindpoint",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/bindpoint.dif",
+   "pos": [
+    256.707,
+    147.48,
+    -133.081
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    151.834
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_bindpoint.glb"
+  },
+  {
+   "name": "fountain",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/fountain1.dif",
+   "pos": [
+    124.586,
+    127.04,
+    -96.3875
+   ],
+   "rot": [
+    1.0,
+    0.0,
+    -0.0,
+    0.0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_fountain1.glb"
+  },
+  {
+   "name": "Tent",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+   "pos": [
+    308.029,
+    137.307,
+    -344.47
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    25.7831
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/architecture_tent1.glb"
+  },
+  {
+   "name": "Lamp",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif",
+   "pos": [
+    110.057,
+    157.783,
+    29.6627
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    26.929
+   ],
+   "scale": [
+    0.8,
+    0.8,
+    0.8
+   ],
+   "glb": "interiors/objects_lantern2.glb"
+  },
+  {
+   "name": "Lamp",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif",
+   "pos": [
+    119.548,
+    157.695,
+    31.6461
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    16.0428
+   ],
+   "scale": [
+    0.8,
+    0.8,
+    0.8
+   ],
+   "glb": "interiors/objects_lantern2.glb"
+  },
+  {
+   "name": "Tavern",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavern1.dif",
+   "pos": [
+    -450.587,
+    154.959,
+    17.2505
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    83.0789
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/buildings_large_tavern1.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/ruins3.dif",
+   "pos": [
+    -166.272,
+    150.781,
+    302.312
+   ],
+   "rot": [
+    0.0,
+    1.0,
+    -0.0,
+    194.233
+   ],
+   "scale": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "glb": "interiors/buildings_large_ruins3.glb"
+  },
+  {
+   "name": "",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    731.454,
+    170.114,
+    -8.30423
+   ],
+   "rot": [
+    0.0,
+    -1.0,
+    -0.0,
+    10.8867
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  },
+  {
+   "name": "BWHouse",
+   "interior": "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+   "pos": [
+    -243.308,
+    205.903,
+    -704.309
+   ],
+   "rot": [
+    -0.000931553,
+    0.999987,
+    -0.00499997,
+    201.107
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "glb": "interiors/hovels_small_cottage.glb"
+  }
+ ],
+ "lights": [
+  {
+   "pos": [
+    411.871,
+    215.285,
+    -214.142
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    39.2334,
+    170.441,
+    256.592
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    44.7648,
+    128.896,
+    267.192
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    32.3866,
+    129.426,
+    255.41
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    45.8277,
+    129.501,
+    247.745
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -368.578,
+    220.126,
+    -237.053
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -365.94,
+    178.617,
+    -233.87
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -383.648,
+    178.012,
+    -225.761
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -378.979,
+    178.542,
+    -242.2
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    118.294,
+    150.785,
+    -15.6587
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    131.526,
+    150.673,
+    -15.6691
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    138.501,
+    163.599,
+    -26.2866
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    135.967,
+    150.333,
+    -8.50875
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    115.506,
+    149.267,
+    -10.6651
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    131.938,
+    151.26,
+    14.9409
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.628,
+    151.34,
+    14.9126
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    268.365,
+    137.326,
+    -258.755
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    235.333,
+    130.575,
+    -304.019
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    206.795,
+    130.596,
+    -302.474
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    104.334,
+    127.858,
+    -181.294
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    104.845,
+    127.795,
+    -119.836
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    108.919,
+    129.613,
+    -117.745
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    140.642,
+    129.613,
+    -118.146
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    141.129,
+    129.613,
+    -135.831
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    109.922,
+    129.613,
+    -143.484
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    140.822,
+    129.613,
+    -153.374
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    109.839,
+    129.613,
+    -160.72
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    109.644,
+    129.613,
+    -178.98
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    126.164,
+    128.784,
+    -186.319
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    130.946,
+    127.698,
+    -189.044
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    183.913,
+    130.414,
+    -142.394
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -37.1572,
+    133.647,
+    -161.535
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    24.1475,
+    128.503,
+    -123.659
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    61.5662,
+    128.028,
+    -113.341
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    11.629,
+    127.984,
+    -172.798
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    83.0809,
+    127.849,
+    -123.844
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    47.8925,
+    127.989,
+    -138.374
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    4.43937,
+    127.812,
+    -141.864
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    34.1913,
+    133.045,
+    -271.348
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    26.9765,
+    133.375,
+    -318.002
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    41.458,
+    133.395,
+    -317.532
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    31.1645,
+    133.361,
+    -287.655
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    10.5689,
+    133.381,
+    -290.686
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    56.6435,
+    133.341,
+    -288.232
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    32.3186,
+    142.245,
+    -271.99
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -251.088,
+    130.137,
+    94.1153
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    391.73,
+    161.166,
+    85.4147
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    400.335,
+    161.022,
+    75.4811
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    600.786,
+    169.191,
+    -199.776
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    529.835,
+    146.981,
+    -396.637
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    528.466,
+    147.126,
+    -416.732
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    520.753,
+    147.867,
+    -471.173
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    600.593,
+    159.932,
+    -515.114
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    589.418,
+    158.56,
+    -540.481
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    512.766,
+    151.257,
+    -583.933
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    501.024,
+    151.349,
+    -605.194
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -537.66,
+    169.793,
+    442.754
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    120.336,
+    149.629,
+    27.4951
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    129.253,
+    149.61,
+    27.5813
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    132.154,
+    129.566,
+    -114.943
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    93.9098,
+    129.486,
+    -117.978
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    96.8601,
+    133.997,
+    -120.355
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    92.0212,
+    128.907,
+    -126.074
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    71.8542,
+    129.082,
+    -126.562
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    72.1514,
+    133.796,
+    -119.784
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    59.5367,
+    129.267,
+    -126.874
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    57.0938,
+    129.417,
+    -118.694
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    63.0633,
+    129.477,
+    -103.703
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    54.4592,
+    129.162,
+    -101.725
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    58.3151,
+    133.48,
+    -106.31
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    58.4193,
+    129.111,
+    -135.426
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    27.2346,
+    129.15,
+    -141.133
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    28.7184,
+    137.346,
+    -139.719
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    14.4264,
+    129.049,
+    -126.801
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    15.2278,
+    133.826,
+    -125.126
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    17.9333,
+    129.613,
+    -144.43
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    8.23541,
+    128.881,
+    -161.929
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    32.2058,
+    128.922,
+    -191.029
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.132,
+    129.43,
+    -120.012
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.087,
+    129.284,
+    -141.187
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.14,
+    129.429,
+    -163.791
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.136,
+    129.391,
+    -176.143
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    132.19,
+    129.395,
+    -156.1
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    132.197,
+    129.344,
+    -133.323
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -446.143,
+    159.357,
+    38.0135
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -445.335,
+    159.353,
+    31.1045
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -444.333,
+    159.36,
+    22.7044
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -443.658,
+    159.39,
+    17.2165
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -442.795,
+    159.351,
+    10.2955
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -449.243,
+    159.361,
+    9.50453
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -448.34,
+    159.37,
+    2.02363
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -441.882,
+    159.368,
+    2.79071
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -440.922,
+    159.359,
+    -5.12366
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -447.371,
+    159.349,
+    -5.87281
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -446.092,
+    159.348,
+    -16.3345
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -439.709,
+    159.364,
+    -15.5227
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -438.074,
+    159.349,
+    -28.396
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -444.543,
+    159.36,
+    -29.2149
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -453.524,
+    159.346,
+    -30.3771
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -450.071,
+    159.342,
+    16.4425
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -450.771,
+    159.34,
+    21.8855
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -451.724,
+    159.371,
+    30.3052
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -452.555,
+    159.359,
+    37.2483
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -446.974,
+    159.357,
+    44.4761
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -453.385,
+    159.389,
+    43.7743
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -454.201,
+    159.359,
+    50.1406
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -447.71,
+    159.359,
+    50.9084
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -446.982,
+    166.368,
+    44.5254
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -453.449,
+    166.334,
+    43.7422
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -454.266,
+    166.356,
+    50.1419
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -447.766,
+    166.349,
+    50.9436
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -446.194,
+    166.352,
+    37.9903
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -445.34,
+    166.362,
+    31.1083
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -451.806,
+    166.354,
+    30.3217
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -452.6,
+    166.386,
+    37.2183
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -444.326,
+    166.368,
+    22.6867
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -450.764,
+    166.381,
+    21.8421
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -450.072,
+    166.365,
+    16.4518
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -443.674,
+    166.37,
+    17.2503
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -442.811,
+    166.372,
+    10.2829
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -441.919,
+    166.381,
+    2.79242
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -449.226,
+    166.351,
+    9.46409
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -448.315,
+    166.383,
+    2.01537
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -434.941,
+    166.614,
+    11.251
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -434.012,
+    166.619,
+    3.72448
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    387.524,
+    163.016,
+    78.6841
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    289.835,
+    132.659,
+    -269.233
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    292.103,
+    133.462,
+    -252.706
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    271.517,
+    132.261,
+    -253.859
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    263.8,
+    132.262,
+    -256.538
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    293.22,
+    139.011,
+    -257.096
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    278.303,
+    139.011,
+    -253.572
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -31.2367,
+    139.669,
+    -161.529
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -31.7325,
+    134.92,
+    -161.37
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    185.012,
+    130.635,
+    -131.49
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    593.085,
+    170.313,
+    -198.759
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    396.142,
+    162.667,
+    69.5837
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    -170.509,
+    154.505,
+    319.692
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    514.754,
+    150.969,
+    -470.294
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    729.293,
+    173.184,
+    -12.6971
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  },
+  {
+   "pos": [
+    117.102,
+    149.387,
+    -23.42
+   ],
+   "color": [
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "radius": 10.0
+  }
+ ],
+ "audio": [
+  {
+   "pos": [
+    126.008,
+    128.778,
+    -186.386
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    -537.174,
+    167.903,
+    442.816
+   ],
+   "file": "~/data/sound/environment/Fire_CampfireLoop2.ogg"
+  },
+  {
+   "pos": [
+    -36.7012,
+    134.147,
+    -161.83
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    -180.12,
+    163.436,
+    255.682
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  },
+  {
+   "pos": [
+    107.645,
+    130.045,
+    -178.875
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    38.1768,
+    159.696,
+    253.072
+   ],
+   "file": "~/data/sound/environment/Amb_Eerie_WindVoicesLoop1.ogg"
+  },
+  {
+   "pos": [
+    6.41142,
+    129.749,
+    -141.774
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    234.847,
+    129.201,
+    -220.11
+   ],
+   "file": "~/data/sound/environment/Amb_Eerie_CaveLoop3.ogg"
+  },
+  {
+   "pos": [
+    107.282,
+    129.407,
+    -117.683
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    49.7931,
+    129.526,
+    -138.458
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    -250.602,
+    131.307,
+    93.1575
+   ],
+   "file": "~/data/sound/environment/Fire_CampfireLoop2.ogg"
+  },
+  {
+   "pos": [
+    11.4008,
+    129.663,
+    -170.281
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    -511.137,
+    254.097,
+    -334.18
+   ],
+   "file": "~/data/sound/environment/Wind_BlowingLoop2.ogg"
+  },
+  {
+   "pos": [
+    350.729,
+    172.375,
+    103.605
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  },
+  {
+   "pos": [
+    123.069,
+    163.935,
+    150.6
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  },
+  {
+   "pos": [
+    138.943,
+    159.91,
+    -258.726
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  },
+  {
+   "pos": [
+    124.392,
+    136.415,
+    -81.4611
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  },
+  {
+   "pos": [
+    387.678,
+    166.201,
+    80.0933
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    397.288,
+    164.667,
+    70.77
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    22.4181,
+    130.537,
+    -123.267
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    61.9679,
+    129.257,
+    -113.215
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    595.453,
+    173.474,
+    -199.493
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    526.015,
+    150.621,
+    -399.506
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    523.235,
+    151.168,
+    -415.969
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    516.093,
+    151.667,
+    -470.526
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    81.2988,
+    128.886,
+    -123.737
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    583.929,
+    162.759,
+    -539.241
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    595.525,
+    164.731,
+    -514.22
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    496.788,
+    155.308,
+    -599.971
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    507.823,
+    156.676,
+    -583.615
+   ],
+   "file": "~/data/sound/environment/Fire_FireplaceLoop1.ogg"
+  },
+  {
+   "pos": [
+    124.531,
+    129.905,
+    -96.0983
+   ],
+   "file": "~/data/sound/environment/Water_FountainLoop08.ogg"
+  },
+  {
+   "pos": [
+    122.626,
+    154.592,
+    1.36055
+   ],
+   "file": "~/data/sound/environment/Amb_TropicalForestLoop1.ogg"
+  }
+ ],
+ "particles": [
+  {
+   "pos": [
+    51.1237,
+    136.834,
+    256.546
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    46.0267,
+    141.759,
+    258.451
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    40.5589,
+    141.183,
+    262.874
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    37.7669,
+    141.914,
+    252.381
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    36.847,
+    147.741,
+    247.529
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    41.7113,
+    152.999,
+    261.183
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    29.0338,
+    154.122,
+    252.782
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    36.8548,
+    159.564,
+    247.489
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    41.6934,
+    165.2,
+    261.189
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    28.9646,
+    167.237,
+    253.185
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    37.1745,
+    173.9,
+    249.725
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    41.5349,
+    173.877,
+    252.675
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    44.7701,
+    128.736,
+    267.219
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    32.4136,
+    129.266,
+    255.405
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    45.8007,
+    129.407,
+    247.75
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -371.266,
+    185.95,
+    -225.087
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -375.324,
+    190.875,
+    -228.712
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -381.783,
+    190.299,
+    -231.494
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -373.794,
+    191.03,
+    -238.847
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -369.928,
+    196.857,
+    -241.919
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -378.213,
+    203.238,
+    -246.391
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -379.75,
+    202.115,
+    -231.26
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -369.889,
+    208.68,
+    -241.931
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -379.764,
+    214.316,
+    -231.273
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -378.602,
+    216.353,
+    -246.265
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -371.719,
+    223.016,
+    -240.607
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -372.301,
+    222.993,
+    -235.375
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -383.67,
+    177.852,
+    -225.744
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -378.962,
+    178.382,
+    -242.179
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -365.957,
+    178.523,
+    -233.891
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    118.265,
+    150.385,
+    -16.5791
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    131.497,
+    150.273,
+    -16.5895
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    139.42,
+    163.079,
+    -26.3532
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    131.918,
+    151.1,
+    14.9216
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    117.608,
+    151.18,
+    14.8933
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    289.916,
+    134.405,
+    -269.134
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    265.222,
+    140.051,
+    -258.931
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    271.324,
+    140.023,
+    -258.929
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    293.202,
+    140.216,
+    -257.132
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    292.705,
+    134.698,
+    -251.439
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    235.392,
+    129.71,
+    -304.004
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    206.854,
+    129.731,
+    -302.459
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    104.662,
+    127.544,
+    -181.526
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    104.719,
+    127.636,
+    -119.737
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    125.906,
+    128.065,
+    -186.247
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    131.051,
+    132.476,
+    -190.37
+   ],
+   "datablock": "",
+   "emitter": "SmallBlackEmitter"
+  },
+  {
+   "pos": [
+    130.949,
+    127.398,
+    -189.06
+   ],
+   "datablock": "",
+   "emitter": "RealFireSmallEmitter"
+  },
+  {
+   "pos": [
+    4.11508,
+    127.442,
+    -141.849
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    -36.8292,
+    133.333,
+    -161.767
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    25.2838,
+    127.589,
+    -123.964
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    61.7139,
+    127.074,
+    -112.968
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    11.3047,
+    127.614,
+    -172.783
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    82.7685,
+    127.479,
+    -123.797
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    47.8735,
+    127.399,
+    -138.439
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    35.1103,
+    132.525,
+    -271.415
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    27.2528,
+    132.855,
+    -320.588
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    41.4498,
+    132.875,
+    -320.213
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    30.2447,
+    132.846,
+    -287.565
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    9.6491,
+    132.866,
+    -290.596
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    57.567,
+    132.826,
+    -288.268
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    30.831,
+    141.725,
+    -271.773
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -251.037,
+    129.272,
+    94.0823
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    390.91,
+    160.467,
+    84.8165
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    400.363,
+    160.464,
+    75.4609
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    529.439,
+    146.42,
+    -396.755
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    528.308,
+    146.566,
+    -416.58
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    520.422,
+    147.066,
+    -470.984
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    600.723,
+    168.672,
+    -199.752
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    600.225,
+    159.371,
+    -514.927
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    589.05,
+    157.999,
+    -540.294
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    512.398,
+    150.696,
+    -583.746
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    500.859,
+    150.788,
+    -604.816
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    -537.609,
+    168.888,
+    442.721
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  },
+  {
+   "pos": [
+    129.271,
+    149.511,
+    27.5794
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    120.406,
+    149.49,
+    27.5039
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    58.4154,
+    128.96,
+    -135.391
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    92.0052,
+    128.742,
+    -126.08
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    71.8382,
+    128.917,
+    -126.568
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    59.5207,
+    129.102,
+    -126.88
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    54.4534,
+    128.997,
+    -101.709
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    27.228,
+    128.985,
+    -141.117
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    14.4103,
+    128.884,
+    -126.807
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    17.9392,
+    129.448,
+    -144.446
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    8.22971,
+    128.716,
+    -161.913
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    32.1898,
+    128.757,
+    -191.035
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    117.138,
+    129.265,
+    -120.028
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    117.093,
+    129.119,
+    -141.203
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    117.146,
+    129.264,
+    -163.807
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    117.142,
+    129.226,
+    -176.159
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    132.185,
+    129.23,
+    -156.084
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    132.192,
+    129.179,
+    -133.307
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    132.15,
+    129.401,
+    -114.927
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    93.9135,
+    128.922,
+    -117.937
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    96.8576,
+    133.442,
+    -120.345
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    72.1451,
+    133.228,
+    -119.784
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    57.1048,
+    128.839,
+    -118.681
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    63.0439,
+    128.865,
+    -103.711
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    58.3047,
+    132.92,
+    -106.3
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    15.2195,
+    133.228,
+    -125.122
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    -446.148,
+    159.192,
+    38.0295
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -445.34,
+    159.188,
+    31.1205
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -444.338,
+    159.195,
+    22.7204
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -443.663,
+    159.225,
+    17.2325
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -442.8,
+    159.186,
+    10.3115
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -449.209,
+    159.196,
+    9.51877
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -448.345,
+    159.205,
+    2.03963
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -441.887,
+    159.203,
+    2.80671
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -440.927,
+    159.194,
+    -5.10766
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -447.376,
+    159.184,
+    -5.85681
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -446.097,
+    159.183,
+    -16.3185
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -439.714,
+    159.199,
+    -15.5067
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -438.079,
+    159.184,
+    -28.38
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -444.548,
+    159.195,
+    -29.1989
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -453.529,
+    159.181,
+    -30.3611
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -450.076,
+    159.177,
+    16.4585
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -450.776,
+    159.175,
+    21.9015
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -451.729,
+    159.206,
+    30.3212
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -452.56,
+    159.194,
+    37.2643
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -446.979,
+    159.192,
+    44.4921
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -453.39,
+    159.224,
+    43.7903
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -454.206,
+    159.194,
+    50.1566
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -447.715,
+    159.194,
+    50.9244
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -446.987,
+    166.203,
+    44.5414
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -453.454,
+    166.169,
+    43.7582
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -454.271,
+    166.191,
+    50.1579
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -447.771,
+    166.184,
+    50.9596
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -446.199,
+    166.187,
+    38.0063
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -445.345,
+    166.197,
+    31.1243
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -451.811,
+    166.189,
+    30.3377
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -452.605,
+    166.221,
+    37.2343
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -444.331,
+    166.203,
+    22.7027
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -450.769,
+    166.216,
+    21.8581
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -450.077,
+    166.2,
+    16.4678
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -443.679,
+    166.205,
+    17.2663
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -442.816,
+    166.207,
+    10.2989
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -441.924,
+    166.216,
+    2.80842
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -449.231,
+    166.186,
+    9.48009
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -448.32,
+    166.218,
+    2.03137
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -434.946,
+    166.449,
+    11.267
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    -434.017,
+    166.454,
+    3.74048
+   ],
+   "datablock": "",
+   "emitter": "LanternFireEmitter"
+  },
+  {
+   "pos": [
+    386.2,
+    145.936,
+    -291.907
+   ],
+   "datablock": "",
+   "emitter": "Falls2Emitter"
+  },
+  {
+   "pos": [
+    400.125,
+    127.737,
+    -292.489
+   ],
+   "datablock": "",
+   "emitter": "Falls3Emitter"
+  },
+  {
+   "pos": [
+    124.507,
+    130.842,
+    -96.3369
+   ],
+   "datablock": "",
+   "emitter": "Fountain2Emitter"
+  },
+  {
+   "pos": [
+    124.58,
+    131.987,
+    -96.3669
+   ],
+   "datablock": "",
+   "emitter": "Fountain3Emitter"
+  },
+  {
+   "pos": [
+    117.361,
+    148.821,
+    -23.6546
+   ],
+   "datablock": "",
+   "emitter": "CandleFireEmitter"
+  },
+  {
+   "pos": [
+    -248.824,
+    206.565,
+    -703.92
+   ],
+   "datablock": "",
+   "emitter": "RealFireEmitter"
+  }
+ ],
+ "referenced_shapes": [
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/BigTable.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/BookOpen.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/FeatherPen.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodBarrel.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/WoodCrate.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bench_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/book_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_2.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/drawers_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/pipe_4.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_4.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/woodtruck.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+ ],
+ "referenced_interiors": [
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/bindpoint.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/fountain1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/pit1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/prisonerpole.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stonehenge.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent_guard.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/guildhall.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/ruins3.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavern1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavernbig.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/barracks.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/greathall.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/guild01.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_castle.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsa.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsb.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc2.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsd.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallse.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/anvil.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/odstv.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/smallforge.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/combat1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/mage1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/priest1.dif",
+  "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/rogue1.dif"
+ ],
+ "terrain_glb": "terrain.glb",
+ "terrain_grid": 256,
+ "terrain_textures": {
+  "grass": "textures/grass01.jpg",
+  "rock": "textures/rock009.jpg",
+  "sand": "textures/sand006.jpg"
+ },
+ "spawn": [
+  77.24895938144333,
+  230.903,
+  -69.03688096597939
+ ]
+}
