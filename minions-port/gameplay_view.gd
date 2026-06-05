@@ -542,6 +542,23 @@ func _load_zone_art() -> void:
 			n.queue_free()
 	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
 
+func _ground_y(x: float, z: float, fallback: float) -> float:
+	# Raycast down through the zone collision to find the ground at (x, z).
+	# Falls back to the server-provided height if nothing is hit.
+	var world := sub_viewport.find_world_3d()
+	if world == null:
+		return fallback
+	var space := world.direct_space_state
+	if space == null:
+		return fallback
+	var q := PhysicsRayQueryParameters3D.create(
+		Vector3(x, fallback + 300.0, z), Vector3(x, fallback - 600.0, z))
+	q.collide_with_areas = false
+	var hit := space.intersect_ray(q)
+	if hit and hit.has("position"):
+		return float(hit.position.y)
+	return fallback
+
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
 	return [godot_pos.x, -godot_pos.z, godot_pos.y]
@@ -749,9 +766,10 @@ func _sync_entity_markers():
 		var entity_dict: Dictionary = entity_list[i]
 		var key := _entity_key(entity_dict)
 		incoming_keys[key] = true
-		# Convert entity server position to absolute Godot world position
+		# Convert entity server position to absolute Godot world position, then drop
+		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		godot_pos.y = ENTITY_CAPSULE_HALF_HEIGHT
+		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + ENTITY_CAPSULE_HALF_HEIGHT
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:

@@ -10,12 +10,15 @@ func _ready() -> void:
 	await get_tree().process_frame
 	gv.apply_world_state({"world_name": "Trinst", "player_name": "Tester"},
 		{"name": "Trinst"}, {"hour": 12, "minute": 0})
-	# Self entity in server coords near the Trinst city centre, spawned high so it
-	# falls onto whatever terrain/roof is there (server z = height).
-	gv.set_entities([{
-		"is_self": true, "position": [77.0, 69.0, 150.0],
-		"health": 1.0, "name": "Tester", "sim_id": 1, "char_index": 0, "mob_id": 0,
-	}])
+	# Self at the Trinst bind point (rpgBindPoint in city.mis, outside the gates).
+	# Server coords are Torque (x, y, z=height).
+	gv.set_entities([
+		{"is_self": true, "position": [257.095, 133.949, 152.194],
+			"health": 1.0, "name": "You", "sim_id": 1, "char_index": 0, "mob_id": 0},
+		{"is_self": false, "position": [272.0, 140.0, 150.0],
+			"health": 1.0, "name": "Gate Guard", "sim_id": 2, "char_index": 0,
+			"mob_id": 42, "level": 10},
+	])
 	for i in range(300):
 		await get_tree().physics_frame
 	await RenderingServer.frame_post_draw
