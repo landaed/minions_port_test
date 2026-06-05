@@ -48,6 +48,12 @@ def main(mis, outdir):
     export_heightmap_png(heights, str(out / "terrain_height.png"))
     man["terrain_glb"] = (out / "terrain.glb").as_posix()
     man["terrain_grid"] = heights.shape[0]
+    tdir = game_root / "data/terrains/mountain"
+    man["terrain_textures"] = {
+        "grass": (tdir / "grass01.jpg").as_posix(),
+        "rock": (tdir / "rock009.jpg").as_posix(),
+        "sand": (tdir / "sand006.jpg").as_posix(),
+    }
 
     # shapes
     glbmap = {}

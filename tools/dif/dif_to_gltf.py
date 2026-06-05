@@ -19,7 +19,9 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "dts"))
-from dts_to_gltf import GLB, resolve_texture, axis  # noqa: E402
+from dts_to_gltf import GLB, embed_material_texture, axis  # noqa: E402
+
+RESERVED_MATERIALS = {"NULL", "ORIGIN", "TRIGGER", "FORCEFIELD"}
 
 
 class R:
@@ -149,7 +151,10 @@ def convert(dif_path, glb_path):
         # group triangles per material with their own vertex stream (UVs are
         # per-surface via texgen, so vertices aren't shared across surfaces)
         by_mat = {}
+        mats = it["materials"]
         for s in it["surfaces"]:
+            if 0 <= s["tex"] < len(mats) and mats[s["tex"]] in RESERVED_MATERIALS:
+                continue  # non-visual (editor markers / trigger volumes)
             w = it["windings"][s["wstart"]:s["wstart"] + s["wcount"]]
             if len(w) < 3:
                 continue
@@ -180,9 +185,8 @@ def convert(dif_path, glb_path):
                     "indices": glb.acc_idx(e["i"]), "mode": 4}
             if mat not in mat_map:
                 name = it["materials"][mat] if mat < len(it["materials"]) else "mat%d" % mat
-                texpath = resolve_texture(name, dif_dir)
-                tex_idx = glb.add_texture(texpath) if texpath else None
-                mat_map[mat] = glb.material(name, tex_idx)
+                tex_idx, is_mask = embed_material_texture(glb, name, dif_dir)
+                mat_map[mat] = glb.material(name, tex_idx, alpha_mask=is_mask)
             prim["material"] = mat_map[mat]
             prims.append(prim)
 

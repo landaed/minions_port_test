@@ -73,6 +73,43 @@ def resolve_texture(name, start_dir, max_up=4):
     return None
 
 
+def composite_rgba_png(rgb_path, alpha_path):
+    """Combine an RGB texture + a grayscale .alpha map into one RGBA PNG (bytes)."""
+    from PIL import Image
+    import io
+    base = Image.open(rgb_path).convert("RGB")
+    a = Image.open(alpha_path).convert("L")
+    if a.size != base.size:
+        a = a.resize(base.size)
+    base.putalpha(a)
+    buf = io.BytesIO()
+    base.save(buf, "PNG")
+    return buf.getvalue()
+
+
+def _png_has_alpha(path):
+    from PIL import Image
+    im = Image.open(path)
+    if im.mode in ("RGBA", "LA"):
+        return im.getchannel("A").getextrema()[0] < 255
+    return im.mode == "P" and "transparency" in im.info
+
+
+def embed_material_texture(glb, name, search_dir):
+    """Resolve a material name to a texture and embed it. MoM stores cutout alpha
+    either as a sibling '<name>.alpha.jpg' or baked into a '<name>.png' alpha
+    channel; either way use alpha-mask. Returns (tex_index|None, is_alpha_mask)."""
+    rgb = resolve_texture(name, search_dir)
+    if not rgb:
+        return None, False
+    alpha = rgb.with_name(rgb.stem + ".alpha" + rgb.suffix)
+    if alpha.exists():
+        return glb.add_texture_png_bytes(composite_rgba_png(rgb, alpha), str(alpha)), True
+    if rgb.suffix.lower() == ".png" and _png_has_alpha(rgb):
+        return glb.add_texture(rgb), True
+    return glb.add_texture(rgb), False
+
+
 def node_worlds(shape):
     """Return per-node (rot3x3, translation) in Torque space."""
     worlds = []
@@ -137,12 +174,7 @@ class GLB:
                                "count": len(idx), "type": "SCALAR"})
         return len(self.accessors) - 1
 
-    def add_texture(self, path):
-        path = str(path)
-        if path in self._tex_cache:
-            return self._tex_cache[path]
-        data = Path(path).read_bytes()
-        mime = "image/png" if path.lower().endswith(".png") else "image/jpeg"
+    def _add_image_bytes(self, data, mime):
         bv = self._view(data)  # image bufferViews carry no target
         img = len(self.images)
         self.images.append({"bufferView": bv, "mimeType": mime})
@@ -150,7 +182,22 @@ class GLB:
             self.samplers.append({"wrapS": 10497, "wrapT": 10497})  # REPEAT
         tex = len(self.textures)
         self.textures.append({"source": img, "sampler": 0})
+        return tex
+
+    def add_texture(self, path):
+        path = str(path)
+        if path in self._tex_cache:
+            return self._tex_cache[path]
+        mime = "image/png" if path.lower().endswith(".png") else "image/jpeg"
+        tex = self._add_image_bytes(Path(path).read_bytes(), mime)
         self._tex_cache[path] = tex
+        return tex
+
+    def add_texture_png_bytes(self, png_bytes, cache_key):
+        if cache_key in self._tex_cache:
+            return self._tex_cache[cache_key]
+        tex = self._add_image_bytes(png_bytes, "image/png")
+        self._tex_cache[cache_key] = tex
         return tex
 
     def material(self, name, tex_index=None, alpha_mask=False):
@@ -248,10 +295,8 @@ def convert(dts_path, glb_path):
             if mat >= 0:
                 if mat not in mat_map:
                     name = shape.materials[mat] if mat < len(shape.materials) else "mat%d" % mat
-                    texpath = resolve_texture(name, dts_dir)
-                    tex_idx = glb.add_texture(texpath) if texpath else None
-                    alpha = bool(texpath and ".alpha" in Path(texpath).name.lower())
-                    mat_map[mat] = glb.material(name, tex_idx, alpha_mask=alpha)
+                    tex_idx, is_mask = embed_material_texture(glb, name, dts_dir)
+                    mat_map[mat] = glb.material(name, tex_idx, alpha_mask=is_mask)
                 prim["material"] = mat_map[mat]
             prims.append(prim)
 

@@ -59,8 +59,9 @@ def export_mesh_glb(heights, path, square=8.0, scale=HEIGHT_SCALE):
     r, c = np.meshgrid(np.arange(g - 1), np.arange(g - 1), indexing="ij")
     v00 = (r * g + c).ravel(); v01 = (r * g + c + 1).ravel()
     v10 = ((r + 1) * g + c).ravel(); v11 = ((r + 1) * g + c + 1).ravel()
-    tris = np.concatenate([np.stack([v00, v10, v11], 1),
-                           np.stack([v00, v11, v01], 1)], 1).reshape(-1).astype("<u4")
+    # wind triangles so faces point up (front-facing from above)
+    tris = np.concatenate([np.stack([v00, v11, v10], 1),
+                           np.stack([v00, v01, v11], 1)], 1).reshape(-1).astype("<u4")
 
     glb = GLB()
     bv = glb._view(pos.tobytes(), 34962)
