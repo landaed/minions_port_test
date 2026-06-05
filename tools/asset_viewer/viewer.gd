@@ -98,7 +98,7 @@ func _add_scale_reference() -> void:
 	cap.height = 1.8
 	cap.radius = 0.3
 	mi.mesh = cap
-	mi.position = Vector3(0, 0.9, 0)
+	mi.position = Vector3(1.3, 0.9, 0)  # beside the asset, not occluding it
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color = Color(0.2, 0.7, 1.0, 0.55)
 	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

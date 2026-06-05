@@ -261,23 +261,27 @@ def _read_mesh(s: Stream) -> Mesh:
     _midx = [s.read16() for _ in range(n_midx)]
     verts_per_frame = s.read32()
     flags = s.read_u32()
+    s.guard()  # standard-mesh closing guard
 
     if mtype == MESH_SKIN:
-        # Skin meshes carry extra data after the standard block. Read it so the
-        # stream stays aligned (geometry handled like a static mesh for now).
+        # Skin data follows the standard block (order per qoh/io_scene_dts).
         n_iv = s.read32()
-        [s.read_vec3() for _ in range(n_iv)]      # initial verts
-        [s.read_vec3() for _ in range(n_iv)]      # initial norms
-        n_node_index = s.read32()
-        [s.read32() for _ in range(n_node_index)]  # node index
-        n_vindex = s.read32()
-        [s.read32() for _ in range(n_vindex)]      # vertex index
-        n_weight = s.read32()
-        [s.read_float() for _ in range(n_weight)]  # weights
-        n_ntrans = s.read32()
-        [tuple(s.read_float() for _ in range(16)) for _ in range(n_ntrans)]  # node transforms
-
-    s.guard()  # closing guard
+        iverts = [s.read_vec3() for _ in range(n_iv)]   # bind-pose verts
+        inorms = [s.read_vec3() for _ in range(n_iv)]   # bind-pose norms
+        [s.read8() for _ in range(n_iv)]                # encoded norms
+        n_bones = s.read32()
+        [tuple(s.read_float() for _ in range(16)) for _ in range(n_bones)]  # bone transforms
+        n_inf = s.read32()
+        [s.read32() for _ in range(n_inf)]              # vertex indices
+        [s.read32() for _ in range(n_inf)]              # bone indices
+        [s.read_float() for _ in range(n_inf)]          # weights
+        n_node = s.read32()
+        [s.read32() for _ in range(n_node)]             # node indices
+        s.guard()  # skin-mesh closing guard
+        # Skinned geometry lives in the skin block, not the standard vert array.
+        if not mesh.verts and iverts:
+            mesh.verts = iverts
+            mesh.normals = inorms
 
     # decode primitives into per-material triangle lists
     for start, count, ptype in prims:
@@ -381,11 +385,19 @@ def read_shape(data: bytes) -> Shape:
                      for _ in range(n_detail)]
     s.guard()  # G14
 
-    shape.meshes = [_read_mesh(s) for _ in range(n_mesh)]
-    s.guard()  # G15
-
-    shape.names = [s.read_string() for _ in range(n_name)]
-    s.guard()  # G16
+    # Keep whatever meshes parse. The highest detail level is first; some
+    # character models' lower-detail skin meshes aren't fully supported yet, but
+    # the high-detail mesh (what we render) parses fine.
+    shape.meshes = []
+    shape.meshes_complete = True
+    try:
+        for _ in range(n_mesh):
+            shape.meshes.append(_read_mesh(s))
+        s.guard()  # G15
+        shape.names = [s.read_string() for _ in range(n_name)]
+        s.guard()  # G16
+    except Exception:
+        shape.meshes_complete = False
 
     # validate full buffer consumption
     shape._cursor_check = {

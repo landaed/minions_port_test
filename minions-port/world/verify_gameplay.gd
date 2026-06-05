@@ -21,6 +21,15 @@ func _ready() -> void:
 	])
 	for i in range(300):
 		await get_tree().physics_frame
+	# external camera framing the player so the avatar is clearly visible
+	var wr = gv.get_node("SubViewportContainer/SubViewport/WorldRoot")
+	var icam := Camera3D.new()
+	wr.add_child(icam)
+	var pp: Vector3 = gv.player_body.global_position
+	icam.global_position = pp + Vector3(2.2, 1.0, 3.0)
+	icam.look_at(pp + Vector3(0.0, 0.8, 0.0), Vector3.UP)
+	icam.current = true
+	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	var out := OS.get_environment("SHOT")
 	if out == "":
