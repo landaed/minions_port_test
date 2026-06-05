@@ -78,6 +78,12 @@ var _debug_visible := false
 
 func _ready():
 	set_process_input(true)
+	# Walk terrain at constant horizontal speed (don't lose ground to slopes) and
+	# stay snapped to the surface, so client prediction tracks the server's flat
+	# movement model instead of falling behind and rubber-banding on hills.
+	player_body.floor_constant_speed = true
+	player_body.floor_snap_length = 1.0
+	player_body.floor_max_angle = deg_to_rad(60.0)
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()

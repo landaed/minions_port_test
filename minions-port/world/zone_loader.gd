@@ -94,6 +94,7 @@ func _build_terrain(data: Dictionary) -> void:
 	add_child(terr)
 	_texture_terrain(terr, data.get("terrain_textures", {}))
 	for mi in _mesh_instances(terr):
+		mi.lod_bias = 64.0
 		mi.create_trimesh_collision()
 
 
@@ -112,8 +113,11 @@ func _place_items(items, collide: bool) -> void:
 		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
 		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
 		add_child(inst)
-		if collide:
-			for mi in _mesh_instances(inst):
+		for mi in _mesh_instances(inst):
+			# Auto-generated mesh LODs decimate alpha-card foliage (leaves vanish
+			# at distance); keep full detail.
+			mi.lod_bias = 64.0
+			if collide:
 				mi.create_trimesh_collision()
 
 
