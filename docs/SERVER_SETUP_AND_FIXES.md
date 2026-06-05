@@ -199,6 +199,33 @@ task (not done here).
 `ClientProxy.py` (poll + merge active skills into the ability bar),
 `tools/proxy_combat_test.py` (new test).
 
+## 5f. Combat HUD pass (Godot client)
+
+The greybox HUD was a single stacked debug dump (unlabeled bars + verbose text).
+Reworked `minions-port/gameplay_view.gd` (+ trimmed the HUD nodes out of
+`gameplay_view.tscn`, the HUD is now built in code) into a proper combat HUD:
+
+- **Dead mobs disappear.** `_sync_entity_markers` drops entities flagged
+  `dead` (or health <= 0): the 3D marker is freed and, if it was your target,
+  the target frame + highlight clear. Previously a killed mob lingered at 0%.
+- **Labeled, colored resource bars** — HP (red) / MP (blue) / SP (yellow), each
+  with a "cur / max" readout, in a top-left player frame with name/level/class.
+- **Target frame** (top-center) — target name, level, race, standing, and a
+  health bar; hidden when nothing is targeted.
+- **Crosshair** at screen center that recolors when you look at an entity
+  (yellow) or an enemy (red), via a camera-center raycast.
+- **Combat-state indicators** — "● IN COMBAT", "● AUTO-ATTACK ON/OFF (Q)", and
+  "● Enemy in sight" so the player can tell what's happening.
+- **Styled ability bar** + a one-line controls hint; the old verbose debug text
+  moved into an **F3-toggle** panel.
+
+Validated headless with Godot 4.6 (`--script` harness + an xvfb screenshot) so
+the scene loads, scripts parse, and the HUD builds/updates without errors.
+
+Note: auto-attack is a **toggle (Q)** — when ON you swing at your target each
+combat round automatically (facing + range permitting); Kick (1) is an extra
+on top. The HUD now shows that ON/OFF state explicitly.
+
 ## 6. Known remaining rough edges (not yet fixed)
 
 - **Disconnect cleanup:** when a client drops, the world keeps ticking the player
