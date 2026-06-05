@@ -1,3 +1,11 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Godot regenerates these on import; keep only the source assets in git.
+*.import
+# Textures Godot extracts out of imported .glb files (re-extracted on import).
+/assets/trinst/shapes/*.jpg
+/assets/trinst/shapes/*.png
+/assets/trinst/interiors/*.jpg
+/assets/trinst/interiors/*.png

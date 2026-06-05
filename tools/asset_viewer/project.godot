@@ -1,0 +1,11 @@
+config_version=5
+
+[application]
+
+config/name="asset_viewer"
+run/main_scene="res://viewer.tscn"
+config/features=PackedStringArray("4.6", "Forward Plus")
+
+[rendering]
+
+renderer/rendering_method="forward_plus"

@@ -12,6 +12,8 @@ const ENTITY_INTERPOLATION_SPEED := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const DEFAULT_ZONE := "trinst"
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -33,6 +35,7 @@ var _has_spawned := false
 var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
 var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
+var _zone_loaded := false
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -75,6 +78,23 @@ var _debug_visible := false
 
 func _ready():
 	set_process_input(true)
+	# Walk terrain at constant horizontal speed (don't lose ground to slopes) and
+	# stay snapped to the surface, so client prediction tracks the server's flat
+	# movement model instead of falling behind and rubber-banding on hills.
+	player_body.floor_constant_speed = true
+	player_body.floor_snap_length = 1.0
+	player_body.floor_max_angle = deg_to_rad(60.0)
+	# Real character model for the player visual (scale reference); the capsule
+	# stays as the collision shape only. Keep the capsule visible if the model
+	# fails to load so the player is never invisible.
+	var avatar_scene = load("res://assets/characters/human.glb")
+	if avatar_scene:
+		var avatar = avatar_scene.instantiate()
+		avatar.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
+		player_body.add_child(avatar)
+		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
+		if capsule_mesh:
+			capsule_mesh.visible = false
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
@@ -513,6 +533,49 @@ func _server_to_godot(position_data) -> Vector3:
 	"""Convert server position to Godot world position using fixed origin offset."""
 	return _world_position_from_server(position_data) + _server_origin_offset
 
+func _load_zone_art() -> void:
+	# Load the real zone geometry into WorldRoot once we know the server spawn
+	# offset, so terrain/buildings/props align with the server-driven player and
+	# replicated entities. Replaces the greybox placeholder world.
+	if _zone_loaded:
+		return
+	var world_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot
+	var zone := DEFAULT_ZONE
+	var z = current_payload.get("zone", null)
+	if z != null and str(z) != "":
+		zone = str(z)
+	var loader: Node3D = ZoneLoaderScript.new()
+	loader.name = "ZoneArt"
+	loader.position = _server_origin_offset
+	world_root.add_child(loader)
+	if not loader.build(zone, true):
+		push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
+		loader.queue_free()
+		return
+	_zone_loaded = true
+	for placeholder in ["FloorBody", "BoxA", "BoxB", "BoxC", "DirectionalLight3D"]:
+		var n: Node = world_root.get_node_or_null(placeholder)
+		if n != null:
+			n.queue_free()
+	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
+
+func _ground_y(x: float, z: float, fallback: float) -> float:
+	# Raycast down through the zone collision to find the ground at (x, z).
+	# Falls back to the server-provided height if nothing is hit.
+	var world := sub_viewport.find_world_3d()
+	if world == null:
+		return fallback
+	var space := world.direct_space_state
+	if space == null:
+		return fallback
+	var q := PhysicsRayQueryParameters3D.create(
+		Vector3(x, fallback + 300.0, z), Vector3(x, fallback - 600.0, z))
+	q.collide_with_areas = false
+	var hit := space.intersect_ray(q)
+	if hit and hit.has("position"):
+		return float(hit.position.y)
+	return fallback
+
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
 	return [godot_pos.x, -godot_pos.z, godot_pos.y]
@@ -677,6 +740,7 @@ func _sync_entity_markers():
 				_server_origin_offset = Vector3(0.0, 2.0, 0.0) - server_pos_raw
 				player_body.global_position = Vector3(0.0, 2.0, 0.0)
 				print("[Godot] SPAWN from entity snapshot: raw=%s  converted=%s  offset=%s" % [str(raw_pos), str(server_pos_raw), str(_server_origin_offset)])
+				_load_zone_art()
 				break
 			var server_pos := _server_to_godot(raw_pos)
 			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:
@@ -719,9 +783,10 @@ func _sync_entity_markers():
 		var entity_dict: Dictionary = entity_list[i]
 		var key := _entity_key(entity_dict)
 		incoming_keys[key] = true
-		# Convert entity server position to absolute Godot world position
+		# Convert entity server position to absolute Godot world position, then drop
+		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		godot_pos.y = ENTITY_CAPSULE_HALF_HEIGHT
+		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + ENTITY_CAPSULE_HALF_HEIGHT
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
