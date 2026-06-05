@@ -85,15 +85,16 @@ func _ready():
 	player_body.floor_snap_length = 1.0
 	player_body.floor_max_angle = deg_to_rad(60.0)
 	# Real character model for the player visual (scale reference); the capsule
-	# stays as the collision shape only.
-	var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
-	if capsule_mesh:
-		capsule_mesh.visible = false
+	# stays as the collision shape only. Keep the capsule visible if the model
+	# fails to load so the player is never invisible.
 	var avatar_scene = load("res://assets/characters/human.glb")
 	if avatar_scene:
 		var avatar = avatar_scene.instantiate()
 		avatar.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
 		player_body.add_child(avatar)
+		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
+		if capsule_mesh:
+			capsule_mesh.visible = false
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
