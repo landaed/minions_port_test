@@ -81,8 +81,30 @@ screenshots it. Use this to catch scale/orientation problems immediately.
 
 ## Converter status
 
-- **DTS models → glTF: working.** Validated end-to-end (parse → `.glb` → Godot
-  render) on props, architecture, trees, and a character statue; geometry,
-  orientation, and real-world scale verified by screenshot. Pending: applying
-  material/texture maps, and skinned-mesh base geometry for animated characters.
-- Next: textures/materials, `.ter` → Terrain3D, `.mis` → Godot scene.
+- **DTS models + textures → glTF: working** (`tools/dts/`). Parse → `.glb` with
+  embedded textures, validated by Godot render on props/architecture/trees/a
+  character. Pending: skinned-mesh base geometry + `.dsq` animations.
+- **Terrain → mesh + heightmap: working** (`tools/ter/`). `.ter` v4 → verification
+  `.glb` + 16-bit PNG. Pending: Terrain3D region import + splat/control map.
+- **Mission → placement manifest: working** (`tools/mis/`). `.mis` → Godot-space
+  transforms for statics/interiors/lights/audio/particles/sun/sky/water.
+- **Zone assembly: working** (`tools/build_trinst.py`, `tools/trinst_preview/`).
+  Trinst assembled in Godot: terrain + 189/211 statics aligned at correct scale.
+- **DIF interiors (buildings): blocked / needs RE.** MoM `.dif` are **version 44**
+  (stock Torque is 0–14), so existing importers (RandomityGuy `io_dif`/`hxDIF`)
+  won't read them directly. Structure confirmed (Torque interior: NULL/ORIGIN/
+  TRIGGER markers, texture names, embedded PNG preview) but the v44 field layout
+  must be reverse-engineered. This is the next major converter.
+- **Not started:** particles (`.dso` datablocks), positional audio, foliage alpha
+  compositing, skinned-character animation, wiring the zone into `minions-port`
+  with a player controller + collision.
+
+## Pipeline (end to end)
+
+```bash
+tools/cloud_setup.sh                 # one-time: Godot 4.6 + Blender + libs
+python3 tools/build_trinst.py        # parse mission, convert terrain + shapes
+# preview the assembled zone (aerial|ground|top):
+SCENE=/tmp/trinst_build/scene.json OUT=/tmp/trinst.png CAM=ground \
+  godot --path tools/trinst_preview --rendering-driver vulkan   # under xvfb-run
+```
