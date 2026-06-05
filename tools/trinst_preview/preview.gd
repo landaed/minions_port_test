@@ -34,22 +34,10 @@ func _ready() -> void:
 			terr.position = Vector3(tp[0], tp[1], tp[2])
 			add_child(terr)
 
-	# statics
+	# statics + interiors (buildings)
 	var pts: Array[Vector3] = []
-	for s in data.get("statics", []):
-		if s.get("glb", null) == null:
-			continue
-		var proto = _load_glb(s["glb"])
-		if proto == null:
-			continue
-		var inst = proto.duplicate()
-		var rot = s["rot"]; var pos = s["pos"]; var scl = s["scale"]
-		var axis := Vector3(rot[0], rot[1], rot[2])
-		var b := Basis(axis.normalized(), deg_to_rad(rot[3])) if axis.length() > 0.001 else Basis()
-		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
-		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
-		add_child(inst)
-		pts.append(Vector3(pos[0], pos[1], pos[2]))
+	_place_items(data.get("statics", []), pts)
+	_place_items(data.get("interiors", []), pts)
 
 	# robust framing: centroid + 80th-percentile radius (ignore outliers)
 	var center := Vector3.ZERO
@@ -82,6 +70,22 @@ func _out_now() -> void:
 func _env(k: String, d: String) -> String:
 	var v := OS.get_environment(k)
 	return v if v != "" else d
+
+func _place_items(items, pts: Array[Vector3]) -> void:
+	for s in items:
+		if s.get("glb", null) == null:
+			continue
+		var proto = _load_glb(s["glb"])
+		if proto == null:
+			continue
+		var inst = proto.duplicate()
+		var rot = s["rot"]; var pos = s["pos"]; var scl = s["scale"]
+		var ax := Vector3(rot[0], rot[1], rot[2])
+		var b := Basis(ax.normalized(), deg_to_rad(rot[3])) if ax.length() > 0.001 else Basis()
+		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
+		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
+		add_child(inst)
+		pts.append(Vector3(pos[0], pos[1], pos[2]))
 
 func _load_glb(path):
 	if path in _cache:

@@ -14,19 +14,24 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-for sub in ("mis", "ter", "dts"):
+for sub in ("mis", "ter", "dts", "dif"):
     sys.path.insert(0, str(HERE / sub))
 
 from mis_parser import build_manifest          # noqa: E402
 from ter_reader import read_ter, export_mesh_glb, export_heightmap_png  # noqa: E402
 import dts_to_gltf                              # noqa: E402
+import dif_to_gltf                              # noqa: E402
+
+
+def _glb_name(path, marker):
+    s = path.replace("\\", "/")
+    if marker in s:
+        s = s.split(marker)[-1]
+    return s.replace("/", "_").rsplit(".", 1)[0] + ".glb"
 
 
 def shape_glb_name(dts_path):
-    s = dts_path.replace("\\", "/")
-    if "data/shapes/" in s:
-        s = s.split("data/shapes/")[-1]
-    return s.replace("/", "_").rsplit(".", 1)[0] + ".glb"
+    return _glb_name(dts_path, "data/shapes/")
 
 
 def main(mis, outdir):
@@ -59,14 +64,33 @@ def main(mis, outdir):
     for s in man["statics"]:
         s["glb"] = glbmap.get(s["shape"])
 
+    # interiors (buildings)
+    (out / "interiors").mkdir(parents=True, exist_ok=True)
+    imap = {}
+    ifails = []
+    for dif in man["referenced_interiors"]:
+        if not Path(dif).exists():
+            continue
+        glb = out / "interiors" / _glb_name(dif, "data/interiors/")
+        try:
+            dif_to_gltf.convert(dif, str(glb))
+            imap[dif] = glb.as_posix()
+        except Exception as e:  # noqa: BLE001
+            ifails.append((dif, str(e)))
+    for it in man["interiors"]:
+        it["glb"] = imap.get(it["interior"])
+
     (out / "scene.json").write_text(json.dumps(man, indent=1))
     placed = sum(1 for s in man["statics"] if s["glb"])
+    iplaced = sum(1 for it in man["interiors"] if it["glb"])
     print(f"terrain -> {out/'terrain.glb'}  grid={man['terrain_grid']}")
     print(f"shapes converted: {len(glbmap)}/{len(man['referenced_shapes'])}")
     print(f"statics with geometry: {placed}/{len(man['statics'])}")
-    if fails:
+    print(f"interiors converted: {len(imap)}/{len(man['referenced_interiors'])}")
+    print(f"interiors placed: {iplaced}/{len(man['interiors'])}")
+    if fails or ifails:
         print("failures:")
-        for d, e in fails:
+        for d, e in fails + ifails:
             print("  ", Path(d).name, "->", e)
     print("wrote", out / "scene.json")
 
