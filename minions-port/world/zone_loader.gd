@@ -1,9 +1,12 @@
 extends Node3D
-## Assembles the walkable Trinst zone from assets/trinst/scene.json:
-## terrain (textured + collision), buildings (collision), props, a modern
-## real-time environment, and positions the Player. No baked lightmaps.
+## Canonical loader for a converted MoM zone. Builds terrain (textured + collision),
+## buildings (collision), props, and a modern real-time environment as children of
+## this node, from res://assets/<zone>/scene.json.
+##
+## Used by the live game (gameplay_view loads this into WorldRoot at the server
+## origin offset) and by the offline art preview. No player/camera of its own.
 
-const BASE := "res://assets/trinst/"
+const ASSET_ROOT := "res://assets/"
 
 const TERRAIN_SHADER := """
 shader_type spatial;
@@ -41,23 +44,34 @@ void fragment() {
 }
 """
 
-@onready var player: CharacterBody3D = $Player
+var zone_name := ""
+var base := ""
 
 
-func _ready() -> void:
-	var data := _load_json(BASE + "scene.json")
+## Build the zone. `with_environment` lets the live game opt out if it manages
+## lighting itself. Returns true on success.
+func build(zone: String, with_environment: bool = true) -> bool:
+	zone_name = zone
+	base = ASSET_ROOT + zone + "/"
+	var data := _load_json(base + "scene.json")
 	if data.is_empty():
-		push_error("Trinst: missing " + BASE + "scene.json")
-		return
-	_setup_environment(data)
-	var world := Node3D.new()
-	world.name = "World"
-	add_child(world)
-	_build_terrain(world, data)
-	_place_items(world, data.get("statics", []), false)
-	_place_items(world, data.get("interiors", []), true)
-	_spawn_player(data)
-	_maybe_headless()
+		push_error("zone_loader: missing or empty " + base + "scene.json")
+		return false
+	if with_environment:
+		_setup_environment(data)
+	_build_terrain(data)
+	_place_items(data.get("statics", []), false)
+	_place_items(data.get("interiors", []), true)
+	return true
+
+
+func spawn_point(zone: String = "") -> Variant:
+	var z := zone if zone != "" else zone_name
+	var data := _load_json(ASSET_ROOT + z + "/scene.json")
+	var sp = data.get("spawn", null)
+	if sp != null and sp.size() == 3:
+		return Vector3(sp[0], sp[1], sp[2])
+	return null
 
 
 func _load_json(path: String) -> Dictionary:
@@ -68,27 +82,27 @@ func _load_json(path: String) -> Dictionary:
 	return d if d is Dictionary else {}
 
 
-func _build_terrain(world: Node3D, data: Dictionary) -> void:
+func _build_terrain(data: Dictionary) -> void:
 	if not data.has("terrain_glb"):
 		return
-	var ps := load(BASE + str(data["terrain_glb"])) as PackedScene
+	var ps := load(base + str(data["terrain_glb"])) as PackedScene
 	if ps == null:
 		return
 	var terr := ps.instantiate()
 	var tp = data["terrain"]["pos"]
 	terr.position = Vector3(tp[0], tp[1], tp[2])
-	world.add_child(terr)
+	add_child(terr)
 	_texture_terrain(terr, data.get("terrain_textures", {}))
 	for mi in _mesh_instances(terr):
 		mi.create_trimesh_collision()
 
 
-func _place_items(world: Node3D, items, collide: bool) -> void:
+func _place_items(items, collide: bool) -> void:
 	for s in items:
 		var rel = s.get("glb", null)
 		if rel == null:
 			continue
-		var ps := load(BASE + str(rel)) as PackedScene
+		var ps := load(base + str(rel)) as PackedScene
 		if ps == null:
 			continue
 		var inst := ps.instantiate()
@@ -97,7 +111,7 @@ func _place_items(world: Node3D, items, collide: bool) -> void:
 		var b := Basis(ax.normalized(), deg_to_rad(rot[3])) if ax.length() > 0.001 else Basis()
 		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
 		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
-		world.add_child(inst)
+		add_child(inst)
 		if collide:
 			for mi in _mesh_instances(inst):
 				mi.create_trimesh_collision()
@@ -123,7 +137,7 @@ func _texture_terrain(node: Node, texdict) -> void:
 func _load_tex(rel):
 	if rel == null:
 		return null
-	return load(BASE + str(rel))
+	return load(base + str(rel))
 
 
 func _mesh_instances(n: Node) -> Array:
@@ -133,14 +147,6 @@ func _mesh_instances(n: Node) -> Array:
 	for c in n.get_children():
 		r += _mesh_instances(c)
 	return r
-
-
-func _spawn_player(data: Dictionary) -> void:
-	if player == null:
-		return
-	var sp = data.get("spawn", null)
-	if sp != null and sp.size() == 3:
-		player.global_position = Vector3(sp[0], sp[1], sp[2])
 
 
 func _setup_environment(data: Dictionary) -> void:
@@ -189,24 +195,3 @@ func _setup_environment(data: Dictionary) -> void:
 	sun.directional_shadow_max_distance = 600.0
 	sun.light_angular_distance = 1.0
 	add_child(sun)
-
-
-## Headless walk test: SHOT=<png> renders from the player camera after the
-## player settles (and optionally DEMO_WALK auto-walks first), then quits.
-func _maybe_headless() -> void:
-	var shot := OS.get_environment("SHOT")
-	if shot == "":
-		return
-	for i in range(70):
-		await get_tree().physics_frame
-	if OS.get_environment("DEMO_WALK") != "":
-		player.auto_forward = true
-		for i in range(70):
-			await get_tree().physics_frame
-		player.auto_forward = false
-	await RenderingServer.frame_post_draw
-	var img := get_viewport().get_texture().get_image()
-	img.save_png(shot)
-	print("WALK_SHOT pos=", player.global_position, " on_floor=", player.is_on_floor(),
-		" -> ", shot)
-	get_tree().quit()

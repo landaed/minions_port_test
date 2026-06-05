@@ -12,6 +12,8 @@ const ENTITY_INTERPOLATION_SPEED := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const DEFAULT_ZONE := "trinst"
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -33,6 +35,7 @@ var _has_spawned := false
 var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
 var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
+var _zone_loaded := false
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -513,6 +516,32 @@ func _server_to_godot(position_data) -> Vector3:
 	"""Convert server position to Godot world position using fixed origin offset."""
 	return _world_position_from_server(position_data) + _server_origin_offset
 
+func _load_zone_art() -> void:
+	# Load the real zone geometry into WorldRoot once we know the server spawn
+	# offset, so terrain/buildings/props align with the server-driven player and
+	# replicated entities. Replaces the greybox placeholder world.
+	if _zone_loaded:
+		return
+	var world_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot
+	var zone := DEFAULT_ZONE
+	var z = current_payload.get("zone", null)
+	if z != null and str(z) != "":
+		zone = str(z)
+	var loader: Node3D = ZoneLoaderScript.new()
+	loader.name = "ZoneArt"
+	loader.position = _server_origin_offset
+	world_root.add_child(loader)
+	if not loader.build(zone, true):
+		push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
+		loader.queue_free()
+		return
+	_zone_loaded = true
+	for placeholder in ["FloorBody", "BoxA", "BoxB", "BoxC", "DirectionalLight3D"]:
+		var n: Node = world_root.get_node_or_null(placeholder)
+		if n != null:
+			n.queue_free()
+	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
+
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
 	return [godot_pos.x, -godot_pos.z, godot_pos.y]
@@ -677,6 +706,7 @@ func _sync_entity_markers():
 				_server_origin_offset = Vector3(0.0, 2.0, 0.0) - server_pos_raw
 				player_body.global_position = Vector3(0.0, 2.0, 0.0)
 				print("[Godot] SPAWN from entity snapshot: raw=%s  converted=%s  offset=%s" % [str(raw_pos), str(server_pos_raw), str(_server_origin_offset)])
+				_load_zone_art()
 				break
 			var server_pos := _server_to_godot(raw_pos)
 			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:

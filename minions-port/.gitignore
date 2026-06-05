@@ -6,4 +6,6 @@
 *.import
 # Textures Godot extracts out of imported .glb files (re-extracted on import).
 /assets/trinst/shapes/*.jpg
+/assets/trinst/shapes/*.png
 /assets/trinst/interiors/*.jpg
+/assets/trinst/interiors/*.png
