@@ -51,6 +51,28 @@ def axis(p):
     return (p[0], p[2], -p[1])
 
 
+TEX_EXTS = (".jpg", ".jpeg", ".png")
+
+
+def resolve_texture(name, start_dir, max_up=4):
+    """Find <name>.<ext> (case-insensitive) near the DTS: same dir, a 'textures'
+    subdir, and a few parent dirs up toward the shapes root."""
+    if not name or name.lower() == "unnamed":
+        return None
+    targets = {(name + e).lower() for e in TEX_EXTS}
+    d = start_dir
+    for _ in range(max_up + 1):
+        for probe in (d, d / "textures"):
+            if probe.is_dir():
+                for f in probe.iterdir():
+                    if f.is_file() and f.name.lower() in targets:
+                        return f
+        if d.parent == d:
+            break
+        d = d.parent
+    return None
+
+
 def node_worlds(shape):
     """Return per-node (rot3x3, translation) in Torque space."""
     worlds = []
@@ -73,6 +95,10 @@ class GLB:
         self.bufferViews = []
         self.accessors = []
         self.materials = []
+        self.images = []
+        self.textures = []
+        self.samplers = []
+        self._tex_cache = {}
 
     def _align(self, n=4):
         while len(self.bin) % n:
@@ -111,13 +137,34 @@ class GLB:
                                "count": len(idx), "type": "SCALAR"})
         return len(self.accessors) - 1
 
-    def material(self, name):
-        self.materials.append({
-            "name": name,
-            "pbrMetallicRoughness": {"baseColorFactor": [0.8, 0.8, 0.8, 1.0],
-                                     "metallicFactor": 0.0, "roughnessFactor": 0.9},
-            "doubleSided": True,
-        })
+    def add_texture(self, path):
+        path = str(path)
+        if path in self._tex_cache:
+            return self._tex_cache[path]
+        data = Path(path).read_bytes()
+        mime = "image/png" if path.lower().endswith(".png") else "image/jpeg"
+        bv = self._view(data)  # image bufferViews carry no target
+        img = len(self.images)
+        self.images.append({"bufferView": bv, "mimeType": mime})
+        if not self.samplers:
+            self.samplers.append({"wrapS": 10497, "wrapT": 10497})  # REPEAT
+        tex = len(self.textures)
+        self.textures.append({"source": img, "sampler": 0})
+        self._tex_cache[path] = tex
+        return tex
+
+    def material(self, name, tex_index=None, alpha_mask=False):
+        pbr = {"metallicFactor": 0.0, "roughnessFactor": 0.9}
+        if tex_index is None:
+            pbr["baseColorFactor"] = [0.8, 0.8, 0.8, 1.0]
+        else:
+            pbr["baseColorFactor"] = [1, 1, 1, 1]
+            pbr["baseColorTexture"] = {"index": tex_index}
+        mat = {"name": name, "pbrMetallicRoughness": pbr, "doubleSided": True}
+        if alpha_mask:
+            mat["alphaMode"] = "MASK"
+            mat["alphaCutoff"] = 0.5
+        self.materials.append(mat)
         return len(self.materials) - 1
 
     def save(self, path, mesh_primitives, mesh_name="shape"):
@@ -133,6 +180,10 @@ class GLB:
         }
         if self.materials:
             gltf["materials"] = self.materials
+        for key, val in (("images", self.images), ("textures", self.textures),
+                         ("samplers", self.samplers)):
+            if val:
+                gltf[key] = val
         js = json.dumps(gltf, separators=(",", ":")).encode("utf-8")
         while len(js) % 4:
             js += b" "
@@ -160,6 +211,7 @@ def convert(dts_path, glb_path):
     glb = GLB()
     mat_map = {}
     prims = []
+    dts_dir = Path(dts_path).resolve().parent
 
     for obj in shape.objects:
         mi = obj.first_mesh + objdetail
@@ -196,7 +248,10 @@ def convert(dts_path, glb_path):
             if mat >= 0:
                 if mat not in mat_map:
                     name = shape.materials[mat] if mat < len(shape.materials) else "mat%d" % mat
-                    mat_map[mat] = glb.material(name)
+                    texpath = resolve_texture(name, dts_dir)
+                    tex_idx = glb.add_texture(texpath) if texpath else None
+                    alpha = bool(texpath and ".alpha" in Path(texpath).name.lower())
+                    mat_map[mat] = glb.material(name, tex_idx, alpha_mask=alpha)
                 prim["material"] = mat_map[mat]
             prims.append(prim)
 

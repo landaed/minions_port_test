@@ -394,10 +394,11 @@ def read_shape(data: bytes) -> Shape:
         "t8": s.t8, "expect8": 4 * (s.size_mem - s.start8),
     }
 
-    # tail: sequences then material list
+    # tail: sequences then material list (raw, little-endian)
     try:
         n_seq = s.tail_s32()
         if n_seq == 0:
+            _matlist_version = s.tail_u8()
             n_mat = s.tail_u32()
             shape.materials = [s.tail_pstring() for _ in range(n_mat)]
     except Exception:
