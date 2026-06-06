@@ -80,6 +80,7 @@ var _crosshair_color := Color(1, 1, 1, 0.7)
 var _looking_at_entity := false
 var _looking_at_enemy := false
 var _looked_entity_id := 0
+var _looking_at_world := ""  # name of the building/world geometry under the crosshair (debug)
 var _debug_visible := false
 
 func _ready():
@@ -304,6 +305,15 @@ func _self_entity() -> Dictionary:
 			return entity
 	return {}
 
+func _find_zone_glb_name(node: Node) -> String:
+	# Walk up to the interior/building node tagged with its source glb name.
+	var n: Node = node
+	while n != null:
+		if n.has_meta("zone_glb"):
+			return str(n.get_meta("zone_glb"))
+		n = n.get_parent()
+	return ""
+
 func _update_look_at():
 	if camera == null or sub_viewport == null:
 		return
@@ -316,6 +326,7 @@ func _update_look_at():
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	var result := player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	_looking_at_world = ""
 	if not result.is_empty():
 		var collider = result.get("collider")
 		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
@@ -323,6 +334,9 @@ func _update_look_at():
 			var ent: Dictionary = collider.get_meta("entity", {})
 			enemy = bool(ent.get("is_enemy", false))
 			_looked_entity_id = int(collider.get_meta("entity_id", 0))
+		elif collider != null and collider is Node:
+			# World geometry — report which building, to help identify e.g. the gate.
+			_looking_at_world = _find_zone_glb_name(collider)
 	_looking_at_entity = looking
 	_looking_at_enemy = enemy
 	var new_col: Color
@@ -603,14 +617,28 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 	var space := world.direct_space_state
 	if space == null:
 		return fallback
-	var q := PhysicsRayQueryParameters3D.create(
-		Vector3(x, fallback + 60.0, z), Vector3(x, fallback - 60.0, z))
-	q.collide_with_areas = false
-	q.collision_mask = TERRAIN_MASK
-	var hit := space.intersect_ray(q)
-	if hit and hit.has("position"):
-		return float(hit.position.y)
-	return fallback
+	var from := Vector3(x, fallback + 60.0, z)
+	var to := Vector3(x, fallback - 60.0, z)
+	# Terrain-only hit: the true ground at any height, so NPCs follow hills.
+	var qt := PhysicsRayQueryParameters3D.create(from, to)
+	qt.collide_with_areas = false
+	qt.collision_mask = TERRAIN_MASK
+	var ht := space.intersect_ray(qt)
+	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
+	# First solid from above (terrain or building floor; entities are on layer 2).
+	var qa := PhysicsRayQueryParameters3D.create(from, to)
+	qa.collide_with_areas = false
+	qa.collision_mask = 1
+	var ha := space.intersect_ray(qa)
+	if ha and ha.has("position"):
+		var any_y := float(ha.position.y)
+		# A surface well above the terrain is a roof/canopy/bridge, not a floor —
+		# don't perch the NPC up there (that was the sky-teleport). A surface near
+		# the terrain is a ground floor the NPC should stand on.
+		if ht and (any_y - ter_y) > 5.0:
+			return ter_y
+		return any_y
+	return ter_y
 
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
@@ -1074,7 +1102,7 @@ func _update_labels():
 			"yes" if player_body.is_on_floor() else "no",
 			"yes" if bool(current_payload.get("paused", false)) else "no",
 		]
-		target_label.text = "Looking at entity id: %d (enemy=%s)" % [_looked_entity_id if _looking_at_entity else 0, str(_looking_at_enemy)]
+		target_label.text = "Looking at entity id: %d (enemy=%s)   building: %s" % [_looked_entity_id if _looking_at_entity else 0, str(_looking_at_enemy), _looking_at_world if _looking_at_world != "" else "<none>"]
 		interaction_label.text = interaction_message
 		var transfer: Variant = current_payload.get("zone_transfer", {})
 		if transfer is Dictionary and not transfer.is_empty():
