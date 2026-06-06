@@ -47,6 +47,18 @@ void fragment() {
 var zone_name := ""
 var base := ""
 
+# Interiors that should be walk-through (no collision): decorative monuments /
+# spawn markers the player stands at or passes through. The bindpoint monument
+# (a tall obelisk ringed by boulders) is exactly where a new character spawns, so
+# colliding geometry there traps the player — in the original you pass through it.
+const PASSTHROUGH_INTERIORS := ["architecture_bindpoint"]
+
+func _is_passthrough(rel: String) -> bool:
+	for key in PASSTHROUGH_INTERIORS:
+		if rel.findn(key) != -1:
+			return true
+	return false
+
 
 ## Build the zone. `with_environment` lets the live game opt out if it manages
 ## lighting itself. Returns true on success.
@@ -113,11 +125,12 @@ func _place_items(items, collide: bool) -> void:
 		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
 		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
 		add_child(inst)
+		var do_collide := collide and not _is_passthrough(str(rel))
 		for mi in _mesh_instances(inst):
 			# Auto-generated mesh LODs decimate alpha-card foliage (leaves vanish
 			# at distance); keep full detail.
 			mi.lod_bias = 64.0
-			if collide:
+			if do_collide:
 				mi.create_trimesh_collision()
 
 

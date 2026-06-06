@@ -8,6 +8,7 @@ from twisted.internet import defer, reactor
 from mud.world.core import CoreSettings
 import traceback
 import os
+import random
 from math import sqrt, atan2, sin, cos
 
 
@@ -169,6 +170,7 @@ class StubSimAvatar:
         """Create a stub sim object for a spawned mob."""
         pos, rot = _parse_transform(transform)
         so = StubSimObject(position=pos, rotation=rot)
+        so._home = pos  # anchor for idle wander/patrol
         self.addSimObject(so)
         return defer.succeed(so)
 
@@ -297,6 +299,15 @@ class StubSimAvatar:
 
     _MOVE_INTERVAL = 0.05  # seconds between movement ticks (50ms, matches client input sync)
     _ARRIVE_DIST = 2.5     # stop this far from target (melee range)
+    # Idle-NPC wander/patrol: mill about near the spawn so the world feels alive.
+    # (The original engine drove waypoint patrols; that lived in Torque, so this
+    # is a lightweight stand-in until a navmesh-based path system exists.)
+    _WANDER_RADIUS = 10.0    # max distance from home a wander point can be
+    _WANDER_MIN = 3.0        # min distance so steps are worth taking
+    _WANDER_ARRIVE = 1.0     # consider a wander point reached within this
+    _WANDER_SPEED = 2.2      # slow stroll (client shows the walk, not run, anim)
+    _WANDER_PAUSE_MIN = 1.5  # pause range between wander legs (seconds)
+    _WANDER_PAUSE_MAX = 5.0
 
     _PLAYER_MOVE_SPEED = 8.0  # units/sec, should match Godot client MOVE_SPEED
 
@@ -312,6 +323,9 @@ class StubSimAvatar:
                     continue
                 tgt = getattr(so, 'moveTarget', None)
                 if not tgt:
+                    # No combat target: idle NPCs wander/patrol near their spawn.
+                    if self._wanderStep(so, dt):
+                        moved += 1
                     continue
                 if not hasattr(tgt, 'position') or tgt.position is None:
                     continue
@@ -340,6 +354,40 @@ class StubSimAvatar:
         except Exception:
             traceback.print_exc()
         self._moveTick = reactor.callLater(self._MOVE_INTERVAL, self._updateMovement)
+
+    def _wanderStep(self, so, dt):
+        """Idle wander/patrol around the spawn home. Returns True if the NPC moved.
+        Only the horizontal plane (x,y) changes; height is left to the client's
+        ground-snap. Combat (moveTarget) always overrides this."""
+        home = getattr(so, '_home', None)
+        if home is None:
+            home = so.position
+            so._home = home
+        now = reactor.seconds()
+        wt = getattr(so, '_wanderTarget', None)
+        if wt is None:
+            if now < getattr(so, '_wanderPauseUntil', 0.0):
+                return False
+            ang = random.uniform(0.0, 6.2831853)
+            rad = random.uniform(self._WANDER_MIN, self._WANDER_RADIUS)
+            wt = (home[0] + cos(ang) * rad, home[1] + sin(ang) * rad, so.position[2])
+            so._wanderTarget = wt
+        dx = wt[0] - so.position[0]
+        dy = wt[1] - so.position[1]
+        dist = sqrt(dx * dx + dy * dy)
+        if dist <= self._WANDER_ARRIVE:
+            so._wanderTarget = None
+            so._wanderPauseUntil = now + random.uniform(self._WANDER_PAUSE_MIN, self._WANDER_PAUSE_MAX)
+            return False
+        so.rotation = _yaw_toward(dx, dy)
+        step = min(self._WANDER_SPEED * dt, dist - self._WANDER_ARRIVE)
+        factor = step / dist if dist > 0 else 0.0
+        so.position = (
+            so.position[0] + dx * factor,
+            so.position[1] + dy * factor,
+            so.position[2],
+        )
+        return True
 
     def _processPlayerInput(self, so, dt):
         """Process client movement inputs and update player simObject position.
