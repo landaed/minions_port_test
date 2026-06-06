@@ -202,25 +202,49 @@ class StubSimAvatar:
         from mud.simulation.shared.simdata import SpawnpointInfo
 
         zone_obj = self.zone.zone  # the persistent Zone ORM object
+        db_groups = set()
+        for sg in zone_obj.spawnGroups:
+            db_groups.add(sg.groupName)
         spawnpoints = []
 
-        for sg in zone_obj.spawnGroups:
-            for si in sg.spawninfos:
-                spi = SpawnpointInfo()
-                spi.group = sg.groupName
-                spi.transform = si.transform if hasattr(si, 'transform') else "0 0 0 1 0 0 0"
-                spi.wanderGroup = si.wanderGroup if hasattr(si, 'wanderGroup') else -1
-                spawnpoints.append(spi)
+        # Recover the real per-marker spawn positions from the mission file. The
+        # DB only has spawn *groups* (no positions) and the headless stub can't
+        # query the Torque engine, so without this every NPC spawned at the origin
+        # (far from the player) and was never streamed.
+        markers = []
+        try:
+            from mud.world.misspawns import find_and_parse_spawn_points
+            markers = find_and_parse_spawn_points(getattr(zone_obj, "missionFile", "") or "")
+        except Exception:
+            traceback.print_exc()
 
-        # Collect unique spawn names to send setSpawnInfos equivalent
-        spawnnames = []
-        for sp in spawnpoints:
-            for g in zone_obj.spawnGroups:
-                if sp.group == g.groupName:
-                    for si in g.spawninfos:
-                        s = si.spawn
-                        if s.name not in spawnnames:
-                            spawnnames.append(s.name)
+        used_groups = set()
+        for mk in markers:
+            if mk["group"] not in db_groups:
+                continue
+            px, py, pz = mk["position"]
+            ax, ay, az, ang = mk["rotation"]
+            spi = SpawnpointInfo()
+            spi.group = mk["group"]
+            spi.transform = "%g %g %g %g %g %g %g" % (px, py, pz, ax, ay, az, ang)
+            spi.wanderGroup = mk["wanderGroup"]
+            spawnpoints.append(spi)
+            used_groups.add(mk["group"])
+
+        if spawnpoints:
+            print("[StubSimAvatar] %s: %d mission spawn points across %d groups" % (
+                self.zone.name, len(spawnpoints), len(used_groups)))
+        else:
+            # Fallback: no mission markers found — keep the old DB-at-origin
+            # behaviour rather than spawning nothing.
+            print("[StubSimAvatar] %s: no mission spawn points; falling back to DB groups at origin" % self.zone.name)
+            for sg in zone_obj.spawnGroups:
+                for si in sg.spawninfos:
+                    spi = SpawnpointInfo()
+                    spi.group = sg.groupName
+                    spi.transform = si.transform if hasattr(si, "transform") else "0 0 0 1 0 0 0"
+                    spi.wanderGroup = si.wanderGroup if hasattr(si, "wanderGroup") else -1
+                    spawnpoints.append(spi)
 
         if spawnpoints:
             self.zone.createSpawnpoints(spawnpoints)
@@ -320,6 +344,9 @@ class StubSimAvatar:
                 if so.isPlayer:
                     # Process player movement from client inputs
                     self._processPlayerInput(so, dt)
+                    # Auto-face the selected target so player melee isn't silently
+                    # blocked by the combat facing check.
+                    self._facePlayerTarget(so)
                     continue
                 tgt = getattr(so, 'moveTarget', None)
                 if not tgt:
@@ -388,6 +415,19 @@ class StubSimAvatar:
             so.position[2],
         )
         return True
+
+    def _facePlayerTarget(self, so):
+        """Auto-face the player's selected target so melee isn't silently inhibited
+        by the combat facing check (camera facing alone often isn't aimed at the
+        target). Mirrors how NPCs auto-face their chase target. Runs every tick,
+        independent of client input, so a stationary auto-attacker still faces."""
+        tgt = getattr(so, "moveTarget", None)
+        if tgt is None or getattr(tgt, "position", None) is None:
+            return
+        dx = tgt.position[0] - so.position[0]
+        dy = tgt.position[1] - so.position[1]
+        if abs(dx) > 0.01 or abs(dy) > 0.01:
+            so.rotation = _yaw_toward(dx, dy)
 
     def _processPlayerInput(self, so, dt):
         """Process client movement inputs and update player simObject position.
