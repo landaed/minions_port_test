@@ -35,10 +35,10 @@ func _snapshot(t: float) -> void:
 			"model": "undead/skeleton", "is_enemy": true, "standing": "Hostile",
 			"attacking": walk >= 12.0},  # swing once it arrives
 		{"is_self": false, "position": [BIND[0] + 10.0, BIND[1] + 17.0, BIND[2]],
-			"health": 1.0, "max_health": 1.0, "name": "Townsperson", "public_name": "Townsperson",
-			"sim_id": 3, "id": 3, "level": 5, "race": "Human", "sex": "Female",
-			"standing": "Neutral", "pclass": "Cleric",
-			"tex": {"head": 4, "body": 30, "arms": 30, "legs": 30, "feet": 8, "hands": 8}},
+			"health": 1.0, "max_health": 1.0, "name": "Orc Patroller", "public_name": "Orc Patroller",
+			"sim_id": 3, "id": 3, "level": 5, "race": "Orc", "sex": "Male",
+			"standing": "Neutral", "pclass": "Warrior",
+			"tex": {"head": 42, "arms": 79, "legs": 80, "body": 81, "feet": 77, "hands": 79}},
 	])
 
 func _ready() -> void:

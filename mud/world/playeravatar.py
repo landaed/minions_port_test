@@ -1497,6 +1497,20 @@ class PlayerAvatar(Avatar):
                         scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0)
                     except Exception:
                         scale_val = 1.0
+                # Per-part skin/armor texture indices for the client (cached on the
+                # mob; appearance rarely changes). Empty for monsters using an
+                # embedded single/multi texture.
+                tex = getattr(other_mob, '_godot_tex', None)
+                if tex is None:
+                    try:
+                        from mud.world.appearance import compute_appearance
+                        tex = compute_appearance(other_mob)
+                    except Exception:
+                        tex = {}
+                    try:
+                        other_mob._godot_tex = tex
+                    except Exception:
+                        pass
                 entities.append({
                     "id": int(other_mob.id),
                     "sim_id": int(other_mob.simObject.id),
@@ -1518,6 +1532,7 @@ class PlayerAvatar(Avatar):
                     "model": model_name,
                     "animation": animation_name,
                     "scale": scale_val,
+                    "tex": tex,
                     "level": int(getattr(other_mob, 'plevel', 0)),
                     "health": health,
                     "max_health": max(max_health, 1.0),
