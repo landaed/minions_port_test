@@ -229,7 +229,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   F3: debug"
+	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   U: unstuck   •   F3: debug"
 	bottom.add_child(hint_label)
 	ability_bar = HBoxContainer.new()
 	ability_bar.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -454,6 +454,29 @@ func _push_log(message: String):
 		combat_log = combat_log.slice(combat_log.size() - 8, combat_log.size())
 	combat_log_label.text = "Combat / server log:\n" + "\n".join(combat_log)
 
+func _unstuck():
+	# "/unstuck": lift the player out of geometry and re-seat them on the nearest
+	# ground surface directly below. Fixes getting buried in terrain/buildings.
+	# Player height is client-side (the server holds player z constant), so this is
+	# safe to do locally and the server won't fight it.
+	var space := player_body.get_world_3d().direct_space_state
+	var origin := player_body.global_position
+	# Cast from a few units above (to escape if shallowly buried) straight down.
+	var q := PhysicsRayQueryParameters3D.create(
+		origin + Vector3(0, 3.0, 0), origin - Vector3(0, 400.0, 0))
+	q.collide_with_areas = false
+	q.collision_mask = 1
+	q.exclude = [player_body]
+	var hit := space.intersect_ray(q)
+	if hit and hit.has("position"):
+		player_body.global_position.y = float(hit.position.y) + 1.0
+		_push_log("Unstuck: re-seated on the ground.")
+	else:
+		# No ground below — pop straight up so gravity can settle onto something.
+		player_body.global_position.y += 6.0
+		_push_log("Unstuck: lifted (no ground found below).")
+	velocity = Vector3.ZERO
+
 func _capture_mouse():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	mouse_captured = true
@@ -560,8 +583,12 @@ func _load_zone_art() -> void:
 	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Raycast down through the zone collision to find the ground at (x, z).
-	# Falls back to the server-provided height if nothing is hit.
+	# Snap an entity to the ground *near* its server-reported height. Cast only a
+	# short window around that height — NOT from hundreds of units up — so an NPC is
+	# never yanked onto a roof / tree canopy / bridge that happens to be above it.
+	# (Casting from far above grabbed the highest surface at (x,z): that was the
+	# "NPC teleported into the sky then falls back down" bug.) World geometry sits
+	# on collision layer 1; entity markers are on layer 2, so mask=1 ignores them.
 	var world := sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
@@ -569,8 +596,9 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 	if space == null:
 		return fallback
 	var q := PhysicsRayQueryParameters3D.create(
-		Vector3(x, fallback + 300.0, z), Vector3(x, fallback - 600.0, z))
+		Vector3(x, fallback + 2.0, z), Vector3(x, fallback - 8.0, z))
 	q.collide_with_areas = false
+	q.collision_mask = 1
 	var hit := space.intersect_ray(q)
 	if hit and hit.has("position"):
 		return float(hit.position.y)
@@ -668,7 +696,11 @@ func _entity_label_text(entity: Dictionary) -> String:
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = str(entity.get("name", "Entity"))
-	body.collision_layer = 1
+	# Entities live on layer 2: ground-snap rays (mask 1) ignore them so NPCs never
+	# stand on each other's heads, and the player walks through NPCs instead of
+	# getting stuck on them. Click/look targeting uses an all-layers ray, so it
+	# still hits these markers and reads their entity_id meta.
+	body.collision_layer = 2
 	body.collision_mask = 1
 
 	var collider := CollisionShape3D.new()
@@ -1056,6 +1088,8 @@ func _input(event):
 				jump_requested = true
 			KEY_E:
 				_send_interact_command()
+			KEY_U:
+				_unstuck()
 			KEY_Q:
 				_toggle_autoattack()
 			KEY_TAB:
