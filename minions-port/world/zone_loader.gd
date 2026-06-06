@@ -108,6 +108,12 @@ func _build_terrain(data: Dictionary) -> void:
 	for mi in _mesh_instances(terr):
 		mi.lod_bias = 64.0
 		mi.create_trimesh_collision()
+		# Tag the terrain collider with bit 3 (value 4) in addition to bit 1, so the
+		# client's NPC ground-snap ray can hit terrain only (climb hills, ignore
+		# building roofs) while the player still collides via bit 1.
+		for c in mi.get_children():
+			if c is StaticBody3D:
+				c.collision_layer = c.collision_layer | 4
 
 
 func _place_items(items, collide: bool) -> void:

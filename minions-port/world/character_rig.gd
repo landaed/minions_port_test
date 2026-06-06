@@ -35,6 +35,9 @@ func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 			if anim and (a == "idle" or a == "walk" or a == "run"):
 				anim.loop_mode = Animation.LOOP_LINEAR
 	loaded = true
+	if OS.get_environment("RIG_DEBUG") == "1":
+		print("[RIG] setup ", glb_path.get_file(), " anim_player=", anim_player != null,
+			" anims=", _anims.keys(), " meshes=", skinned_meshes.size())
 	# Start in idle so a freshly spawned character isn't frozen in bind pose.
 	_play("idle")
 	return true

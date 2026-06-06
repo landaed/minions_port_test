@@ -12,6 +12,7 @@ const ENTITY_INTERPOLATION_SPEED := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
 const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
@@ -40,6 +41,7 @@ var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to 
 var _zone_loaded := false
 var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
+var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -590,12 +592,11 @@ func _load_zone_art() -> void:
 	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Snap an entity to the ground *near* its server-reported height. Cast only a
-	# short window around that height — NOT from hundreds of units up — so an NPC is
-	# never yanked onto a roof / tree canopy / bridge that happens to be above it.
-	# (Casting from far above grabbed the highest surface at (x,z): that was the
-	# "NPC teleported into the sky then falls back down" bug.) World geometry sits
-	# on collision layer 1; entity markers are on layer 2, so mask=1 ignores them.
+	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
+	# a dedicated bit (TERRAIN_MASK); buildings do not and entities are on layer 2,
+	# so this ray hits only the ground. That lets us cast from well above and find
+	# the surface at any height — so NPCs climb hills instead of sinking into them —
+	# while never grabbing a building roof/tree (which caused the sky-teleport bug).
 	var world := sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
@@ -603,9 +604,9 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 	if space == null:
 		return fallback
 	var q := PhysicsRayQueryParameters3D.create(
-		Vector3(x, fallback + 2.0, z), Vector3(x, fallback - 8.0, z))
+		Vector3(x, fallback + 60.0, z), Vector3(x, fallback - 60.0, z))
 	q.collide_with_areas = false
-	q.collision_mask = 1
+	q.collision_mask = TERRAIN_MASK
 	var hit := space.intersect_ray(q)
 	if hit and hit.has("position"):
 		return float(hit.position.y)
@@ -831,14 +832,14 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 25.0:
-					# Very large desync — snap to server position
-					player_body.global_position.x = server_pos.x
-					player_body.global_position.z = server_pos.z
-				elif desync > 8.0:
-					# Moderate desync — gently blend toward server (10% per sync tick)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.08)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.08)
+				if desync > 8.0:
+					# Reconcile toward the server COLLISION-AWARE so the player is never
+					# dragged through a building. The stub server has no geometry, so its
+					# position can sit inside walls; the client's own collision must win,
+					# else you phase through almost everything. Larger desync corrects faster.
+					var factor := 1.0 if desync > 25.0 else 0.12
+					var corr := Vector3(server_pos.x - current_pos.x, 0.0, server_pos.z - current_pos.z) * factor
+					player_body.move_and_collide(corr)
 				# else: within 8 units, TRUST client prediction. The server
 				# snapshot always lags prediction by a few units (input latency +
 				# snapshot interval), so a tight tolerance yanks the player back
@@ -1098,6 +1099,9 @@ func _activate_ability(slot_index: int):
 		interaction_message = "%s is only a fallback placeholder because no server skill data was available." % ability_name
 		return
 	interaction_message = "Sent SKILL %s to the legacy world server." % ability_name
+	# Play the attack swing locally for immediate feedback (server confirms via the
+	# self entity's `attacking` flag for sustained combat).
+	_player_attack_until = Time.get_ticks_msec() / 1000.0 + 0.6
 	_request_server_command("use_ability", {"ability_name": ability_name})
 
 func _target_entity_from_click(screen_position: Vector2) -> bool:
@@ -1226,10 +1230,12 @@ func _physics_process(delta):
 			_last_sent_input = input_state.duplicate()
 			_request_server_command("player_input", input_state)
 
-	# Drive the player avatar animation from predicted horizontal speed.
+	# Drive the player avatar animation from predicted horizontal speed + combat.
 	if _player_rig and _player_rig.has_method("drive"):
 		var pspeed := Vector2(velocity.x, velocity.z).length()
-		_player_rig.drive(pspeed, false, false)
+		var now := Time.get_ticks_msec() / 1000.0
+		var attacking := bool(_self_entity().get("attacking", false)) or now < _player_attack_until
+		_player_rig.drive(pspeed, attacking, false)
 
 	# Interpolate replicated entity positions toward server targets, and drive each
 	# NPC's animation from how fast its marker is actually moving.
