@@ -231,7 +231,7 @@ def _resolve_part_texture(glb, mat_name, tex_dir, tex_indices):
     return None
 
 
-def convert(model_path, out_path, anims, tex_dir=None, tex_indices=None):
+def convert(model_path, out_path, anims, tex_dir=None, tex_indices=None, single_tex=None):
     shape = read_shape(Path(model_path).read_bytes())
     n_nodes = len(shape.nodes)
     worlds = node_worlds(shape)
@@ -302,6 +302,15 @@ def convert(model_path, out_path, anims, tex_dir=None, tex_indices=None):
                 part_tex = _resolve_part_texture(glb, name, tex_dir, tex_indices)
                 if part_tex is not None:
                     mat_map[mat] = glb.material(name, part_tex, alpha_mask=False)
+                elif single_tex and tex_dir:
+                    # Creature whole-body (single/) or multi/ texture, e.g.
+                    # "single/bear_polar" -> character/textures/single/bear_polar.jpg
+                    sp = Path(tex_dir) / (single_tex + ".jpg")
+                    if sp.exists():
+                        mat_map[mat] = glb.material(name, glb.add_texture(str(sp)), alpha_mask=False)
+                    else:
+                        tex_idx, is_mask = static.embed_material_texture(glb, name, dts_dir)
+                        mat_map[mat] = glb.material(name, tex_idx, alpha_mask=is_mask)
                 else:
                     tex_idx, is_mask = static.embed_material_texture(glb, name, dts_dir)
                     mat_map[mat] = glb.material(name, tex_idx, alpha_mask=is_mask)

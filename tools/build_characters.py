@@ -79,6 +79,39 @@ JOBS = [
 ]
 
 
+_RACIAL_DIRS = {"human", "elf", "gnome", "dwarf", "halfling", "titan",
+                "drakken", "orc", "goblin", "troll", "ogre"}
+
+
+def _find_db():
+    import glob
+    hits = glob.glob(str(ROOT / "**" / "world.db"), recursive=True)
+    return hits[0] if hits else None
+
+
+def creatures_from_db():
+    """Every non-racial monster model the world DB references, keyed by its
+    sanitized model path (animal/bear.dts -> animal_bear), with its animation
+    folder and a default whole-body texture (single/ or multi/)."""
+    db = _find_db()
+    if not db:
+        print("  (no world.db found; skipping creatures)")
+        return []
+    import sqlite3
+    cur = sqlite3.connect(db).cursor()
+    cur.execute("SELECT model, animation, texture_single, texture_body FROM spawn WHERE model!=''")
+    best = {}
+    for m, a, ts, tb in cur.fetchall():
+        if not m or m.split("/")[0].lower() in _RACIAL_DIRS or "/" not in m:
+            continue
+        key = m.lower().replace(".dts", "").replace("/", "_")
+        tex = ts if ts else (tb if tb and tb.lower().startswith("multi/") else "")
+        prev = best.get(key)
+        if prev is None or (tex and not prev[2]):
+            best[key] = (m, (a or "").lower(), tex)
+    return [(k, v[0], v[1], v[2]) for k, v in sorted(best.items())]
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     only = sys.argv[1:] or None
@@ -98,6 +131,24 @@ def main():
                 key, model_rel, info["anims"], info["nodes"], info["prims"]))
         except Exception as e:
             print("  FAIL %-16s %s: %s" % (key, model_rel, e))
+
+    # Creatures / monsters (bears, wolves, spiders, golems, dragons, ...).
+    for key, model_rel, folder, single_tex in creatures_from_db():
+        if only and key not in only:
+            continue
+        model = MODELS / model_rel
+        if not model.exists():
+            print("  SKIP %-22s (missing %s)" % (key, model_rel))
+            continue
+        anims = anims_for(folder)
+        out = OUT / (key + ".glb")
+        try:
+            info = conv.convert(str(model), str(out), anims,
+                                tex_dir=str(TEX), single_tex=single_tex or None)
+            print("  %-22s <- %-26s anims=%s nodes=%d prims=%d tex=%s" % (
+                key, model_rel, info["anims"], info["nodes"], info["prims"], single_tex or "-"))
+        except Exception as e:
+            print("  FAIL %-22s %s: %s" % (key, model_rel, e))
 
 
 if __name__ == "__main__":
