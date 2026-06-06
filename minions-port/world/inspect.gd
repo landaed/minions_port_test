@@ -135,6 +135,16 @@ func _ready() -> void:
 				var gpos: Vector3 = mi.global_position
 				best.append([gpos.distance_to(focus), str(mi.name), gpos, aabb])
 		best.sort_custom(func(a, b): return a[0] < b[0])
+		print("--- horizontal collision probes from focus (does building geometry collide?) ---")
+		for probe_dir in [Vector3(1,0,0), Vector3(-1,0,0), Vector3(0,0,1), Vector3(0,0,-1)]:
+			var fromp: Vector3 = focus + Vector3(0, 1.0, 0)
+			var q2 := PhysicsRayQueryParameters3D.create(fromp, fromp + probe_dir * 30.0)
+			q2.collision_mask = 1
+			var h2 := space.intersect_ray(q2)
+			if h2:
+				print("  probe ", probe_dir, " HIT ", h2.collider.name, " @", snappedf(fromp.distance_to(h2.position), 0.1), "u")
+			else:
+				print("  probe ", probe_dir, " no collision within 30u")
 		print("--- nearest mesh AABBs to focus ---")
 		for i in range(min(5, best.size())):
 			var b = best[i]
