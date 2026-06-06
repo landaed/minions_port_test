@@ -37,7 +37,8 @@ func _snapshot(t: float) -> void:
 		{"is_self": false, "position": [BIND[0] + 10.0, BIND[1] + 17.0, BIND[2]],
 			"health": 1.0, "max_health": 1.0, "name": "Townsperson", "public_name": "Townsperson",
 			"sim_id": 3, "id": 3, "level": 5, "race": "Human", "sex": "Female",
-			"standing": "Neutral", "pclass": "Cleric"},
+			"standing": "Neutral", "pclass": "Cleric",
+			"tex": {"head": 4, "body": 30, "arms": 30, "legs": 30, "feet": 8, "hands": 8}},
 	])
 
 func _ready() -> void:
@@ -59,12 +60,14 @@ func _ready() -> void:
 	var pp: Vector3 = gv.player_body.global_position
 	# Aim at the skeleton's marker if present, else the player.
 	var focus := pp
-	if _env("FOCUS", "skeleton") == "player":
+	var which := _env("FOCUS", "skeleton")
+	if which == "player":
 		focus = pp
 	else:
-		var sk = gv.replicated_entity_nodes.get("2")
-		if sk != null and is_instance_valid(sk):
-			focus = sk.global_position
+		var node_id := "3" if which == "townsperson" else "2"
+		var ent = gv.replicated_entity_nodes.get(node_id)
+		if ent != null and is_instance_valid(ent):
+			focus = ent.global_position
 	var off := _env_vec("CAM_OFF", Vector3(4.0, 2.2, 4.5))
 	var at := _env_vec("CAM_AT", Vector3(0.0, 0.9, 0.0))
 	icam.global_position = focus + off

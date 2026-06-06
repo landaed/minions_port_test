@@ -8,6 +8,7 @@ extends Node3D
 
 const RUN_SPEED := 5.0   # server move speeds: NPC ~5 u/s, player ~8 u/s
 const WALK_MIN := 0.35   # below this we consider the character standing still
+const TEX_DIR := "res://assets/character_textures/"
 
 var anim_player: AnimationPlayer
 var skinned_meshes: Array[MeshInstance3D] = []
@@ -75,6 +76,40 @@ func drive(speed: float, attacking: bool, dead: bool) -> void:
 		_play("walk")
 	else:
 		_play("idle")
+
+func apply_appearance(parts: Dictionary) -> void:
+	# parts maps a body part -> texture index, e.g. {"head":5,"body":12,...}.
+	# Overrides the model's base.<part> materials with the chosen numbered skin/
+	# armor texture. No-op for monster models whose surfaces aren't named base.<part>
+	# (they keep their own embedded textures), so it's safe to call on anything.
+	if parts == null or parts.is_empty():
+		return
+	for mi in skinned_meshes:
+		if not is_instance_valid(mi) or mi.mesh == null:
+			continue
+		var m: Mesh = mi.mesh
+		for si in range(m.get_surface_count()):
+			var base_mat := m.surface_get_material(si)
+			if base_mat == null:
+				continue
+			var nm := str(base_mat.resource_name).to_lower()
+			var dot := nm.rfind(".")
+			var part := nm.substr(dot + 1) if dot >= 0 else nm
+			if not parts.has(part):
+				continue
+			var idx := int(parts[part])
+			var tex_path := "%s%s/%s%d.jpg" % [TEX_DIR, part, part, idx]
+			if not ResourceLoader.exists(tex_path):
+				continue
+			var nmat: Material
+			if base_mat is StandardMaterial3D:
+				nmat = base_mat.duplicate()
+				nmat.albedo_texture = load(tex_path)
+			else:
+				var sm := StandardMaterial3D.new()
+				sm.albedo_texture = load(tex_path)
+				nmat = sm
+			mi.set_surface_override_material(si, nmat)
 
 func set_highlight(on: bool) -> void:
 	for mi in skinned_meshes:

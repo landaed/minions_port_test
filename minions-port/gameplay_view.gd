@@ -726,6 +726,13 @@ func _glb_for(race: String, sex: String, model: String) -> String:
 func _glb_for_entity(entity: Dictionary) -> String:
 	return _glb_for(str(entity.get("race", "")), str(entity.get("sex", "")), str(entity.get("model", "")))
 
+func _appearance_for(entity: Dictionary) -> Dictionary:
+	# The server streams per-part texture indices in entity["tex"]:
+	# {"head":N,"body":N,"arms":N,"legs":N,"feet":N,"hands":N}. Empty -> the model
+	# keeps its baked default textures.
+	var tex = entity.get("tex", {})
+	return tex if tex is Dictionary else {}
+
 func _ensure_player_model(entity: Dictionary) -> void:
 	# Build/replace the avatar once we know the player's race/sex/model.
 	var path := _glb_for_entity(entity)
@@ -738,6 +745,7 @@ func _ensure_player_model(entity: Dictionary) -> void:
 	player_body.add_child(_player_rig)
 	if _player_rig.setup(path, 0.0):
 		_player_model_key = path
+		_player_rig.apply_appearance(_appearance_for(entity))
 		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
 		if capsule_mesh:
 			capsule_mesh.visible = false
@@ -769,6 +777,7 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	if rig.setup(_glb_for_entity(entity), 0.0):
 		body.add_child(rig)
 		body.set_meta("rig", rig)
+		rig.apply_appearance(_appearance_for(entity))
 	else:
 		fallback_mesh = MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
