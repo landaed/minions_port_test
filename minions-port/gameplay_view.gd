@@ -13,7 +13,9 @@ const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
+const CHAR_ASSET_DIR := "res://assets/characters/"
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -36,6 +38,8 @@ var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
 var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
 var _zone_loaded := false
+var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
+var _player_model_key := ""     # which glb the avatar currently uses
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -84,17 +88,13 @@ func _ready():
 	player_body.floor_constant_speed = true
 	player_body.floor_snap_length = 1.0
 	player_body.floor_max_angle = deg_to_rad(60.0)
-	# Real character model for the player visual (scale reference); the capsule
-	# stays as the collision shape only. Keep the capsule visible if the model
-	# fails to load so the player is never invisible.
-	var avatar_scene = load("res://assets/characters/human.glb")
-	if avatar_scene:
-		var avatar = avatar_scene.instantiate()
-		avatar.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
-		player_body.add_child(avatar)
-		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
-		if capsule_mesh:
-			capsule_mesh.visible = false
+	# Animated player avatar. The real race/sex isn't known until the first self
+	# snapshot, so build the rig node now and load the model in _ensure_player_model
+	# once we know it. The capsule stays visible until the model loads, so the
+	# player is never invisible.
+	_player_rig = CharacterRigScript.new()
+	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
+	player_body.add_child(_player_rig)
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
@@ -413,30 +413,37 @@ func on_server_selection_by_mob(target_id: int, _char_index: int):
 	server_target_description = {"name": "Target (mob %d)" % target_id}
 	_update_labels()
 
+func _set_marker_highlight(body: StaticBody3D, on: bool):
+	var rig = body.get_meta("rig", null)
+	if rig != null and is_instance_valid(rig):
+		rig.set_highlight(on)
+		return
+	var mesh: MeshInstance3D = body.get_meta("mesh", null)
+	if mesh == null:
+		return
+	if on:
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(1.0, 1.0, 0.2, 1.0)  # bright yellow highlight
+		mat.emission_enabled = true
+		mat.emission = Color(1.0, 1.0, 0.2, 1.0)
+		mat.emission_energy_multiplier = 0.5
+		mesh.material_override = mat
+	else:
+		var prev_entity: Dictionary = body.get_meta("entity", {})
+		var restore := StandardMaterial3D.new()
+		restore.albedo_color = _entity_color(prev_entity)
+		mesh.material_override = restore
+
 func _highlight_entity(key: String):
-	# Remove highlight from previous target
 	if not _highlighted_entity_key.is_empty() and replicated_entity_nodes.has(_highlighted_entity_key):
 		var prev: StaticBody3D = replicated_entity_nodes[_highlighted_entity_key]
 		if is_instance_valid(prev):
-			var prev_entity: Dictionary = prev.get_meta("entity", {})
-			var mesh: MeshInstance3D = prev.get_meta("mesh")
-			if mesh:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = _entity_color(prev_entity)
-				mesh.material_override = mat
+			_set_marker_highlight(prev, false)
 	_highlighted_entity_key = key
-	# Apply highlight to new target
 	if not key.is_empty() and replicated_entity_nodes.has(key):
 		var body: StaticBody3D = replicated_entity_nodes[key]
 		if is_instance_valid(body):
-			var mesh: MeshInstance3D = body.get_meta("mesh")
-			if mesh:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = Color(1.0, 1.0, 0.2, 1.0)  # bright yellow highlight
-				mat.emission_enabled = true
-				mat.emission = Color(1.0, 1.0, 0.2, 1.0)
-				mat.emission_energy_multiplier = 0.5
-				mesh.material_override = mat
+			_set_marker_highlight(body, true)
 
 func append_game_text(message: String):
 	_push_log(message)
@@ -693,51 +700,90 @@ func _entity_label_text(entity: Dictionary) -> String:
 		health_pct,
 	]
 
+func _glb_for(race: String, sex: String, model: String) -> String:
+	# Map an entity (or the player) to a converted character glb. Monster models
+	# are keyed by their server model path (undead/skeleton -> undead_skeleton.glb);
+	# playable races by <race>_<sex>.glb. Falls back to a human of the right sex so
+	# a character is never modelless.
+	if model != "":
+		var key := model.to_lower()
+		if key.ends_with(".dts"):
+			key = key.substr(0, key.length() - 4)
+		key = key.replace("/", "_").replace("\\", "_")
+		var mp := CHAR_ASSET_DIR + key + ".glb"
+		if ResourceLoader.exists(mp):
+			return mp
+	var s := "female" if sex.to_lower().begins_with("f") else "male"
+	var r := race.to_lower().replace(" ", "")
+	if r != "":
+		var rp := CHAR_ASSET_DIR + r + "_" + s + ".glb"
+		if ResourceLoader.exists(rp):
+			return rp
+	var hp := CHAR_ASSET_DIR + "human_" + s + ".glb"
+	return hp if ResourceLoader.exists(hp) else ""
+
+func _glb_for_entity(entity: Dictionary) -> String:
+	return _glb_for(str(entity.get("race", "")), str(entity.get("sex", "")), str(entity.get("model", "")))
+
+func _ensure_player_model(entity: Dictionary) -> void:
+	# Build/replace the avatar once we know the player's race/sex/model.
+	var path := _glb_for_entity(entity)
+	if path == "" or path == _player_model_key:
+		return
+	if _player_rig and is_instance_valid(_player_rig):
+		_player_rig.queue_free()
+	_player_rig = CharacterRigScript.new()
+	_player_rig.position = Vector3(0.0, -0.9, 0.0)
+	player_body.add_child(_player_rig)
+	if _player_rig.setup(path, 0.0):
+		_player_model_key = path
+		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
+		if capsule_mesh:
+			capsule_mesh.visible = false
+
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = str(entity.get("name", "Entity"))
 	# Entities live on layer 2: ground-snap rays (mask 1) ignore them so NPCs never
 	# stand on each other's heads, and the player walks through NPCs instead of
 	# getting stuck on them. Click/look targeting uses an all-layers ray, so it
-	# still hits these markers and reads their entity_id meta.
+	# still hits these markers and reads their entity_id meta. The body origin is at
+	# the feet (ground), so the model and collider start at y=0.
 	body.collision_layer = 2
 	body.collision_mask = 1
 
+	# Invisible collision capsule (feet..head) for click/look targeting.
 	var collider := CollisionShape3D.new()
 	var shape := CapsuleShape3D.new()
-	shape.radius = 0.55
-	shape.height = 1.4
+	shape.radius = 0.5
+	shape.height = 1.6
 	collider.shape = shape
+	collider.position = Vector3(0, 0.9, 0)
 	body.add_child(collider)
 
-	var mesh_instance := MeshInstance3D.new()
-	var mesh := CapsuleMesh.new()
-	mesh.radius = 0.55
-	mesh.height = 1.4
-	mesh_instance.mesh = mesh
-	body.add_child(mesh_instance)
-
-	# Facing indicator (small cone pointing forward)
-	var nose := MeshInstance3D.new()
-	var cone := CylinderMesh.new()
-	cone.top_radius = 0.0
-	cone.bottom_radius = 0.2
-	cone.height = 0.4
-	nose.mesh = cone
-	nose.position = Vector3(0, 0.6, -0.55)
-	nose.rotation_degrees = Vector3(90, 0, 0)
-	var nose_mat := StandardMaterial3D.new()
-	nose_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.9)
-	nose.material_override = nose_mat
-	body.add_child(nose)
+	# Animated model; fall back to a coloured capsule if it can't load so the
+	# entity is never invisible.
+	var rig: Node3D = CharacterRigScript.new()
+	var fallback_mesh: MeshInstance3D = null
+	if rig.setup(_glb_for_entity(entity), 0.0):
+		body.add_child(rig)
+		body.set_meta("rig", rig)
+	else:
+		fallback_mesh = MeshInstance3D.new()
+		var mesh := CapsuleMesh.new()
+		mesh.radius = 0.5
+		mesh.height = 1.6
+		fallback_mesh.mesh = mesh
+		fallback_mesh.position = Vector3(0, 0.9, 0)
+		body.add_child(fallback_mesh)
 
 	var label := Label3D.new()
-	label.position = Vector3(0, 1.6, 0)
+	label.position = Vector3(0, 2.05, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.fixed_size = false
 	body.add_child(label)
 
-	body.set_meta("mesh", mesh_instance)
-	body.set_meta("nose", nose)
+	body.set_meta("mesh", fallback_mesh)
 	body.set_meta("label", label)
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	_update_entity_marker(body, entity)
@@ -748,12 +794,16 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	var key := _entity_key(entity)
-	var mesh_instance: MeshInstance3D = body.get_meta("mesh")
-	# Preserve yellow highlight if this entity is the current target
-	if key != _highlighted_entity_key:
+	# Colour the fallback capsule when there's no model (highlight preserved).
+	var fb: MeshInstance3D = body.get_meta("mesh", null)
+	if fb and key != _highlighted_entity_key:
 		var mesh_material := StandardMaterial3D.new()
 		mesh_material.albedo_color = _entity_color(entity)
-		mesh_instance.material_override = mesh_material
+		fb.material_override = mesh_material
+	# Apply the server's per-spawn scale multiplier (anchored at the feet).
+	var scl := float(entity.get("scale", 1.0))
+	if scl > 0.0:
+		body.scale = Vector3(scl, scl, scl)
 	var label: Label3D = body.get_meta("label")
 	label.text = _entity_label_text(entity)
 
@@ -765,6 +815,8 @@ func _sync_entity_markers():
 	for entity in replicated_entities:
 		if entity is Dictionary and bool(entity.get("is_self", false)):
 			var raw_pos = entity.get("position", [])
+			# Pick the avatar model from the player's own race/sex/model.
+			_ensure_player_model(entity)
 			# Compute spawn offset from first entity snapshot (more reliable than root_info)
 			if not _has_spawned:
 				_has_spawned = true
@@ -818,7 +870,8 @@ func _sync_entity_markers():
 		# Convert entity server position to absolute Godot world position, then drop
 		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + ENTITY_CAPSULE_HALF_HEIGHT
+		# Body origin is at the feet, so seat it right on the ground.
+		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
@@ -1173,12 +1226,27 @@ func _physics_process(delta):
 			_last_sent_input = input_state.duplicate()
 			_request_server_command("player_input", input_state)
 
-	# Interpolate replicated entity positions toward server targets
+	# Drive the player avatar animation from predicted horizontal speed.
+	if _player_rig and _player_rig.has_method("drive"):
+		var pspeed := Vector2(velocity.x, velocity.z).length()
+		_player_rig.drive(pspeed, false, false)
+
+	# Interpolate replicated entity positions toward server targets, and drive each
+	# NPC's animation from how fast its marker is actually moving.
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
 		var target_position: Vector3 = body.get_meta("target_position", body.position)
+		var prev_xz := Vector2(body.position.x, body.position.z)
 		body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
+		var inst_speed := moved / maxf(delta, 0.001)
+		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
+		body.set_meta("speed", smoothed)
+		var rig = body.get_meta("rig", null)
+		if rig != null and is_instance_valid(rig):
+			var ent: Dictionary = body.get_meta("entity", {})
+			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
 	_update_look_at()
 	_update_labels()
