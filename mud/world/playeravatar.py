@@ -1482,6 +1482,21 @@ class PlayerAvatar(Avatar):
                     is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
                 race_name = str(other_mob.race.name) if other_mob.race and hasattr(other_mob.race, 'name') else "Unknown"
                 pclass_name = str(other_mob.pclass.name) if other_mob.pclass and hasattr(other_mob.pclass, 'name') else "Unknown"
+                # Model/animation/sex/scale let the Godot client pick the right
+                # character model + skeleton (monsters by model path, players by
+                # race+sex) and size it. Pulled from the mob's spawn row.
+                sex_name = str(getattr(other_mob, 'sex', '') or '')
+                spawn_row = getattr(other_mob, 'spawn', None)
+                model_name = ""
+                animation_name = ""
+                scale_val = 1.0
+                if spawn_row is not None:
+                    model_name = str(getattr(spawn_row, 'model', '') or '')
+                    animation_name = str(getattr(spawn_row, 'animation', '') or '')
+                    try:
+                        scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0)
+                    except Exception:
+                        scale_val = 1.0
                 entities.append({
                     "id": int(other_mob.id),
                     "sim_id": int(other_mob.simObject.id),
@@ -1499,6 +1514,10 @@ class PlayerAvatar(Avatar):
                     "realm": int(getattr(other_mob, 'realm', 0)),
                     "race": race_name,
                     "pclass": pclass_name,
+                    "sex": sex_name,
+                    "model": model_name,
+                    "animation": animation_name,
+                    "scale": scale_val,
                     "level": int(getattr(other_mob, 'plevel', 0)),
                     "health": health,
                     "max_health": max(max_health, 1.0),
