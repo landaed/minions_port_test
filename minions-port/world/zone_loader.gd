@@ -2,8 +2,8 @@
 extends Node3D
 ## Canonical runtime support for a converted MoM zone. It can either build the
 ## legacy JSON description into children, or finalize an authored .tscn version
-## of that same zone by applying terrain material, collision, and lighting.
-##
+## of that same zone by applying runtime collision and lighting without
+## overriding authored terrain materials or directional lights.
 ## Used by the live game (gameplay_view loads this into WorldRoot at the server
 ## origin offset), the generated Trinst .tscn scene, and the offline art preview.
 ## No player/camera of its own.
@@ -21,24 +21,13 @@ var _normal_mesh_cache := {}
 
 
 func _ready() -> void:
-	# Tool-mode preview: make the authored terrain and repaired mesh normals look
-	# in the editor like they do in game, without generating collision bodies or
-	# adding runtime lighting.
+	# Tool-mode preview: repair mesh normals only. Terrain materials and authored
+	# lights are left as saved in the scene.
 	if not Engine.is_editor_hint() or authored_zone_name == "":
 		return
 	zone_name = authored_zone_name
 	base = ASSET_ROOT + zone_name + "/"
 	_repair_mesh_normals(self)
-	_apply_authored_terrain_material(self)
-
-
-func _apply_authored_terrain_material(node: Node) -> void:
-	for child in node.get_children():
-		if child is Node3D:
-			var n := child as Node3D
-			if str(n.get_meta("zone_role", "")) == "terrain":
-				_texture_terrain(n, _terrain_texture_defaults())
-		_apply_authored_terrain_material(child)
 
 
 func _terrain_texture_defaults() -> Dictionary:
@@ -98,8 +87,9 @@ func build(zone: String, with_environment: bool = true) -> bool:
 
 ## Finalize a pre-authored Godot scene for runtime use. This intentionally does
 ## not instantiate scene objects from JSON; it only applies runtime-only state
-## (collision, mesh normals, terrain shader, and optional environment) to nodes
-## that already exist in the .tscn and can be moved/edited in the Godot editor.
+## (collision, mesh normals, and optional environment) to nodes that already
+## exist in the .tscn and can be moved/edited in the Godot editor. Authored
+## terrain materials and directional lights are preserved as saved in the scene.
 func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
 	zone_name = zone if zone != "" else authored_zone_name
 	if zone_name == "":
@@ -128,7 +118,6 @@ func _finalize_authored_node(node: Node) -> void:
 			for mi in _mesh_instances(n):
 				mi.lod_bias = 64.0
 			if role == "terrain":
-				_texture_terrain(n, _terrain_texture_defaults())
 				_ensure_mesh_collision(n, true)
 			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
 				_ensure_mesh_collision(n, false)
@@ -400,6 +389,15 @@ func _mesh_instances(n: Node) -> Array:
 	return r
 
 
+
+func _has_directional_light(node: Node) -> bool:
+	if node is DirectionalLight3D:
+		return true
+	for child in node.get_children():
+		if _has_directional_light(child):
+			return true
+	return false
+
 func _setup_environment(data: Dictionary) -> void:
 	var we := WorldEnvironment.new()
 	var e := Environment.new()
@@ -432,6 +430,9 @@ func _setup_environment(data: Dictionary) -> void:
 	e.adjustment_saturation = 1.05
 	we.environment = e
 	add_child(we)
+
+	if _has_directional_light(self):
+		return
 
 	var sun := DirectionalLight3D.new()
 	var az := 40.0
