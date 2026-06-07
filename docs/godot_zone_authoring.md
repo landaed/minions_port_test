@@ -65,6 +65,12 @@ invisible vertical edge across entrances/gates; this is what made
 has no usable floor triangles, add its asset key to `FOOTPRINT_FLOOR_INTERIORS`
 only after confirming the slab does not cover a doorway.
 
+NPC visual ground snapping now probes for collision near the server-provided
+height before falling back to terrain. This keeps mobs that the server spawned on
+upper/interior floors (for example inside `prefabs_tower1`) from being visually
+dropped to the outside terrain. Dead mobs are also retained briefly on the client
+so their death animation can play before the marker despawns.
+
 ## Regenerating from `scene.json`
 
 If the converted assets or JSON are rebuilt, regenerate the editable scene with:

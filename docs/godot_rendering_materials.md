@@ -15,9 +15,12 @@ most global post-processing-style settings live on that `Environment` resource:
 
 Dynamic depth of field is camera-local and lives in `gameplay_view.gd`. It creates
 a `CameraAttributesPractical` on the gameplay `Camera3D`, raycasts from the
-screen center each physics frame, smooths the hit distance, and moves the near/far
-DOF distances around that focus point. Tune it with the `DOF_*` constants in
-`gameplay_view.gd` (`DOF_BLUR_AMOUNT`, focus range, margins, and transitions).
+screen center each physics frame, smooths the hit distance, and moves the far DOF
+distance around that focus point. Near blur is intentionally disabled so the
+third-person player character stays readable; this is closer to how many
+third-person games use DOF (subtle background separation, not heavy blur over the
+player/avatar). Tune it with the `DOF_*` constants in `gameplay_view.gd`
+(`DOF_BLUR_AMOUNT`, focus range, margins, and transitions).
 
 To adjust other global post-processing for Trinst, start in `_setup_environment()`
 in `world/zone_loader.gd`. If you want an editor-authored workflow later, the

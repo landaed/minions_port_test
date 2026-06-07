@@ -12,14 +12,14 @@ const CAMERA_ZOOM_STEP := 1.0
 const DOF_ENABLED := true
 const DOF_FOCUS_MIN := 4.0
 const DOF_FOCUS_MAX := 120.0
-const DOF_DEFAULT_FOCUS := 24.0
-const DOF_FOCUS_SMOOTH_SPEED := 8.0
+const DOF_DEFAULT_FOCUS := 36.0
+const DOF_FOCUS_SMOOTH_SPEED := 5.0
 const DOF_FOCUS_RAY_LENGTH := 160.0
-const DOF_NEAR_MARGIN := 4.0
-const DOF_FAR_MARGIN := 10.0
-const DOF_NEAR_TRANSITION := 3.0
-const DOF_FAR_TRANSITION := 16.0
-const DOF_BLUR_AMOUNT := 0.06
+const DOF_NEAR_MARGIN := 999.0  # near blur disabled; keep player/weapon readable
+const DOF_FAR_MARGIN := 28.0
+const DOF_NEAR_TRANSITION := 12.0
+const DOF_FAR_TRANSITION := 34.0
+const DOF_BLUR_AMOUNT := 0.025
 const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
@@ -27,6 +27,9 @@ const GRAVITY := 20.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
+const ENTITY_DEATH_DESPAWN_DELAY := 2.75
+const ENTITY_FLOOR_PROBE_UP := 4.0
+const ENTITY_FLOOR_PROBE_DOWN := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
@@ -64,6 +67,7 @@ var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
 var _camera_attributes: CameraAttributesPractical = null
 var _dof_focus_distance := DOF_DEFAULT_FOCUS
+var _dead_entity_remove_at: Dictionary = {}
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -328,7 +332,7 @@ func _setup_dynamic_dof() -> void:
 	if camera == null or not DOF_ENABLED:
 		return
 	_camera_attributes = CameraAttributesPractical.new()
-	_camera_attributes.dof_blur_near_enabled = true
+	_camera_attributes.dof_blur_near_enabled = false
 	_camera_attributes.dof_blur_far_enabled = true
 	_camera_attributes.dof_blur_amount = DOF_BLUR_AMOUNT
 	_camera_attributes.dof_blur_near_transition = DOF_NEAR_TRANSITION
@@ -700,35 +704,45 @@ func _load_zone_art() -> void:
 	print("[Godot] Loaded zone art '%s' from %s at offset %s" % [zone, authored_scene_path if ResourceLoader.exists(authored_scene_path) else "scene.json", str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
-	# a dedicated bit (TERRAIN_MASK); buildings do not and entities are on layer 2,
-	# so this ray hits only the ground. That lets us cast from well above and find
-	# the surface at any height — so NPCs climb hills instead of sinking into them —
-	# while never grabbing a building roof/tree (which caused the sky-teleport bug).
-	var world := sub_viewport.find_world_3d()
+	# Seat an entity on collision near the server's intended height first. This is
+	# important for multi-floor interiors such as prefabs_tower1: the server Z says
+	# which floor the mob belongs on, while a terrain-only snap drops it outside/on
+	# the ground. If no nearby floor exists, fall back to terrain snapping.
+	var world: World3D = sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
-	var space := world.direct_space_state
+	var space: PhysicsDirectSpaceState3D = world.direct_space_state
 	if space == null:
 		return fallback
+
+	# Prefer any solid floor close to the authoritative server height.
+	var near_from := Vector3(x, fallback + ENTITY_FLOOR_PROBE_UP, z)
+	var near_to := Vector3(x, fallback - ENTITY_FLOOR_PROBE_DOWN, z)
+	var near_q := PhysicsRayQueryParameters3D.create(near_from, near_to)
+	near_q.collide_with_areas = false
+	near_q.collision_mask = 1
+	var near_hit: Dictionary = space.intersect_ray(near_q)
+	if near_hit and near_hit.has("position"):
+		return float(near_hit.position.y)
+
 	var from := Vector3(x, fallback + 60.0, z)
 	var to := Vector3(x, fallback - 60.0, z)
 	# Terrain-only hit: the true ground at any height, so NPCs follow hills.
 	var qt := PhysicsRayQueryParameters3D.create(from, to)
 	qt.collide_with_areas = false
 	qt.collision_mask = TERRAIN_MASK
-	var ht := space.intersect_ray(qt)
+	var ht: Dictionary = space.intersect_ray(qt)
 	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
 	# First solid from above (terrain or building floor; entities are on layer 2).
 	var qa := PhysicsRayQueryParameters3D.create(from, to)
 	qa.collide_with_areas = false
 	qa.collision_mask = 1
-	var ha := space.intersect_ray(qa)
+	var ha: Dictionary = space.intersect_ray(qa)
 	if ha and ha.has("position"):
 		var any_y := float(ha.position.y)
-		# A surface well above the terrain is a roof/canopy/bridge, not a floor —
-		# don't perch the NPC up there (that was the sky-teleport). A surface near
-		# the terrain is a ground floor the NPC should stand on.
+		# A high hit far from the server's expected height is probably a roof/canopy.
+		# Keep the old terrain fallback for those, but allow elevated floors when they
+		# were close enough to the authoritative fallback height to be found above.
 		if ht and (any_y - ter_y) > 5.0:
 			return ter_y
 		return any_y
@@ -975,21 +989,33 @@ func _sync_entity_markers():
 
 	var incoming_keys: Dictionary = {}
 	var entity_list: Array = []
+	var now_seconds: float = Time.get_ticks_msec() / 1000.0
 	for entity in replicated_entities:
 		if not (entity is Dictionary):
 			continue
 		if bool(entity.get("is_self", false)):
 			continue
-		# Dead mobs disappear: skip them so their marker is freed below, and
-		# drop them as the current target so the target frame/highlight clears.
-		if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
-			var dead_key := _entity_key(entity)
-			if dead_key == _highlighted_entity_key:
+		var entity_key := _entity_key(entity)
+		var entity_dead := bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0
+		if entity_dead:
+			# Keep a dead entity visible briefly so its death animation (when present)
+			# can read before it disappears. This is much clearer than instantly
+			# removing it on the same snapshot that reports 0 HP.
+			if entity_key == _highlighted_entity_key:
 				_highlight_entity("")
-			if not server_target_description.is_empty() and _entity_key(server_target_description) == dead_key:
+			if not server_target_description.is_empty() and _entity_key(server_target_description) == entity_key:
 				server_target_description = {}
-			continue
-		entity_list.append(entity)
+			if not _dead_entity_remove_at.has(entity_key):
+				_dead_entity_remove_at[entity_key] = now_seconds + ENTITY_DEATH_DESPAWN_DELAY
+			if now_seconds >= float(_dead_entity_remove_at.get(entity_key, now_seconds)):
+				continue
+			var dead_entity: Dictionary = entity.duplicate(true)
+			dead_entity["dead"] = true
+			dead_entity["health"] = 0.0
+			entity_list.append(dead_entity)
+		else:
+			_dead_entity_remove_at.erase(entity_key)
+			entity_list.append(entity)
 
 	for i in range(entity_list.size()):
 		var entity_dict: Dictionary = entity_list[i]
@@ -1021,7 +1047,15 @@ func _sync_entity_markers():
 			continue
 		var old_body: Node = replicated_entity_nodes[key]
 		if is_instance_valid(old_body):
+			var old_entity: Dictionary = old_body.get_meta("entity", {})
+			var old_dead := bool(old_entity.get("dead", false)) or float(old_entity.get("health", 1.0)) <= 0.0
+			if old_dead:
+				if not _dead_entity_remove_at.has(key):
+					_dead_entity_remove_at[key] = now_seconds + ENTITY_DEATH_DESPAWN_DELAY
+				if now_seconds < float(_dead_entity_remove_at.get(key, now_seconds)):
+					continue
 			old_body.queue_free()
+		_dead_entity_remove_at.erase(key)
 		replicated_entity_nodes.erase(key)
 
 	# Resolve pending target highlight if entity just appeared in snapshot
