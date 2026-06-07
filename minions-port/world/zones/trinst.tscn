@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3]
+[gd_scene load_steps=64 format=3]
 
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/terrain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__rocks_rock1.tscn" id="2"]
@@ -62,8 +62,11 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_lantern2.tscn" id="60"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavern1.tscn" id="61"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_ruins3.tscn" id="62"]
+[ext_resource type="Script" path="res://world/zone_loader.gd" id="63"]
 
 [node name="Trinst" type="Node3D"]
+script = ExtResource("63")
+authored_zone_name = "trinst"
 metadata/zone = "trinst"
 
 [node name="Terrain" parent="." instance=ExtResource("1")]
