@@ -13,9 +13,24 @@ no longer instantiated from JSON in the live client.
 3. Move, rotate, add, hide, or delete children under `Statics` and `Interiors`.
 4. Save the scene and run the client normally.
 
-The root scene script (`world/zone_loader.gd`) only adds runtime details that are
-not convenient to store in the generated scene: terrain material, collision, the
-fallback building floor slabs, and the sky/sun environment.
+The root scene script (`world/zone_loader.gd`) adds runtime details that are not
+convenient to store in the generated scene: collision, the fallback building
+floor slabs, and the sky/sun environment. It is also a `@tool` script now, so
+when `world/zones/trinst.tscn` is open in the editor it previews the same terrain
+material used at runtime.
+
+## Terrain material/shader
+
+The terrain GLB itself has little/no useful material data from the conversion, so
+it appears white if nothing overrides it. The Trinst loader applies
+`world/zone_terrain.gdshader`, a triplanar spatial shader that blends:
+
+- `assets/trinst/textures/grass01.jpg` on flatter areas,
+- `assets/trinst/textures/rock009.jpg` on steep slopes, and
+- `assets/trinst/textures/sand006.jpg` below the shoreline height.
+
+That shader is applied in editor tool mode for preview and again at runtime when
+the authored scene is finalized.
 
 ## Regenerating from `scene.json`
 

@@ -1,3 +1,4 @@
+@tool
 extends Node3D
 ## Canonical runtime support for a converted MoM zone. It can either build the
 ## legacy JSON description into children, or finalize an authored .tscn version
@@ -9,47 +10,40 @@ extends Node3D
 
 const ASSET_ROOT := "res://assets/"
 
-const TERRAIN_SHADER := """
-shader_type spatial;
-render_mode cull_disabled;
-uniform sampler2D grass_tex : source_color, filter_linear, repeat_enable;
-uniform sampler2D rock_tex : source_color, filter_linear, repeat_enable;
-uniform sampler2D sand_tex : source_color, filter_linear, repeat_enable;
-uniform float tex_scale = 0.12;
-uniform float sand_height = 63.0;
-uniform float sand_blend = 3.0;
-varying vec3 wpos;
-varying vec3 wnrm;
-void vertex() {
-	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	wnrm = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
-}
-vec3 tri(sampler2D t, vec3 p, vec3 n) {
-	vec3 bw = pow(abs(n), vec3(4.0));
-	bw /= (bw.x + bw.y + bw.z);
-	return texture(t, p.zy * tex_scale).rgb * bw.x
-		 + texture(t, p.xz * tex_scale).rgb * bw.y
-		 + texture(t, p.xy * tex_scale).rgb * bw.z;
-}
-void fragment() {
-	vec3 n = normalize(wnrm);
-	float slope = clamp(n.y, 0.0, 1.0);
-	vec3 g = tri(grass_tex, wpos, n);
-	g = mix(g, vec3(0.26, 0.40, 0.14), 0.25);
-	vec3 r = tri(rock_tex, wpos, n);
-	vec3 s = tri(sand_tex, wpos, n);
-	float rockw = smoothstep(0.55, 0.32, slope);
-	float sandw = smoothstep(sand_height + sand_blend, sand_height, wpos.y);
-	ALBEDO = mix(mix(g, s, sandw), r, rockw);
-	ROUGHNESS = 0.96;
-}
-"""
+const TERRAIN_SHADER_PATH := "res://world/zone_terrain.gdshader"
 
 @export var authored_zone_name := ""
 @export var authored_with_environment := true
 
 var zone_name := ""
 var base := ""
+
+
+func _ready() -> void:
+	# Tool-mode preview: make the authored terrain look in the editor like it does
+	# in game, without generating collision bodies or adding runtime lighting.
+	if not Engine.is_editor_hint() or authored_zone_name == "":
+		return
+	zone_name = authored_zone_name
+	base = ASSET_ROOT + zone_name + "/"
+	_apply_authored_terrain_material(self)
+
+
+func _apply_authored_terrain_material(node: Node) -> void:
+	for child in node.get_children():
+		if child is Node3D:
+			var n := child as Node3D
+			if str(n.get_meta("zone_role", "")) == "terrain":
+				_texture_terrain(n, _terrain_texture_defaults())
+		_apply_authored_terrain_material(child)
+
+
+func _terrain_texture_defaults() -> Dictionary:
+	return {
+		"grass": "textures/grass01.jpg",
+		"rock": "textures/rock009.jpg",
+		"sand": "textures/sand006.jpg",
+	}
 
 # Interiors that should be walk-through (no collision): decorative monuments /
 # spawn markers the player stands at or passes through. The bindpoint monument
@@ -114,11 +108,7 @@ func _finalize_authored_node(node: Node) -> void:
 			for mi in _mesh_instances(n):
 				mi.lod_bias = 64.0
 			if role == "terrain":
-				_texture_terrain(n, {
-					"grass": "textures/grass01.jpg",
-					"rock": "textures/rock009.jpg",
-					"sand": "textures/sand006.jpg",
-				})
+				_texture_terrain(n, _terrain_texture_defaults())
 				_ensure_mesh_collision(n, true)
 			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
 				_ensure_mesh_collision(n, false)
@@ -249,9 +239,10 @@ func _texture_terrain(node: Node, texdict) -> void:
 	var rock = _load_tex(texdict.get("rock", null))
 	var sand = _load_tex(texdict.get("sand", null))
 	var mat := ShaderMaterial.new()
-	var sh := Shader.new()
-	sh.code = TERRAIN_SHADER
-	mat.shader = sh
+	mat.shader = load(TERRAIN_SHADER_PATH) as Shader
+	if mat.shader == null:
+		push_warning("zone_loader: terrain shader missing at " + TERRAIN_SHADER_PATH)
+		return
 	mat.set_shader_parameter("grass_tex", grass)
 	mat.set_shader_parameter("rock_tex", rock if rock else grass)
 	mat.set_shader_parameter("sand_tex", sand if sand else grass)
