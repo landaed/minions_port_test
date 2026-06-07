@@ -64,10 +64,21 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_ruins3.tscn" id="62"]
 [ext_resource type="Script" uid="uid://p08nspx3t8it" path="res://world/zone_loader.gd" id="63"]
 
+[sub_resource type="Environment" id="Environment_a7ty3"]
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+sdfgi_use_occlusion = true
+sdfgi_min_cell_size = 28.57
+glow_enabled = true
+
 [node name="Trinst" type="Node3D" unique_id=784430246]
 script = ExtResource("63")
 authored_zone_name = "trinst"
 metadata/zone = "trinst"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=281494654]
+environment = SubResource("Environment_a7ty3")
 
 [node name="Terrain" parent="." unique_id=1321051519 instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1024, 0, 1024)
@@ -75,10 +86,8 @@ metadata/zone_glb = "terrain"
 
 [node name="Statics" type="Node3D" parent="." unique_id=985780187]
 
-[node name="rocks_rock1_000" parent="Statics" unique_id=943960641 instance=ExtResource("2")]
+[node name="rocks_rock1_000" parent="Statics" unique_id=578706599 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 119.356, 134.917, -61.3617)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
 [node name="DoorUpperRoom_000" parent="Statics" unique_id=1256717104 instance=ExtResource("3")]
 transform = Transform3D(-0.10240276, 0, -0.16004272, 0, 0.19, 0, 0.16004272, 0, -0.10240276, 31.6632, 162.059, 255.088)
@@ -150,55 +159,35 @@ transform = Transform3D(-0.24999493, 0, -0.0015926021, 0, 0.25, 0, 0.0015926021,
 metadata/zone_glb = "lanterns_lantern"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
 
-[node name="plants_weed_1_000" parent="Statics" unique_id=1559061341 instance=ExtResource("6")]
+[node name="plants_weed_1_000" parent="Statics" unique_id=815317835 instance=ExtResource("6")]
 transform = Transform3D(-0.1937036, 0, -0.04978869, 0, 0.2, 0, 0.04978869, 0, -0.1937036, 133.284, 147.052, 5.48532)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_001" parent="Statics" unique_id=811359538 instance=ExtResource("6")]
+[node name="plants_weed_1_001" parent="Statics" unique_id=1188475851 instance=ExtResource("6")]
 transform = Transform3D(-0.031707093, 0, -0.19747065, 0, 0.2, 0, 0.19747065, 0, -0.031707093, 133.032, 147.032, -0.415132)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_002" parent="Statics" unique_id=1543653887 instance=ExtResource("6")]
+[node name="plants_weed_1_002" parent="Statics" unique_id=225928065 instance=ExtResource("6")]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 116.073, 147.06, -2.54681)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_003" parent="Statics" unique_id=55820709 instance=ExtResource("6")]
+[node name="plants_weed_1_003" parent="Statics" unique_id=350623428 instance=ExtResource("6")]
 transform = Transform3D(0.081697635, 0, -0.18255273, 0, 0.2, 0, 0.18255273, 0, 0.081697635, 117.184, 147.092, 0.536572)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_004" parent="Statics" unique_id=937194255 instance=ExtResource("6")]
+[node name="plants_weed_1_004" parent="Statics" unique_id=944196155 instance=ExtResource("6")]
 transform = Transform3D(-0.07030624, 0, -0.18723524, 0, 0.2, 0, 0.18723524, 0, -0.07030624, 113.264, 147.032, 5.05434)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_005" parent="Statics" unique_id=991072296 instance=ExtResource("6")]
+[node name="plants_weed_1_005" parent="Statics" unique_id=690594113 instance=ExtResource("6")]
 transform = Transform3D(0.1967687, 0, -0.03580612, 0, 0.2, 0, 0.03580612, 0, 0.1967687, 115.855, 147.052, 2.3423)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_006" parent="Statics" unique_id=55552153 instance=ExtResource("6")]
+[node name="plants_weed_1_006" parent="Statics" unique_id=1372914590 instance=ExtResource("6")]
 transform = Transform3D(0.1967687, 0, -0.03580612, 0, 0.2, 0, 0.03580612, 0, 0.1967687, 113.801, 147.052, -0.112038)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_007" parent="Statics" unique_id=1159762256 instance=ExtResource("6")]
+[node name="plants_weed_1_007" parent="Statics" unique_id=389486702 instance=ExtResource("6")]
 transform = Transform3D(0.1967687, 0, -0.03580612, 0, 0.2, 0, 0.03580612, 0, 0.1967687, 136.544, 147.032, 1.43203)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_008" parent="Statics" unique_id=655523881 instance=ExtResource("6")]
+[node name="plants_weed_1_008" parent="Statics" unique_id=1199078737 instance=ExtResource("6")]
 transform = Transform3D(0.010154844, 0, -0.19974203, 0, 0.2, 0, 0.19974203, 0, 0.010154844, 135.602, 146.972, -1.37684)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="plants_weed_1_009" parent="Statics" unique_id=1435510114 instance=ExtResource("6")]
+[node name="plants_weed_1_009" parent="Statics" unique_id=972592516 instance=ExtResource("6")]
 transform = Transform3D(0.010154844, 0, -0.19974203, 0, 0.2, 0, 0.19974203, 0, 0.010154844, 134.346, 147.052, 1.13657)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
 [node name="lantern_011" parent="Statics" unique_id=958424683 instance=ExtResource("4")]
 transform = Transform3D(0.011500833, 0, -0.39983463, 0, 0.4, 0, 0.39983463, 0, 0.011500833, 35.0373, 132.099, -271.418)
@@ -235,100 +224,62 @@ transform = Transform3D(0.011858822, 0, 0.39982417, 0, 0.4, 0, -0.39982417, 0, 0
 metadata/zone_glb = "lanterns_lantern"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
 
-[node name="rocks_rock1_001" parent="Statics" unique_id=1712178697 instance=ExtResource("2")]
+[node name="rocks_rock1_001" parent="Statics" unique_id=697412732 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -610.081, 246.241, -422.638)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="Tree_000" parent="Statics" unique_id=1190488556 instance=ExtResource("7")]
+[node name="Tree_000" parent="Statics" unique_id=110078714 instance=ExtResource("7")]
 transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 117.705, 130.176, -76.6401)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="Tree_001" parent="Statics" unique_id=842437991 instance=ExtResource("7")]
+[node name="Tree_001" parent="Statics" unique_id=1032367510 instance=ExtResource("7")]
 transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 132.138, 130.439, -76.5252)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="Tree_002" parent="Statics" unique_id=1510532559 instance=ExtResource("7")]
+[node name="Tree_002" parent="Statics" unique_id=612238210 instance=ExtResource("7")]
 transform = Transform3D(0.34640226, 0, -1.2010435, 0, 1.25, 0, 1.2010435, 0, 0.34640226, 140.094, 127.885, -90.0701)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="Tree_003" parent="Statics" unique_id=1232724743 instance=ExtResource("7")]
+[node name="Tree_003" parent="Statics" unique_id=376427063 instance=ExtResource("7")]
 transform = Transform3D(-0.36844695, 0, -1.194465, 0, 1.25, 0, 1.194465, 0, -0.36844695, 140.468, 127.174, -102.213)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="Tree_004" parent="Statics" unique_id=395529204 instance=ExtResource("7")]
+[node name="Tree_004" parent="Statics" unique_id=489405512 instance=ExtResource("7")]
 transform = Transform3D(-0.36844695, 0, -1.194465, 0, 1.25, 0, 1.194465, 0, -0.36844695, 108.623, 128.092, -88.065)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="Tree_005" parent="Statics" unique_id=322215855 instance=ExtResource("7")]
+[node name="Tree_005" parent="Statics" unique_id=1307660541 instance=ExtResource("7")]
 transform = Transform3D(-0.93844634, 0, -0.825723, 0, 1.25, 0, 0.825723, 0, -0.93844634, 107.409, 127.493, -103.427)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_000" parent="Statics" unique_id=1447295301 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_000" parent="Statics" unique_id=1693395352 instance=ExtResource("7")]
 transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 74.0076, 131.272, 226.277)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_001" parent="Statics" unique_id=721641938 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_001" parent="Statics" unique_id=1350858233 instance=ExtResource("7")]
 transform = Transform3D(0.043108054, 0, -1.3993362, 0, 1.4, 0, 1.3993362, 0, 0.043108054, 50.1755, 129.841, 223.259)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_002" parent="Statics" unique_id=2008911330 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_002" parent="Statics" unique_id=1758468745 instance=ExtResource("7")]
 transform = Transform3D(0.5360487, 0, -1.6132736, 0, 1.7, 0, 1.6132736, 0, 0.5360487, 80.056, 136.891, 193.775)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_003" parent="Statics" unique_id=657000300 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_003" parent="Statics" unique_id=2134926783 instance=ExtResource("7")]
 transform = Transform3D(-1.2830625, 0, -0.20916688, 0, 1.3, 0, 0.20916688, 0, -1.2830625, 91.4962, 135.714, 215.794)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_004" parent="Statics" unique_id=238685120 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_004" parent="Statics" unique_id=239483050 instance=ExtResource("7")]
 transform = Transform3D(-1.3817595, 0, -0.22525664, 0, 1.4, 0, 0.22525664, 0, -1.3817595, 120.329, 143.934, 191.117)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_005" parent="Statics" unique_id=50962325 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_005" parent="Statics" unique_id=1262505870 instance=ExtResource("7")]
 transform = Transform3D(-1.2937112, 0, 0.12771583, 0, 1.3, 0, -0.12771583, 0, -1.2937112, 101.126, 144.178, 174.313)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_006" parent="Statics" unique_id=30460642 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_006" parent="Statics" unique_id=237645270 instance=ExtResource("7")]
 transform = Transform3D(-0.9040751, 0, -0.42737365, 0, 1, 0, 0.42737365, 0, -0.9040751, 114.051, 148.068, 149.098)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_007" parent="Statics" unique_id=1466868985 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_007" parent="Statics" unique_id=2067201759 instance=ExtResource("7")]
 transform = Transform3D(-0.68637097, 0, 1.2202028, 0, 1.4, 0, -1.2202028, 0, -0.68637097, 132.547, 148.31, 149.21)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_008" parent="Statics" unique_id=862248061 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_008" parent="Statics" unique_id=234116112 instance=ExtResource("7")]
 transform = Transform3D(-1.3817595, 0, -0.22525664, 0, 1.4, 0, 0.22525664, 0, -1.3817595, 134.533, 151.677, 121.413)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_009" parent="Statics" unique_id=930872320 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_009" parent="Statics" unique_id=64518684 instance=ExtResource("7")]
 transform = Transform3D(-1.5791538, 0, -0.25743616, 0, 1.6, 0, 0.25743616, 0, -1.5791538, 112.494, 148.258, 116.755)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_010" parent="Statics" unique_id=1025797108 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_010" parent="Statics" unique_id=1505332841 instance=ExtResource("7")]
 transform = Transform3D(-1.2937112, 0, 0.12771583, 0, 1.3, 0, -0.12771583, 0, -1.2937112, 112.466, 148.141, 68.3182)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_011" parent="Statics" unique_id=1868672165 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_011" parent="Statics" unique_id=1313867563 instance=ExtResource("7")]
 transform = Transform3D(-1.4927437, 0, 0.14736441, 0, 1.5, 0, -0.14736441, 0, -1.4927437, 135.182, 148.9, 54.6944)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
 [node name="lantern_018" parent="Statics" unique_id=864503793 instance=ExtResource("4")]
 transform = Transform3D(0.0038914906, 0, -0.2499697, 0, 0.25, 0, 0.2499697, 0, 0.0038914906, 132.092, 129.158, -114.923)
@@ -685,55 +636,37 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 183.858, 128.745, -128.475)
 metadata/zone_glb = "objects_bottle_1"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts"
 
-[node name="Rock_000" parent="Statics" unique_id=1749683624 instance=ExtResource("19")]
+[node name="Rock_000" parent="Statics" unique_id=52895025 instance=ExtResource("19")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -431.38, 155.577, 42.7696)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_001" parent="Statics" unique_id=1233382349 instance=ExtResource("19")]
+[node name="Rock_001" parent="Statics" unique_id=51771587 instance=ExtResource("19")]
 transform = Transform3D(-0.2710959, 1.9451481, -0.37802905, -5.9051513e-06, -0.38155127, -1.9632673, -1.9815416, -0.26611573, 0.051724233, -434.167, 153.391, 42.0405)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_002" parent="Statics" unique_id=388854197 instance=ExtResource("19")]
+[node name="Rock_002" parent="Statics" unique_id=708779233 instance=ExtResource("19")]
 transform = Transform3D(-1.8055118, -0.21127042, 0.8339616, -0.15011409, 1.9863793, 0.17822216, -0.8471086, 0.09829642, -1.809073, -430.538, 156.058, 42.9005)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_003" parent="Statics" unique_id=1583151814 instance=ExtResource("19")]
+[node name="Rock_003" parent="Statics" unique_id=956290554 instance=ExtResource("19")]
 transform = Transform3D(-1.9977684, -0.042643175, 0.084279835, 1.4122969e-06, 1.7845582, 0.9029686, -0.09445386, 0.9019611, -1.7825669, -433.661, 161.372, 42.1297)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_004" parent="Statics" unique_id=1967184721 instance=ExtResource("19")]
+[node name="Rock_004" parent="Statics" unique_id=245591627 instance=ExtResource("19")]
 transform = Transform3D(0.7037328, -0.32861012, 0.62990123, -0.024195477, 0.8750051, 0.48350868, -0.71005267, -0.35550165, 0.6078189, -416.261, 155.207, 26.7546)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_005" parent="Statics" unique_id=1402197161 instance=ExtResource("19")]
+[node name="Rock_005" parent="Statics" unique_id=2142686287 instance=ExtResource("19")]
 transform = Transform3D(-0.9159416, 0.16188915, -0.3672096, -1.5860218e-07, 0.9150235, 0.40340045, 0.4013116, 0.3694913, -0.83810806, -407.843, 154.104, 44.746)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_006" parent="Statics" unique_id=1609898620 instance=ExtResource("19")]
+[node name="Rock_006" parent="Statics" unique_id=1155702557 instance=ExtResource("19")]
 transform = Transform3D(0.72570837, -0.169148, 0.6668855, 0.59138113, 0.648707, -0.4790069, -0.35159025, 0.74200284, 0.57080305, -388.547, 148.921, 24.1046)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
-[node name="Rock_007" parent="Statics" unique_id=1630329705 instance=ExtResource("19")]
+[node name="Rock_007" parent="Statics" unique_id=1936287673 instance=ExtResource("19")]
 transform = Transform3D(0.37777883, -4.87127, -1.0620785, 4.4717975, 0.802044, -2.0880027, 2.2046118, -0.79211926, 4.4172654, -446.522, 170.855, 21.7458)
-metadata/zone_glb = "rocks_rock3"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
 
 [node name="pipe_000" parent="Statics" unique_id=723520950 instance=ExtResource("20")]
 transform = Transform3D(2.402069, 1.7938619, 0.11010569, -1.7889614, 2.4041343, -0.14055403, -0.17228112, 0.046881884, 2.994682, 376.389, 147.895, -291.752)
 metadata/zone_glb = "objects_pipe_4"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/pipe_4.dts"
 
-[node name="GIANTROCKSNAKE_000" parent="Statics" unique_id=1331698425 instance=ExtResource("2")]
+[node name="GIANTROCKSNAKE_000" parent="Statics" unique_id=1654802896 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 557.884, 165.656, 76.3955)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
 [node name="ZoustDoorOut_000" parent="Statics" unique_id=1791760707 instance=ExtResource("21")]
 transform = Transform3D(0.05156991, 0, 0.19323702, 0, 0.2, 0, -0.19323702, 0, 0.05156991, 519.557, 145.575, -402.135)
@@ -755,160 +688,98 @@ transform = Transform3D(-0.090434015, 0, 0.17838635, 0, 0.2, 0, -0.17838635, 0, 
 metadata/zone_glb = "objects_door_1"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts"
 
-[node name="trees_ftree04_ftree04_012" parent="Statics" unique_id=1249151826 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_012" parent="Statics" unique_id=148418652 instance=ExtResource("7")]
 transform = Transform3D(-0.9040751, 0, -0.42737365, 0, 1, 0, 0.42737365, 0, -0.9040751, 109.819, 146.718, 233.727)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_013" parent="Statics" unique_id=1540172355 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_013" parent="Statics" unique_id=2140900180 instance=ExtResource("7")]
 transform = Transform3D(-0.9040751, 0, -0.42737365, 0, 1, 0, 0.42737365, 0, -0.9040751, 67.8097, 150.33, 168.605)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_014" parent="Statics" unique_id=108734123 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_014" parent="Statics" unique_id=1851074166 instance=ExtResource("7")]
 transform = Transform3D(-0.9040751, 0, -0.42737365, 0, 1, 0, 0.42737365, 0, -0.9040751, 85.3769, 159.615, 107.498)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_015" parent="Statics" unique_id=1855452185 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_015" parent="Statics" unique_id=1586639804 instance=ExtResource("7")]
 transform = Transform3D(-0.9040751, 0, -0.42737365, 0, 1, 0, 0.42737365, 0, -0.9040751, 166.083, 161.724, 102.858)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_016" parent="Statics" unique_id=607627093 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_016" parent="Statics" unique_id=462389427 instance=ExtResource("7")]
 transform = Transform3D(-0.6228561, 0, 0.7823365, 0, 1, 0, -0.7823365, 0, -0.6228561, 80.9462, 154.339, 151.327)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_017" parent="Statics" unique_id=939404904 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_017" parent="Statics" unique_id=1217433952 instance=ExtResource("7")]
 transform = Transform3D(-0.6228561, 0, 0.7823365, 0, 1, 0, -0.7823365, 0, -0.6228561, 86.1608, 146.672, 252.914)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_018" parent="Statics" unique_id=1503971719 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_018" parent="Statics" unique_id=104378226 instance=ExtResource("7")]
 transform = Transform3D(-0.6228561, 0, 0.7823365, 0, 1, 0, -0.7823365, 0, -0.6228561, 166.961, 160.451, 136.078)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_019" parent="Statics" unique_id=81505674 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_019" parent="Statics" unique_id=1979472692 instance=ExtResource("7")]
 transform = Transform3D(-0.45271403, 0, 0.21224985, 0, 0.5, 0, -0.21224985, 0, -0.45271403, 133.105, 147.514, 3.10983)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_020" parent="Statics" unique_id=963913201 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_020" parent="Statics" unique_id=1273116001 instance=ExtResource("7")]
 transform = Transform3D(-0.45203754, 0, -0.21368682, 0, 0.5, 0, 0.21368682, 0, -0.45203754, 136.068, 147.314, 4.06823)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_021" parent="Statics" unique_id=1282986186 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_021" parent="Statics" unique_id=114795458 instance=ExtResource("7")]
 transform = Transform3D(-0.45203754, 0, -0.21368682, 0, 0.5, 0, 0.21368682, 0, -0.45203754, 114.154, 147.514, 2.17566)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_022" parent="Statics" unique_id=1695817140 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_022" parent="Statics" unique_id=2103256457 instance=ExtResource("7")]
 transform = Transform3D(-0.45203754, 0, -0.21368682, 0, 0.5, 0, 0.21368682, 0, -0.45203754, 134.354, 147.314, -0.973314)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_023" parent="Statics" unique_id=1742455187 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_023" parent="Statics" unique_id=2108096865 instance=ExtResource("7")]
 transform = Transform3D(-0.45203754, 0, -0.21368682, 0, 0.5, 0, 0.21368682, 0, -0.45203754, 115.757, 147.314, -0.351234)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_024" parent="Statics" unique_id=440487365 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_024" parent="Statics" unique_id=1584821487 instance=ExtResource("7")]
 transform = Transform3D(-0.26235706, 0, 0.42563924, 0, 0.5, 0, -0.42563924, 0, -0.26235706, 116.65, 147.514, 4.38631)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_025" parent="Statics" unique_id=766870582 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_025" parent="Statics" unique_id=831977785 instance=ExtResource("7")]
 transform = Transform3D(-0.26235706, 0, 0.42563924, 0, 0.5, 0, -0.42563924, 0, -0.26235706, -3.35657, 136.81, 239.47)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_026" parent="Statics" unique_id=294930544 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_026" parent="Statics" unique_id=2113013291 instance=ExtResource("7")]
 transform = Transform3D(-0.26235706, 0, 0.42563924, 0, 0.5, 0, -0.42563924, 0, -0.26235706, -4.84541, 127.873, 260.411)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_027" parent="Statics" unique_id=572010896 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_027" parent="Statics" unique_id=1858715914 instance=ExtResource("7")]
 transform = Transform3D(0.20735377, 0, 0.45497736, 0, 0.5, 0, -0.45497736, 0, 0.20735377, -0.802752, 134.82, 246.232)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_028" parent="Statics" unique_id=1824888733 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_028" parent="Statics" unique_id=29585700 instance=ExtResource("7")]
 transform = Transform3D(0.40891272, 0, 0.2877332, 0, 0.5, 0, -0.2877332, 0, 0.40891272, 9.00503, 145.8, 207.15)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_029" parent="Statics" unique_id=1635277557 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_029" parent="Statics" unique_id=1686650227 instance=ExtResource("7")]
 transform = Transform3D(0.40891272, 0, 0.2877332, 0, 0.5, 0, -0.2877332, 0, 0.40891272, 26.0115, 150.075, 204.247)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_030" parent="Statics" unique_id=1705742841 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_030" parent="Statics" unique_id=673048426 instance=ExtResource("7")]
 transform = Transform3D(0.40891272, 0, 0.2877332, 0, 0.5, 0, -0.2877332, 0, 0.40891272, 37.4595, 150.515, 179.337)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_031" parent="Statics" unique_id=1227171239 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_031" parent="Statics" unique_id=1788100093 instance=ExtResource("7")]
 transform = Transform3D(0.40891272, 0, 0.2877332, 0, 0.5, 0, -0.2877332, 0, 0.40891272, 17.9394, 149.292, 193.567)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_032" parent="Statics" unique_id=2054819040 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_032" parent="Statics" unique_id=1563112581 instance=ExtResource("7")]
 transform = Transform3D(0.40891272, 0, 0.2877332, 0, 0.5, 0, -0.2877332, 0, 0.40891272, 56.0584, 134.041, 304.334)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_033" parent="Statics" unique_id=289133430 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_033" parent="Statics" unique_id=30913237 instance=ExtResource("7")]
 transform = Transform3D(0.30018777, 0, -0.3998591, 0, 0.5, 0, 0.3998591, 0, 0.30018777, 71.8561, 139.958, 291.489)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_034" parent="Statics" unique_id=1967560693 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_034" parent="Statics" unique_id=273937824 instance=ExtResource("7")]
 transform = Transform3D(-0.08756308, 0, -0.492273, 0, 0.5, 0, 0.492273, 0, -0.08756308, 77.5274, 142.534, 274.084)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_035" parent="Statics" unique_id=1117325585 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_035" parent="Statics" unique_id=722968994 instance=ExtResource("7")]
 transform = Transform3D(-0.08756308, 0, -0.492273, 0, 0.5, 0, 0.492273, 0, -0.08756308, 100.477, 147.539, 255.728)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="trees_ftree04_ftree04_036" parent="Statics" unique_id=1893001436 instance=ExtResource("7")]
+[node name="trees_ftree04_ftree04_036" parent="Statics" unique_id=2101923752 instance=ExtResource("7")]
 transform = Transform3D(-0.122588314, 0, -0.6891822, 0, 0.7, 0, 0.6891822, 0, -0.122588314, 66.3349, 138.443, 292.042)
-metadata/zone_glb = "trees_ftree04_ftree04"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
 
-[node name="rocks_rock1_002" parent="Statics" unique_id=1813056171 instance=ExtResource("2")]
+[node name="rocks_rock1_002" parent="Statics" unique_id=607288687 instance=ExtResource("2")]
 transform = Transform3D(0.30581662, 0, -0.95209044, 0, 1, 0, 0.95209044, 0, 0.30581662, 56.3771, 132.441, 279.104)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="rocks_rock1_003" parent="Statics" unique_id=63647964 instance=ExtResource("2")]
+[node name="rocks_rock1_003" parent="Statics" unique_id=1543599720 instance=ExtResource("2")]
 transform = Transform3D(0.30581662, 0, -0.95209044, 0, 1, 0, 0.95209044, 0, 0.30581662, 55.2607, 126.344, 264.668)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="rocks_rock1_004" parent="Statics" unique_id=208443423 instance=ExtResource("2")]
+[node name="rocks_rock1_004" parent="Statics" unique_id=1987481235 instance=ExtResource("2")]
 transform = Transform3D(0.30581662, 0, -0.95209044, 0, 1, 0, 0.95209044, 0, 0.30581662, 48.4279, 128.447, 284.628)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="rocks_rock1_005" parent="Statics" unique_id=1443382097 instance=ExtResource("2")]
+[node name="rocks_rock1_005" parent="Statics" unique_id=1356955902 instance=ExtResource("2")]
 transform = Transform3D(-0.6124932, 0, -0.79047585, 0, 1, 0, 0.79047585, 0, -0.6124932, 19.3477, 129.136, 252.696)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="rocks_rock1_006" parent="Statics" unique_id=933402342 instance=ExtResource("2")]
+[node name="rocks_rock1_006" parent="Statics" unique_id=388807607 instance=ExtResource("2")]
 transform = Transform3D(-0.6124932, 0, -0.79047585, 0, 1, 0, 0.79047585, 0, -0.6124932, 18.0081, 134.638, 241.792)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
-[node name="rocks_rock1_007" parent="Statics" unique_id=621674465 instance=ExtResource("2")]
+[node name="rocks_rock1_007" parent="Statics" unique_id=1212528085 instance=ExtResource("2")]
 transform = Transform3D(-0.6124932, 0, -0.79047585, 0, 1, 0, 0.79047585, 0, -0.6124932, 24.2059, 129.449, 246.17)
-metadata/zone_glb = "rocks_rock1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
 
 [node name="Chair_012" parent="Statics" unique_id=1797070265 instance=ExtResource("15")]
 transform = Transform3D(0.39812714, 0, -0.038662538, 0, 0.4, 0, 0.038662538, 0, 0.39812714, 118.56, 147.082, -22.2711)
@@ -930,85 +801,53 @@ transform = Transform3D(0.17716686, 0, 0.17638566, 0, 0.25, 0, -0.17638566, 0, 0
 metadata/zone_glb = "objects_candle_1"
 metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
 
-[node name="BWFlowerA1_000" parent="Statics" unique_id=459161977 instance=ExtResource("6")]
+[node name="BWFlowerA1_000" parent="Statics" unique_id=389808866 instance=ExtResource("6")]
 transform = Transform3D(-0.034312293, 0.00019988013, 0.19703458, -0.009811363, 0.19975005, -0.00191122, -0.19679025, -0.009993781, -0.034259606, -249.273, 205.279, -693.733)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA2_000" parent="Statics" unique_id=614312575 instance=ExtResource("6")]
+[node name="BWFlowerA2_000" parent="Statics" unique_id=1318176258 instance=ExtResource("6")]
 transform = Transform3D(0.0015171769, 0.00019989346, 0.19999415, -0.009994973, 0.19975005, -0.00012382655, -0.19974433, -0.009993741, 0.0015252705, -246.994, 205.475, -690.622)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA3_000" parent="Statics" unique_id=1082203384 instance=ExtResource("6")]
+[node name="BWFlowerA3_000" parent="Statics" unique_id=13224781 instance=ExtResource("6")]
 transform = Transform3D(0.16582996, 0.00019990015, 0.111805126, -0.0057523004, 0.19975005, 0.0081747025, -0.11165723, -0.009993736, 0.16562846, -246.426, 205.327, -695.36)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA4_000" parent="Statics" unique_id=1389149102 instance=ExtResource("6")]
+[node name="BWFlowerA4_000" parent="Statics" unique_id=1261323008 instance=ExtResource("6")]
 transform = Transform3D(0.19652091, 0.0001999443, -0.037141517, 0.001659744, 0.19975004, 0.009857251, 0.037104953, -0.009994007, 0.19627364, -243.351, 205.566, -690.326)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA5_000" parent="Statics" unique_id=2053612293 instance=ExtResource("6")]
+[node name="BWFlowerA5_000" parent="Statics" unique_id=2094748543 instance=ExtResource("6")]
 transform = Transform3D(0.0015239713, -0.011853619, 0.1996426, -0.0019991056, 0.19963752, 0.0118685765, -0.19998421, -0.00208597, 0.0014027262, -243.031, 205.463, -693.533)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA6_000" parent="Statics" unique_id=453518227 instance=ExtResource("6")]
+[node name="BWFlowerA6_000" parent="Statics" unique_id=310730961 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -241.609, 205.627, -688.878)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA7_000" parent="Statics" unique_id=856363081 instance=ExtResource("6")]
+[node name="BWFlowerA7_000" parent="Statics" unique_id=340877827 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -239.899, 205.565, -691.491)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerA8_000" parent="Statics" unique_id=1635667510 instance=ExtResource("6")]
+[node name="BWFlowerA8_000" parent="Statics" unique_id=182622229 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -239.127, 205.484, -694.398)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB1_000" parent="Statics" unique_id=1921542123 instance=ExtResource("6")]
+[node name="BWFlowerB1_000" parent="Statics" unique_id=878783788 instance=ExtResource("6")]
 transform = Transform3D(0.05470029, 0.0045269183, 0.19232105, -0.009811372, 0.19975005, -0.0019112172, -0.19212396, -0.008911946, 0.054854006, -243.853, 205.19, -708.712)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB2_000" parent="Statics" unique_id=728002620 instance=ExtResource("6")]
+[node name="BWFlowerB2_000" parent="Statics" unique_id=957843043 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -242.134, 205.22, -705.859)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB3_000" parent="Statics" unique_id=749796982 instance=ExtResource("6")]
+[node name="BWFlowerB3_000" parent="Statics" unique_id=752823816 instance=ExtResource("6")]
 transform = Transform3D(0.19788814, 0.004526956, 0.028632008, -0.005752333, 0.19975005, 0.00817472, -0.028411193, -0.008911906, 0.19777103, -240.583, 205.138, -708.935)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB4_000" parent="Statics" unique_id=974254821 instance=ExtResource("6")]
+[node name="BWFlowerB4_000" parent="Statics" unique_id=599113820 instance=ExtResource("6")]
 transform = Transform3D(0.08835845, -0.00976622, 0.1791575, -0.001999098, 0.19963752, 0.011868559, -0.17941235, -0.007034204, 0.08810069, -239.174, 205.136, -707.165)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB5_000" parent="Statics" unique_id=1587404 instance=ExtResource("6")]
+[node name="BWFlowerB5_000" parent="Statics" unique_id=608316997 instance=ExtResource("6")]
 transform = Transform3D(0.16081733, 0.0045270845, -0.11881622, 0.0016597434, 0.19975005, 0.009857247, 0.118890844, -0.008912102, 0.16057877, -237.314, 205.127, -703.923)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB6_000" parent="Statics" unique_id=1181122874 instance=ExtResource("6")]
+[node name="BWFlowerB6_000" parent="Statics" unique_id=1554744300 instance=ExtResource("6")]
 transform = Transform3D(0.08808996, -0.0069512157, 0.17942084, 0.015983794, 0.19936024, -0.00012381913, -0.1788426, 0.014393665, 0.08836371, -234.675, 205.111, -705.654)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB7_000" parent="Statics" unique_id=927822195 instance=ExtResource("6")]
+[node name="BWFlowerB7_000" parent="Statics" unique_id=2123687016 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -234.936, 205.077, -702.245)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
-[node name="BWFlowerB8_000" parent="Statics" unique_id=696157191 instance=ExtResource("6")]
+[node name="BWFlowerB8_000" parent="Statics" unique_id=1888179201 instance=ExtResource("6")]
 transform = Transform3D(0.08824788, 0.004526917, 0.17942078, -0.009994966, 0.19975005, -0.00012382807, -0.17919937, -0.008911885, 0.08836383, -237.191, 205.216, -700.828)
-metadata/zone_glb = "plants_weed_1"
-metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
 
 [node name="BWTable_000" parent="Statics" unique_id=1562624802 instance=ExtResource("22")]
 transform = Transform3D(-0.18657319, 0.0032940444, -0.46387455, -0.0006916194, 0.29998952, 0.0024084453, 0.4638848, 0.0025672533, -0.18655908, -240.353, 206.142, -701.398)
@@ -1314,4 +1153,4 @@ transform = Transform3D(0.98200256, 0, 0.1888675, 0, 1, 0, -0.1888675, 0, 0.9820
 transform = Transform3D(-0.9329079, -4.1264787e-08, 0.36011514, -0.0036011278, 0.99995, -0.009328903, -0.36009714, -0.0099998275, -0.9328612, -243.308, 205.903, -704.309)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1745281072]
-transform = Transform3D(1, 0, 0, 0, -0.9929655, 0.118403874, 0, -0.118403874, -0.9929655, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.62809896, 0.77813345, 0, -0.77813345, -0.62809896, 0, 0, 0)

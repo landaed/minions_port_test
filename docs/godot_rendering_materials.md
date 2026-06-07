@@ -64,6 +64,16 @@ add a loader/generator rule that assigns a material override based on
 `metadata/source_glb` or `metadata/zone_glb`. Avoid editing generated scene lines
 by hand if you plan to regenerate the scene.
 
+
+### Baked normals for converted organic assets
+
+Character GLBs and the Trinst tree/rock/plant shape GLBs have their vertex
+normals baked directly into the source `.glb` files so they light correctly in
+both the Godot editor and live gameplay. Do not add a runtime normal flip for
+these assets: the editor-visible source assets are the canonical fix, while
+buildings, interiors, and terrain remain unchanged because their normals already
+match the directional light.
+
 ### Characters
 
 Characters are loaded through `world/character_rig.gd`. Player/NPC texture swaps
