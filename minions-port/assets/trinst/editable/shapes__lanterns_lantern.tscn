@@ -4,33 +4,27 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8mpt1"]
 emission_enabled = true
-emission = Color(18.540012, 16.920147, 0, 1)
+emission = Color(15.581995, 13.750843, 0, 1)
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_e4nsi"]
-emission_shape = 1
-emission_sphere_radius = 1.0
-inherit_velocity_ratio = 1.0
-direction = Vector3(0, 1, 0)
-spread = 29.647
-initial_velocity_max = 1.0
-gravity = Vector3(0, -1, 0)
-scale_min = 0.01
-scale_max = 0.5
-hue_variation_min = -0.91
-hue_variation_max = 0.99999994
-turbulence_enabled = true
-
-[sub_resource type="SphereMesh" id="SphereMesh_b2olk"]
+[sub_resource type="SphereMesh" id="SphereMesh_e4nsi"]
+material = SubResource("StandardMaterial3D_8mpt1")
+radius = 0.1
+height = 0.1
 
 [node name="lanterns_lantern" unique_id=1578713288 instance=ExtResource("1")]
 metadata/source_glb = "res://assets/trinst/shapes/lanterns_lantern.glb"
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="." index="1" unique_id=771630534]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4788814, 0)
-material_override = SubResource("StandardMaterial3D_8mpt1")
-visibility_aabb = AABB(0, 0, 0, 0, 0, 0)
-process_material = SubResource("ParticleProcessMaterial_e4nsi")
-draw_pass_1 = SubResource("SphereMesh_b2olk")
+[node name="CPUParticles3D" type="CPUParticles3D" parent="lantern" parent_id_path=PackedInt32Array(1266971098) index="0" unique_id=108351533]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4190106, -0.29674304)
+amount = 20
+mesh = SubResource("SphereMesh_e4nsi")
+direction = Vector3(0, 1, 0)
+spread = 25.4
+gravity = Vector3(0, -1, 0)
+initial_velocity_max = 3.0
+scale_amount_min = 0.1
+scale_amount_max = 0.5
 
-[node name="OmniLight3D" type="OmniLight3D" parent="." index="2" unique_id=1987026320]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4822934, 0)
+[node name="OmniLight3D" type="OmniLight3D" parent="." index="1" unique_id=1987026320]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.055784523, 1.7896585, -0.37751758)
+light_color = Color(0.9999998, 0.9896856, 0.3794788, 1)

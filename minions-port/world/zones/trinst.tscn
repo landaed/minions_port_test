@@ -1,12 +1,12 @@
-[gd_scene load_steps=64 format=3]
+[gd_scene format=3 uid="uid://cpsm4n653i20s"]
 
 [ext_resource type="PackedScene" uid="uid://b5hnbgd25yedb" path="res://assets/trinst/editable/terrain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__rocks_rock1.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_door_2.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__lanterns_lantern.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://dgo8bskrb222m" path="res://assets/trinst/editable/shapes__lanterns_lantern.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_woodtruck.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__plants_weed_1.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__trees_ftree04_ftree04.tscn" id="7"]
+[ext_resource type="PackedScene" uid="uid://bsas1v0j6kyr7" path="res://assets/trinst/editable/shapes__trees_ftree04_ftree04.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bed_single_1.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bench_1.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_4.tscn" id="10"]
@@ -62,9 +62,9 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_lantern2.tscn" id="60"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavern1.tscn" id="61"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_ruins3.tscn" id="62"]
-[ext_resource type="Script" path="res://world/zone_loader.gd" id="63"]
+[ext_resource type="Script" uid="uid://p08nspx3t8it" path="res://world/zone_loader.gd" id="63"]
 
-[node name="Trinst" type="Node3D"]
+[node name="Trinst" type="Node3D" unique_id=784430246]
 script = ExtResource("63")
 authored_zone_name = "trinst"
 metadata/zone = "trinst"
