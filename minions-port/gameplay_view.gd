@@ -14,6 +14,7 @@ const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
 const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const ZONE_SCENE_ROOT := "res://world/zones/"
 const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
 const CHAR_ASSET_DIR := "res://assets/characters/"
@@ -582,7 +583,8 @@ func _server_to_godot(position_data) -> Vector3:
 func _load_zone_art() -> void:
 	# Load the real zone geometry into WorldRoot once we know the server spawn
 	# offset, so terrain/buildings/props align with the server-driven player and
-	# replicated entities. Replaces the greybox placeholder world.
+	# replicated entities. Prefer an editable authored .tscn (Trinst) and fall back
+	# to the legacy JSON builder for zones that have not been converted yet.
 	if _zone_loaded:
 		return
 	var world_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot
@@ -590,20 +592,35 @@ func _load_zone_art() -> void:
 	var z = current_payload.get("zone", null)
 	if z != null and str(z) != "":
 		zone = str(z)
-	var loader: Node3D = ZoneLoaderScript.new()
-	loader.name = "ZoneArt"
-	loader.position = _server_origin_offset
-	world_root.add_child(loader)
-	if not loader.build(zone, true):
-		push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
-		loader.queue_free()
-		return
+	var zone_node: Node3D = null
+	var authored_scene_path := ZONE_SCENE_ROOT + zone + ".tscn"
+	if ResourceLoader.exists(authored_scene_path):
+		var ps := load(authored_scene_path) as PackedScene
+		if ps != null:
+			zone_node = ps.instantiate() as Node3D
+			if zone_node != null:
+				zone_node.name = "ZoneArt"
+				zone_node.position = _server_origin_offset
+				world_root.add_child(zone_node)
+				if zone_node.has_method("prepare_authored_scene") and not zone_node.prepare_authored_scene(zone, true):
+					zone_node.queue_free()
+					zone_node = null
+	if zone_node == null:
+		var loader: Node3D = ZoneLoaderScript.new()
+		loader.name = "ZoneArt"
+		loader.position = _server_origin_offset
+		world_root.add_child(loader)
+		if not loader.build(zone, true):
+			push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
+			loader.queue_free()
+			return
+		zone_node = loader
 	_zone_loaded = true
 	for placeholder in ["FloorBody", "BoxA", "BoxB", "BoxC", "DirectionalLight3D"]:
 		var n: Node = world_root.get_node_or_null(placeholder)
 		if n != null:
 			n.queue_free()
-	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
+	print("[Godot] Loaded zone art '%s' from %s at offset %s" % [zone, authored_scene_path if ResourceLoader.exists(authored_scene_path) else "scene.json", str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
 	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
