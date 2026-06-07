@@ -106,12 +106,17 @@ def generate(zone: str = DEFAULT_ZONE) -> Path:
     resources = collect_resources(data, zone)
     res_ids = {path: idx + 1 for idx, path in enumerate(resources)}
 
+    terrain_material_path = "res://world/zone_terrain_material.tres" if zone == DEFAULT_ZONE and data.get("terrain_glb") else ""
+
     lines: list[str] = []
-    lines.append(f'[gd_scene load_steps={len(resources) + 1} format=3 uid="uid://mom_{zone}_authored_scene"]')
+    extra_steps = 2 if terrain_material_path else 1
+    lines.append(f'[gd_scene load_steps={len(resources) + extra_steps} format=3 uid="uid://mom_{zone}_authored_scene"]')
     lines.append("")
     for path in resources:
         typ = "Script" if path.endswith(".gd") else "PackedScene"
         lines.append(f'[ext_resource type="{typ}" path="{esc(path)}" id="{res_ids[path]}"]')
+    if terrain_material_path:
+        lines.append(f'[ext_resource type="Material" path="{esc(terrain_material_path)}" id="terrain_mat"]')
     lines.append("")
     lines.append(f'[node name="{zone.capitalize()}Zone" type="Node3D"]')
     lines.append('script = ExtResource("1")')
@@ -127,6 +132,16 @@ def generate(zone: str = DEFAULT_ZONE) -> Path:
             "scale": [1, 1, 1],
         }
         emit_instance(lines, ".", "Terrain", res_ids[f"res://assets/{zone}/{terrain}"], item, "terrain", False)
+        # Allow the generated scene to override the GLB child material directly.
+        # This is what makes the terrain textured as soon as the scene opens.
+        lines.insert(len(lines) - 1, "editable_children = true")
+        if terrain_material_path:
+            # The terrain GLB contains one child MeshInstance3D named city_terrain.
+            # This override makes the generated scene textured immediately in the
+            # editor, before the @tool script or runtime finalizer run.
+            lines.append('[node name="city_terrain" parent="Terrain" index="0"]')
+            lines.append('surface_material_override/0 = ExtResource("terrain_mat")')
+            lines.append("")
 
     lines.append('[node name="Statics" type="Node3D" parent="."]')
     lines.append("")

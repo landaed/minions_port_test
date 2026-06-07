@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://world/zone_terrain.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" path="res://assets/trinst/textures/grass01.jpg" id="2_grass"]
+[ext_resource type="Texture2D" path="res://assets/trinst/textures/rock009.jpg" id="3_rock"]
+[ext_resource type="Texture2D" path="res://assets/trinst/textures/sand006.jpg" id="4_sand"]
+
+[resource]
+shader = ExtResource("1_shader")
+shader_parameter/grass_tex = ExtResource("2_grass")
+shader_parameter/rock_tex = ExtResource("3_rock")
+shader_parameter/sand_tex = ExtResource("4_sand")
+shader_parameter/tex_scale = 0.12
+shader_parameter/sand_height = 63.0
+shader_parameter/sand_blend = 3.0

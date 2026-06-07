@@ -1,4 +1,4 @@
-[gd_scene load_steps=64 format=3 uid="uid://mom_trinst_authored_scene"]
+[gd_scene load_steps=65 format=3 uid="uid://mom_trinst_authored_scene"]
 
 [ext_resource type="Script" path="res://world/zone_loader.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/trinst/terrain.glb" id="2"]
@@ -63,6 +63,7 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_lantern2.glb" id="61"]
 [ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_tavern1.glb" id="62"]
 [ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_ruins3.glb" id="63"]
+[ext_resource type="Material" path="res://world/zone_terrain_material.tres" id="terrain_mat"]
 
 [node name="TrinstZone" type="Node3D"]
 script = ExtResource("1")
@@ -73,6 +74,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1024, 0, 1024)
 metadata/zone_glb = "terrain"
 metadata/source_glb = "terrain.glb"
 metadata/zone_role = "terrain"
+editable_children = true
+
+[node name="city_terrain" parent="Terrain" index="0"]
+surface_material_override/0 = ExtResource("terrain_mat")
 
 [node name="Statics" type="Node3D" parent="."]
 

@@ -29,8 +29,24 @@ it appears white if nothing overrides it. The Trinst loader applies
 - `assets/trinst/textures/rock009.jpg` on steep slopes, and
 - `assets/trinst/textures/sand006.jpg` below the shoreline height.
 
-That shader is applied in editor tool mode for preview and again at runtime when
-the authored scene is finalized.
+That material is assigned directly to the generated terrain sub-node for
+immediate editor visibility, applied again in editor tool mode as a safety net,
+and applied again at runtime when the authored scene is finalized.
+
+## Should Trinst become a "real Godot terrain"?
+
+Godot does not have a built-in Unity-style terrain object in core 4.x. The
+converted GLB is currently the safest authoritative representation because it
+keeps the exact legacy height mesh and works with the existing collision and
+server-coordinate offsets. Converting it to a heightmap-terrain addon later could
+make sculpting/painting nicer, but it would be a separate pipeline decision and
+would need validation that collision, spawn alignment, and server/client position
+conversion still match.
+
+For foliage placement, keeping the terrain as a mesh does not block us. The next
+practical step is to add editor-side foliage/scatter helpers (for example
+MultiMesh-based grass/tree painters or marker nodes) that raycast against the
+terrain mesh, rather than replacing the terrain format first.
 
 ## Regenerating from `scene.json`
 
@@ -50,7 +66,10 @@ legacy Python world server remains authoritative for entity state and combat. Th
 Godot client sends movement inputs, predicts local player motion for responsiveness,
 and reconciles against server snapshots. NPCs and other replicated entities are
 rendered from server snapshots and locally snapped to visible terrain/collision so
-they do not visually sink into hills or floors.
+they do not visually sink into hills or floors. The WebSocket proxy streams nearby
+entities within `MOM_ENTITY_STREAM_RADIUS` units (default `120`) up to
+`MOM_ENTITY_STREAM_LIMIT` entities (default `50`), so town NPC wandering remains
+visible without making payloads unbounded.
 
 That means moving visual/collision objects in `trinst.tscn` does **not** require a
 Godot navmesh rebake right now. What you do need to watch is collision:
