@@ -137,6 +137,29 @@ def _uv(plane, p):
     return plane[0] * p[0] + plane[1] * p[1] + plane[2] * p[2] + plane[3]
 
 
+def _surface_normal(plane_index, planes, normals):
+    """Outward normal for a surface, in Godot (Y-up) space.
+
+    Torque stores the geometric plane per surface; the surface's plane index
+    high bit (0x8000) flags a flipped plane, and a negative plane normalIndex
+    flags the same at plane level. Resolve to a unit normal and rotate Z-up->Y-up.
+    """
+    flip = bool(plane_index & 0x8000)
+    pi = plane_index & 0x7FFF
+    if not (0 <= pi < len(planes)):
+        return (0.0, 1.0, 0.0)
+    ni = planes[pi][0]
+    if ni < 0:                       # negative normalIndex => flipped plane
+        ni = ~ni
+        flip = not flip
+    if not (0 <= ni < len(normals)):
+        return (0.0, 1.0, 0.0)
+    nx, ny, nz = normals[ni]
+    if flip:
+        nx, ny, nz = -nx, -ny, -nz
+    return axis((nx, ny, nz))
+
+
 def convert(dif_path, glb_path):
     data = Path(dif_path).read_bytes()
     interiors = parse_dif(data)
@@ -148,6 +171,8 @@ def convert(dif_path, glb_path):
     for it in interiors:
         pts = it["points"]
         tg = it["texgens"]
+        nrms = it["normals"]
+        planes = it["planes"]
         # group triangles per material with their own vertex stream (UVs are
         # per-surface via texgen, so vertices aren't shared across surfaces)
         by_mat = {}
@@ -158,6 +183,14 @@ def convert(dif_path, glb_path):
             w = it["windings"][s["wstart"]:s["wstart"] + s["wcount"]]
             if len(w) < 3:
                 continue
+            # Per-surface flat normal from the surface's plane. Each interior
+            # surface is planar, so one normal per surface is exact. Without
+            # this the glTF has no normals and every interior renders black
+            # (only ambient) under lighting. The high bit of the surface plane
+            # index (and a negative plane normalIndex) flags a flipped plane;
+            # honour it, though materials are double-sided so lighting is
+            # correct from either side regardless of sign.
+            gn = _surface_normal(s["plane"], planes, nrms)
             tgp = tg[s["texgen"]] if 0 <= s["texgen"] < len(tg) else None
             verts = []
             for idx in w:
@@ -165,10 +198,10 @@ def convert(dif_path, glb_path):
                 u = _uv(tgp[0:4], p) if tgp else 0.0
                 v = _uv(tgp[4:8], p) if tgp else 0.0
                 verts.append((axis(p), (u, -v)))
-            entry = by_mat.setdefault(s["tex"], {"v": [], "t": [], "i": []})
+            entry = by_mat.setdefault(s["tex"], {"v": [], "t": [], "n": [], "i": []})
             base = len(entry["v"])
             for gp, uv in verts:
-                entry["v"].append(gp); entry["t"].append(uv)
+                entry["v"].append(gp); entry["t"].append(uv); entry["n"].append(gn)
             # triangle-strip winding
             for k in range(len(w) - 2):
                 a, b, c = base + k, base + k + 1, base + k + 2
@@ -180,8 +213,9 @@ def convert(dif_path, glb_path):
             if not e["i"]:
                 continue
             pos = glb.acc_f(e["v"], 3)
+            nrm = glb.acc_f(e["n"], 3)
             uv = glb.acc_f(e["t"], 2)
-            prim = {"attributes": {"POSITION": pos, "TEXCOORD_0": uv},
+            prim = {"attributes": {"POSITION": pos, "NORMAL": nrm, "TEXCOORD_0": uv},
                     "indices": glb.acc_idx(e["i"]), "mode": 4}
             if mat not in mat_map:
                 name = it["materials"][mat] if mat < len(it["materials"]) else "mat%d" % mat

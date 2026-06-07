@@ -19,9 +19,15 @@ uniform float sand_height = 63.0;
 uniform float sand_blend = 3.0;
 varying vec3 wpos;
 varying vec3 wnrm;
+varying float oheight;
 void vertex() {
 	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	wnrm = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
+	// Object-space height: the true terrain elevation, independent of where the
+	// live game shifts the whole zone (it re-origins the world on the player's
+	// spawn). Keying the sand blend off world Y instead turned the city into a
+	// desert once shifted; oheight keeps biomes anchored to real elevation.
+	oheight = VERTEX.y;
 }
 vec3 tri(sampler2D t, vec3 p, vec3 n) {
 	vec3 bw = pow(abs(n), vec3(4.0));
@@ -34,11 +40,10 @@ void fragment() {
 	vec3 n = normalize(wnrm);
 	float slope = clamp(n.y, 0.0, 1.0);
 	vec3 g = tri(grass_tex, wpos, n);
-	g = mix(g, vec3(0.26, 0.40, 0.14), 0.25);
 	vec3 r = tri(rock_tex, wpos, n);
 	vec3 s = tri(sand_tex, wpos, n);
 	float rockw = smoothstep(0.55, 0.32, slope);
-	float sandw = smoothstep(sand_height + sand_blend, sand_height, wpos.y);
+	float sandw = smoothstep(sand_height + sand_blend, sand_height, oheight);
 	ALBEDO = mix(mix(g, s, sandw), r, rockw);
 	ROUGHNESS = 0.96;
 }

@@ -46,9 +46,44 @@ buildings + server coordinates together (a design decision, not a fix).
 ## Spawn
 
 Spawn position is **server-authoritative** (saved character position, or the
-zone bind point for a new character); the client uses whatever position the
-server sends. Trinst's bind point is `rpgBindPoint = 257 134 152` in `city.mis`
-(outside the gates). The client honours it.
+realm start for a new character); the client uses whatever position the server
+sends and re-origins the world on it (`_server_origin_offset`).
+
+**A new character does NOT spawn at the bind-point obelisk.** Captured live from
+the world server, a fresh Human/Warrior spawns at the **guard-tower outpost**:
+server `(31.80, -275.43, 126.0)` → godot `(31.80, 126.0, 275.43)`, a few metres
+in front of the `GuardTower` (`prefabs/tower1.dif`, a peaked-roof gate tower)
+at godot `(40.98, 125.35, 254.04)`. That tower — not the obelisk — is the
+structure you see at spawn.
+
+`rpgBindPoint = 257 134 152` (the `architecture/bindpoint.dif` obelisk, godot
+`256.7, 147.5, -133.1`) is the **death-respawn** bind point, a separate location
+~280 m away. Use `tools/spawn_probe.py` to re-capture the live spawn (it drives
+the proxy like the Godot client and prints the raw self position).
+
+## Spawn-area fidelity fixes (interiors were black; terrain was a desert)
+
+Three issues made the spawn look wrong versus the original game:
+
+- **Interiors rendered black.** `tools/dif/dif_to_gltf.py` emitted only
+  `POSITION` + `TEXCOORD_0`, **no `NORMAL`s**, so every converted building
+  (the guard tower, walls, houses…) had no normals and lit to near-black under
+  any light — a dark monolith instead of stone. The converter already parsed the
+  interior planes/normals but discarded them. Fixed: emit a per-surface flat
+  normal from each surface's plane (`_surface_normal`, honouring the plane flip
+  bit; materials are double-sided so sign is forgiving). All 40 Trinst interiors
+  regenerated with normals.
+- **City rendered as desert.** The terrain shader chose sand/grass/rock from
+  **world-space** Y (`sand_height = 63`). Because the live game re-origins the
+  whole zone on the player's spawn (shifting terrain world-Y down ~124 m), the
+  city dropped below the sand threshold and the ground turned to sand. Fixed:
+  key the sand blend off **object-space** elevation (`oheight = VERTEX.y`),
+  which is invariant to the re-origin shift (`world/zone_loader.gd`,
+  `tools/trinst_preview/preview.gd`).
+- **Ground was green, not brown.** The build hardcoded the green `grass01.jpg`
+  and the shader tinted it *further* toward green, but `city.ter`'s primary
+  ground layer is `drygrass3` (brown). Fixed: use `drygrass3.jpg` as the ground
+  texture and drop the green tint (`tools/build_trinst.py`, both shaders).
 
 ## NPCs / characters on the ground
 

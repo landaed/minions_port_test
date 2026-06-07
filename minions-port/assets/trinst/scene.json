@@ -10151,7 +10151,7 @@
  "terrain_glb": "terrain.glb",
  "terrain_grid": 256,
  "terrain_textures": {
-  "grass": "textures/grass01.jpg",
+  "grass": "textures/drygrass3.jpg",
   "rock": "textures/rock009.jpg",
   "sand": "textures/sand006.jpg"
  },

@@ -49,8 +49,11 @@ def main(mis, outdir):
     man["terrain_glb"] = (out / "terrain.glb").as_posix()
     man["terrain_grid"] = heights.shape[0]
     tdir = game_root / "data/terrains/mountain"
+    # Use the city.ter's actual primary ground layer (drygrass3, a brown dry
+    # grass/dirt) rather than the green grass01, so Trinst reads as the brown
+    # terrain of the original instead of a green meadow.
     man["terrain_textures"] = {
-        "grass": (tdir / "grass01.jpg").as_posix(),
+        "grass": (tdir / "drygrass3.jpg").as_posix(),
         "rock": (tdir / "rock009.jpg").as_posix(),
         "sand": (tdir / "sand006.jpg").as_posix(),
     }
