@@ -3,14 +3,13 @@ extends Node3D
 ## Canonical runtime support for a converted MoM zone. It can either build the
 ## legacy JSON description into children, or finalize an authored .tscn version
 ## of that same zone by applying runtime collision and lighting without
-## overriding authored terrain materials or directional lights.
+## overriding terrain materials or authored directional lights.
 ## Used by the live game (gameplay_view loads this into WorldRoot at the server
 ## origin offset), the generated Trinst .tscn scene, and the offline art preview.
 ## No player/camera of its own.
 
 const ASSET_ROOT := "res://assets/"
 
-const TERRAIN_SHADER_PATH := "res://world/zone_terrain.gdshader"
 const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 @export var authored_zone_name := ""
@@ -30,12 +29,6 @@ func _ready() -> void:
 	_repair_mesh_normals(self)
 
 
-func _terrain_texture_defaults() -> Dictionary:
-	return {
-		"grass": "textures/grass01.jpg",
-		"rock": "textures/rock009.jpg",
-		"sand": "textures/sand006.jpg",
-	}
 
 # Interiors that should be walk-through (no collision): decorative monuments /
 # spawn markers the player stands at or passes through. The bindpoint monument
@@ -88,8 +81,8 @@ func build(zone: String, with_environment: bool = true) -> bool:
 ## Finalize a pre-authored Godot scene for runtime use. This intentionally does
 ## not instantiate scene objects from JSON; it only applies runtime-only state
 ## (collision, mesh normals, and optional environment) to nodes that already
-## exist in the .tscn and can be moved/edited in the Godot editor. Authored
-## terrain materials and directional lights are preserved as saved in the scene.
+## exist in the .tscn and can be moved/edited in the Godot editor. Terrain
+## materials and authored directional lights are preserved as saved in the scene.
 func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
 	zone_name = zone if zone != "" else authored_zone_name
 	if zone_name == "":
@@ -171,7 +164,6 @@ func _build_terrain(data: Dictionary) -> void:
 	terr.position = Vector3(tp[0], tp[1], tp[2])
 	add_child(terr)
 	_repair_mesh_normals(terr)
-	_texture_terrain(terr, data.get("terrain_textures", {}))
 	for mi in _mesh_instances(terr):
 		mi.lod_bias = 64.0
 		mi.create_trimesh_collision()
@@ -306,29 +298,6 @@ func _repair_mesh_normals(node: Node) -> void:
 	MeshNormalRepairScript.repair_node(node)
 
 
-func _texture_terrain(node: Node, texdict) -> void:
-	var grass = _load_tex(texdict.get("grass", null))
-	if grass == null:
-		return
-	var rock = _load_tex(texdict.get("rock", null))
-	var sand = _load_tex(texdict.get("sand", null))
-	var mat := ShaderMaterial.new()
-	mat.shader = load(TERRAIN_SHADER_PATH) as Shader
-	if mat.shader == null:
-		push_warning("zone_loader: terrain shader missing at " + TERRAIN_SHADER_PATH)
-		return
-	mat.set_shader_parameter("grass_tex", grass)
-	mat.set_shader_parameter("rock_tex", rock if rock else grass)
-	mat.set_shader_parameter("sand_tex", sand if sand else grass)
-	for mi in _mesh_instances(node):
-		mi.material_override = mat
-
-
-func _load_tex(rel):
-	if rel == null:
-		return null
-	return load(base + str(rel))
-
 
 func _mesh_instances(n: Node) -> Array:
 	var r := []
@@ -337,7 +306,6 @@ func _mesh_instances(n: Node) -> Array:
 	for c in n.get_children():
 		r += _mesh_instances(c)
 	return r
-
 
 
 func _has_directional_light(node: Node) -> bool:
