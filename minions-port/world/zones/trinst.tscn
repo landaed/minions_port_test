@@ -1,0 +1,1897 @@
+[gd_scene load_steps=65 format=3 uid="uid://mom_trinst_authored_scene"]
+
+[ext_resource type="Script" path="res://world/zone_loader.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/trinst/terrain.glb" id="2"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/rocks_rock1.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_door_2.glb" id="4"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/lanterns_lantern.glb" id="5"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_woodtruck.glb" id="6"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/plants_weed_1.glb" id="7"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/trees_ftree04_ftree04.glb" id="8"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_bed_single_1.glb" id="9"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_bench_1.glb" id="10"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_table_4.glb" id="11"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_drawers_1.glb" id="12"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_candle_1.glb" id="13"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_table_3.glb" id="14"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_book_1.glb" id="15"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_chair_1.glb" id="16"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_rug_1.glb" id="17"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_bed_single_2.glb" id="18"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_bottle_1.glb" id="19"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/rocks_rock3.glb" id="20"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_pipe_4.glb" id="21"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_door_1.glb" id="22"]
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_table_1.glb" id="23"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_tower1.glb" id="24"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_castle.glb" id="25"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallsa.glb" id="26"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallsc1.glb" id="27"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallse.glb" id="28"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallsd.glb" id="29"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallsb.glb" id="30"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_stairs2a.glb" id="31"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_city_wallsc2.glb" id="32"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/prefabs_tower1.glb" id="33"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/prefabs_tower1wall.glb" id="34"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_small_barracks.glb" id="35"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_small_greathall.glb" id="36"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_firept3.glb" id="37"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/signs_combat1.glb" id="38"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/signs_priest1.glb" id="39"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/shops_shoplrg1.glb" id="40"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_smallforge.glb" id="41"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_anvil.glb" id="42"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_odstv.glb" id="43"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_tent_guard.glb" id="44"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_prisonerpole.glb" id="45"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_pit1.glb" id="46"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_tavernbig.glb" id="47"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_small_guild01.glb" id="48"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/houses_cityhouse1.glb" id="49"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/houses_cityhouse2.glb" id="50"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/houses_cityhouse3.glb" id="51"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/signs_rogue1.glb" id="52"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/signs_mage1.glb" id="53"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_guildhall.glb" id="54"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_desert_obelisk.glb" id="55"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_tent1.glb" id="56"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/hovels_small_cottage.glb" id="57"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_stonehenge.glb" id="58"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_bindpoint.glb" id="59"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/architecture_fountain1.glb" id="60"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/objects_lantern2.glb" id="61"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_tavern1.glb" id="62"]
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_ruins3.glb" id="63"]
+[ext_resource type="Material" path="res://world/zone_terrain_material.tres" id="terrain_mat"]
+
+[node name="TrinstZone" type="Node3D"]
+script = ExtResource("1")
+authored_zone_name = "trinst"
+
+[node name="Terrain" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1024, 0, 1024)
+metadata/zone_glb = "terrain"
+metadata/source_glb = "terrain.glb"
+metadata/zone_role = "terrain"
+editable_children = true
+
+[node name="city_terrain" parent="Terrain" index="0"]
+surface_material_override/0 = ExtResource("terrain_mat")
+
+[node name="Statics" type="Node3D" parent="."]
+
+[node name="Static_001_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 119.356, 134.917, -61.3617)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_002_objects_door_2" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.102403, 0, -0.160043, 0, 0.19, 0, 0.160043, 0, -0.102403, 31.6632, 162.059, 255.088)
+metadata/zone_glb = "objects_door_2"
+metadata/source_glb = "shapes/objects_door_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_003_objects_door_2" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.107158, 0, -0.156899, 0, 0.19, 0, 0.156899, 0, -0.107158, 31.2637, 162.059, 254.866)
+metadata/zone_glb = "objects_door_2"
+metadata/source_glb = "shapes/objects_door_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_004_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.207005, 0, -0.140175, 0, 0.25, 0, 0.140175, 0, 0.207005, 44.7452, 128.473, 267.221)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_005_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.28068, 0, 0.413786, 0, 0.5, 0, -0.413786, 0, 0.28068, 32.4505, 128.703, 255.447)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_006_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.280023, 0, -0.414231, 0, 0.5, 0, 0.414231, 0, -0.280023, 45.7252, 128.758, 247.711)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_007_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.496953, 0, 0.055119, 0, 0.5, 0, -0.055119, 0, -0.496953, -365.958, 177.874, -233.976)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_008_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.027755, 0, -0.248455, 0, 0.25, 0, 0.248455, 0, -0.027755, -383.683, 177.589, -225.765)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_009_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.496865, 0, -0.055907, 0, 0.5, 0, 0.055907, 0, 0.496865, -378.982, 177.819, -242.127)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_010_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.499964, 0, -0.00602, 0, 0.5, 0, 0.00602, 0, 0.499964, 118.259, 149.819, -16.5066)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_011_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.499964, 0, -0.00602, 0, 0.5, 0, 0.00602, 0, 0.499964, 131.491, 149.707, -16.517)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_012_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.011501, 0, -0.399835, 0, 0.4, 0, 0.399835, 0, 0.011501, 139.347, 162.653, -26.3562)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_020_objects_woodtruck" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(-1.017687, 0, -0.808896, 0, 1.3, 0, 0.808896, 0, -1.017687, 109.513, 147.124, -7.43425)
+metadata/zone_glb = "objects_woodtruck"
+metadata/source_glb = "shapes/objects_woodtruck.glb"
+metadata/zone_role = "static"
+
+[node name="Static_027_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.249995, 0, -0.001593, 0, 0.25, 0, 0.001593, 0, -0.249995, 131.937, 150.837, 14.9059)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_028_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.249995, 0, -0.001593, 0, 0.25, 0, 0.001593, 0, -0.249995, 117.627, 150.917, 14.8776)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_029_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.193704, 0, -0.049789, 0, 0.2, 0, 0.049789, 0, -0.193704, 133.284, 147.052, 5.48532)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_030_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.031707, 0, -0.197471, 0, 0.2, 0, 0.197471, 0, -0.031707, 133.032, 147.032, -0.415132)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_031_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 0.2, 116.073, 147.06, -2.54681)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_032_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.081698, 0, -0.182553, 0, 0.2, 0, 0.182553, 0, 0.081698, 117.184, 147.092, 0.536572)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_033_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.070306, 0, -0.187235, 0, 0.2, 0, 0.187235, 0, -0.070306, 113.264, 147.032, 5.05434)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_034_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.196769, 0, -0.035806, 0, 0.2, 0, 0.035806, 0, 0.196769, 115.855, 147.052, 2.3423)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_035_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.196769, 0, -0.035806, 0, 0.2, 0, 0.035806, 0, 0.196769, 113.801, 147.052, -0.112038)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_036_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.196769, 0, -0.035806, 0, 0.2, 0, 0.035806, 0, 0.196769, 136.544, 147.032, 1.43203)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_037_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.010155, 0, -0.199742, 0, 0.2, 0, 0.199742, 0, 0.010155, 135.602, 146.972, -1.37684)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_038_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.010155, 0, -0.199742, 0, 0.2, 0, 0.199742, 0, 0.010155, 134.346, 147.052, 1.13657)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_039_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.011501, 0, -0.399835, 0, 0.4, 0, 0.399835, 0, 0.011501, 35.0373, 132.099, -271.418)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_040_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.397025, 0, -0.048695, 0, 0.4, 0, 0.048695, 0, 0.397025, 27.2389, 132.429, -320.517)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_041_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.399971, 0, -0.004816, 0, 0.4, 0, 0.004816, 0, 0.399971, 41.4437, 132.449, -320.141)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_042_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.014878, 0.001078, 0.399722, -0.011901, 0.39982, -0.001522, -0.399546, -0.01195, -0.014839, 30.3157, 132.42, -287.55)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_043_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.014878, 0.001078, 0.399722, -0.011901, 0.39982, -0.001522, -0.399546, -0.01195, -0.014839, 9.7201, 132.44, -290.581)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_044_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.008471, -0.001774, -0.399906, -0.011901, 0.39982, -0.001522, 0.399733, 0.011866, -0.00852, 57.497, 132.4, -288.287)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_045_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.011859, 0, 0.399824, 0, 0.4, 0, -0.399824, 0, 0.011859, 30.9037, 141.299, -271.766)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_046_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -610.081, 246.241, -422.638)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_047_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 117.705, 130.176, -76.6401)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_048_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 132.138, 130.439, -76.5252)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_049_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.346402, 0, -1.201043, 0, 1.25, 0, 1.201043, 0, 0.346402, 140.094, 127.885, -90.0701)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_050_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.368447, 0, -1.194465, 0, 1.25, 0, 1.194465, 0, -0.368447, 140.468, 127.174, -102.213)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_051_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.368447, 0, -1.194465, 0, 1.25, 0, 1.194465, 0, -0.368447, 108.623, 128.092, -88.065)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_052_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.938446, 0, -0.825723, 0, 1.25, 0, 0.825723, 0, -0.938446, 107.409, 127.493, -103.427)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_053_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(1.7, 0, 0, 0, 1.7, 0, 0, 0, 1.7, 74.0076, 131.272, 226.277)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_054_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.043108, 0, -1.399336, 0, 1.4, 0, 1.399336, 0, 0.043108, 50.1755, 129.841, 223.259)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_055_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.536049, 0, -1.613274, 0, 1.7, 0, 1.613274, 0, 0.536049, 80.056, 136.891, 193.775)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_056_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.283062, 0, -0.209167, 0, 1.3, 0, 0.209167, 0, -1.283062, 91.4962, 135.714, 215.794)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_057_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.38176, 0, -0.225257, 0, 1.4, 0, 0.225257, 0, -1.38176, 120.329, 143.934, 191.117)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_058_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.293711, 0, 0.127716, 0, 1.3, 0, -0.127716, 0, -1.293711, 101.126, 144.178, 174.313)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_059_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.904075, 0, -0.427374, 0, 1, 0, 0.427374, 0, -0.904075, 114.051, 148.068, 149.098)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_060_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.686371, 0, 1.220203, 0, 1.4, 0, -1.220203, 0, -0.686371, 132.547, 148.31, 149.21)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_061_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.38176, 0, -0.225257, 0, 1.4, 0, 0.225257, 0, -1.38176, 134.533, 151.677, 121.413)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_062_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.579154, 0, -0.257436, 0, 1.6, 0, 0.257436, 0, -1.579154, 112.494, 148.258, 116.755)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_063_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.293711, 0, 0.127716, 0, 1.3, 0, -0.127716, 0, -1.293711, 112.466, 148.141, 68.3182)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_064_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-1.492744, 0, 0.147364, 0, 1.5, 0, -0.147364, 0, -1.492744, 135.182, 148.9, 54.6944)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_065_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.003891, 0, -0.24997, 0, 0.25, 0, 0.24997, 0, 0.003891, 132.092, 129.158, -114.923)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_066_objects_bed_single_1" parent="Statics" instance=ExtResource("9")]
+transform = Transform3D(0, 0, 0.75, 0, 0.75, 0, -0.75, 0, 0, 95.6917, 131.08, -123.854)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_glb = "shapes/objects_bed_single_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_067_objects_bench_1" parent="Statics" instance=ExtResource("10")]
+transform = Transform3D(-0.5, 0, 0, 0, 0.5, 0, 0, 0, -0.5, 92.3326, 135.159, -125.498)
+metadata/zone_glb = "objects_bench_1"
+metadata/source_glb = "shapes/objects_bench_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_068_objects_table_4" parent="Statics" instance=ExtResource("11")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 93.7679, 126.797, -117.997)
+metadata/zone_glb = "objects_table_4"
+metadata/source_glb = "shapes/objects_table_4.glb"
+metadata/zone_role = "static"
+
+[node name="Static_069_objects_drawers_1" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 96.8988, 131.132, -120.341)
+metadata/zone_glb = "objects_drawers_1"
+metadata/source_glb = "shapes/objects_drawers_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_070_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 93.9111, 128.306, -117.935)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_071_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 96.8657, 132.779, -120.349)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_072_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 88.1484, 131.147, -124.576)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_073_objects_book_1" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.139256, 0, 0.207624, 0, 0.25, 0, -0.207624, 0, 0.139256, 88.237, 132.265, -124.504)
+metadata/zone_glb = "objects_book_1"
+metadata/source_glb = "shapes/objects_book_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_074_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 94.0269, 127.151, -115.844)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_075_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.305937, 0, 0.257687, 0, 0.4, 0, -0.257687, 0, 0.305937, 96.102, 127.123, -116.695)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_076_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(0, 0, -0.48, 0, 0.48, 0, 0.48, 0, 0, 89.4937, 130.655, -115.804)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_077_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.5, 0, 0, 0, 0.5, 0, 0, 0, -0.5, 95.0129, 130.634, -120.252)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_078_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.25, 0, 0, 0, 0.25, 0, 0, 0, -0.25, 92.0024, 128.499, -126.137)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_079_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.25, 0, 0, 0, 0.25, 0, 0, 0, -0.25, 71.8354, 128.674, -126.625)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_080_objects_bed_single_2" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(0, 0, -0.75, 0, 0.75, 0, 0.75, 0, 0, 73.2705, 131.438, -122.503)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_glb = "shapes/objects_bed_single_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_081_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.52253, 0, 0.538017, 0, 0.75, 0, -0.538017, 0, 0.52253, 72.0949, 131.47, -119.698)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_082_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 72.157, 132.578, -119.778)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_083_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.5, 0, 0, 0, 0.5, 0, 0, 0, -0.5, 74.5041, 126.55, -120.383)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_084_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.25, 0, 0, 0, 0.25, 0, 0, 0, -0.25, 59.5179, 128.859, -126.937)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_085_objects_bed_single_1" parent="Statics" instance=ExtResource("9")]
+transform = Transform3D(0, 0, -0.75, 0, 0.75, 0, 0.75, 0, 0, 58.01, 127.065, -121.125)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_glb = "shapes/objects_bed_single_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_086_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.5, 0, 0, 0, 0.5, 0, 0, 0, -0.5, 60.5266, 126.647, -121.088)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_087_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.25486, 0, -0.308296, 0, 0.4, 0, 0.308296, 0, 0.25486, 56.8129, 127.066, -117.492)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_088_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 57.0622, 127.1, -118.67)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_089_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 57.0994, 128.199, -118.688)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_090_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.208897, 0, -0.13734, 0, 0.25, 0, 0.13734, 0, -0.208897, 63.0553, 128.259, -103.705)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_091_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(-0.62669, 0, -0.412019, 0, 0.75, 0, 0.412019, 0, -0.62669, 63.0765, 127.16, -103.741)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_092_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.382323, 0, 0.117596, 0, 0.4, 0, -0.117596, 0, -0.382323, 62.72, 127.126, -105.13)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_093_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.015042, 0, 0.399717, 0, 0.4, 0, -0.399717, 0, 0.015042, 63.744, 127.094, -102.452)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_094_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.418229, 0, -0.274015, 0, 0.5, 0, 0.274015, 0, -0.418229, 61.916, 126.626, -102.797)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_095_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.002301, 0, -0.249989, 0, 0.25, 0, 0.249989, 0, 0.002301, 54.3964, 128.754, -101.706)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_096_objects_bed_single_2" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 60.4898, 131.146, -105.342)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_glb = "shapes/objects_bed_single_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_097_objects_bed_single_2" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 56.0143, 131.12, -105.325)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_glb = "shapes/objects_bed_single_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_098_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(-0.749973, 0, 0.006309, 0, 0.75, 0, -0.006309, 0, -0.749973, 58.2677, 131.147, -106.47)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_099_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.249784, 0, -0.010395, 0, 0.25, 0, 0.010395, 0, -0.249784, 58.3093, 132.262, -106.315)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_100_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 58.0513, 130.06, -99.994)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_101_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.249958, 0, 0.004603, 0, 0.25, 0, -0.004603, 0, 0.249958, 58.4388, 128.703, -135.363)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_102_objects_bed_single_1" parent="Statics" instance=ExtResource("9")]
+transform = Transform3D(0, 0, 0.75, 0, 0.75, 0, -0.75, 0, 0, 56.1876, 131.499, -137.492)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_glb = "shapes/objects_bed_single_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_103_objects_drawers_1" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.789992, 0, 0.613117, 0, 1, 0, -0.613117, 0, 0.789992, 57.9205, 131.475, -142.094)
+metadata/zone_glb = "objects_drawers_1"
+metadata/source_glb = "shapes/objects_drawers_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_104_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.005197, 0, -0.249946, 0, 0.25, 0, 0.249946, 0, -0.005197, 27.1709, 128.742, -141.116)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_105_objects_table_4" parent="Statics" instance=ExtResource("11")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 33.9303, 127.088, -142.77)
+metadata/zone_glb = "objects_table_4"
+metadata/source_glb = "shapes/objects_table_4.glb"
+metadata/zone_role = "static"
+
+[node name="Static_106_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.399839, 0, 0.011364, 0, 0.4, 0, -0.011364, 0, -0.399839, 33.8526, 127.051, -143.931)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_107_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.012951, 0, 0.39979, 0, 0.4, 0, -0.39979, 0, -0.012951, 34.8133, 127.076, -142.651)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_108_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.194438, 0, 0.349562, 0, 0.4, 0, -0.349562, 0, 0.194438, 34.0162, 127.08, -141.27)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_109_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 31.8845, 130.006, -141.172)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_110_objects_bed_single_2" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(0, 0, -0.75, 0, 0.75, 0, 0.75, 0, 0, 29.8546, 135.044, -142.008)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_glb = "shapes/objects_bed_single_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_111_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(-0.630779, 0, -0.405731, 0, 0.75, 0, 0.405731, 0, -0.630779, 28.591, 135.013, -139.827)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_112_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.203237, 0, -0.145584, 0, 0.25, 0, 0.145584, 0, -0.203237, 28.7108, 136.128, -139.72)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_113_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.249987, 0, 0.0025, 0, 0.25, 0, -0.0025, 0, -0.249987, 14.4087, 128.641, -126.864)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_114_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(-0.563068, 0, -0.495434, 0, 0.75, 0, 0.495434, 0, -0.563068, 15.0857, 131.493, -125.213)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_115_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.1792, 0, -0.174319, 0, 0.25, 0, 0.174319, 0, -0.1792, 15.2202, 132.608, -125.125)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_116_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.399986, 0, 0.003365, 0, 0.4, 0, -0.003365, 0, -0.399986, 16.7936, 131.501, -125.349)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_117_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.008316, 0, -0.399914, 0, 0.4, 0, 0.399914, 0, 0.008316, 14.8326, 131.503, -123.681)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_118_objects_bed_single_2" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(0, 0, -0.75, 0, 0.75, 0, 0.75, 0, 0, 15.4662, 131.499, -119.849)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_glb = "shapes/objects_bed_single_2.glb"
+metadata/zone_role = "static"
+
+[node name="Static_119_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.000199, 0, 0.25, 0, 0.25, 0, -0.25, 0, -0.000199, 17.9962, 129.205, -144.449)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_120_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.31063, 0, -0.25201, 0, 0.4, 0, 0.25201, 0, -0.31063, 6.67379, 127.086, -144.943)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_121_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.28481, 0, 0.280861, 0, 0.4, 0, -0.280861, 0, -0.28481, 15.937, 127.109, -145.234)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_122_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(-0.006905, 0, -0.749968, 0, 0.75, 0, 0.749968, 0, -0.006905, 14.5961, 127.08, -145.896)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_123_objects_book_1" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.139256, 0, 0.207624, 0, 0.25, 0, -0.207624, 0, 0.139256, 14.5862, 128.201, -145.891)
+metadata/zone_glb = "objects_book_1"
+metadata/source_glb = "shapes/objects_book_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_124_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.003097, 0, -0.249981, 0, 0.25, 0, 0.249981, 0, 0.003097, 8.17276, 128.473, -161.909)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_125_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-0.249978, 0, -0.003294, 0, 0.25, 0, 0.003294, 0, -0.249978, 32.1858, 128.514, -191.092)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_126_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.001507, 0, 0.249995, 0, 0.25, 0, -0.249995, 0, 0.001507, 117.195, 129.022, -120.031)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_127_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.001507, 0, 0.249995, 0, 0.25, 0, -0.249995, 0, 0.001507, 117.15, 128.876, -141.206)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_128_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.001507, 0, 0.249995, 0, 0.25, 0, -0.249995, 0, 0.001507, 117.203, 129.021, -163.81)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_129_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.001507, 0, 0.249995, 0, 0.25, 0, -0.249995, 0, 0.001507, 117.199, 128.983, -176.162)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_130_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.003891, 0, -0.24997, 0, 0.25, 0, 0.24997, 0, 0.003891, 132.128, 128.987, -156.08)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_131_lanterns_lantern" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(0.003891, 0, -0.24997, 0, 0.25, 0, 0.24997, 0, 0.003891, 132.135, 128.936, -133.303)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_glb = "shapes/lanterns_lantern.glb"
+metadata/zone_role = "static"
+
+[node name="Static_132_objects_bottle_1" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 182.97, 128.717, -128.415)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_glb = "shapes/objects_bottle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_133_objects_bottle_1" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 183.209, 129.968, -128.448)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_glb = "shapes/objects_bottle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_134_objects_bottle_1" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 184.185, 129.951, -128.455)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_glb = "shapes/objects_bottle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_135_objects_bottle_1" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 183.858, 128.745, -128.475)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_glb = "shapes/objects_bottle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_136_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -431.38, 155.577, 42.7696)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_137_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(-0.271096, 1.945148, -0.378029, -0.000006, -0.381551, -1.963267, -1.981542, -0.266116, 0.051724, -434.167, 153.391, 42.0405)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_138_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(-1.805512, -0.21127, 0.833962, -0.150114, 1.986379, 0.178222, -0.847109, 0.098296, -1.809073, -430.538, 156.058, 42.9005)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_139_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(-1.997768, -0.042643, 0.08428, 0.000001, 1.784558, 0.902969, -0.094454, 0.901961, -1.782567, -433.661, 161.372, 42.1297)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_140_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(0.703733, -0.32861, 0.629901, -0.024195, 0.875005, 0.483509, -0.710053, -0.355502, 0.607819, -416.261, 155.207, 26.7546)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_141_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(-0.915942, 0.161889, -0.36721, 0, 0.915024, 0.4034, 0.401312, 0.369491, -0.838108, -407.843, 154.104, 44.746)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_142_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(0.725708, -0.169148, 0.666886, 0.591381, 0.648707, -0.479007, -0.35159, 0.742003, 0.570803, -388.547, 148.921, 24.1046)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_143_rocks_rock3" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(0.377779, -4.87127, -1.062078, 4.471797, 0.802044, -2.088003, 2.204612, -0.792119, 4.417265, -446.522, 170.855, 21.7458)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_glb = "shapes/rocks_rock3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_144_objects_pipe_4" parent="Statics" instance=ExtResource("21")]
+transform = Transform3D(2.402069, 1.793862, 0.110106, -1.788961, 2.404134, -0.140554, -0.172281, 0.046882, 2.994682, 376.389, 147.895, -291.752)
+metadata/zone_glb = "objects_pipe_4"
+metadata/source_glb = "shapes/objects_pipe_4.glb"
+metadata/zone_role = "static"
+
+[node name="Static_145_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 557.884, 165.656, 76.3955)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_146_objects_door_1" parent="Statics" instance=ExtResource("22")]
+transform = Transform3D(0.05157, 0, 0.193237, 0, 0.2, 0, -0.193237, 0, 0.05157, 519.557, 145.575, -402.135)
+metadata/zone_glb = "objects_door_1"
+metadata/source_glb = "shapes/objects_door_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_147_objects_door_1" parent="Statics" instance=ExtResource("22")]
+transform = Transform3D(0.05157, 0, 0.193237, 0, 0.2, 0, -0.193237, 0, 0.05157, 519.421, 145.575, -402.171)
+metadata/zone_glb = "objects_door_1"
+metadata/source_glb = "shapes/objects_door_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_148_objects_door_1" parent="Statics" instance=ExtResource("22")]
+transform = Transform3D(-0.090434, 0, 0.178386, 0, 0.2, 0, -0.178386, 0, -0.090434, 501.813, 149.841, -580.405)
+metadata/zone_glb = "objects_door_1"
+metadata/source_glb = "shapes/objects_door_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_149_objects_door_1" parent="Statics" instance=ExtResource("22")]
+transform = Transform3D(-0.090434, 0, 0.178386, 0, 0.2, 0, -0.178386, 0, -0.090434, 501.687, 149.841, -580.341)
+metadata/zone_glb = "objects_door_1"
+metadata/source_glb = "shapes/objects_door_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_150_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.904075, 0, -0.427374, 0, 1, 0, 0.427374, 0, -0.904075, 109.819, 146.718, 233.727)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_151_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.904075, 0, -0.427374, 0, 1, 0, 0.427374, 0, -0.904075, 67.8097, 150.33, 168.605)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_152_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.904075, 0, -0.427374, 0, 1, 0, 0.427374, 0, -0.904075, 85.3769, 159.615, 107.498)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_153_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.904075, 0, -0.427374, 0, 1, 0, 0.427374, 0, -0.904075, 166.083, 161.724, 102.858)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_154_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.622856, 0, 0.782336, 0, 1, 0, -0.782336, 0, -0.622856, 80.9462, 154.339, 151.327)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_155_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.622856, 0, 0.782336, 0, 1, 0, -0.782336, 0, -0.622856, 86.1608, 146.672, 252.914)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_156_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.622856, 0, 0.782336, 0, 1, 0, -0.782336, 0, -0.622856, 166.961, 160.451, 136.078)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_157_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.452714, 0, 0.21225, 0, 0.5, 0, -0.21225, 0, -0.452714, 133.105, 147.514, 3.10983)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_158_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.452038, 0, -0.213687, 0, 0.5, 0, 0.213687, 0, -0.452038, 136.068, 147.314, 4.06823)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_159_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.452038, 0, -0.213687, 0, 0.5, 0, 0.213687, 0, -0.452038, 114.154, 147.514, 2.17566)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_160_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.452038, 0, -0.213687, 0, 0.5, 0, 0.213687, 0, -0.452038, 134.354, 147.314, -0.973314)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_161_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.452038, 0, -0.213687, 0, 0.5, 0, 0.213687, 0, -0.452038, 115.757, 147.314, -0.351234)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_162_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.262357, 0, 0.425639, 0, 0.5, 0, -0.425639, 0, -0.262357, 116.65, 147.514, 4.38631)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_163_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.262357, 0, 0.425639, 0, 0.5, 0, -0.425639, 0, -0.262357, -3.35657, 136.81, 239.47)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_164_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.262357, 0, 0.425639, 0, 0.5, 0, -0.425639, 0, -0.262357, -4.84541, 127.873, 260.411)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_165_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.207354, 0, 0.454977, 0, 0.5, 0, -0.454977, 0, 0.207354, -0.802752, 134.82, 246.232)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_166_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.408913, 0, 0.287733, 0, 0.5, 0, -0.287733, 0, 0.408913, 9.00503, 145.8, 207.15)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_167_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.408913, 0, 0.287733, 0, 0.5, 0, -0.287733, 0, 0.408913, 26.0115, 150.075, 204.247)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_168_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.408913, 0, 0.287733, 0, 0.5, 0, -0.287733, 0, 0.408913, 37.4595, 150.515, 179.337)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_169_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.408913, 0, 0.287733, 0, 0.5, 0, -0.287733, 0, 0.408913, 17.9394, 149.292, 193.567)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_170_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.408913, 0, 0.287733, 0, 0.5, 0, -0.287733, 0, 0.408913, 56.0584, 134.041, 304.334)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_171_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(0.300188, 0, -0.399859, 0, 0.5, 0, 0.399859, 0, 0.300188, 71.8561, 139.958, 291.489)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_172_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.087563, 0, -0.492273, 0, 0.5, 0, 0.492273, 0, -0.087563, 77.5274, 142.534, 274.084)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_173_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.087563, 0, -0.492273, 0, 0.5, 0, 0.492273, 0, -0.087563, 100.477, 147.539, 255.728)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_174_trees_ftree04_ftree04" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(-0.122588, 0, -0.689182, 0, 0.7, 0, 0.689182, 0, -0.122588, 66.3349, 138.443, 292.042)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_glb = "shapes/trees_ftree04_ftree04.glb"
+metadata/zone_role = "static"
+
+[node name="Static_175_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(0.305817, 0, -0.95209, 0, 1, 0, 0.95209, 0, 0.305817, 56.3771, 132.441, 279.104)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_176_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(0.305817, 0, -0.95209, 0, 1, 0, 0.95209, 0, 0.305817, 55.2607, 126.344, 264.668)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_177_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(0.305817, 0, -0.95209, 0, 1, 0, 0.95209, 0, 0.305817, 48.4279, 128.447, 284.628)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_178_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(-0.612493, 0, -0.790476, 0, 1, 0, 0.790476, 0, -0.612493, 19.3477, 129.136, 252.696)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_179_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(-0.612493, 0, -0.790476, 0, 1, 0, 0.790476, 0, -0.612493, 18.0081, 134.638, 241.792)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_180_rocks_rock1" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(-0.612493, 0, -0.790476, 0, 1, 0, 0.790476, 0, -0.612493, 24.2059, 129.449, 246.17)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_glb = "shapes/rocks_rock1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_188_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.398127, 0, -0.038663, 0, 0.4, 0, 0.038663, 0, 0.398127, 118.56, 147.082, -22.2711)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_189_objects_table_3" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.531501, 0, 0.529157, 0, 0.75, 0, -0.529157, 0, 0.531501, 117.335, 147.116, -23.6186)
+metadata/zone_glb = "objects_table_3"
+metadata/source_glb = "shapes/objects_table_3.glb"
+metadata/zone_role = "static"
+
+[node name="Static_190_objects_chair_1" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(0.065298, 0, -0.394634, 0, 0.4, 0, 0.394634, 0, 0.065298, 116.342, 147.05, -25.2412)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_glb = "shapes/objects_chair_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_191_objects_candle_1" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.177167, 0, 0.176386, 0, 0.25, 0, -0.176386, 0, 0.177167, 117.349, 148.215, -23.6581)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_glb = "shapes/objects_candle_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_192_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.034312, 0.0002, 0.197035, -0.009811, 0.19975, -0.001911, -0.19679, -0.009994, -0.03426, -249.273, 205.279, -693.733)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_193_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.001517, 0.0002, 0.199994, -0.009995, 0.19975, -0.000124, -0.199744, -0.009994, 0.001525, -246.994, 205.475, -690.622)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_194_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.16583, 0.0002, 0.111805, -0.005752, 0.19975, 0.008175, -0.111657, -0.009994, 0.165628, -246.426, 205.327, -695.36)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_195_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.196521, 0.0002, -0.037142, 0.00166, 0.19975, 0.009857, 0.037105, -0.009994, 0.196274, -243.351, 205.566, -690.326)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_196_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.001524, -0.011854, 0.199643, -0.001999, 0.199638, 0.011869, -0.199984, -0.002086, 0.001403, -243.031, 205.463, -693.533)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_197_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -241.609, 205.627, -688.878)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_198_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -239.899, 205.565, -691.491)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_199_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -239.127, 205.484, -694.398)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_200_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.0547, 0.004527, 0.192321, -0.009811, 0.19975, -0.001911, -0.192124, -0.008912, 0.054854, -243.853, 205.19, -708.712)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_201_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -242.134, 205.22, -705.859)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_202_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.197888, 0.004527, 0.028632, -0.005752, 0.19975, 0.008175, -0.028411, -0.008912, 0.197771, -240.583, 205.138, -708.935)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_203_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088358, -0.009766, 0.179157, -0.001999, 0.199638, 0.011869, -0.179412, -0.007034, 0.088101, -239.174, 205.136, -707.165)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_204_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.160817, 0.004527, -0.118816, 0.00166, 0.19975, 0.009857, 0.118891, -0.008912, 0.160579, -237.314, 205.127, -703.923)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_205_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.08809, -0.006951, 0.179421, 0.015984, 0.19936, -0.000124, -0.178843, 0.014394, 0.088364, -234.675, 205.111, -705.654)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_206_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -234.936, 205.077, -702.245)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_207_plants_weed_1" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.088248, 0.004527, 0.179421, -0.009995, 0.19975, -0.000124, -0.179199, -0.008912, 0.088364, -237.191, 205.216, -700.828)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_glb = "shapes/plants_weed_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_208_objects_table_1" parent="Statics" instance=ExtResource("23")]
+transform = Transform3D(-0.186573, 0.003294, -0.463875, -0.000692, 0.29999, 0.002408, 0.463885, 0.002567, -0.186559, -240.353, 206.142, -701.398)
+metadata/zone_glb = "objects_table_1"
+metadata/source_glb = "shapes/objects_table_1.glb"
+metadata/zone_role = "static"
+
+[node name="Static_210_objects_rug_1" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(1.492471, 0.014298, -0.576476, -0.001856, 0.999798, 0.019992, 0.360403, -0.01798, 0.932623, -244.312, 205.144, -700.86)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_glb = "shapes/objects_rug_1.glb"
+metadata/zone_role = "static"
+
+[node name="Interiors" type="Node3D" parent="."]
+
+[node name="Interior_001_components_city_tower1" parent="Interiors" instance=ExtResource("24")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -110.996, 147.81, -301.139)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_glb = "interiors/components_city_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_002_components_city_tower1" parent="Interiors" instance=ExtResource("24")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 271.736, 148.073, -31.1675)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_glb = "interiors/components_city_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_003_components_city_tower1" parent="Interiors" instance=ExtResource("24")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 333.848, 147.898, -150.731)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_glb = "interiors/components_city_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_004_components_city_tower1" parent="Interiors" instance=ExtResource("24")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -21.6122, 147.918, -32.7274)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_glb = "interiors/components_city_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_005_components_city_castle" parent="Interiors" instance=ExtResource("25")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 124.497, 146.067, -5.66935)
+metadata/zone_glb = "components_city_castle"
+metadata/source_glb = "interiors/components_city_castle.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_006_components_city_wallsa" parent="Interiors" instance=ExtResource("26")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.677, 148.006, -224.744)
+metadata/zone_glb = "components_city_wallsa"
+metadata/source_glb = "interiors/components_city_wallsa.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_007_components_city_wallsc1" parent="Interiors" instance=ExtResource("27")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.785, 148.006, -224.13)
+metadata/zone_glb = "components_city_wallsc1"
+metadata/source_glb = "interiors/components_city_wallsc1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_008_components_city_wallse" parent="Interiors" instance=ExtResource("28")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.775, 148.006, -224.13)
+metadata/zone_glb = "components_city_wallse"
+metadata/source_glb = "interiors/components_city_wallse.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_009_components_city_wallsd" parent="Interiors" instance=ExtResource("29")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.79, 148.006, -224.12)
+metadata/zone_glb = "components_city_wallsd"
+metadata/source_glb = "interiors/components_city_wallsd.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_010_components_city_wallsb" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.105, 148.006, -224.793)
+metadata/zone_glb = "components_city_wallsb"
+metadata/source_glb = "interiors/components_city_wallsb.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_011_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 126.695, 141.226, -44.3245)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_012_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 122.695, 141.226, -44.3245)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_013_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 126.695, 135.69, -55.38)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_014_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 122.695, 135.69, -55.38)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_015_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 122.699, 130.218, -65.8579)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_016_architecture_stairs2a" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 126.689, 130.218, -65.8579)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_glb = "interiors/architecture_stairs2a.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_017_components_city_wallsc2" parent="Interiors" instance=ExtResource("32")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.785, 148.006, -224.138)
+metadata/zone_glb = "components_city_wallsc2"
+metadata/source_glb = "interiors/components_city_wallsc2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_018_prefabs_tower1" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(1.240697, 0, -0.843012, 0, 1.5, 0, 0.843012, 0, 1.240697, 40.982, 125.35, 254.041)
+metadata/zone_glb = "prefabs_tower1"
+metadata/source_glb = "interiors/prefabs_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_019_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(1.016707, 0, -0.637423, 0, 1.2, 0, 0.637423, 0, 1.016707, 43.3589, 126.049, 252.973)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_020_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(0.962516, 0, -0.716633, 0, 1.2, 0, 0.716633, 0, 0.962516, 16.6068, 125.929, 233.969)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_021_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(1.016707, 0, -0.637423, 0, 1.2, 0, 0.637423, 0, 1.016707, 55.5933, 126.049, 260.643)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_022_prefabs_tower1" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(-0.168887, 0, -1.490462, 0, 1.5, 0, 1.490462, 0, -0.168887, -373.768, 174.466, -235.229)
+metadata/zone_glb = "prefabs_tower1"
+metadata/source_glb = "interiors/prefabs_tower1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_023_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(-0.091134, 0, -1.196534, 0, 1.2, 0, 1.196534, 0, -0.091134, -371.716, 175.165, -233.622)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_024_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(-0.186461, 0, -1.185425, 0, 1.2, 0, 1.185425, 0, -0.186461, -367.343, 175.045, -266.144)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_025_prefabs_tower1wall" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(-0.091134, 0, -1.196534, 0, 1.2, 0, 1.196534, 0, -0.091134, -372.813, 175.165, -219.224)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_glb = "interiors/prefabs_tower1wall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_026_buildings_small_barracks" parent="Interiors" instance=ExtResource("35")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 276.121, 129.91, -259.235)
+metadata/zone_glb = "buildings_small_barracks"
+metadata/source_glb = "interiors/buildings_small_barracks.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_027_buildings_small_greathall" parent="Interiors" instance=ExtResource("36")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 221.475, 131.107, -345.824)
+metadata/zone_glb = "buildings_small_greathall"
+metadata/source_glb = "interiors/buildings_small_greathall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_028_objects_firept3" parent="Interiors" instance=ExtResource("37")]
+transform = Transform3D(0.689498, 0, -0.724287, 0, 1, 0, 0.724287, 0, 0.689498, 235.487, 128.809, -304.004)
+metadata/zone_glb = "objects_firept3"
+metadata/source_glb = "interiors/objects_firept3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_029_objects_firept3" parent="Interiors" instance=ExtResource("37")]
+transform = Transform3D(0.689498, 0, -0.724287, 0, 1, 0, 0.724287, 0, 0.689498, 206.949, 128.83, -302.459)
+metadata/zone_glb = "objects_firept3"
+metadata/source_glb = "interiors/objects_firept3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_030_signs_combat1" parent="Interiors" instance=ExtResource("38")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 251.133, 138.77, -265.29)
+metadata/zone_glb = "signs_combat1"
+metadata/source_glb = "interiors/signs_combat1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_031_signs_priest1" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(0.000796, 0, -1, 0, 1, 0, 1, 0, 0.000796, 218.013, 136.215, -298.087)
+metadata/zone_glb = "signs_priest1"
+metadata/source_glb = "interiors/signs_priest1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_032_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.901, -162.568)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_033_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.901, -118.768)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_034_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.941, -180.568)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_035_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 139.036, 126.901, -116.53)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_036_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 139.036, 126.891, -134.53)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_037_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(-0.75, 0, 0, 0, 0.75, 0, 0, 0, -0.75, 139.036, 126.851, -151.93)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_038_shops_shoplrg1" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.931, -145.368)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_glb = "interiors/shops_shoplrg1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_039_objects_smallforge" parent="Interiors" instance=ExtResource("41")]
+transform = Transform3D(0.281577, 0, 0.64087, 0, 0.7, 0, -0.64087, 0, 0.281577, 128.59, 136.85, -173.801)
+metadata/zone_glb = "objects_smallforge"
+metadata/source_glb = "interiors/objects_smallforge.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_040_objects_anvil" parent="Interiors" instance=ExtResource("42")]
+transform = Transform3D(0.999201, 0, 0.039975, 0, 1, 0, -0.039975, 0, 0.999201, 118.85, 140.964, -176.595)
+metadata/zone_glb = "objects_anvil"
+metadata/source_glb = "interiors/objects_anvil.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_041_objects_odstv" parent="Interiors" instance=ExtResource("43")]
+transform = Transform3D(-0.994844, 0, 0.101421, 0, 1, 0, -0.101421, 0, -0.994844, 140.958, 141.541, -194.384)
+metadata/zone_glb = "objects_odstv"
+metadata/source_glb = "interiors/objects_odstv.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_042_architecture_tent_guard" parent="Interiors" instance=ExtResource("44")]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 198.808, 128.778, -226.272)
+metadata/zone_glb = "architecture_tent_guard"
+metadata/source_glb = "interiors/architecture_tent_guard.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_043_architecture_prisonerpole" parent="Interiors" instance=ExtResource("45")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 208.017, 127.47, -222.868)
+metadata/zone_glb = "architecture_prisonerpole"
+metadata/source_glb = "interiors/architecture_prisonerpole.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_044_architecture_pit1" parent="Interiors" instance=ExtResource("46")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 234.337, 127.855, -219.937)
+metadata/zone_glb = "architecture_pit1"
+metadata/source_glb = "interiors/architecture_pit1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_045_buildings_large_tavernbig" parent="Interiors" instance=ExtResource("47")]
+transform = Transform3D(-0.012388, 0, 0.999923, 0, 1, 0, -0.999923, 0, -0.012388, 188.092, 128.123, -138.889)
+metadata/zone_glb = "buildings_large_tavernbig"
+metadata/source_glb = "interiors/buildings_large_tavernbig.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_046_buildings_small_guild01" parent="Interiors" instance=ExtResource("48")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.824, 127.415, -161.913)
+metadata/zone_glb = "buildings_small_guild01"
+metadata/source_glb = "interiors/buildings_small_guild01.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_047_houses_cityhouse1" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 92.3136, 126.902, -119.208)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_glb = "interiors/houses_cityhouse1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_048_houses_cityhouse2" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 77.0939, 126.824, -121.852)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_glb = "interiors/houses_cityhouse2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_049_houses_cityhouse3" parent="Interiors" instance=ExtResource("51")]
+transform = Transform3D(0.020794, 0, 0.999784, 0, 1, 0, -0.999784, 0, 0.020794, 61.4337, 127.167, -118.128)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_glb = "interiors/houses_cityhouse3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_050_houses_cityhouse2" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 53.0114, 126.864, -140.125)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_glb = "interiors/houses_cityhouse2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_051_houses_cityhouse1" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 61.2976, 126.912, -101.952)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_glb = "interiors/houses_cityhouse1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_052_houses_cityhouse3" parent="Interiors" instance=ExtResource("51")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.126, 127.197, -119.561)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_glb = "interiors/houses_cityhouse3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_053_houses_cityhouse1" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 34.0976, 126.832, -141.552)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_glb = "interiors/houses_cityhouse1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_054_houses_cityhouse2" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 19.6477, 126.874, -122.091)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_glb = "interiors/houses_cityhouse2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_055_houses_cityhouse3" parent="Interiors" instance=ExtResource("51")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2593, 127.137, -142.258)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_glb = "interiors/houses_cityhouse3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_056_houses_cityhouse2" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 12.9093, 126.864, -167.198)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_glb = "interiors/houses_cityhouse2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_057_houses_cityhouse3" parent="Interiors" instance=ExtResource("51")]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 33.3967, 127.137, -159.4)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_glb = "interiors/houses_cityhouse3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_058_houses_cityhouse1" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 32.5996, 126.832, -184.166)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_glb = "interiors/houses_cityhouse1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_059_signs_rogue1" parent="Interiors" instance=ExtResource("52")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91404, 131.869, -150.608)
+metadata/zone_glb = "signs_rogue1"
+metadata/source_glb = "interiors/signs_rogue1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_060_signs_mage1" parent="Interiors" instance=ExtResource("53")]
+transform = Transform3D(0, 0, -1.5, 0, 1.5, 0, 1.5, 0, 0, 35.1723, 141.682, -261.28)
+metadata/zone_glb = "signs_mage1"
+metadata/source_glb = "interiors/signs_mage1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_061_buildings_large_guildhall" parent="Interiors" instance=ExtResource("54")]
+transform = Transform3D(0.020796, 0, 0.999784, 0, 1, 0, -0.999784, 0, 0.020796, 33.6826, 128.293, -292.944)
+metadata/zone_glb = "buildings_large_guildhall"
+metadata/source_glb = "interiors/buildings_large_guildhall.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_062_components_desert_obelisk" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72.9657, 84.5764, 685.545)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_glb = "interiors/components_desert_obelisk.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_063_components_desert_obelisk" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.166, 84.5764, 685.545)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_glb = "interiors/components_desert_obelisk.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_064_components_desert_obelisk" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.971338, 0, -0.237703, 0, 1, 0, 0.237703, 0, 0.971338, -68.0385, 102.407, 520.463)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_glb = "interiors/components_desert_obelisk.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_065_components_desert_obelisk" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.971338, 0, -0.237703, 0, 1, 0, 0.237703, 0, 0.971338, -96.4018, 102.407, 513.523)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_glb = "interiors/components_desert_obelisk.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_066_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(-0.029199, 0, -0.999574, 0, 1, 0, 0.999574, 0, -0.029199, -220.929, 116.288, 415.334)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_067_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.238478, 0, -0.971148, 0, 1, 0, 0.971148, 0, 0.238478, -229.83, 116.327, 416.291)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_068_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.971338, 0, -0.237701, 0, 1, 0, 0.237701, 0, 0.971338, 161.086, 139.953, 594.519)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_069_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.985585, 0, 0.169184, 0, 1, 0, -0.169184, 0, 0.985585, 161.811, 139.807, 583.895)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_070_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.796084, 0, -0.605186, 0, 1, 0, 0.605186, 0, 0.796084, -258.689, 128.511, 87.935)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_071_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.140333, 0, -0.990104, 0, 1, 0, 0.990104, 0, 0.140333, -248.289, 128.518, 82.6218)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_072_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(-0.9243, 0, -0.381667, 0, 1, 0, 0.381667, 0, -0.9243, -258.655, 128.668, 102.52)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_073_objects_firept3" parent="Interiors" instance=ExtResource("37")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -250.971, 128.371, 94.0138)
+metadata/zone_glb = "objects_firept3"
+metadata/source_glb = "interiors/objects_firept3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_074_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.682222, 0, -0.731145, 0, 1, 0, 0.731145, 0, 0.682222, 385.844, 159.492, 82.3891)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_075_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.738473, 0, -0.674283, 0, 1, 0, 0.674283, 0, 0.738473, 395.006, 159.358, 73.6099)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_076_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.966392, 0, -0.257074, 0, 1, 0, 0.257074, 0, 0.966392, 523.953, 145.56, -396.088)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_077_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.963769, 0, 0.266739, 0, 1, 0, -0.266739, 0, 0.963769, 523.657, 145.505, -413.203)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_078_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.908963, 0, 0.416877, 0, 1, 0, -0.416877, 0, 0.908963, 516.558, 146.405, -466.902)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_079_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.908963, 0, 0.416877, 0, 1, 0, -0.416877, 0, 0.908963, 596.743, 167.81, -195.724)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_080_architecture_stonehenge" parent="Interiors" instance=ExtResource("58")]
+transform = Transform3D(0.764843, 0, 0.644217, 0, 1, 0, -0.644217, 0, 0.764843, 483.337, 148.02, -0.012574)
+metadata/zone_glb = "architecture_stonehenge"
+metadata/source_glb = "interiors/architecture_stonehenge.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_081_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.877579, 0, 0.479432, 0, 1, 0, -0.479432, 0, 0.877579, 596.708, 158.511, -510.664)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_082_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.877579, 0, 0.479432, 0, 1, 0, -0.479432, 0, 0.877579, 585.533, 157.139, -536.031)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_083_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.877579, 0, 0.479432, 0, 1, 0, -0.479432, 0, 0.877579, 508.881, 149.836, -579.483)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_084_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.371653, 0, 0.928372, 0, 1, 0, -0.928372, 0, 0.371653, 500.86, 149.928, -599.289)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_085_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.140333, 0, -0.990104, 0, 1, 0, 0.990104, 0, 0.140333, -534.861, 168.654, 431.26)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_086_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.796084, 0, -0.605186, 0, 1, 0, 0.605186, 0, 0.796084, -545.26, 168.707, 436.574)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_087_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(-0.9243, 0, -0.381667, 0, 1, 0, 0.381667, 0, -0.9243, -545.227, 168.244, 451.159)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_088_objects_firept3" parent="Interiors" instance=ExtResource("37")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -537.543, 167.987, 442.652)
+metadata/zone_glb = "objects_firept3"
+metadata/source_glb = "interiors/objects_firept3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_089_architecture_bindpoint" parent="Interiors" instance=ExtResource("59")]
+transform = Transform3D(-0.881584, 0, -0.472028, 0, 1, 0, 0.472028, 0, -0.881584, 256.707, 147.48, -133.081)
+metadata/zone_glb = "architecture_bindpoint"
+metadata/source_glb = "interiors/architecture_bindpoint.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_090_architecture_fountain1" parent="Interiors" instance=ExtResource("60")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124.586, 127.04, -96.3875)
+metadata/zone_glb = "architecture_fountain1"
+metadata/source_glb = "interiors/architecture_fountain1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_091_architecture_tent1" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.900447, 0, 0.434966, 0, 1, 0, -0.434966, 0, 0.900447, 308.029, 137.307, -344.47)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_glb = "interiors/architecture_tent1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_092_objects_lantern2" parent="Interiors" instance=ExtResource("61")]
+transform = Transform3D(0.713255, 0, -0.362309, 0, 0.8, 0, 0.362309, 0, 0.713255, 110.057, 157.783, 29.6627)
+metadata/zone_glb = "objects_lantern2"
+metadata/source_glb = "interiors/objects_lantern2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_093_objects_lantern2" parent="Interiors" instance=ExtResource("61")]
+transform = Transform3D(0.768844, 0, -0.221084, 0, 0.8, 0, 0.221084, 0, 0.768844, 119.548, 157.695, 31.6461)
+metadata/zone_glb = "objects_lantern2"
+metadata/source_glb = "interiors/objects_lantern2.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_094_buildings_large_tavern1" parent="Interiors" instance=ExtResource("62")]
+transform = Transform3D(0.120502, 0, 0.992713, 0, 1, 0, -0.992713, 0, 0.120502, -450.587, 154.959, 17.2505)
+metadata/zone_glb = "buildings_large_tavern1"
+metadata/source_glb = "interiors/buildings_large_tavern1.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_095_buildings_large_ruins3" parent="Interiors" instance=ExtResource("63")]
+transform = Transform3D(-1.938608, 0, 0.491731, 0, 2, 0, -0.491731, 0, -1.938608, -166.272, 150.781, 302.312)
+metadata/zone_glb = "buildings_large_ruins3"
+metadata/source_glb = "interiors/buildings_large_ruins3.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_096_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.982003, 0, 0.188867, 0, 1, 0, -0.188867, 0, 0.982003, 731.454, 170.114, -8.30423)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
+
+[node name="Interior_097_hovels_small_cottage" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(-0.932908, 0, 0.360115, -0.003601, 0.99995, -0.009329, -0.360097, -0.01, -0.932861, -243.308, 205.903, -704.309)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_glb = "interiors/hovels_small_cottage.glb"
+metadata/zone_role = "interior"
+metadata/zone_collide = true
