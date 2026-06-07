@@ -20,14 +20,13 @@ var base := ""
 
 
 func _ready() -> void:
-	# Tool-mode preview: repair mesh normals only. Terrain materials and authored
-	# lights are left as saved in the scene.
+	# Tool-mode preview: repair non-terrain mesh normals only. Terrain meshes,
+	# materials, and authored lights are left exactly as saved in the scene.
 	if not Engine.is_editor_hint() or authored_zone_name == "":
 		return
 	zone_name = authored_zone_name
 	base = ASSET_ROOT + zone_name + "/"
-	_repair_mesh_normals(self)
-
+	_repair_authored_non_terrain_mesh_normals(self)
 
 
 # Interiors that should be walk-through (no collision): decorative monuments /
@@ -80,9 +79,9 @@ func build(zone: String, with_environment: bool = true) -> bool:
 
 ## Finalize a pre-authored Godot scene for runtime use. This intentionally does
 ## not instantiate scene objects from JSON; it only applies runtime-only state
-## (collision, mesh normals, and optional environment) to nodes that already
-## exist in the .tscn and can be moved/edited in the Godot editor. Terrain
-## materials and authored directional lights are preserved as saved in the scene.
+## (collision, non-terrain mesh normals, and optional environment) to nodes that
+## already exist in the .tscn and can be moved/edited in the Godot editor. Terrain
+## meshes/materials and authored directional lights are preserved as saved.
 func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
 	zone_name = zone if zone != "" else authored_zone_name
 	if zone_name == "":
@@ -91,7 +90,7 @@ func prepare_authored_scene(zone: String = "", with_environment: bool = true) ->
 	base = ASSET_ROOT + zone_name + "/"
 	if with_environment and authored_with_environment:
 		_setup_environment({})
-	_repair_mesh_normals(self)
+	_repair_authored_non_terrain_mesh_normals(self)
 	_finalize_authored_children()
 	return true
 
@@ -108,11 +107,11 @@ func _finalize_authored_node(node: Node) -> void:
 			var n := child as Node3D
 			var rel := str(n.get_meta("zone_glb", ""))
 			var role := str(n.get_meta("zone_role", ""))
-			for mi in _mesh_instances(n):
-				mi.lod_bias = 64.0
 			if role == "terrain":
 				_ensure_mesh_collision(n, true)
 			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
+				for mi in _mesh_instances(n):
+					mi.lod_bias = 64.0
 				_ensure_mesh_collision(n, false)
 				_add_walkable_floor_collision(n)
 				if _uses_footprint_fallback(rel):
@@ -163,9 +162,7 @@ func _build_terrain(data: Dictionary) -> void:
 	var tp = data["terrain"]["pos"]
 	terr.position = Vector3(tp[0], tp[1], tp[2])
 	add_child(terr)
-	_repair_mesh_normals(terr)
 	for mi in _mesh_instances(terr):
-		mi.lod_bias = 64.0
 		mi.create_trimesh_collision()
 		# Tag the terrain collider with bit 3 (value 4) in addition to bit 1, so the
 		# client's NPC ground-snap ray can hit terrain only (climb hills, ignore
@@ -297,6 +294,19 @@ func _repair_mesh_normals(node: Node) -> void:
 	# flip authored building or terrain normals that were already visually correct.
 	MeshNormalRepairScript.repair_node(node)
 
+
+func _repair_authored_non_terrain_mesh_normals(node: Node) -> void:
+	if _is_authored_terrain_node(node):
+		return
+	if node is MeshInstance3D:
+		_repair_mesh_normals(node)
+		return
+	for child in node.get_children():
+		_repair_authored_non_terrain_mesh_normals(child)
+
+
+func _is_authored_terrain_node(node: Node) -> bool:
+	return node is Node3D and str((node as Node3D).get_meta("zone_role", "")) == "terrain"
 
 
 func _mesh_instances(n: Node) -> Array:
