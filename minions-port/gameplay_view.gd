@@ -24,6 +24,9 @@ const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
+const PLAYER_FOOT_OFFSET := 0.9
+const PLAYER_STEP_UP_HEIGHT := 0.75
+const PLAYER_STEP_FORWARD_SCALE := 0.9
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
@@ -115,8 +118,8 @@ func _ready():
 	# stay snapped to the surface, so client prediction tracks the server's flat
 	# movement model instead of falling behind and rubber-banding on hills.
 	player_body.floor_constant_speed = true
-	player_body.floor_snap_length = 1.0
-	player_body.floor_max_angle = deg_to_rad(60.0)
+	player_body.floor_snap_length = 1.35
+	player_body.floor_max_angle = deg_to_rad(68.0)
 	# Animated player avatar. The real race/sex isn't known until the first self
 	# snapshot, so build the rig node now and load the model in _ensure_player_model
 	# once we know it. The capsule stays visible until the model loads, so the
@@ -748,9 +751,69 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 		return any_y
 	return ter_y
 
-func _godot_to_server_pos(godot_pos: Vector3) -> Array:
-	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
-	return [godot_pos.x, -godot_pos.z, godot_pos.y]
+func _godot_direction_to_server(godot_dir: Vector3) -> Array:
+	"""Convert a Godot direction vector to server coordinates (no origin offset)."""
+	return [godot_dir.x, -godot_dir.z, godot_dir.y]
+
+func _godot_world_to_server(godot_pos: Vector3) -> Array:
+	"""Convert an absolute Godot world position back to server coordinates.
+
+	The zone art, player, and replicated entities are shifted by
+	_server_origin_offset after spawn. Inverting that offset is required when
+	replicating player Z; otherwise Trinst's ~147u source height becomes ~2u on
+	the server and nearby NPCs fail the server-side visibility range check.
+	"""
+	var server_space_pos := godot_pos - _server_origin_offset
+	return [server_space_pos.x, -server_space_pos.z, server_space_pos.y]
+
+func _try_step_up(horizontal_motion: Vector3, was_on_floor: bool) -> void:
+	# CharacterBody3D has slope snapping but no built-in stair stepping. When a
+	# grounded move hits a low vertical riser, probe the same horizontal move from a
+	# small lifted position and settle back down onto the first floor below. This
+	# keeps Trinst stairs walkable without letting server reconciliation tunnel the
+	# player through full-height walls.
+	if not was_on_floor or horizontal_motion.length_squared() < 0.000001:
+		return
+	var hit_riser := false
+	for i in range(player_body.get_slide_collision_count()):
+		var collision := player_body.get_slide_collision(i)
+		if collision != null and absf(collision.get_normal().y) < 0.25:
+			hit_riser = true
+			break
+	if not hit_riser:
+		return
+
+	var original_pos := player_body.global_position
+	var up := Vector3.UP * PLAYER_STEP_UP_HEIGHT
+	if player_body.move_and_collide(up, true) != null:
+		return
+	var lifted_pos := original_pos + up
+	player_body.global_position = lifted_pos
+	var step_motion := horizontal_motion * PLAYER_STEP_FORWARD_SCALE
+	if player_body.move_and_collide(step_motion, true) != null:
+		player_body.global_position = original_pos
+		return
+
+	var candidate_pos := lifted_pos + step_motion
+	var world := player_body.get_world_3d()
+	if world == null:
+		player_body.global_position = original_pos
+		return
+	var q := PhysicsRayQueryParameters3D.create(
+		candidate_pos, candidate_pos - Vector3.UP * (PLAYER_STEP_UP_HEIGHT + player_body.floor_snap_length + 0.25))
+	q.collide_with_areas = false
+	q.collision_mask = 1
+	q.exclude = [player_body]
+	var floor_hit := world.direct_space_state.intersect_ray(q)
+	if not (floor_hit and floor_hit.has("position")):
+		player_body.global_position = original_pos
+		return
+	var floor_y := float(floor_hit.position.y) + PLAYER_FOOT_OFFSET
+	if floor_y < original_pos.y - 0.05 or floor_y > original_pos.y + PLAYER_STEP_UP_HEIGHT + 0.05:
+		player_body.global_position = original_pos
+		return
+	player_body.global_position = Vector3(candidate_pos.x, floor_y, candidate_pos.z)
+	velocity.y = 0.0
 
 func _server_rotation_to_godot_y(rotation_data) -> float:
 	"""Extract Y-axis rotation (yaw) from TGE axis-angle for Godot.
@@ -1373,8 +1436,11 @@ func _physics_process(delta):
 	else:
 		velocity.y -= GRAVITY * delta
 	jump_requested = false
+	var horizontal_motion := Vector3(velocity.x, 0.0, velocity.z) * delta
+	var was_on_floor := player_body.is_on_floor()
 	player_body.velocity = velocity
 	player_body.move_and_slide()
+	_try_step_up(horizontal_motion, was_on_floor)
 	# Safety net: teleport back above the platform if player falls
 	if player_body.global_position.y < -50.0:
 		player_body.global_position = Vector3(player_body.global_position.x, 5.0, player_body.global_position.z)
@@ -1386,7 +1452,7 @@ func _physics_process(delta):
 		_input_sync_timer = 0.0
 		# Convert facing direction to server coords for the server movement sim
 		var forward_dir := -basis.z  # Godot forward is -Z
-		var server_forward := _godot_to_server_pos(forward_dir)
+		var server_forward := _godot_direction_to_server(forward_dir)
 		var input_state := {
 			"move_x": input_vec.x,
 			"move_y": input_vec.y,
@@ -1394,7 +1460,7 @@ func _physics_process(delta):
 			"jump": jump_requested,
 			# Replicate the client-resolved floor height back to the headless server.
 			# The server stores positions as (x, y, z), where z is vertical.
-			"position_z": _godot_to_server_pos(player_body.global_position)[2],
+			"position_z": _godot_world_to_server(player_body.global_position)[2],
 		}
 		if input_state != _last_sent_input:
 			_last_sent_input = input_state.duplicate()
