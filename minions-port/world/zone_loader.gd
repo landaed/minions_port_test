@@ -3,14 +3,13 @@ extends Node3D
 ## Canonical runtime support for a converted MoM zone. It can either build the
 ## legacy JSON description into children, or finalize an authored .tscn version
 ## of that same zone by applying runtime collision and lighting without
-## overriding terrain materials or authored directional lights.
+## overriding terrain materials, mesh normals, or authored directional lights.
 ## Used by the live game (gameplay_view loads this into WorldRoot at the server
 ## origin offset), the generated Trinst .tscn scene, and the offline art preview.
 ## No player/camera of its own.
 
 const ASSET_ROOT := "res://assets/"
 
-const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 @export var authored_zone_name := ""
 @export var authored_with_environment := true
@@ -20,13 +19,9 @@ var base := ""
 
 
 func _ready() -> void:
-	# Tool-mode preview: repair non-terrain mesh normals only. Terrain meshes,
-	# materials, and authored lights are left exactly as saved in the scene.
-	if not Engine.is_editor_hint() or authored_zone_name == "":
-		return
-	zone_name = authored_zone_name
-	base = ASSET_ROOT + zone_name + "/"
-	_repair_authored_non_terrain_mesh_normals(self)
+	# Runtime intentionally does not mutate mesh normals or materials. If converted
+	# assets need normal repair, run the editor bake/repair tools and save the scene.
+	pass
 
 
 # Interiors that should be walk-through (no collision): decorative monuments /
@@ -79,9 +74,9 @@ func build(zone: String, with_environment: bool = true) -> bool:
 
 ## Finalize a pre-authored Godot scene for runtime use. This intentionally does
 ## not instantiate scene objects from JSON; it only applies runtime-only state
-## (collision, non-terrain mesh normals, and optional environment) to nodes that
-## already exist in the .tscn and can be moved/edited in the Godot editor. Terrain
-## meshes/materials and authored directional lights are preserved as saved.
+## (collision and optional environment) to nodes that already exist in the .tscn
+## and can be moved/edited in the Godot editor. Mesh normals, terrain materials,
+## and authored directional lights are preserved as saved.
 func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
 	zone_name = zone if zone != "" else authored_zone_name
 	if zone_name == "":
@@ -90,7 +85,6 @@ func prepare_authored_scene(zone: String = "", with_environment: bool = true) ->
 	base = ASSET_ROOT + zone_name + "/"
 	if with_environment and authored_with_environment:
 		_setup_environment({})
-	_repair_authored_non_terrain_mesh_normals(self)
 	_finalize_authored_children()
 	return true
 
@@ -189,7 +183,6 @@ func _place_items(items, collide: bool) -> void:
 		# Tag with the source glb name so the client can report which building the
 		# player is looking at (debug panel) — handy for pinning down the gate.
 		inst.set_meta("zone_glb", str(rel).get_file().get_basename())
-		_repair_mesh_normals(inst)
 		add_child(inst)
 		var do_collide := collide and not _is_passthrough(str(rel))
 		for mi in _mesh_instances(inst):
@@ -287,26 +280,6 @@ func _add_footprint_fallback_floor(inst: Node3D) -> void:
 	add_child(body)
 	body.global_position = Vector3(aabb.position.x + aabb.size.x * 0.5,
 		aabb.position.y + 0.2, aabb.position.z + aabb.size.z * 0.5)
-
-
-func _repair_mesh_normals(node: Node) -> void:
-	# Keep the original zone behavior: generate missing/invalid normals, but do not
-	# flip authored building or terrain normals that were already visually correct.
-	MeshNormalRepairScript.repair_node(node)
-
-
-func _repair_authored_non_terrain_mesh_normals(node: Node) -> void:
-	if _is_authored_terrain_node(node):
-		return
-	if node is MeshInstance3D:
-		_repair_mesh_normals(node)
-		return
-	for child in node.get_children():
-		_repair_authored_non_terrain_mesh_normals(child)
-
-
-func _is_authored_terrain_node(node: Node) -> bool:
-	return node is Node3D and str((node as Node3D).get_meta("zone_role", "")) == "terrain"
 
 
 func _mesh_instances(n: Node) -> Array:

@@ -5,7 +5,6 @@ extends Node3D
 ## Env: GLB (path), ANIM (animation name), TIME (seconds, default 0.3),
 ##      SHOT (png), DIST (camera distance), YAW, FOV, GRID(1)
 
-const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 func _env(k: String, d: String) -> String:
 	var v := OS.get_environment(k)
@@ -58,7 +57,6 @@ func _ready() -> void:
 		return
 	var model := doc.generate_scene(st)
 	add_child(model)
-	MeshNormalRepairScript.repair_node(model, true)
 
 	# AABB to frame the model
 	var aabb := _scene_aabb(model)

@@ -4,12 +4,13 @@ extends Node3D
 ## and skinned mesh, and drives a small idle/walk/run/attack/death state machine.
 ## Used for both the player avatar and replicated NPCs so every visible character
 ## shares the same animation behaviour. If the model fails to load, the caller can
-## fall back to a capsule so a character is never invisible.
+## fall back to a capsule so a character is never invisible. Prefer editor-baked
+## repaired wrappers when present; never mutates mesh normals at runtime.
 
 const RUN_SPEED := 5.0   # server move speeds: NPC ~5 u/s, player ~8 u/s
 const WALK_MIN := 0.35   # below this we consider the character standing still
 const TEX_DIR := "res://assets/character_textures/"
-const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
+const EDITOR_REPAIRED_CHARACTER_DIR := "res://assets/characters/repaired/"
 
 var anim_player: AnimationPlayer
 var skinned_meshes: Array[MeshInstance3D] = []
@@ -21,17 +22,14 @@ var loaded := false
 func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 	if glb_path == "" or not ResourceLoader.exists(glb_path):
 		return false
-	var scene = load(glb_path)
+	var scene_path := _editor_repaired_scene_path(glb_path)
+	var scene = load(scene_path)
 	if scene == null:
 		return false
 	var inst = scene.instantiate()
 	if face_offset_deg != 0.0:
 		inst.rotation_degrees.y += face_offset_deg
 	add_child(inst)
-	# Character, NPC, and monster GLBs can carry inverted normals from the
-	# converter. Repair before collecting mesh references so all actor lighting is
-	# consistent with the already-repaired world geometry.
-	MeshNormalRepairScript.repair_node(inst, true)
 	anim_player = _find_anim_player(inst)
 	skinned_meshes = _find_meshes(inst)
 	if anim_player:
@@ -47,6 +45,16 @@ func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 	# Start in idle so a freshly spawned character isn't frozen in bind pose.
 	_play("idle")
 	return true
+
+func _editor_repaired_scene_path(glb_path: String) -> String:
+	if glb_path.begins_with("res://assets/characters/"):
+		var repaired_path := (
+			EDITOR_REPAIRED_CHARACTER_DIR + glb_path.get_file().get_basename() + ".tscn"
+		)
+		if ResourceLoader.exists(repaired_path):
+			return repaired_path
+	return glb_path
+
 
 func _play(name: String, blend: float = 0.15) -> void:
 	if anim_player == null or not _anims.has(name):
