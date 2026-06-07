@@ -1407,7 +1407,7 @@ func _input(event):
 		camera_pitch.rotate_x(-event.relative.y * LOOK_SENSITIVITY)
 		camera_pitch.rotation.x = clamp(camera_pitch.rotation.x, deg_to_rad(-70), deg_to_rad(70))
 
-func _physics_process(delta):
+func _physics_process(delta: float) -> void:
 	if not visible:
 		return
 	# Gather movement inputs
@@ -1436,7 +1436,7 @@ func _physics_process(delta):
 	else:
 		velocity.y -= GRAVITY * delta
 	jump_requested = false
-	var horizontal_motion := Vector3(velocity.x, 0.0, velocity.z) * delta
+	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
 	player_body.velocity = velocity
 	player_body.move_and_slide()
