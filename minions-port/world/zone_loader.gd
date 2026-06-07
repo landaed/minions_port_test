@@ -11,13 +11,13 @@ extends Node3D
 const ASSET_ROOT := "res://assets/"
 
 const TERRAIN_SHADER_PATH := "res://world/zone_terrain.gdshader"
+const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 @export var authored_zone_name := ""
 @export var authored_with_environment := true
 
 var zone_name := ""
 var base := ""
-var _normal_mesh_cache := {}
 
 
 func _ready() -> void:
@@ -301,59 +301,7 @@ func _add_footprint_fallback_floor(inst: Node3D) -> void:
 
 
 func _repair_mesh_normals(node: Node) -> void:
-	for mi in _mesh_instances(node):
-		if mi.mesh == null:
-			continue
-		var repaired := _mesh_with_repaired_normals(mi.mesh)
-		if repaired != mi.mesh:
-			mi.mesh = repaired
-
-
-func _mesh_with_repaired_normals(mesh: Mesh) -> Mesh:
-	var cache_key := mesh.get_instance_id()
-	if _normal_mesh_cache.has(cache_key):
-		return _normal_mesh_cache[cache_key]
-	if not _mesh_needs_normal_repair(mesh):
-		return mesh
-	var rebuilt := ArrayMesh.new()
-	rebuilt.resource_name = mesh.resource_name + "_repaired_normals"
-	for surface in range(mesh.get_surface_count()):
-		var st := SurfaceTool.new()
-		st.create_from(mesh, surface)
-		# Many converted building GLBs have POSITION/TEXCOORD data but no NORMAL
-		# attribute, which makes directional lights shade each whole surface as if
-		# it had one default normal. Generate normals from the triangle winding once
-		# per source mesh and share the repaired ArrayMesh across instances.
-		if mesh.surface_get_primitive_type(surface) == Mesh.PRIMITIVE_TRIANGLES:
-			st.generate_normals()
-		st.commit(rebuilt)
-		var mat := mesh.surface_get_material(surface)
-		if mat != null:
-			rebuilt.surface_set_material(rebuilt.get_surface_count() - 1, mat)
-	if rebuilt.get_surface_count() == 0:
-		return mesh
-	_normal_mesh_cache[cache_key] = rebuilt
-	return rebuilt
-
-
-func _mesh_needs_normal_repair(mesh: Mesh) -> bool:
-	for surface in range(mesh.get_surface_count()):
-		var arrays := mesh.surface_get_arrays(surface)
-		if arrays.is_empty():
-			continue
-		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
-		if verts.is_empty():
-			continue
-		var normals := PackedVector3Array()
-		if arrays[Mesh.ARRAY_NORMAL] is PackedVector3Array:
-			normals = arrays[Mesh.ARRAY_NORMAL]
-		if normals.size() != verts.size():
-			return true
-		for normal in normals:
-			var len_sq := normal.length_squared()
-			if len_sq < 0.25 or len_sq > 2.25:
-				return true
-	return false
+	MeshNormalRepairScript.repair_node(node)
 
 
 func _texture_terrain(node: Node, texdict) -> void:

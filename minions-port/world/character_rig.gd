@@ -9,6 +9,7 @@ extends Node3D
 const RUN_SPEED := 5.0   # server move speeds: NPC ~5 u/s, player ~8 u/s
 const WALK_MIN := 0.35   # below this we consider the character standing still
 const TEX_DIR := "res://assets/character_textures/"
+const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 var anim_player: AnimationPlayer
 var skinned_meshes: Array[MeshInstance3D] = []
@@ -27,6 +28,10 @@ func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 	if face_offset_deg != 0.0:
 		inst.rotation_degrees.y += face_offset_deg
 	add_child(inst)
+	# Character, NPC, and monster GLBs can carry inverted normals from the
+	# converter. Repair before collecting mesh references so all actor lighting is
+	# consistent with the already-repaired world geometry.
+	MeshNormalRepairScript.repair_node(inst)
 	anim_player = _find_anim_player(inst)
 	skinned_meshes = _find_meshes(inst)
 	if anim_player:
