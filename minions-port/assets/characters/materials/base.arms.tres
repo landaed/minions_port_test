@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://m60s4np8mbhh"]
+
+[ext_resource type="Texture2D" uid="uid://cd3cp5k6qifp1" path="res://assets/characters/elf_male_2.jpg" id="1_wufoy"]
+
+[resource]
+resource_name = "base.arms"
+cull_mode = 2
+albedo_texture = ExtResource("1_wufoy")
+roughness = 0.9

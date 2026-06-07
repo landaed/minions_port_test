@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://damy74fc6l8nx"]
+
+[ext_resource type="Texture2D" uid="uid://cthn23ckpxbcw" path="res://assets/characters/elf_male_4.jpg" id="1_xrnr7"]
+
+[resource]
+resource_name = "base.hands"
+cull_mode = 2
+albedo_texture = ExtResource("1_xrnr7")
+roughness = 0.9

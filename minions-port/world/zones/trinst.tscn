@@ -1022,490 +1022,296 @@ metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth
 
 [node name="Interiors" type="Node3D" parent="." unique_id=1996467812]
 
-[node name="tower_000" parent="Interiors" unique_id=1890258199 instance=ExtResource("23")]
+[node name="tower_000" parent="Interiors" unique_id=84338225 instance=ExtResource("23")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -110.996, 147.81, -301.139)
-metadata/zone_glb = "components_city_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
 
-[node name="tower_001" parent="Interiors" unique_id=545802985 instance=ExtResource("23")]
+[node name="tower_001" parent="Interiors" unique_id=418933804 instance=ExtResource("23")]
 transform = Transform3D(6.123234e-17, 0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 271.736, 148.073, -31.1675)
-metadata/zone_glb = "components_city_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
 
-[node name="tower_002" parent="Interiors" unique_id=427153289 instance=ExtResource("23")]
+[node name="tower_002" parent="Interiors" unique_id=1497583482 instance=ExtResource("23")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 333.848, 147.898, -150.731)
-metadata/zone_glb = "components_city_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
 
-[node name="tower_003" parent="Interiors" unique_id=428204424 instance=ExtResource("23")]
+[node name="tower_003" parent="Interiors" unique_id=491322193 instance=ExtResource("23")]
 transform = Transform3D(6.123234e-17, 0, 1, 0, 1, 0, -1, 0, 6.123234e-17, -21.6122, 147.918, -32.7274)
-metadata/zone_glb = "components_city_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
 
-[node name="Entrance_000" parent="Interiors" unique_id=1270624561 instance=ExtResource("24")]
+[node name="Entrance_000" parent="Interiors" unique_id=2058739328 instance=ExtResource("24")]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 124.497, 146.067, -5.66935)
-metadata/zone_glb = "components_city_castle"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_castle.dif"
 
-[node name="WallsA_000" parent="Interiors" unique_id=950185301 instance=ExtResource("25")]
+[node name="WallsA_000" parent="Interiors" unique_id=1412807654 instance=ExtResource("25")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.677, 148.006, -224.744)
-metadata/zone_glb = "components_city_wallsa"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsa.dif"
 
-[node name="WallsC1_000" parent="Interiors" unique_id=641909249 instance=ExtResource("26")]
+[node name="WallsC1_000" parent="Interiors" unique_id=1088261329 instance=ExtResource("26")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.785, 148.006, -224.13)
-metadata/zone_glb = "components_city_wallsc1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc1.dif"
 
-[node name="WallsE_000" parent="Interiors" unique_id=2052311794 instance=ExtResource("27")]
+[node name="WallsE_000" parent="Interiors" unique_id=300982846 instance=ExtResource("27")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.775, 148.006, -224.13)
-metadata/zone_glb = "components_city_wallse"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallse.dif"
 
-[node name="WallsD_000" parent="Interiors" unique_id=568268413 instance=ExtResource("28")]
+[node name="WallsD_000" parent="Interiors" unique_id=1575711516 instance=ExtResource("28")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.79, 148.006, -224.12)
-metadata/zone_glb = "components_city_wallsd"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsd.dif"
 
-[node name="WallsB_000" parent="Interiors" unique_id=1883224562 instance=ExtResource("29")]
+[node name="WallsB_000" parent="Interiors" unique_id=1579418228 instance=ExtResource("29")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 114.105, 148.006, -224.793)
-metadata/zone_glb = "components_city_wallsb"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsb.dif"
 
-[node name="stairs_000" parent="Interiors" unique_id=1355852095 instance=ExtResource("30")]
+[node name="stairs_000" parent="Interiors" unique_id=1431553243 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 126.695, 141.226, -44.3245)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="stairs_001" parent="Interiors" unique_id=1696628222 instance=ExtResource("30")]
+[node name="stairs_001" parent="Interiors" unique_id=1466468158 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 122.695, 141.226, -44.3245)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="stairs_002" parent="Interiors" unique_id=2038658564 instance=ExtResource("30")]
+[node name="stairs_002" parent="Interiors" unique_id=1424562753 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 126.695, 135.69, -55.38)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="stairs_003" parent="Interiors" unique_id=1092076512 instance=ExtResource("30")]
+[node name="stairs_003" parent="Interiors" unique_id=1734125349 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 122.695, 135.69, -55.38)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="stairs_004" parent="Interiors" unique_id=380637838 instance=ExtResource("30")]
+[node name="stairs_004" parent="Interiors" unique_id=130956193 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 122.699, 130.218, -65.8579)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="stairs_005" parent="Interiors" unique_id=175258010 instance=ExtResource("30")]
+[node name="stairs_005" parent="Interiors" unique_id=93387222 instance=ExtResource("30")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 126.689, 130.218, -65.8579)
-metadata/zone_glb = "architecture_stairs2a"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
 
-[node name="WallsC2_000" parent="Interiors" unique_id=897828864 instance=ExtResource("31")]
+[node name="WallsC2_000" parent="Interiors" unique_id=768120376 instance=ExtResource("31")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 112.785, 148.006, -224.138)
-metadata/zone_glb = "components_city_wallsc2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc2.dif"
 
-[node name="GuardTower_000" parent="Interiors" unique_id=627981692 instance=ExtResource("32")]
+[node name="GuardTower_000" parent="Interiors" unique_id=309591254 instance=ExtResource("32")]
 transform = Transform3D(1.2406974, 0, -0.84301245, 0, 1.5, 0, 0.84301245, 0, 1.2406974, 40.982, 125.35, 254.041)
-metadata/zone_glb = "prefabs_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif"
 
-[node name="prefabs_tower1wall_000" parent="Interiors" unique_id=260174055 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_000" parent="Interiors" unique_id=1109192580 instance=ExtResource("33")]
 transform = Transform3D(1.0167066, 0, -0.6374228, 0, 1.2, 0, 0.6374228, 0, 1.0167066, 43.3589, 126.049, 252.973)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="prefabs_tower1wall_001" parent="Interiors" unique_id=597655899 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_001" parent="Interiors" unique_id=2083470995 instance=ExtResource("33")]
 transform = Transform3D(0.9625161, 0, -0.71663284, 0, 1.2, 0, 0.71663284, 0, 0.9625161, 16.6068, 125.929, 233.969)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="prefabs_tower1wall_002" parent="Interiors" unique_id=1500348319 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_002" parent="Interiors" unique_id=2142518471 instance=ExtResource("33")]
 transform = Transform3D(1.0167066, 0, -0.6374228, 0, 1.2, 0, 0.6374228, 0, 1.0167066, 55.5933, 126.049, 260.643)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="GuardTower_001" parent="Interiors" unique_id=698609471 instance=ExtResource("32")]
+[node name="GuardTower_001" parent="Interiors" unique_id=103515162 instance=ExtResource("32")]
 transform = Transform3D(-0.16888657, 0, -1.4904621, 0, 1.5, 0, 1.4904621, 0, -0.16888657, -373.768, 174.466, -235.229)
-metadata/zone_glb = "prefabs_tower1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif"
 
-[node name="prefabs_tower1wall_003" parent="Interiors" unique_id=1928058634 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_003" parent="Interiors" unique_id=743019110 instance=ExtResource("33")]
 transform = Transform3D(-0.09113355, 0, -1.1965344, 0, 1.2, 0, 1.1965344, 0, -0.09113355, -371.716, 175.165, -233.622)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="prefabs_tower1wall_004" parent="Interiors" unique_id=1365502869 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_004" parent="Interiors" unique_id=922824073 instance=ExtResource("33")]
 transform = Transform3D(-0.18646146, 0, -1.1854249, 0, 1.2, 0, 1.1854249, 0, -0.18646146, -367.343, 175.045, -266.144)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="prefabs_tower1wall_005" parent="Interiors" unique_id=1582764727 instance=ExtResource("33")]
+[node name="prefabs_tower1wall_005" parent="Interiors" unique_id=383670245 instance=ExtResource("33")]
 transform = Transform3D(-0.09113355, 0, -1.1965344, 0, 1.2, 0, 1.1965344, 0, -0.09113355, -372.813, 175.165, -219.224)
-metadata/zone_glb = "prefabs_tower1wall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
 
-[node name="barracks_000" parent="Interiors" unique_id=1439949485 instance=ExtResource("34")]
+[node name="barracks_000" parent="Interiors" unique_id=1093926077 instance=ExtResource("34")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 276.121, 129.91, -259.235)
-metadata/zone_glb = "buildings_small_barracks"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/barracks.dif"
 
-[node name="Priest_000" parent="Interiors" unique_id=25264463 instance=ExtResource("35")]
+[node name="Priest_000" parent="Interiors" unique_id=1487021621 instance=ExtResource("35")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 221.475, 131.107, -345.824)
-metadata/zone_glb = "buildings_small_greathall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/greathall.dif"
 
-[node name="objects_firept3_000" parent="Interiors" unique_id=1379754519 instance=ExtResource("36")]
+[node name="objects_firept3_000" parent="Interiors" unique_id=157961266 instance=ExtResource("36")]
 transform = Transform3D(0.6894982, 0, -0.7242874, 0, 1, 0, 0.7242874, 0, 0.6894982, 235.487, 128.809, -304.004)
-metadata/zone_glb = "objects_firept3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
 
-[node name="objects_firept3_001" parent="Interiors" unique_id=945842832 instance=ExtResource("36")]
+[node name="objects_firept3_001" parent="Interiors" unique_id=21947699 instance=ExtResource("36")]
 transform = Transform3D(0.6894982, 0, -0.7242874, 0, 1, 0, 0.7242874, 0, 0.6894982, 206.949, 128.83, -302.459)
-metadata/zone_glb = "objects_firept3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
 
-[node name="CombatantSign_000" parent="Interiors" unique_id=2108886863 instance=ExtResource("37")]
+[node name="CombatantSign_000" parent="Interiors" unique_id=773612796 instance=ExtResource("37")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 251.133, 138.77, -265.29)
-metadata/zone_glb = "signs_combat1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/combat1.dif"
 
-[node name="PriestSign_000" parent="Interiors" unique_id=1876991624 instance=ExtResource("38")]
+[node name="PriestSign_000" parent="Interiors" unique_id=2135567943 instance=ExtResource("38")]
 transform = Transform3D(0.00079587003, 0, -0.9999997, 0, 1, 0, 0.9999997, 0, 0.00079587003, 218.013, 136.215, -298.087)
-metadata/zone_glb = "signs_priest1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/priest1.dif"
 
-[node name="shop_000" parent="Interiors" unique_id=1976538306 instance=ExtResource("39")]
+[node name="shop_000" parent="Interiors" unique_id=786950251 instance=ExtResource("39")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.901, -162.568)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_001" parent="Interiors" unique_id=1939237408 instance=ExtResource("39")]
+[node name="shop_001" parent="Interiors" unique_id=1402350208 instance=ExtResource("39")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.901, -118.768)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_002" parent="Interiors" unique_id=2056206799 instance=ExtResource("39")]
+[node name="shop_002" parent="Interiors" unique_id=383242179 instance=ExtResource("39")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.941, -180.568)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_003" parent="Interiors" unique_id=990403290 instance=ExtResource("39")]
+[node name="shop_003" parent="Interiors" unique_id=1980032052 instance=ExtResource("39")]
 transform = Transform3D(-0.75, 0, -9.184851e-17, 0, 0.75, 0, 9.184851e-17, 0, -0.75, 139.036, 126.901, -116.53)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_004" parent="Interiors" unique_id=474175080 instance=ExtResource("39")]
+[node name="shop_004" parent="Interiors" unique_id=1025525025 instance=ExtResource("39")]
 transform = Transform3D(-0.75, 0, -9.184851e-17, 0, 0.75, 0, 9.184851e-17, 0, -0.75, 139.036, 126.891, -134.53)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_005" parent="Interiors" unique_id=645433921 instance=ExtResource("39")]
+[node name="shop_005" parent="Interiors" unique_id=984393320 instance=ExtResource("39")]
 transform = Transform3D(-0.75, 0, -9.184851e-17, 0, 0.75, 0, 9.184851e-17, 0, -0.75, 139.036, 126.851, -151.93)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="shop_006" parent="Interiors" unique_id=1371083351 instance=ExtResource("39")]
+[node name="shop_006" parent="Interiors" unique_id=932847067 instance=ExtResource("39")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 110.271, 126.931, -145.368)
-metadata/zone_glb = "shops_shoplrg1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
 
-[node name="objects_smallforge_000" parent="Interiors" unique_id=863029184 instance=ExtResource("40")]
+[node name="objects_smallforge_000" parent="Interiors" unique_id=757610679 instance=ExtResource("40")]
 transform = Transform3D(0.2815771, 0, 0.64087, 0, 0.7, 0, -0.64087, 0, 0.2815771, 128.59, 136.85, -173.801)
-metadata/zone_glb = "objects_smallforge"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/smallforge.dif"
 
-[node name="objects_anvil_000" parent="Interiors" unique_id=89508624 instance=ExtResource("41")]
+[node name="objects_anvil_000" parent="Interiors" unique_id=2080153775 instance=ExtResource("41")]
 transform = Transform3D(0.99920064, 0, 0.039975364, 0, 1, 0, -0.039975364, 0, 0.99920064, 118.85, 140.964, -176.595)
-metadata/zone_glb = "objects_anvil"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/anvil.dif"
 
-[node name="objects_odstv_000" parent="Interiors" unique_id=1719283422 instance=ExtResource("42")]
+[node name="objects_odstv_000" parent="Interiors" unique_id=975435048 instance=ExtResource("42")]
 transform = Transform3D(-0.9948436, 0, 0.10142093, 0, 1, 0, -0.10142093, 0, -0.9948436, 140.958, 141.541, -194.384)
-metadata/zone_glb = "objects_odstv"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/odstv.dif"
 
-[node name="Tent_000" parent="Interiors" unique_id=541251270 instance=ExtResource("43")]
+[node name="Tent_000" parent="Interiors" unique_id=1747793627 instance=ExtResource("43")]
 transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 198.808, 128.778, -226.272)
-metadata/zone_glb = "architecture_tent_guard"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent_guard.dif"
 
-[node name="prisonerpole_000" parent="Interiors" unique_id=611050722 instance=ExtResource("44")]
+[node name="prisonerpole_000" parent="Interiors" unique_id=1426967430 instance=ExtResource("44")]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 208.017, 127.47, -222.868)
-metadata/zone_glb = "architecture_prisonerpole"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/prisonerpole.dif"
 
-[node name="pit_000" parent="Interiors" unique_id=97884551 instance=ExtResource("45")]
+[node name="pit_000" parent="Interiors" unique_id=163448169 instance=ExtResource("45")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 234.337, 127.855, -219.937)
-metadata/zone_glb = "architecture_pit1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/pit1.dif"
 
-[node name="buildings_large_tavernbig_000" parent="Interiors" unique_id=1368162531 instance=ExtResource("46")]
+[node name="buildings_large_tavernbig_000" parent="Interiors" unique_id=931990316 instance=ExtResource("46")]
 transform = Transform3D(-0.01238803, 0, 0.9999233, 0, 1, 0, -0.9999233, 0, -0.01238803, 188.092, 128.123, -138.889)
-metadata/zone_glb = "buildings_large_tavernbig"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavernbig.dif"
 
-[node name="Rogue_000" parent="Interiors" unique_id=511381417 instance=ExtResource("47")]
+[node name="Rogue_000" parent="Interiors" unique_id=1918730734 instance=ExtResource("47")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.824, 127.415, -161.913)
-metadata/zone_glb = "buildings_small_guild01"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/guild01.dif"
 
-[node name="houses_cityhouse1_000" parent="Interiors" unique_id=1160640476 instance=ExtResource("48")]
+[node name="houses_cityhouse1_000" parent="Interiors" unique_id=1072941409 instance=ExtResource("48")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 92.3136, 126.902, -119.208)
-metadata/zone_glb = "houses_cityhouse1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
 
-[node name="houses_cityhouse2_000" parent="Interiors" unique_id=480136033 instance=ExtResource("49")]
+[node name="houses_cityhouse2_000" parent="Interiors" unique_id=1887152666 instance=ExtResource("49")]
 transform = Transform3D(6.123234e-17, 0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 77.0939, 126.824, -121.852)
-metadata/zone_glb = "houses_cityhouse2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
 
-[node name="houses_cityhouse3_000" parent="Interiors" unique_id=380231575 instance=ExtResource("50")]
+[node name="houses_cityhouse3_000" parent="Interiors" unique_id=637944629 instance=ExtResource("50")]
 transform = Transform3D(0.0207941, 0, 0.99978375, 0, 1, 0, -0.99978375, 0, 0.0207941, 61.4337, 127.167, -118.128)
-metadata/zone_glb = "houses_cityhouse3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
 
-[node name="houses_cityhouse2_001" parent="Interiors" unique_id=322995089 instance=ExtResource("49")]
+[node name="houses_cityhouse2_001" parent="Interiors" unique_id=1116368105 instance=ExtResource("49")]
 transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, 0, 6.123234e-17, 53.0114, 126.864, -140.125)
-metadata/zone_glb = "houses_cityhouse2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
 
-[node name="houses_cityhouse1_001" parent="Interiors" unique_id=1832287874 instance=ExtResource("48")]
+[node name="houses_cityhouse1_001" parent="Interiors" unique_id=641971306 instance=ExtResource("48")]
 transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, 0, 6.123234e-17, 61.2976, 126.912, -101.952)
-metadata/zone_glb = "houses_cityhouse1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
 
-[node name="houses_cityhouse3_001" parent="Interiors" unique_id=853119548 instance=ExtResource("50")]
+[node name="houses_cityhouse3_001" parent="Interiors" unique_id=1813760346 instance=ExtResource("50")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.126, 127.197, -119.561)
-metadata/zone_glb = "houses_cityhouse3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
 
-[node name="houses_cityhouse1_002" parent="Interiors" unique_id=1818608556 instance=ExtResource("48")]
+[node name="houses_cityhouse1_002" parent="Interiors" unique_id=237476270 instance=ExtResource("48")]
 transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, 0, 6.123234e-17, 34.0976, 126.832, -141.552)
-metadata/zone_glb = "houses_cityhouse1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
 
-[node name="houses_cityhouse2_002" parent="Interiors" unique_id=1585111361 instance=ExtResource("49")]
+[node name="houses_cityhouse2_002" parent="Interiors" unique_id=1422814798 instance=ExtResource("49")]
 transform = Transform3D(6.123234e-17, 0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 19.6477, 126.874, -122.091)
-metadata/zone_glb = "houses_cityhouse2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
 
-[node name="houses_cityhouse3_002" parent="Interiors" unique_id=572912860 instance=ExtResource("50")]
+[node name="houses_cityhouse3_002" parent="Interiors" unique_id=488463743 instance=ExtResource("50")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.2593, 127.137, -142.258)
-metadata/zone_glb = "houses_cityhouse3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
 
-[node name="houses_cityhouse2_003" parent="Interiors" unique_id=1247349679 instance=ExtResource("49")]
+[node name="houses_cityhouse2_003" parent="Interiors" unique_id=1751051084 instance=ExtResource("49")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 12.9093, 126.864, -167.198)
-metadata/zone_glb = "houses_cityhouse2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
 
-[node name="houses_cityhouse3_003" parent="Interiors" unique_id=166868107 instance=ExtResource("50")]
+[node name="houses_cityhouse3_003" parent="Interiors" unique_id=893946271 instance=ExtResource("50")]
 transform = Transform3D(6.123234e-17, 0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 33.3967, 127.137, -159.4)
-metadata/zone_glb = "houses_cityhouse3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
 
-[node name="houses_cityhouse1_003" parent="Interiors" unique_id=1045069055 instance=ExtResource("48")]
+[node name="houses_cityhouse1_003" parent="Interiors" unique_id=168648827 instance=ExtResource("48")]
 transform = Transform3D(-1, 0, -1.2246469e-16, 0, 1, 0, 1.2246469e-16, 0, -1, 32.5996, 126.832, -184.166)
-metadata/zone_glb = "houses_cityhouse1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
 
-[node name="RogueSign_000" parent="Interiors" unique_id=1965268087 instance=ExtResource("51")]
+[node name="RogueSign_000" parent="Interiors" unique_id=1563161369 instance=ExtResource("51")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91404, 131.869, -150.608)
-metadata/zone_glb = "signs_rogue1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/rogue1.dif"
 
-[node name="MageSign_000" parent="Interiors" unique_id=379514001 instance=ExtResource("52")]
+[node name="MageSign_000" parent="Interiors" unique_id=513486825 instance=ExtResource("52")]
 transform = Transform3D(9.184851e-17, 0, -1.5, 0, 1.5, 0, 1.5, 0, 9.184851e-17, 35.1723, 141.682, -261.28)
-metadata/zone_glb = "signs_mage1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/mage1.dif"
 
-[node name="MageGuild_000" parent="Interiors" unique_id=931336554 instance=ExtResource("53")]
+[node name="MageGuild_000" parent="Interiors" unique_id=1568158632 instance=ExtResource("53")]
 transform = Transform3D(0.020795844, 0, 0.99978375, 0, 1, 0, -0.99978375, 0, 0.020795844, 33.6826, 128.293, -292.944)
-metadata/zone_glb = "buildings_large_guildhall"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/guildhall.dif"
 
-[node name="obelisk_000" parent="Interiors" unique_id=395060164 instance=ExtResource("54")]
+[node name="obelisk_000" parent="Interiors" unique_id=547721192 instance=ExtResource("54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -72.9657, 84.5764, 685.545)
-metadata/zone_glb = "components_desert_obelisk"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
 
-[node name="obelisk_001" parent="Interiors" unique_id=136734559 instance=ExtResource("54")]
+[node name="obelisk_001" parent="Interiors" unique_id=2103811608 instance=ExtResource("54")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -102.166, 84.5764, 685.545)
-metadata/zone_glb = "components_desert_obelisk"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
 
-[node name="obelisk_002" parent="Interiors" unique_id=1504475168 instance=ExtResource("54")]
+[node name="obelisk_002" parent="Interiors" unique_id=1647918520 instance=ExtResource("54")]
 transform = Transform3D(0.9713379, 0, -0.23770285, 0, 1, 0, 0.23770285, 0, 0.9713379, -68.0385, 102.407, 520.463)
-metadata/zone_glb = "components_desert_obelisk"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
 
-[node name="obelisk_003" parent="Interiors" unique_id=563595423 instance=ExtResource("54")]
+[node name="obelisk_003" parent="Interiors" unique_id=1461114263 instance=ExtResource("54")]
 transform = Transform3D(0.9713379, 0, -0.23770285, 0, 1, 0, 0.23770285, 0, 0.9713379, -96.4018, 102.407, 513.523)
-metadata/zone_glb = "components_desert_obelisk"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
 
-[node name="architecture_tent1_000" parent="Interiors" unique_id=1055646418 instance=ExtResource("55")]
+[node name="architecture_tent1_000" parent="Interiors" unique_id=322306423 instance=ExtResource("55")]
 transform = Transform3D(-0.029198699, 0, -0.99957365, 0, 1, 0, 0.99957365, 0, -0.029198699, -220.929, 116.288, 415.334)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_001" parent="Interiors" unique_id=1725994134 instance=ExtResource("55")]
+[node name="architecture_tent1_001" parent="Interiors" unique_id=1444416605 instance=ExtResource("55")]
 transform = Transform3D(0.23847753, 0, -0.971148, 0, 1, 0, 0.971148, 0, 0.23847753, -229.83, 116.327, 416.291)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_002" parent="Interiors" unique_id=1836767545 instance=ExtResource("55")]
+[node name="architecture_tent1_002" parent="Interiors" unique_id=649074401 instance=ExtResource("55")]
 transform = Transform3D(0.97133833, 0, -0.23770115, 0, 1, 0, 0.23770115, 0, 0.97133833, 161.086, 139.953, 594.519)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_003" parent="Interiors" unique_id=52185992 instance=ExtResource("55")]
+[node name="architecture_tent1_003" parent="Interiors" unique_id=1101524104 instance=ExtResource("55")]
 transform = Transform3D(0.98558456, 0, 0.16918351, 0, 1, 0, -0.16918351, 0, 0.98558456, 161.811, 139.807, 583.895)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_004" parent="Interiors" unique_id=1737933576 instance=ExtResource("55")]
+[node name="architecture_tent1_004" parent="Interiors" unique_id=327150739 instance=ExtResource("55")]
 transform = Transform3D(0.7960844, 0, -0.6051856, 0, 1, 0, 0.6051856, 0, 0.7960844, -258.689, 128.511, 87.935)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_005" parent="Interiors" unique_id=819636295 instance=ExtResource("55")]
+[node name="architecture_tent1_005" parent="Interiors" unique_id=1217141469 instance=ExtResource("55")]
 transform = Transform3D(0.14033273, 0, -0.9901044, 0, 1, 0, 0.9901044, 0, 0.14033273, -248.289, 128.518, 82.6218)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_006" parent="Interiors" unique_id=1325394818 instance=ExtResource("55")]
+[node name="architecture_tent1_006" parent="Interiors" unique_id=747595449 instance=ExtResource("55")]
 transform = Transform3D(-0.9242998, 0, -0.38166735, 0, 1, 0, 0.38166735, 0, -0.9242998, -258.655, 128.668, 102.52)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="objects_firept3_002" parent="Interiors" unique_id=550578117 instance=ExtResource("36")]
+[node name="objects_firept3_002" parent="Interiors" unique_id=1928655317 instance=ExtResource("36")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -250.971, 128.371, 94.0138)
-metadata/zone_glb = "objects_firept3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
 
-[node name="hovels_small_cottage_000" parent="Interiors" unique_id=1957675026 instance=ExtResource("56")]
+[node name="hovels_small_cottage_000" parent="Interiors" unique_id=1130734342 instance=ExtResource("56")]
 transform = Transform3D(0.6822217, 0, -0.7311454, 0, 1, 0, 0.7311454, 0, 0.6822217, 385.844, 159.492, 82.3891)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_001" parent="Interiors" unique_id=879384973 instance=ExtResource("56")]
+[node name="hovels_small_cottage_001" parent="Interiors" unique_id=1820103942 instance=ExtResource("56")]
 transform = Transform3D(0.738473, 0, -0.674283, 0, 1, 0, 0.674283, 0, 0.738473, 395.006, 159.358, 73.6099)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_002" parent="Interiors" unique_id=461543054 instance=ExtResource("56")]
+[node name="hovels_small_cottage_002" parent="Interiors" unique_id=1695461685 instance=ExtResource("56")]
 transform = Transform3D(0.9663918, 0, -0.25707376, 0, 1, 0, 0.25707376, 0, 0.9663918, 523.953, 145.56, -396.088)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_003" parent="Interiors" unique_id=929287265 instance=ExtResource("56")]
+[node name="hovels_small_cottage_003" parent="Interiors" unique_id=1601574110 instance=ExtResource("56")]
 transform = Transform3D(0.96376884, 0, 0.26673883, 0, 1, 0, -0.26673883, 0, 0.96376884, 523.657, 145.505, -413.203)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_004" parent="Interiors" unique_id=1321264625 instance=ExtResource("56")]
+[node name="hovels_small_cottage_004" parent="Interiors" unique_id=685592685 instance=ExtResource("56")]
 transform = Transform3D(0.9089627, 0, 0.4168774, 0, 1, 0, -0.4168774, 0, 0.9089627, 516.558, 146.405, -466.902)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_005" parent="Interiors" unique_id=1857490941 instance=ExtResource("56")]
+[node name="hovels_small_cottage_005" parent="Interiors" unique_id=964885130 instance=ExtResource("56")]
 transform = Transform3D(0.9089627, 0, 0.4168774, 0, 1, 0, -0.4168774, 0, 0.9089627, 596.743, 167.81, -195.724)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="DruidRing_000" parent="Interiors" unique_id=1206379958 instance=ExtResource("57")]
+[node name="DruidRing_000" parent="Interiors" unique_id=330170355 instance=ExtResource("57")]
 transform = Transform3D(0.7648427, 0, 0.6442171, 0, 1, 0, -0.6442171, 0, 0.7648427, 483.337, 148.02, -0.0125737)
-metadata/zone_glb = "architecture_stonehenge"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stonehenge.dif"
 
-[node name="hovels_small_cottage_006" parent="Interiors" unique_id=408684801 instance=ExtResource("56")]
+[node name="hovels_small_cottage_006" parent="Interiors" unique_id=1411695019 instance=ExtResource("56")]
 transform = Transform3D(0.87757915, 0, 0.4794318, 0, 1, 0, -0.4794318, 0, 0.87757915, 596.708, 158.511, -510.664)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_007" parent="Interiors" unique_id=1776416615 instance=ExtResource("56")]
+[node name="hovels_small_cottage_007" parent="Interiors" unique_id=600801840 instance=ExtResource("56")]
 transform = Transform3D(0.87757915, 0, 0.4794318, 0, 1, 0, -0.4794318, 0, 0.87757915, 585.533, 157.139, -536.031)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_008" parent="Interiors" unique_id=314310905 instance=ExtResource("56")]
+[node name="hovels_small_cottage_008" parent="Interiors" unique_id=1114878742 instance=ExtResource("56")]
 transform = Transform3D(0.87757915, 0, 0.4794318, 0, 1, 0, -0.4794318, 0, 0.87757915, 508.881, 149.836, -579.483)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="hovels_small_cottage_009" parent="Interiors" unique_id=1660872324 instance=ExtResource("56")]
+[node name="hovels_small_cottage_009" parent="Interiors" unique_id=3578761 instance=ExtResource("56")]
 transform = Transform3D(0.37165302, 0, 0.9283717, 0, 1, 0, -0.9283717, 0, 0.37165302, 500.86, 149.928, -599.289)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="architecture_tent1_007" parent="Interiors" unique_id=518790955 instance=ExtResource("55")]
+[node name="architecture_tent1_007" parent="Interiors" unique_id=736645018 instance=ExtResource("55")]
 transform = Transform3D(0.14033273, 0, -0.9901044, 0, 1, 0, 0.9901044, 0, 0.14033273, -534.861, 168.654, 431.26)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_008" parent="Interiors" unique_id=175913089 instance=ExtResource("55")]
+[node name="architecture_tent1_008" parent="Interiors" unique_id=642821062 instance=ExtResource("55")]
 transform = Transform3D(0.7960844, 0, -0.6051856, 0, 1, 0, 0.6051856, 0, 0.7960844, -545.26, 168.707, 436.574)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="architecture_tent1_009" parent="Interiors" unique_id=850082067 instance=ExtResource("55")]
+[node name="architecture_tent1_009" parent="Interiors" unique_id=676056092 instance=ExtResource("55")]
 transform = Transform3D(-0.9242998, 0, -0.38166735, 0, 1, 0, 0.38166735, 0, -0.9242998, -545.227, 168.244, 451.159)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="objects_firept3_003" parent="Interiors" unique_id=55981187 instance=ExtResource("36")]
+[node name="objects_firept3_003" parent="Interiors" unique_id=92530448 instance=ExtResource("36")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -537.543, 167.987, 442.652)
-metadata/zone_glb = "objects_firept3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
 
-[node name="bindpoint_000" parent="Interiors" unique_id=1861846853 instance=ExtResource("58")]
+[node name="bindpoint_000" parent="Interiors" unique_id=579035071 instance=ExtResource("58")]
 transform = Transform3D(-0.8815837, 0, -0.47202772, 0, 1, 0, 0.47202772, 0, -0.8815837, 256.707, 147.48, -133.081)
-metadata/zone_glb = "architecture_bindpoint"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/bindpoint.dif"
 
-[node name="fountain_000" parent="Interiors" unique_id=942976294 instance=ExtResource("59")]
+[node name="fountain_000" parent="Interiors" unique_id=1687657589 instance=ExtResource("59")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 124.586, 127.04, -96.3875)
-metadata/zone_glb = "architecture_fountain1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/fountain1.dif"
 
-[node name="Tent_001" parent="Interiors" unique_id=423317241 instance=ExtResource("55")]
+[node name="Tent_001" parent="Interiors" unique_id=1098215503 instance=ExtResource("55")]
 transform = Transform3D(0.90044713, 0, 0.43496552, 0, 1, 0, -0.43496552, 0, 0.90044713, 308.029, 137.307, -344.47)
-metadata/zone_glb = "architecture_tent1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
 
-[node name="Lamp_000" parent="Interiors" unique_id=2143927039 instance=ExtResource("60")]
+[node name="Lamp_000" parent="Interiors" unique_id=986801298 instance=ExtResource("60")]
 transform = Transform3D(0.71325475, 0, -0.36230883, 0, 0.8, 0, 0.36230883, 0, 0.71325475, 110.057, 157.783, 29.6627)
-metadata/zone_glb = "objects_lantern2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif"
 
-[node name="Lamp_001" parent="Interiors" unique_id=438556146 instance=ExtResource("60")]
+[node name="Lamp_001" parent="Interiors" unique_id=1775836240 instance=ExtResource("60")]
 transform = Transform3D(0.7688444, 0, -0.22108427, 0, 0.8, 0, 0.22108427, 0, 0.7688444, 119.548, 157.695, 31.6461)
-metadata/zone_glb = "objects_lantern2"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif"
 
-[node name="Tavern_000" parent="Interiors" unique_id=1552122956 instance=ExtResource("61")]
+[node name="Tavern_000" parent="Interiors" unique_id=1992223982 instance=ExtResource("61")]
 transform = Transform3D(0.12050243, 0, 0.99271303, 0, 1, 0, -0.99271303, 0, 0.12050243, -450.587, 154.959, 17.2505)
-metadata/zone_glb = "buildings_large_tavern1"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavern1.dif"
 
-[node name="buildings_large_ruins3_000" parent="Interiors" unique_id=1241589362 instance=ExtResource("62")]
+[node name="buildings_large_ruins3_000" parent="Interiors" unique_id=500419300 instance=ExtResource("62")]
 transform = Transform3D(-1.9386078, 0, 0.4917314, 0, 2, 0, -0.4917314, 0, -1.9386078, -166.272, 150.781, 302.312)
-metadata/zone_glb = "buildings_large_ruins3"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/ruins3.dif"
 
-[node name="hovels_small_cottage_010" parent="Interiors" unique_id=1936317204 instance=ExtResource("56")]
+[node name="hovels_small_cottage_010" parent="Interiors" unique_id=887800660 instance=ExtResource("56")]
 transform = Transform3D(0.98200256, 0, 0.1888675, 0, 1, 0, -0.1888675, 0, 0.98200256, 731.454, 170.114, -8.30423)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
-[node name="BWHouse_000" parent="Interiors" unique_id=1903178087 instance=ExtResource("56")]
+[node name="BWHouse_000" parent="Interiors" unique_id=1740325845 instance=ExtResource("56")]
 transform = Transform3D(-0.9329079, -4.1264787e-08, 0.36011514, -0.0036011278, 0.99995, -0.009328903, -0.36009714, -0.0099998275, -0.9328612, -243.308, 205.903, -704.309)
-metadata/zone_glb = "hovels_small_cottage"
-metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1745281072]
-transform = Transform3D(1, 0, 0, 0, 0.76021326, 0.64967364, 0, -0.64967364, 0.76021326, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -0.9929655, 0.118403874, 0, -0.118403874, -0.9929655, 0, 0, 0)

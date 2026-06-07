@@ -17,15 +17,18 @@ const TERRAIN_SHADER_PATH := "res://world/zone_terrain.gdshader"
 
 var zone_name := ""
 var base := ""
+var _normal_mesh_cache := {}
 
 
 func _ready() -> void:
-	# Tool-mode preview: make the authored terrain look in the editor like it does
-	# in game, without generating collision bodies or adding runtime lighting.
+	# Tool-mode preview: make the authored terrain and repaired mesh normals look
+	# in the editor like they do in game, without generating collision bodies or
+	# adding runtime lighting.
 	if not Engine.is_editor_hint() or authored_zone_name == "":
 		return
 	zone_name = authored_zone_name
 	base = ASSET_ROOT + zone_name + "/"
+	_repair_mesh_normals(self)
 	_apply_authored_terrain_material(self)
 
 
@@ -95,8 +98,8 @@ func build(zone: String, with_environment: bool = true) -> bool:
 
 ## Finalize a pre-authored Godot scene for runtime use. This intentionally does
 ## not instantiate scene objects from JSON; it only applies runtime-only state
-## (collision, terrain shader, and optional environment) to nodes that already
-## exist in the .tscn and can be moved/edited in the Godot editor.
+## (collision, mesh normals, terrain shader, and optional environment) to nodes
+## that already exist in the .tscn and can be moved/edited in the Godot editor.
 func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
 	zone_name = zone if zone != "" else authored_zone_name
 	if zone_name == "":
@@ -105,6 +108,7 @@ func prepare_authored_scene(zone: String = "", with_environment: bool = true) ->
 	base = ASSET_ROOT + zone_name + "/"
 	if with_environment and authored_with_environment:
 		_setup_environment({})
+	_repair_mesh_normals(self)
 	_finalize_authored_children()
 	return true
 
@@ -177,6 +181,7 @@ func _build_terrain(data: Dictionary) -> void:
 	var tp = data["terrain"]["pos"]
 	terr.position = Vector3(tp[0], tp[1], tp[2])
 	add_child(terr)
+	_repair_mesh_normals(terr)
 	_texture_terrain(terr, data.get("terrain_textures", {}))
 	for mi in _mesh_instances(terr):
 		mi.lod_bias = 64.0
@@ -206,6 +211,7 @@ func _place_items(items, collide: bool) -> void:
 		# Tag with the source glb name so the client can report which building the
 		# player is looking at (debug panel) — handy for pinning down the gate.
 		inst.set_meta("zone_glb", str(rel).get_file().get_basename())
+		_repair_mesh_normals(inst)
 		add_child(inst)
 		var do_collide := collide and not _is_passthrough(str(rel))
 		for mi in _mesh_instances(inst):
@@ -303,6 +309,62 @@ func _add_footprint_fallback_floor(inst: Node3D) -> void:
 	add_child(body)
 	body.global_position = Vector3(aabb.position.x + aabb.size.x * 0.5,
 		aabb.position.y + 0.2, aabb.position.z + aabb.size.z * 0.5)
+
+
+func _repair_mesh_normals(node: Node) -> void:
+	for mi in _mesh_instances(node):
+		if mi.mesh == null:
+			continue
+		var repaired := _mesh_with_repaired_normals(mi.mesh)
+		if repaired != mi.mesh:
+			mi.mesh = repaired
+
+
+func _mesh_with_repaired_normals(mesh: Mesh) -> Mesh:
+	var cache_key := mesh.get_instance_id()
+	if _normal_mesh_cache.has(cache_key):
+		return _normal_mesh_cache[cache_key]
+	if not _mesh_needs_normal_repair(mesh):
+		return mesh
+	var rebuilt := ArrayMesh.new()
+	rebuilt.resource_name = mesh.resource_name + "_repaired_normals"
+	for surface in range(mesh.get_surface_count()):
+		var st := SurfaceTool.new()
+		st.create_from(mesh, surface)
+		# Many converted building GLBs have POSITION/TEXCOORD data but no NORMAL
+		# attribute, which makes directional lights shade each whole surface as if
+		# it had one default normal. Generate normals from the triangle winding once
+		# per source mesh and share the repaired ArrayMesh across instances.
+		if mesh.surface_get_primitive_type(surface) == Mesh.PRIMITIVE_TRIANGLES:
+			st.generate_normals()
+		st.commit(rebuilt)
+		var mat := mesh.surface_get_material(surface)
+		if mat != null:
+			rebuilt.surface_set_material(rebuilt.get_surface_count() - 1, mat)
+	if rebuilt.get_surface_count() == 0:
+		return mesh
+	_normal_mesh_cache[cache_key] = rebuilt
+	return rebuilt
+
+
+func _mesh_needs_normal_repair(mesh: Mesh) -> bool:
+	for surface in range(mesh.get_surface_count()):
+		var arrays := mesh.surface_get_arrays(surface)
+		if arrays.is_empty():
+			continue
+		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		if verts.is_empty():
+			continue
+		var normals := PackedVector3Array()
+		if arrays[Mesh.ARRAY_NORMAL] is PackedVector3Array:
+			normals = arrays[Mesh.ARRAY_NORMAL]
+		if normals.size() != verts.size():
+			return true
+		for normal in normals:
+			var len_sq := normal.length_squared()
+			if len_sq < 0.25 or len_sq > 2.25:
+				return true
+	return false
 
 
 func _texture_terrain(node: Node, texdict) -> void:

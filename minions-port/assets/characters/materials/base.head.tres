@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://csffsvw0qry3w"]
+
+[ext_resource type="Texture2D" uid="uid://brc6ts44whkeu" path="res://assets/characters/elf_male_3.jpg" id="1_qwhde"]
+
+[resource]
+resource_name = "base.head"
+cull_mode = 2
+albedo_texture = ExtResource("1_qwhde")
+roughness = 0.9
