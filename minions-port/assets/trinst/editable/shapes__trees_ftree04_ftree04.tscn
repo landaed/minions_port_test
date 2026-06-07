@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bsas1v0j6kyr7"]
 
-[ext_resource type="PackedScene" path="res://assets/trinst/shapes/trees_ftree04_ftree04.glb" id="1"]
+[ext_resource type="PackedScene" uid="uid://1rneuqytk3cg" path="res://assets/trinst/shapes/trees_ftree04_ftree04.glb" id="1"]
 
-[node name="trees_ftree04_ftree04" instance=ExtResource("1")]
+[node name="trees_ftree04_ftree04" unique_id=110078714 instance=ExtResource("1")]
 metadata/source_glb = "res://assets/trinst/shapes/trees_ftree04_ftree04.glb"
+
+[node name="ftree04" parent="." index="0" unique_id=959401907]
+lod_bias = 128.0
