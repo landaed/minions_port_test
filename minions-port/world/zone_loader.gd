@@ -1,57 +1,64 @@
+@tool
 extends Node3D
-## Canonical loader for a converted MoM zone. Builds terrain (textured + collision),
-## buildings (collision), props, and a modern real-time environment as children of
-## this node, from res://assets/<zone>/scene.json.
+## Canonical runtime support for a converted MoM zone. It can either build the
+## legacy JSON description into children, or finalize an authored .tscn version
+## of that same zone by applying terrain material, collision, and lighting.
 ##
 ## Used by the live game (gameplay_view loads this into WorldRoot at the server
-## origin offset) and by the offline art preview. No player/camera of its own.
+## origin offset), the generated Trinst .tscn scene, and the offline art preview.
+## No player/camera of its own.
 
 const ASSET_ROOT := "res://assets/"
 
-const TERRAIN_SHADER := """
-shader_type spatial;
-render_mode cull_disabled;
-uniform sampler2D grass_tex : source_color, filter_linear, repeat_enable;
-uniform sampler2D rock_tex : source_color, filter_linear, repeat_enable;
-uniform sampler2D sand_tex : source_color, filter_linear, repeat_enable;
-uniform float tex_scale = 0.12;
-uniform float sand_height = 63.0;
-uniform float sand_blend = 3.0;
-varying vec3 wpos;
-varying vec3 wnrm;
-void vertex() {
-	wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	wnrm = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
-}
-vec3 tri(sampler2D t, vec3 p, vec3 n) {
-	vec3 bw = pow(abs(n), vec3(4.0));
-	bw /= (bw.x + bw.y + bw.z);
-	return texture(t, p.zy * tex_scale).rgb * bw.x
-		 + texture(t, p.xz * tex_scale).rgb * bw.y
-		 + texture(t, p.xy * tex_scale).rgb * bw.z;
-}
-void fragment() {
-	vec3 n = normalize(wnrm);
-	float slope = clamp(n.y, 0.0, 1.0);
-	vec3 g = tri(grass_tex, wpos, n);
-	g = mix(g, vec3(0.26, 0.40, 0.14), 0.25);
-	vec3 r = tri(rock_tex, wpos, n);
-	vec3 s = tri(sand_tex, wpos, n);
-	float rockw = smoothstep(0.55, 0.32, slope);
-	float sandw = smoothstep(sand_height + sand_blend, sand_height, wpos.y);
-	ALBEDO = mix(mix(g, s, sandw), r, rockw);
-	ROUGHNESS = 0.96;
-}
-"""
+const TERRAIN_SHADER_PATH := "res://world/zone_terrain.gdshader"
+
+@export var authored_zone_name := ""
+@export var authored_with_environment := true
 
 var zone_name := ""
 var base := ""
+
+
+func _ready() -> void:
+	# Tool-mode preview: make the authored terrain look in the editor like it does
+	# in game, without generating collision bodies or adding runtime lighting.
+	if not Engine.is_editor_hint() or authored_zone_name == "":
+		return
+	zone_name = authored_zone_name
+	base = ASSET_ROOT + zone_name + "/"
+	_apply_authored_terrain_material(self)
+
+
+func _apply_authored_terrain_material(node: Node) -> void:
+	for child in node.get_children():
+		if child is Node3D:
+			var n := child as Node3D
+			if str(n.get_meta("zone_role", "")) == "terrain":
+				_texture_terrain(n, _terrain_texture_defaults())
+		_apply_authored_terrain_material(child)
+
+
+func _terrain_texture_defaults() -> Dictionary:
+	return {
+		"grass": "textures/grass01.jpg",
+		"rock": "textures/rock009.jpg",
+		"sand": "textures/sand006.jpg",
+	}
 
 # Interiors that should be walk-through (no collision): decorative monuments /
 # spawn markers the player stands at or passes through. The bindpoint monument
 # (a tall obelisk ringed by boulders) is exactly where a new character spawns, so
 # colliding geometry there traps the player — in the original you pass through it.
 const PASSTHROUGH_INTERIORS := ["architecture_bindpoint"]
+
+# Broad rectangular fallback floors are opt-in only. They can rescue a building
+# with no usable floor triangles at all, but their vertical slab edges are bad
+# around doorways/gates (notably prefabs_tower1). Prefer the triangle-derived
+# walkable floor collision below, and add asset names here only after checking
+# the slab does not cover an entrance.
+const FOOTPRINT_FLOOR_INTERIORS := []
+
+const WALKABLE_FLOOR_NORMAL_Y := 0.62
 
 func _is_passthrough(rel: String) -> bool:
 	for key in PASSTHROUGH_INTERIORS:
@@ -60,8 +67,17 @@ func _is_passthrough(rel: String) -> bool:
 	return false
 
 
-## Build the zone. `with_environment` lets the live game opt out if it manages
-## lighting itself. Returns true on success.
+func _uses_footprint_fallback(rel: String) -> bool:
+	for key in FOOTPRINT_FLOOR_INTERIORS:
+		if rel.findn(key) != -1:
+			return true
+	return false
+
+
+## Build the zone from the legacy JSON description. Kept as a fallback and for
+## tooling/preview scenes; the live Trinst path now loads res://world/zones/trinst.tscn.
+## `with_environment` lets the live game opt out if it manages lighting itself.
+## Returns true on success.
 func build(zone: String, with_environment: bool = true) -> bool:
 	zone_name = zone
 	base = ASSET_ROOT + zone + "/"
@@ -75,6 +91,63 @@ func build(zone: String, with_environment: bool = true) -> bool:
 	_place_items(data.get("statics", []), false)
 	_place_items(data.get("interiors", []), true)
 	return true
+
+
+## Finalize a pre-authored Godot scene for runtime use. This intentionally does
+## not instantiate scene objects from JSON; it only applies runtime-only state
+## (collision, terrain shader, and optional environment) to nodes that already
+## exist in the .tscn and can be moved/edited in the Godot editor.
+func prepare_authored_scene(zone: String = "", with_environment: bool = true) -> bool:
+	zone_name = zone if zone != "" else authored_zone_name
+	if zone_name == "":
+		push_error("zone_loader: authored scene has no zone_name")
+		return false
+	base = ASSET_ROOT + zone_name + "/"
+	if with_environment and authored_with_environment:
+		_setup_environment({})
+	_finalize_authored_children()
+	return true
+
+
+func _finalize_authored_children() -> void:
+	_finalize_authored_node(self)
+
+
+func _finalize_authored_node(node: Node) -> void:
+	for child in node.get_children():
+		if child is WorldEnvironment or child is DirectionalLight3D:
+			continue
+		if child is Node3D:
+			var n := child as Node3D
+			var rel := str(n.get_meta("zone_glb", ""))
+			var role := str(n.get_meta("zone_role", ""))
+			for mi in _mesh_instances(n):
+				mi.lod_bias = 64.0
+			if role == "terrain":
+				_texture_terrain(n, _terrain_texture_defaults())
+				_ensure_mesh_collision(n, true)
+			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
+				_ensure_mesh_collision(n, false)
+				_add_walkable_floor_collision(n)
+				if _uses_footprint_fallback(rel):
+					_add_footprint_fallback_floor(n)
+		_finalize_authored_node(child)
+
+
+func _ensure_mesh_collision(node: Node3D, terrain_only_mask: bool) -> void:
+	for mi in _mesh_instances(node):
+		var has_body := false
+		for c in mi.get_children():
+			if c is StaticBody3D:
+				has_body = true
+				if terrain_only_mask:
+					c.collision_layer = c.collision_layer | 4
+		if not has_body:
+			mi.create_trimesh_collision()
+			if terrain_only_mask:
+				for c in mi.get_children():
+					if c is StaticBody3D:
+						c.collision_layer = c.collision_layer | 4
 
 
 func spawn_point(zone: String = "") -> Variant:
@@ -142,14 +215,69 @@ func _place_items(items, collide: bool) -> void:
 			if do_collide:
 				mi.create_trimesh_collision()
 		if do_collide:
-			_add_fallback_floor(inst)
+			_add_walkable_floor_collision(inst)
+			if _uses_footprint_fallback(str(rel)):
+				_add_footprint_fallback_floor(inst)
 
 
-func _add_fallback_floor(inst: Node3D) -> void:
-	# Some converted interiors are missing floor collision (the player/NPCs fall
-	# through and get stuck under the building). Add a thin collision slab at the
-	# building's base, covering its footprint, as a safety net. Only real buildings
-	# get one (small props are skipped).
+func _add_walkable_floor_collision(inst: Node3D) -> void:
+	# Some converted DIF->GLB interiors have renderable floors that do not produce
+	# reliable concave collision everywhere. Add a second, floor-only concave shape
+	# built from upward-facing visual triangles. Unlike the old full-footprint slab,
+	# this follows actual floor geometry and does not put invisible walls across
+	# tower/gate openings.
+	var faces: PackedVector3Array = PackedVector3Array()
+	var to_zone: Transform3D = global_transform.affine_inverse()
+	for mi in _mesh_instances(inst):
+		if mi.mesh == null:
+			continue
+		var mesh_to_zone: Transform3D = to_zone * mi.global_transform
+		for surface in range(mi.mesh.get_surface_count()):
+			var arrays: Array = mi.mesh.surface_get_arrays(surface)
+			if arrays.is_empty():
+				continue
+			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			if verts.is_empty():
+				continue
+			var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+			if indices.is_empty():
+				for i in range(0, verts.size() - 2, 3):
+					_append_walkable_tri(faces, mesh_to_zone * verts[i], mesh_to_zone * verts[i + 1], mesh_to_zone * verts[i + 2])
+			else:
+				for i in range(0, indices.size() - 2, 3):
+					_append_walkable_tri(faces, mesh_to_zone * verts[indices[i]], mesh_to_zone * verts[indices[i + 1]], mesh_to_zone * verts[indices[i + 2]])
+	if faces.is_empty():
+		return
+	var body := StaticBody3D.new()
+	body.name = str(inst.name) + "_WalkableFloors"
+	body.collision_layer = 1
+	body.set_meta("zone_glb", inst.get_meta("zone_glb", "building") + " (walkable floors)")
+	var cs := CollisionShape3D.new()
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	cs.shape = shape
+	body.add_child(cs)
+	add_child(body)
+	body.transform = Transform3D.IDENTITY
+
+
+func _append_walkable_tri(faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3) -> void:
+	var n := (b - a).cross(c - a)
+	if n.length_squared() < 0.000001:
+		return
+	n = n.normalized()
+	if n.y < WALKABLE_FLOOR_NORMAL_Y:
+		return
+	faces.append(a)
+	faces.append(b)
+	faces.append(c)
+
+
+func _add_footprint_fallback_floor(inst: Node3D) -> void:
+	# Last-resort safety net for simple buildings whose source has no usable floor
+	# triangles at all. Do not use this on gate/tower/wall pieces: a footprint slab
+	# creates an invisible vertical edge across openings. Only real buildings get
+	# one (small props are skipped).
 	var meshes := _mesh_instances(inst)
 	if meshes.is_empty():
 		return
@@ -184,9 +312,10 @@ func _texture_terrain(node: Node, texdict) -> void:
 	var rock = _load_tex(texdict.get("rock", null))
 	var sand = _load_tex(texdict.get("sand", null))
 	var mat := ShaderMaterial.new()
-	var sh := Shader.new()
-	sh.code = TERRAIN_SHADER
-	mat.shader = sh
+	mat.shader = load(TERRAIN_SHADER_PATH) as Shader
+	if mat.shader == null:
+		push_warning("zone_loader: terrain shader missing at " + TERRAIN_SHADER_PATH)
+		return
 	mat.set_shader_parameter("grass_tex", grass)
 	mat.set_shader_parameter("rock_tex", rock if rock else grass)
 	mat.set_shader_parameter("sand_tex", sand if sand else grass)

@@ -29,6 +29,12 @@ from autobahn.exception import Disconnected
 
 from hashlib import md5
 
+# Stream enough nearby entities to make idle NPC wandering visible around town,
+# while still bounding payload size. Override for profiling with
+# MOM_ENTITY_STREAM_RADIUS=<units>.
+ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "120.0"))
+ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "50"))
+
 # Load game config to get master server IP/port
 from mud.gamesettings import LoadGameConfiguration
 LoadGameConfiguration()
@@ -600,9 +606,12 @@ class GodotClientSession:
             else:
                 others.append(e)
         others.sort(key=lambda e: float(e.get("distance", 999999)) if isinstance(e, dict) else 999999)
-        # Only send entities within 50 units to focus on nearby/relevant mobs
-        nearby = [e for e in others if isinstance(e, dict) and float(e.get("distance", 999999)) <= 50.0]
-        capped = nearby[:50]
+        # Only send nearby/relevant mobs. This used to be a hard 50-unit bubble,
+        # which made the authored Trinst scene feel empty/static because many
+        # town NPCs are visible but just outside that range. Keep the payload cap,
+        # but use a wider configurable radius so idle wandering is actually seen.
+        nearby = [e for e in others if isinstance(e, dict) and float(e.get("distance", 999999)) <= ENTITY_STREAM_RADIUS]
+        capped = nearby[:ENTITY_STREAM_LIMIT]
         if self_entity:
             capped.insert(0, self_entity)
 

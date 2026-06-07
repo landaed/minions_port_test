@@ -3,17 +3,39 @@ extends Control
 signal command_requested(command_type: String, payload: Dictionary)
 
 const MOVE_SPEED := 8.0
+const SERVER_RECONCILE_THRESHOLD := 2.0
+const SERVER_RECONCILE_SNAP_THRESHOLD := 12.0
+const SERVER_RECONCILE_BLEND := 0.35
+const CAMERA_ZOOM_MIN := 2.5
+const CAMERA_ZOOM_MAX := 14.0
+const CAMERA_ZOOM_STEP := 1.0
+const DOF_ENABLED := true
+const DOF_FOCUS_MIN := 4.0
+const DOF_FOCUS_MAX := 120.0
+const DOF_DEFAULT_FOCUS := 36.0
+const DOF_FOCUS_SMOOTH_SPEED := 5.0
+const DOF_FOCUS_RAY_LENGTH := 160.0
+const DOF_NEAR_MARGIN := 999.0  # near blur disabled; keep player/weapon readable
+const DOF_FAR_MARGIN := 28.0
+const DOF_NEAR_TRANSITION := 12.0
+const DOF_FAR_TRANSITION := 34.0
+const DOF_BLUR_AMOUNT := 0.025
 const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
-const ENTITY_INTERPOLATION_SPEED := 8.0
+const ENTITY_INTERPOLATION_SPEED := 14.0
+const ENTITY_SNAP_DISTANCE := 8.0
+const ENTITY_DEATH_DESPAWN_DELAY := 2.75
+const ENTITY_FLOOR_PROBE_UP := 4.0
+const ENTITY_FLOOR_PROBE_DOWN := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
 const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const ZONE_SCENE_ROOT := "res://world/zones/"
 const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
 const CHAR_ASSET_DIR := "res://assets/characters/"
@@ -42,6 +64,10 @@ var _zone_loaded := false
 var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
+var _camera_zoom := 7.0
+var _camera_attributes: CameraAttributesPractical = null
+var _dof_focus_distance := DOF_DEFAULT_FOCUS
+var _dead_entity_remove_at: Dictionary = {}
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -98,6 +124,9 @@ func _ready():
 	_player_rig = CharacterRigScript.new()
 	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
 	player_body.add_child(_player_rig)
+	_camera_zoom = camera.position.z
+	_apply_camera_zoom()
+	_setup_dynamic_dof()
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
@@ -232,7 +261,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   U: unstuck   •   F3: debug"
+	hint_label.text = "Tab/Click: target   •   Wheel: zoom   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   U: unstuck   •   F3: debug"
 	bottom.add_child(hint_label)
 	ability_bar = HBoxContainer.new()
 	ability_bar.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -286,6 +315,58 @@ func _build_hud():
 	transfer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	transfer_label.add_theme_font_size_override("font_size", 11)
 	dv.add_child(transfer_label)
+
+func _apply_camera_zoom() -> void:
+	if camera == null:
+		return
+	_camera_zoom = clampf(_camera_zoom, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
+	camera.position.z = _camera_zoom
+
+
+func _adjust_camera_zoom(direction: float) -> void:
+	_camera_zoom = clampf(_camera_zoom + direction * CAMERA_ZOOM_STEP, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
+	_apply_camera_zoom()
+
+
+func _setup_dynamic_dof() -> void:
+	if camera == null or not DOF_ENABLED:
+		return
+	_camera_attributes = CameraAttributesPractical.new()
+	_camera_attributes.dof_blur_near_enabled = false
+	_camera_attributes.dof_blur_far_enabled = true
+	_camera_attributes.dof_blur_amount = DOF_BLUR_AMOUNT
+	_camera_attributes.dof_blur_near_transition = DOF_NEAR_TRANSITION
+	_camera_attributes.dof_blur_far_transition = DOF_FAR_TRANSITION
+	camera.attributes = _camera_attributes
+	_apply_dof_focus(DOF_DEFAULT_FOCUS)
+
+
+func _update_dynamic_dof(delta: float) -> void:
+	if _camera_attributes == null or camera == null or sub_viewport == null:
+		return
+	var target_focus: float = DOF_DEFAULT_FOCUS
+	var center: Vector2 = Vector2(sub_viewport.size) * 0.5
+	var from: Vector3 = camera.project_ray_origin(center)
+	var to: Vector3 = from + camera.project_ray_normal(center) * DOF_FOCUS_RAY_LENGTH
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.exclude = [player_body]
+	var hit: Dictionary = player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit and hit.has("position"):
+		target_focus = from.distance_to(hit.position)
+	target_focus = clampf(target_focus, DOF_FOCUS_MIN, DOF_FOCUS_MAX)
+	var blend: float = clampf(delta * DOF_FOCUS_SMOOTH_SPEED, 0.0, 1.0)
+	_dof_focus_distance = lerpf(_dof_focus_distance, target_focus, blend)
+	_apply_dof_focus(_dof_focus_distance)
+
+
+func _apply_dof_focus(focus_distance: float) -> void:
+	if _camera_attributes == null:
+		return
+	_camera_attributes.dof_blur_near_distance = maxf(DOF_FOCUS_MIN, focus_distance - DOF_NEAR_MARGIN)
+	_camera_attributes.dof_blur_far_distance = minf(DOF_FOCUS_MAX, focus_distance + DOF_FAR_MARGIN)
+
 
 func _draw_crosshair():
 	var c := crosshair.size * 0.5
@@ -360,6 +441,7 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 		# Don't compute offset from root_info — it may have stale/zero position.
 		# Instead, offset will be computed from the first entity_snapshot with is_self.
 		player_body.global_position = Vector3(0.0, 2.0, 0.0)
+	_apply_camera_zoom()
 	camera.current = true
 	visible = true
 	_capture_mouse()
@@ -582,7 +664,8 @@ func _server_to_godot(position_data) -> Vector3:
 func _load_zone_art() -> void:
 	# Load the real zone geometry into WorldRoot once we know the server spawn
 	# offset, so terrain/buildings/props align with the server-driven player and
-	# replicated entities. Replaces the greybox placeholder world.
+	# replicated entities. Prefer an editable authored .tscn (Trinst) and fall back
+	# to the legacy JSON builder for zones that have not been converted yet.
 	if _zone_loaded:
 		return
 	var world_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot
@@ -590,51 +673,76 @@ func _load_zone_art() -> void:
 	var z = current_payload.get("zone", null)
 	if z != null and str(z) != "":
 		zone = str(z)
-	var loader: Node3D = ZoneLoaderScript.new()
-	loader.name = "ZoneArt"
-	loader.position = _server_origin_offset
-	world_root.add_child(loader)
-	if not loader.build(zone, true):
-		push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
-		loader.queue_free()
-		return
+	var zone_node: Node3D = null
+	var authored_scene_path := ZONE_SCENE_ROOT + zone + ".tscn"
+	if ResourceLoader.exists(authored_scene_path):
+		var ps := load(authored_scene_path) as PackedScene
+		if ps != null:
+			zone_node = ps.instantiate() as Node3D
+			if zone_node != null:
+				zone_node.name = "ZoneArt"
+				zone_node.position = _server_origin_offset
+				world_root.add_child(zone_node)
+				if zone_node.has_method("prepare_authored_scene") and not zone_node.prepare_authored_scene(zone, true):
+					zone_node.queue_free()
+					zone_node = null
+	if zone_node == null:
+		var loader: Node3D = ZoneLoaderScript.new()
+		loader.name = "ZoneArt"
+		loader.position = _server_origin_offset
+		world_root.add_child(loader)
+		if not loader.build(zone, true):
+			push_warning("Zone art unavailable for '%s'; keeping greybox world." % zone)
+			loader.queue_free()
+			return
+		zone_node = loader
 	_zone_loaded = true
 	for placeholder in ["FloorBody", "BoxA", "BoxB", "BoxC", "DirectionalLight3D"]:
 		var n: Node = world_root.get_node_or_null(placeholder)
 		if n != null:
 			n.queue_free()
-	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
+	print("[Godot] Loaded zone art '%s' from %s at offset %s" % [zone, authored_scene_path if ResourceLoader.exists(authored_scene_path) else "scene.json", str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
-	# a dedicated bit (TERRAIN_MASK); buildings do not and entities are on layer 2,
-	# so this ray hits only the ground. That lets us cast from well above and find
-	# the surface at any height — so NPCs climb hills instead of sinking into them —
-	# while never grabbing a building roof/tree (which caused the sky-teleport bug).
-	var world := sub_viewport.find_world_3d()
+	# Seat an entity on collision near the server's intended height first. This is
+	# important for multi-floor interiors such as prefabs_tower1: the server Z says
+	# which floor the mob belongs on, while a terrain-only snap drops it outside/on
+	# the ground. If no nearby floor exists, fall back to terrain snapping.
+	var world: World3D = sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
-	var space := world.direct_space_state
+	var space: PhysicsDirectSpaceState3D = world.direct_space_state
 	if space == null:
 		return fallback
+
+	# Prefer any solid floor close to the authoritative server height.
+	var near_from := Vector3(x, fallback + ENTITY_FLOOR_PROBE_UP, z)
+	var near_to := Vector3(x, fallback - ENTITY_FLOOR_PROBE_DOWN, z)
+	var near_q := PhysicsRayQueryParameters3D.create(near_from, near_to)
+	near_q.collide_with_areas = false
+	near_q.collision_mask = 1
+	var near_hit: Dictionary = space.intersect_ray(near_q)
+	if near_hit and near_hit.has("position"):
+		return float(near_hit.position.y)
+
 	var from := Vector3(x, fallback + 60.0, z)
 	var to := Vector3(x, fallback - 60.0, z)
 	# Terrain-only hit: the true ground at any height, so NPCs follow hills.
 	var qt := PhysicsRayQueryParameters3D.create(from, to)
 	qt.collide_with_areas = false
 	qt.collision_mask = TERRAIN_MASK
-	var ht := space.intersect_ray(qt)
+	var ht: Dictionary = space.intersect_ray(qt)
 	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
 	# First solid from above (terrain or building floor; entities are on layer 2).
 	var qa := PhysicsRayQueryParameters3D.create(from, to)
 	qa.collide_with_areas = false
 	qa.collision_mask = 1
-	var ha := space.intersect_ray(qa)
+	var ha: Dictionary = space.intersect_ray(qa)
 	if ha and ha.has("position"):
 		var any_y := float(ha.position.y)
-		# A surface well above the terrain is a roof/canopy/bridge, not a floor —
-		# don't perch the NPC up there (that was the sky-teleport). A surface near
-		# the terrain is a ground floor the NPC should stand on.
+		# A high hit far from the server's expected height is probably a roof/canopy.
+		# Keep the old terrain fallback for those, but allow elevated floors when they
+		# were close enough to the authoritative fallback height to be found above.
 		if ht and (any_y - ter_y) > 5.0:
 			return ter_y
 		return any_y
@@ -869,37 +977,45 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 8.0:
-					# Reconcile toward the server COLLISION-AWARE so the player is never
-					# dragged through a building. The stub server has no geometry, so its
-					# position can sit inside walls; the client's own collision must win,
-					# else you phase through almost everything. Larger desync corrects faster.
-					var factor := 1.0 if desync > 25.0 else 0.12
+				if desync > SERVER_RECONCILE_THRESHOLD:
+					# Reconcile toward the authoritative server position, but still use
+					# CharacterBody collision so server snapshots cannot drag the client
+					# straight through buildings. Tighter than the old 8u tolerance so
+					# visible client/server disagreement is smaller.
+					var factor := 1.0 if desync > SERVER_RECONCILE_SNAP_THRESHOLD else SERVER_RECONCILE_BLEND
 					var corr := Vector3(server_pos.x - current_pos.x, 0.0, server_pos.z - current_pos.z) * factor
 					player_body.move_and_collide(corr)
-				# else: within 8 units, TRUST client prediction. The server
-				# snapshot always lags prediction by a few units (input latency +
-				# snapshot interval), so a tight tolerance yanks the player back
-				# every snapshot. That tight tolerance was the rubber-band.
 			break
 
 	var incoming_keys: Dictionary = {}
 	var entity_list: Array = []
+	var now_seconds: float = Time.get_ticks_msec() / 1000.0
 	for entity in replicated_entities:
 		if not (entity is Dictionary):
 			continue
 		if bool(entity.get("is_self", false)):
 			continue
-		# Dead mobs disappear: skip them so their marker is freed below, and
-		# drop them as the current target so the target frame/highlight clears.
-		if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
-			var dead_key := _entity_key(entity)
-			if dead_key == _highlighted_entity_key:
+		var entity_key := _entity_key(entity)
+		var entity_dead := bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0
+		if entity_dead:
+			# Keep a dead entity visible briefly so its death animation (when present)
+			# can read before it disappears. This is much clearer than instantly
+			# removing it on the same snapshot that reports 0 HP.
+			if entity_key == _highlighted_entity_key:
 				_highlight_entity("")
-			if not server_target_description.is_empty() and _entity_key(server_target_description) == dead_key:
+			if not server_target_description.is_empty() and _entity_key(server_target_description) == entity_key:
 				server_target_description = {}
-			continue
-		entity_list.append(entity)
+			if not _dead_entity_remove_at.has(entity_key):
+				_dead_entity_remove_at[entity_key] = now_seconds + ENTITY_DEATH_DESPAWN_DELAY
+			if now_seconds >= float(_dead_entity_remove_at.get(entity_key, now_seconds)):
+				continue
+			var dead_entity: Dictionary = entity.duplicate(true)
+			dead_entity["dead"] = true
+			dead_entity["health"] = 0.0
+			entity_list.append(dead_entity)
+		else:
+			_dead_entity_remove_at.erase(entity_key)
+			entity_list.append(entity)
 
 	for i in range(entity_list.size()):
 		var entity_dict: Dictionary = entity_list[i]
@@ -931,7 +1047,15 @@ func _sync_entity_markers():
 			continue
 		var old_body: Node = replicated_entity_nodes[key]
 		if is_instance_valid(old_body):
+			var old_entity: Dictionary = old_body.get_meta("entity", {})
+			var old_dead := bool(old_entity.get("dead", false)) or float(old_entity.get("health", 1.0)) <= 0.0
+			if old_dead:
+				if not _dead_entity_remove_at.has(key):
+					_dead_entity_remove_at[key] = now_seconds + ENTITY_DEATH_DESPAWN_DELAY
+				if now_seconds < float(_dead_entity_remove_at.get(key, now_seconds)):
+					continue
 			old_body.queue_free()
+		_dead_entity_remove_at.erase(key)
 		replicated_entity_nodes.erase(key)
 
 	# Resolve pending target highlight if entity just appeared in snapshot
@@ -1169,7 +1293,13 @@ func _on_ability_pressed(slot_index: int):
 func _input(event):
 	if not visible:
 		return
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		_adjust_camera_zoom(-1.0)
+		_capture_mouse()
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		_adjust_camera_zoom(1.0)
+		_capture_mouse()
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var selected := _target_entity_from_click(event.position)
 		_capture_mouse()
 		if selected:
@@ -1284,7 +1414,10 @@ func _physics_process(delta):
 			continue
 		var target_position: Vector3 = body.get_meta("target_position", body.position)
 		var prev_xz := Vector2(body.position.x, body.position.z)
-		body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+		if body.position.distance_to(target_position) > ENTITY_SNAP_DISTANCE:
+			body.position = target_position
+		else:
+			body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
 		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
 		var inst_speed := moved / maxf(delta, 0.001)
 		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
@@ -1294,5 +1427,6 @@ func _physics_process(delta):
 			var ent: Dictionary = body.get_meta("entity", {})
 			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
+	_update_dynamic_dof(delta)
 	_update_look_at()
 	_update_labels()
