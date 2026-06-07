@@ -461,10 +461,15 @@ class StubSimAvatar:
             dx /= mag
             dy /= mag
         speed = self._PLAYER_MOVE_SPEED
+        # The headless server does not own Godot collision, but it still needs to
+        # replicate vertical placement for stairs and multi-story interiors. Trust
+        # the client's collider-resolved Z when present; otherwise preserve the old
+        # vertical coordinate for compatibility with non-Godot callers/tests.
+        z = client_input.get("position_z", so.position[2])
         so.position = (
             so.position[0] + dx * speed * dt,
             so.position[1] + dy * speed * dt,
-            so.position[2],  # Z (up) stays the same — no server-side gravity yet
+            float(z),
         )
 
 

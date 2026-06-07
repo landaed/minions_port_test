@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/trinst/interiors/buildings_large_ruins3.glb" id="1"]
+
+[node name="buildings_large_ruins3" instance=ExtResource("1")]
+metadata/source_glb = "res://assets/trinst/interiors/buildings_large_ruins3.glb"

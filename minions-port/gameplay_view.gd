@@ -606,39 +606,48 @@ func _load_zone_art() -> void:
 	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
-	# a dedicated bit (TERRAIN_MASK); buildings do not and entities are on layer 2,
-	# so this ray hits only the ground. That lets us cast from well above and find
-	# the surface at any height — so NPCs climb hills instead of sinking into them —
-	# while never grabbing a building roof/tree (which caused the sky-teleport bug).
+	# Snap an entity to the floor closest to its replicated server height. This is
+	# intentionally Z-aware: Trinst has multi-story buildings, stairs, and NPCs that
+	# can belong on upper floors. A broad top-down ray alone would often hit a roof,
+	# while terrain-only snapping would collapse every indoor NPC down to the street.
 	var world := sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
 	var space := world.direct_space_state
 	if space == null:
 		return fallback
-	var from := Vector3(x, fallback + 60.0, z)
-	var to := Vector3(x, fallback - 60.0, z)
-	# Terrain-only hit: the true ground at any height, so NPCs follow hills.
-	var qt := PhysicsRayQueryParameters3D.create(from, to)
-	qt.collide_with_areas = false
-	qt.collision_mask = TERRAIN_MASK
-	var ht := space.intersect_ray(qt)
-	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
-	# First solid from above (terrain or building floor; entities are on layer 2).
-	var qa := PhysicsRayQueryParameters3D.create(from, to)
-	qa.collide_with_areas = false
-	qa.collision_mask = 1
-	var ha := space.intersect_ray(qa)
-	if ha and ha.has("position"):
-		var any_y := float(ha.position.y)
-		# A surface well above the terrain is a roof/canopy/bridge, not a floor —
-		# don't perch the NPC up there (that was the sky-teleport). A surface near
-		# the terrain is a ground floor the NPC should stand on.
-		if ht and (any_y - ter_y) > 5.0:
-			return ter_y
-		return any_y
-	return ter_y
+
+	# First prefer a nearby solid surface around the replicated height. This handles
+	# floors, stairs, balconies, and upper stories as long as the server Z is close.
+	var local_query := PhysicsRayQueryParameters3D.create(
+		Vector3(x, fallback + 4.0, z), Vector3(x, fallback - 6.0, z))
+	local_query.collide_with_areas = false
+	local_query.collision_mask = 1
+	var local_hit := space.intersect_ray(local_query)
+	if local_hit and local_hit.has("position"):
+		return float(local_hit.position.y)
+
+	# Terrain-only fallback: terrain carries a dedicated bit (TERRAIN_MASK), while
+	# entities live on layer 2. This keeps outdoor NPCs following hills.
+	var terrain_query := PhysicsRayQueryParameters3D.create(
+		Vector3(x, fallback + 60.0, z), Vector3(x, fallback - 60.0, z))
+	terrain_query.collide_with_areas = false
+	terrain_query.collision_mask = TERRAIN_MASK
+	var terrain_hit := space.intersect_ray(terrain_query)
+	var terrain_y := float(terrain_hit.position.y) if (terrain_hit and terrain_hit.has("position")) else fallback
+
+	# Last chance: accept any nearby floor from a broader ray only if it is close to
+	# the replicated height. That avoids resurrecting the old roof/canopy snap bug.
+	var any_query := PhysicsRayQueryParameters3D.create(
+		Vector3(x, fallback + 12.0, z), Vector3(x, fallback - 12.0, z))
+	any_query.collide_with_areas = false
+	any_query.collision_mask = 1
+	var any_hit := space.intersect_ray(any_query)
+	if any_hit and any_hit.has("position"):
+		var any_y := float(any_hit.position.y)
+		if absf(any_y - fallback) <= 6.0:
+			return any_y
+	return terrain_y
 
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
@@ -1262,6 +1271,9 @@ func _physics_process(delta):
 			"move_y": input_vec.y,
 			"forward": server_forward,
 			"jump": jump_requested,
+			# Replicate the client-resolved floor height back to the headless server.
+			# The server stores positions as (x, y, z), where z is vertical.
+			"position_z": _godot_to_server_pos(player_body.global_position)[2],
 		}
 		if input_state != _last_sent_input:
 			_last_sent_input = input_state.duplicate()

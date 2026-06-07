@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_bed_single_2.glb" id="1"]
+
+[node name="objects_bed_single_2" instance=ExtResource("1")]
+metadata/source_glb = "res://assets/trinst/shapes/objects_bed_single_2.glb"

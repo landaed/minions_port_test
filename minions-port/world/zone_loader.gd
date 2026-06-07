@@ -7,6 +7,15 @@ extends Node3D
 ## origin offset) and by the offline art preview. No player/camera of its own.
 
 const ASSET_ROOT := "res://assets/"
+const EDITABLE_ZONE_SCENES := {
+	"trinst": [
+		# Preferred hand-authored/previously generated scene, if present in the project.
+		"res://world/zones/trinst.tscn",
+		# Fallback output from tools/bake_trinst_editable.gd for checkouts that do not
+		# already have an editable Trinst scene committed.
+		"res://world/trinst_baked.tscn",
+	],
+}
 
 const TERRAIN_SHADER := """
 shader_type spatial;
@@ -71,10 +80,28 @@ func build(zone: String, with_environment: bool = true) -> bool:
 		return false
 	if with_environment:
 		_setup_environment(data)
+	if _build_editable_scene(zone):
+		return true
 	_build_terrain(data)
 	_place_items(data.get("statics", []), false)
 	_place_items(data.get("interiors", []), true)
 	return true
+
+
+func _build_editable_scene(zone: String) -> bool:
+	var scene_paths: Array = EDITABLE_ZONE_SCENES.get(zone, [])
+	for scene_path in scene_paths:
+		var path := str(scene_path)
+		if path.is_empty() or not ResourceLoader.exists(path):
+			continue
+		var ps := load(path) as PackedScene
+		if ps == null:
+			continue
+		var inst := ps.instantiate()
+		inst.name = "EditableZone"
+		add_child(inst)
+		return true
+	return false
 
 
 func spawn_point(zone: String = "") -> Variant:
