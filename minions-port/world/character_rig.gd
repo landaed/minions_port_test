@@ -4,13 +4,16 @@ extends Node3D
 ## and skinned mesh, and drives a small idle/walk/run/attack/death state machine.
 ## Used for both the player avatar and replicated NPCs so every visible character
 ## shares the same animation behaviour. If the model fails to load, the caller can
-## fall back to a capsule so a character is never invisible. Prefer editor-baked
-## repaired wrappers when present; never mutates mesh normals at runtime.
+## fall back to a capsule so a character is never invisible. Character GLBs from
+## the Torque/DTS pipeline arrive with lighting normals reversed in Godot, so the
+## rig fixes those vertex normals after instancing without changing animation or
+## triangle winding.
 
 const RUN_SPEED := 5.0   # server move speeds: NPC ~5 u/s, player ~8 u/s
 const WALK_MIN := 0.35   # below this we consider the character standing still
 const TEX_DIR := "res://assets/character_textures/"
 const EDITOR_REPAIRED_CHARACTER_DIR := "res://assets/characters/repaired/"
+const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 var anim_player: AnimationPlayer
 var skinned_meshes: Array[MeshInstance3D] = []
@@ -29,6 +32,7 @@ func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 	var inst = scene.instantiate()
 	if face_offset_deg != 0.0:
 		inst.rotation_degrees.y += face_offset_deg
+	MeshNormalRepairScript.invert_node_normals(inst)
 	add_child(inst)
 	anim_player = _find_anim_player(inst)
 	skinned_meshes = _find_meshes(inst)
