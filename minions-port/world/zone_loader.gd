@@ -2,13 +2,15 @@
 extends Node3D
 ## Canonical runtime support for a converted MoM zone. It can either build the
 ## legacy JSON description into children, or finalize an authored .tscn version
-## of that same zone by applying runtime collision and lighting without
-## overriding terrain materials, mesh normals, or authored directional lights.
+## of that same zone by applying runtime collision, lighting, and targeted normal
+## correction for organic/rock static shapes while leaving buildings/interiors,
+## terrain materials, and authored directional lights alone.
 ## Used by the live game (gameplay_view loads this into WorldRoot at the server
 ## origin offset), the generated Trinst .tscn scene, and the offline art preview.
 ## No player/camera of its own.
 
 const ASSET_ROOT := "res://assets/"
+const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 
 @export var authored_zone_name := ""
@@ -19,8 +21,6 @@ var base := ""
 
 
 func _ready() -> void:
-	# Runtime intentionally does not mutate mesh normals or materials. If converted
-	# assets need normal repair, run the editor bake/repair tools and save the scene.
 	pass
 
 
@@ -39,6 +39,12 @@ const FOOTPRINT_FLOOR_INTERIORS := []
 
 const WALKABLE_FLOOR_NORMAL_Y := 0.62
 
+# Buildings/interiors import with correct lighting, but organic DTS statics do
+# not: trees, weeds, and rocks have their vertex normals reversed relative to the
+# Godot sun. Keep the fix scoped to these visual-only shape families so authored
+# interiors stay unchanged.
+const INVERT_NORMAL_SHAPE_PREFIXES := ["trees_", "rocks_", "plants_"]
+
 func _is_passthrough(rel: String) -> bool:
 	for key in PASSTHROUGH_INTERIORS:
 		if rel.findn(key) != -1:
@@ -51,6 +57,21 @@ func _uses_footprint_fallback(rel: String) -> bool:
 		if rel.findn(key) != -1:
 			return true
 	return false
+
+
+func _should_invert_shape_normals(rel: String) -> bool:
+	var name := str(rel).get_file().get_basename().to_lower()
+	for prefix in INVERT_NORMAL_SHAPE_PREFIXES:
+		if name.begins_with(prefix):
+			return true
+	return false
+
+
+func _invert_shape_normals_once(node: Node3D) -> void:
+	if bool(node.get_meta("normals_inverted_for_lighting", false)):
+		return
+	MeshNormalRepairScript.invert_node_normals(node)
+	node.set_meta("normals_inverted_for_lighting", true)
 
 
 ## Build the zone from the legacy JSON description. Kept as a fallback and for
@@ -101,6 +122,8 @@ func _finalize_authored_node(node: Node) -> void:
 			var n := child as Node3D
 			var rel := str(n.get_meta("zone_glb", ""))
 			var role := str(n.get_meta("zone_role", ""))
+			if _should_invert_shape_normals(rel):
+				_invert_shape_normals_once(n)
 			if role == "terrain":
 				_ensure_mesh_collision(n, true)
 			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
@@ -183,6 +206,8 @@ func _place_items(items, collide: bool) -> void:
 		# Tag with the source glb name so the client can report which building the
 		# player is looking at (debug panel) — handy for pinning down the gate.
 		inst.set_meta("zone_glb", str(rel).get_file().get_basename())
+		if _should_invert_shape_normals(str(rel)):
+			_invert_shape_normals_once(inst)
 		add_child(inst)
 		var do_collide := collide and not _is_passthrough(str(rel))
 		for mi in _mesh_instances(inst):
