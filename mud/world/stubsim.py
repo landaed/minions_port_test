@@ -252,6 +252,18 @@ class StubSimAvatar:
     # ---- visibility updates (replaces SimMind.updateCanSee) ----
 
     _VISIBILITY_RANGE_SQ = 500.0 * 500.0
+    # The headless sim has no Torque BSP/portal LOS queries, so a pure radius
+    # test makes NPCs on stacked tower floors see guards directly below them.
+    # They then aggro/chase through the floor and get replicated on the ground.
+    # Treat close horizontal / large vertical gaps as different visibility layers
+    # (floors) while preserving normal long-range outdoor visibility over hills.
+    _VISIBILITY_LAYER_RADIUS_SQ = 35.0 * 35.0
+    _VISIBILITY_LAYER_MAX_DZ = 12.0
+
+    def _same_visibility_layer(self, dx, dy, dz):
+        if dx * dx + dy * dy <= self._VISIBILITY_LAYER_RADIUS_SQ:
+            return abs(dz) <= self._VISIBILITY_LAYER_MAX_DZ
+        return True
 
     def _updateCanSee(self):
         """Compute distance-based canSee for every sim object.
@@ -275,7 +287,8 @@ class StubSimAvatar:
                     dx = sx - opos[0]
                     dy = sy - opos[1]
                     dz = sz - opos[2]
-                    if dx * dx + dy * dy + dz * dz <= rng:
+                    in_range = dx * dx + dy * dy + dz * dz <= rng
+                    if in_range and self._same_visibility_layer(dx, dy, dz):
                         visible.append(other.id)
                 so.canSee = visible
             if not getattr(self, '_cansee_logged', False) and objects:
@@ -359,6 +372,12 @@ class StubSimAvatar:
                 dx = tgt.position[0] - so.position[0]
                 dy = tgt.position[1] - so.position[1]
                 dz = tgt.position[2] - so.position[2]
+                if not self._same_visibility_layer(dx, dy, dz):
+                    # The radius-only stub LOS can leave pre-fix saves with an
+                    # invalid cross-floor target. Drop it instead of flying the
+                    # NPC down/up through tower floors toward guards/players.
+                    so.moveTarget = None
+                    continue
                 dist = sqrt(dx * dx + dy * dy + dz * dz)
                 # Always face target, even when arrived
                 if abs(dx) > 0.01 or abs(dy) > 0.01:
