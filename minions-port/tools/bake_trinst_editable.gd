@@ -8,9 +8,9 @@ extends EditorScript
 ##   res://assets/trinst/editable/<asset>.tscn  (one inherited wrapper per GLB)
 ##   res://world/trinst_baked.tscn              (placed editable fallback scene)
 ##
-## Collision is generated once in the editor and saved into those .tscn files, so
-## the live loader can instance saved collision instead of calling
-## create_trimesh_collision() during gameplay.
+## Collision and converted GLB normal repair are generated once in the editor and
+## saved into those .tscn files, so the live loader can instance saved data
+## instead of mutating meshes or calling create_trimesh_collision() during gameplay.
 
 const ZONE := "trinst"
 const ASSET_ROOT := "res://assets/"
@@ -18,6 +18,7 @@ const BAKED_SCENE_PATH := "res://world/trinst_baked.tscn"
 const EDITABLE_DIR := "res://assets/trinst/editable/"
 const TERRAIN_LAYER := 1 | 4
 const WORLD_LAYER := 1
+const MeshNormalRepairScript := preload("res://world/mesh_normal_repair.gd")
 
 # Match zone_loader.gd: these interiors are visual/decorative and should not
 # trap the player at spawn.
@@ -78,6 +79,7 @@ func _bake_asset_wrapper(glb_path: String, with_collision: bool, collision_layer
 	inst.name = "Model"
 	root.add_child(inst)
 	inst.owner = root
+	MeshNormalRepairScript.repair_node(inst)
 	if with_collision:
 		for mi in _mesh_instances(inst):
 			mi.create_trimesh_collision()

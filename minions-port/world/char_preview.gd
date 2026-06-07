@@ -5,6 +5,7 @@ extends Node3D
 ## Env: GLB (path), ANIM (animation name), TIME (seconds, default 0.3),
 ##      SHOT (png), DIST (camera distance), YAW, FOV, GRID(1)
 
+
 func _env(k: String, d: String) -> String:
 	var v := OS.get_environment(k)
 	return v if v != "" else d
