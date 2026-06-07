@@ -12,8 +12,11 @@ const ENTITY_INTERPOLATION_SPEED := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
+const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
+const CHAR_ASSET_DIR := "res://assets/characters/"
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -36,6 +39,9 @@ var _input_sync_timer := 0.0
 var _last_sent_input: Dictionary = {}
 var _server_origin_offset := Vector3.ZERO  # fixed offset: maps server spawn to Godot origin
 var _zone_loaded := false
+var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
+var _player_model_key := ""     # which glb the avatar currently uses
+var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -74,6 +80,7 @@ var _crosshair_color := Color(1, 1, 1, 0.7)
 var _looking_at_entity := false
 var _looking_at_enemy := false
 var _looked_entity_id := 0
+var _looking_at_world := ""  # name of the building/world geometry under the crosshair (debug)
 var _debug_visible := false
 
 func _ready():
@@ -84,17 +91,13 @@ func _ready():
 	player_body.floor_constant_speed = true
 	player_body.floor_snap_length = 1.0
 	player_body.floor_max_angle = deg_to_rad(60.0)
-	# Real character model for the player visual (scale reference); the capsule
-	# stays as the collision shape only. Keep the capsule visible if the model
-	# fails to load so the player is never invisible.
-	var avatar_scene = load("res://assets/characters/human.glb")
-	if avatar_scene:
-		var avatar = avatar_scene.instantiate()
-		avatar.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
-		player_body.add_child(avatar)
-		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
-		if capsule_mesh:
-			capsule_mesh.visible = false
+	# Animated player avatar. The real race/sex isn't known until the first self
+	# snapshot, so build the rig node now and load the model in _ensure_player_model
+	# once we know it. The capsule stays visible until the model loads, so the
+	# player is never invisible.
+	_player_rig = CharacterRigScript.new()
+	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
+	player_body.add_child(_player_rig)
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
@@ -229,7 +232,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   F3: debug"
+	hint_label.text = "Tab/Click: target   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   U: unstuck   •   F3: debug"
 	bottom.add_child(hint_label)
 	ability_bar = HBoxContainer.new()
 	ability_bar.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -302,6 +305,15 @@ func _self_entity() -> Dictionary:
 			return entity
 	return {}
 
+func _find_zone_glb_name(node: Node) -> String:
+	# Walk up to the interior/building node tagged with its source glb name.
+	var n: Node = node
+	while n != null:
+		if n.has_meta("zone_glb"):
+			return str(n.get_meta("zone_glb"))
+		n = n.get_parent()
+	return ""
+
 func _update_look_at():
 	if camera == null or sub_viewport == null:
 		return
@@ -314,6 +326,7 @@ func _update_look_at():
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	var result := player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	_looking_at_world = ""
 	if not result.is_empty():
 		var collider = result.get("collider")
 		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
@@ -321,6 +334,9 @@ func _update_look_at():
 			var ent: Dictionary = collider.get_meta("entity", {})
 			enemy = bool(ent.get("is_enemy", false))
 			_looked_entity_id = int(collider.get_meta("entity_id", 0))
+		elif collider != null and collider is Node:
+			# World geometry — report which building, to help identify e.g. the gate.
+			_looking_at_world = _find_zone_glb_name(collider)
 	_looking_at_entity = looking
 	_looking_at_enemy = enemy
 	var new_col: Color
@@ -413,30 +429,37 @@ func on_server_selection_by_mob(target_id: int, _char_index: int):
 	server_target_description = {"name": "Target (mob %d)" % target_id}
 	_update_labels()
 
+func _set_marker_highlight(body: StaticBody3D, on: bool):
+	var rig = body.get_meta("rig", null)
+	if rig != null and is_instance_valid(rig):
+		rig.set_highlight(on)
+		return
+	var mesh: MeshInstance3D = body.get_meta("mesh", null)
+	if mesh == null:
+		return
+	if on:
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(1.0, 1.0, 0.2, 1.0)  # bright yellow highlight
+		mat.emission_enabled = true
+		mat.emission = Color(1.0, 1.0, 0.2, 1.0)
+		mat.emission_energy_multiplier = 0.5
+		mesh.material_override = mat
+	else:
+		var prev_entity: Dictionary = body.get_meta("entity", {})
+		var restore := StandardMaterial3D.new()
+		restore.albedo_color = _entity_color(prev_entity)
+		mesh.material_override = restore
+
 func _highlight_entity(key: String):
-	# Remove highlight from previous target
 	if not _highlighted_entity_key.is_empty() and replicated_entity_nodes.has(_highlighted_entity_key):
 		var prev: StaticBody3D = replicated_entity_nodes[_highlighted_entity_key]
 		if is_instance_valid(prev):
-			var prev_entity: Dictionary = prev.get_meta("entity", {})
-			var mesh: MeshInstance3D = prev.get_meta("mesh")
-			if mesh:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = _entity_color(prev_entity)
-				mesh.material_override = mat
+			_set_marker_highlight(prev, false)
 	_highlighted_entity_key = key
-	# Apply highlight to new target
 	if not key.is_empty() and replicated_entity_nodes.has(key):
 		var body: StaticBody3D = replicated_entity_nodes[key]
 		if is_instance_valid(body):
-			var mesh: MeshInstance3D = body.get_meta("mesh")
-			if mesh:
-				var mat := StandardMaterial3D.new()
-				mat.albedo_color = Color(1.0, 1.0, 0.2, 1.0)  # bright yellow highlight
-				mat.emission_enabled = true
-				mat.emission = Color(1.0, 1.0, 0.2, 1.0)
-				mat.emission_energy_multiplier = 0.5
-				mesh.material_override = mat
+			_set_marker_highlight(body, true)
 
 func append_game_text(message: String):
 	_push_log(message)
@@ -453,6 +476,29 @@ func _push_log(message: String):
 	if combat_log.size() > 8:
 		combat_log = combat_log.slice(combat_log.size() - 8, combat_log.size())
 	combat_log_label.text = "Combat / server log:\n" + "\n".join(combat_log)
+
+func _unstuck():
+	# "/unstuck": lift the player out of geometry and re-seat them on the nearest
+	# ground surface directly below. Fixes getting buried in terrain/buildings.
+	# Player height is client-side (the server holds player z constant), so this is
+	# safe to do locally and the server won't fight it.
+	var space := player_body.get_world_3d().direct_space_state
+	var origin := player_body.global_position
+	# Cast from a few units above (to escape if shallowly buried) straight down.
+	var q := PhysicsRayQueryParameters3D.create(
+		origin + Vector3(0, 3.0, 0), origin - Vector3(0, 400.0, 0))
+	q.collide_with_areas = false
+	q.collision_mask = 1
+	q.exclude = [player_body]
+	var hit := space.intersect_ray(q)
+	if hit and hit.has("position"):
+		player_body.global_position.y = float(hit.position.y) + 1.0
+		_push_log("Unstuck: re-seated on the ground.")
+	else:
+		# No ground below — pop straight up so gravity can settle onto something.
+		player_body.global_position.y += 6.0
+		_push_log("Unstuck: lifted (no ground found below).")
+	velocity = Vector3.ZERO
 
 func _capture_mouse():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -560,21 +606,39 @@ func _load_zone_art() -> void:
 	print("[Godot] Loaded zone art '%s' at offset %s" % [zone, str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
-	# Raycast down through the zone collision to find the ground at (x, z).
-	# Falls back to the server-provided height if nothing is hit.
+	# Snap an entity to the *terrain* surface at (x,z). The terrain collider carries
+	# a dedicated bit (TERRAIN_MASK); buildings do not and entities are on layer 2,
+	# so this ray hits only the ground. That lets us cast from well above and find
+	# the surface at any height — so NPCs climb hills instead of sinking into them —
+	# while never grabbing a building roof/tree (which caused the sky-teleport bug).
 	var world := sub_viewport.find_world_3d()
 	if world == null:
 		return fallback
 	var space := world.direct_space_state
 	if space == null:
 		return fallback
-	var q := PhysicsRayQueryParameters3D.create(
-		Vector3(x, fallback + 300.0, z), Vector3(x, fallback - 600.0, z))
-	q.collide_with_areas = false
-	var hit := space.intersect_ray(q)
-	if hit and hit.has("position"):
-		return float(hit.position.y)
-	return fallback
+	var from := Vector3(x, fallback + 60.0, z)
+	var to := Vector3(x, fallback - 60.0, z)
+	# Terrain-only hit: the true ground at any height, so NPCs follow hills.
+	var qt := PhysicsRayQueryParameters3D.create(from, to)
+	qt.collide_with_areas = false
+	qt.collision_mask = TERRAIN_MASK
+	var ht := space.intersect_ray(qt)
+	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
+	# First solid from above (terrain or building floor; entities are on layer 2).
+	var qa := PhysicsRayQueryParameters3D.create(from, to)
+	qa.collide_with_areas = false
+	qa.collision_mask = 1
+	var ha := space.intersect_ray(qa)
+	if ha and ha.has("position"):
+		var any_y := float(ha.position.y)
+		# A surface well above the terrain is a roof/canopy/bridge, not a floor —
+		# don't perch the NPC up there (that was the sky-teleport). A surface near
+		# the terrain is a ground floor the NPC should stand on.
+		if ht and (any_y - ter_y) > 5.0:
+			return ter_y
+		return any_y
+	return ter_y
 
 func _godot_to_server_pos(godot_pos: Vector3) -> Array:
 	"""Convert Godot position to server coordinates: server(x,y,z) = godot(x,-z,y)."""
@@ -665,47 +729,99 @@ func _entity_label_text(entity: Dictionary) -> String:
 		health_pct,
 	]
 
+func _glb_for(race: String, sex: String, model: String) -> String:
+	# Map an entity (or the player) to a converted character glb. Monster models
+	# are keyed by their server model path (undead/skeleton -> undead_skeleton.glb);
+	# playable races by <race>_<sex>.glb. Falls back to a human of the right sex so
+	# a character is never modelless.
+	if model != "":
+		var key := model.to_lower()
+		if key.ends_with(".dts"):
+			key = key.substr(0, key.length() - 4)
+		key = key.replace("/", "_").replace("\\", "_")
+		var mp := CHAR_ASSET_DIR + key + ".glb"
+		if ResourceLoader.exists(mp):
+			return mp
+	var s := "female" if sex.to_lower().begins_with("f") else "male"
+	var r := race.to_lower().replace(" ", "")
+	if r != "":
+		var rp := CHAR_ASSET_DIR + r + "_" + s + ".glb"
+		if ResourceLoader.exists(rp):
+			return rp
+	var hp := CHAR_ASSET_DIR + "human_" + s + ".glb"
+	return hp if ResourceLoader.exists(hp) else ""
+
+func _glb_for_entity(entity: Dictionary) -> String:
+	return _glb_for(str(entity.get("race", "")), str(entity.get("sex", "")), str(entity.get("model", "")))
+
+func _appearance_for(entity: Dictionary) -> Dictionary:
+	# The server streams per-part texture indices in entity["tex"]:
+	# {"head":N,"body":N,"arms":N,"legs":N,"feet":N,"hands":N}. Empty -> the model
+	# keeps its baked default textures.
+	var tex = entity.get("tex", {})
+	return tex if tex is Dictionary else {}
+
+func _ensure_player_model(entity: Dictionary) -> void:
+	# Build/replace the avatar once we know the player's race/sex/model.
+	var path := _glb_for_entity(entity)
+	if path == "" or path == _player_model_key:
+		return
+	if _player_rig and is_instance_valid(_player_rig):
+		_player_rig.queue_free()
+	_player_rig = CharacterRigScript.new()
+	_player_rig.position = Vector3(0.0, -0.9, 0.0)
+	player_body.add_child(_player_rig)
+	if _player_rig.setup(path, 0.0):
+		_player_model_key = path
+		_player_rig.apply_appearance(_appearance_for(entity))
+		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
+		if capsule_mesh:
+			capsule_mesh.visible = false
+
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = str(entity.get("name", "Entity"))
-	body.collision_layer = 1
+	# Entities live on layer 2: ground-snap rays (mask 1) ignore them so NPCs never
+	# stand on each other's heads, and the player walks through NPCs instead of
+	# getting stuck on them. Click/look targeting uses an all-layers ray, so it
+	# still hits these markers and reads their entity_id meta. The body origin is at
+	# the feet (ground), so the model and collider start at y=0.
+	body.collision_layer = 2
 	body.collision_mask = 1
 
+	# Invisible collision capsule (feet..head) for click/look targeting.
 	var collider := CollisionShape3D.new()
 	var shape := CapsuleShape3D.new()
-	shape.radius = 0.55
-	shape.height = 1.4
+	shape.radius = 0.5
+	shape.height = 1.6
 	collider.shape = shape
+	collider.position = Vector3(0, 0.9, 0)
 	body.add_child(collider)
 
-	var mesh_instance := MeshInstance3D.new()
-	var mesh := CapsuleMesh.new()
-	mesh.radius = 0.55
-	mesh.height = 1.4
-	mesh_instance.mesh = mesh
-	body.add_child(mesh_instance)
-
-	# Facing indicator (small cone pointing forward)
-	var nose := MeshInstance3D.new()
-	var cone := CylinderMesh.new()
-	cone.top_radius = 0.0
-	cone.bottom_radius = 0.2
-	cone.height = 0.4
-	nose.mesh = cone
-	nose.position = Vector3(0, 0.6, -0.55)
-	nose.rotation_degrees = Vector3(90, 0, 0)
-	var nose_mat := StandardMaterial3D.new()
-	nose_mat.albedo_color = Color(1.0, 1.0, 1.0, 0.9)
-	nose.material_override = nose_mat
-	body.add_child(nose)
+	# Animated model; fall back to a coloured capsule if it can't load so the
+	# entity is never invisible.
+	var rig: Node3D = CharacterRigScript.new()
+	var fallback_mesh: MeshInstance3D = null
+	if rig.setup(_glb_for_entity(entity), 0.0):
+		body.add_child(rig)
+		body.set_meta("rig", rig)
+		rig.apply_appearance(_appearance_for(entity))
+	else:
+		fallback_mesh = MeshInstance3D.new()
+		var mesh := CapsuleMesh.new()
+		mesh.radius = 0.5
+		mesh.height = 1.6
+		fallback_mesh.mesh = mesh
+		fallback_mesh.position = Vector3(0, 0.9, 0)
+		body.add_child(fallback_mesh)
 
 	var label := Label3D.new()
-	label.position = Vector3(0, 1.6, 0)
+	label.position = Vector3(0, 2.05, 0)
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	label.fixed_size = false
 	body.add_child(label)
 
-	body.set_meta("mesh", mesh_instance)
-	body.set_meta("nose", nose)
+	body.set_meta("mesh", fallback_mesh)
 	body.set_meta("label", label)
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	_update_entity_marker(body, entity)
@@ -716,12 +832,16 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	var key := _entity_key(entity)
-	var mesh_instance: MeshInstance3D = body.get_meta("mesh")
-	# Preserve yellow highlight if this entity is the current target
-	if key != _highlighted_entity_key:
+	# Colour the fallback capsule when there's no model (highlight preserved).
+	var fb: MeshInstance3D = body.get_meta("mesh", null)
+	if fb and key != _highlighted_entity_key:
 		var mesh_material := StandardMaterial3D.new()
 		mesh_material.albedo_color = _entity_color(entity)
-		mesh_instance.material_override = mesh_material
+		fb.material_override = mesh_material
+	# Apply the server's per-spawn scale multiplier (anchored at the feet).
+	var scl := float(entity.get("scale", 1.0))
+	if scl > 0.0:
+		body.scale = Vector3(scl, scl, scl)
 	var label: Label3D = body.get_meta("label")
 	label.text = _entity_label_text(entity)
 
@@ -733,6 +853,8 @@ func _sync_entity_markers():
 	for entity in replicated_entities:
 		if entity is Dictionary and bool(entity.get("is_self", false)):
 			var raw_pos = entity.get("position", [])
+			# Pick the avatar model from the player's own race/sex/model.
+			_ensure_player_model(entity)
 			# Compute spawn offset from first entity snapshot (more reliable than root_info)
 			if not _has_spawned:
 				_has_spawned = true
@@ -747,14 +869,14 @@ func _sync_entity_markers():
 				var current_pos := player_body.global_position
 				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
 				var desync := diff_xz.length()
-				if desync > 25.0:
-					# Very large desync — snap to server position
-					player_body.global_position.x = server_pos.x
-					player_body.global_position.z = server_pos.z
-				elif desync > 8.0:
-					# Moderate desync — gently blend toward server (10% per sync tick)
-					player_body.global_position.x = lerpf(current_pos.x, server_pos.x, 0.08)
-					player_body.global_position.z = lerpf(current_pos.z, server_pos.z, 0.08)
+				if desync > 8.0:
+					# Reconcile toward the server COLLISION-AWARE so the player is never
+					# dragged through a building. The stub server has no geometry, so its
+					# position can sit inside walls; the client's own collision must win,
+					# else you phase through almost everything. Larger desync corrects faster.
+					var factor := 1.0 if desync > 25.0 else 0.12
+					var corr := Vector3(server_pos.x - current_pos.x, 0.0, server_pos.z - current_pos.z) * factor
+					player_body.move_and_collide(corr)
 				# else: within 8 units, TRUST client prediction. The server
 				# snapshot always lags prediction by a few units (input latency +
 				# snapshot interval), so a tight tolerance yanks the player back
@@ -786,7 +908,8 @@ func _sync_entity_markers():
 		# Convert entity server position to absolute Godot world position, then drop
 		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + ENTITY_CAPSULE_HALF_HEIGHT
+		# Body origin is at the feet, so seat it right on the ground.
+		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
@@ -979,7 +1102,7 @@ func _update_labels():
 			"yes" if player_body.is_on_floor() else "no",
 			"yes" if bool(current_payload.get("paused", false)) else "no",
 		]
-		target_label.text = "Looking at entity id: %d (enemy=%s)" % [_looked_entity_id if _looking_at_entity else 0, str(_looking_at_enemy)]
+		target_label.text = "Looking at entity id: %d (enemy=%s)   building: %s" % [_looked_entity_id if _looking_at_entity else 0, str(_looking_at_enemy), _looking_at_world if _looking_at_world != "" else "<none>"]
 		interaction_label.text = interaction_message
 		var transfer: Variant = current_payload.get("zone_transfer", {})
 		if transfer is Dictionary and not transfer.is_empty():
@@ -1013,6 +1136,9 @@ func _activate_ability(slot_index: int):
 		interaction_message = "%s is only a fallback placeholder because no server skill data was available." % ability_name
 		return
 	interaction_message = "Sent SKILL %s to the legacy world server." % ability_name
+	# Play the attack swing locally for immediate feedback (server confirms via the
+	# self entity's `attacking` flag for sustained combat).
+	_player_attack_until = Time.get_ticks_msec() / 1000.0 + 0.6
 	_request_server_command("use_ability", {"ability_name": ability_name})
 
 func _target_entity_from_click(screen_position: Vector2) -> bool:
@@ -1056,6 +1182,8 @@ func _input(event):
 				jump_requested = true
 			KEY_E:
 				_send_interact_command()
+			KEY_U:
+				_unstuck()
 			KEY_Q:
 				_toggle_autoattack()
 			KEY_TAB:
@@ -1139,12 +1267,29 @@ func _physics_process(delta):
 			_last_sent_input = input_state.duplicate()
 			_request_server_command("player_input", input_state)
 
-	# Interpolate replicated entity positions toward server targets
+	# Drive the player avatar animation from predicted horizontal speed + combat.
+	if _player_rig and _player_rig.has_method("drive"):
+		var pspeed := Vector2(velocity.x, velocity.z).length()
+		var now := Time.get_ticks_msec() / 1000.0
+		var attacking := bool(_self_entity().get("attacking", false)) or now < _player_attack_until
+		_player_rig.drive(pspeed, attacking, false)
+
+	# Interpolate replicated entity positions toward server targets, and drive each
+	# NPC's animation from how fast its marker is actually moving.
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
 		var target_position: Vector3 = body.get_meta("target_position", body.position)
+		var prev_xz := Vector2(body.position.x, body.position.z)
 		body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
+		var inst_speed := moved / maxf(delta, 0.001)
+		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
+		body.set_meta("speed", smoothed)
+		var rig = body.get_meta("rig", null)
+		if rig != null and is_instance_valid(rig):
+			var ent: Dictionary = body.get_meta("entity", {})
+			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
 	_update_look_at()
 	_update_labels()

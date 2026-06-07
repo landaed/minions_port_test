@@ -196,6 +196,10 @@ class Mesh:
     tris_by_mat: dict = field(default_factory=dict)
     bounds: tuple = None
     radius: float = 0.0
+    # skin data (only populated for MESH_SKIN): per-vertex bone weights and the
+    # bone->node map, so the exporter can build glTF JOINTS_0/WEIGHTS_0.
+    influences: List[Tuple[int, int, float]] = field(default_factory=list)  # (vert, bone, weight)
+    skin_node_index: List[int] = field(default_factory=list)  # bone -> node index
 
 
 @dataclass
@@ -270,14 +274,16 @@ def _read_mesh(s: Stream) -> Mesh:
         inorms = [s.read_vec3() for _ in range(n_iv)]   # bind-pose norms
         [s.read8() for _ in range(n_iv)]                # encoded norms
         n_bones = s.read32()
-        [tuple(s.read_float() for _ in range(16)) for _ in range(n_bones)]  # bone transforms
+        [tuple(s.read_float() for _ in range(16)) for _ in range(n_bones)]  # initial bone transforms
         n_inf = s.read32()
-        [s.read32() for _ in range(n_inf)]              # vertex indices
-        [s.read32() for _ in range(n_inf)]              # bone indices
-        [s.read_float() for _ in range(n_inf)]          # weights
+        inf_vert = [s.read32() for _ in range(n_inf)]   # vertex indices
+        inf_bone = [s.read32() for _ in range(n_inf)]   # bone indices
+        inf_weight = [s.read_float() for _ in range(n_inf)]  # weights
         n_node = s.read32()
-        [s.read32() for _ in range(n_node)]             # node indices
+        node_index = [s.read32() for _ in range(n_node)]  # bone -> node index
         s.guard()  # skin-mesh closing guard
+        mesh.influences = list(zip(inf_vert, inf_bone, inf_weight))
+        mesh.skin_node_index = node_index
         # Skinned geometry lives in the skin block, not the standard vert array.
         if not mesh.verts and iverts:
             mesh.verts = iverts
@@ -290,6 +296,31 @@ def _read_mesh(s: Stream) -> Mesh:
         for tri in _triangulate(ptype, elems):
             mesh.tris_by_mat.setdefault(mat, []).append(tri)
     return mesh
+
+
+def _recover_names(data: bytes, base8: int, end_buffer: int, n_name: int) -> List[str]:
+    """Recover the names table directly from the 8-bit region when normal parsing
+    aborts on an unsupported lower-detail mesh (names are written after all meshes,
+    so a mesh failure loses them). The names are the final contiguous block of
+    null-terminated strings in the 8-bit region, so take the last n_name runs."""
+    region = data[base8:end_buffer]
+    runs: List[Tuple[int, int, str]] = []
+    cur = bytearray()
+    start = 0
+    for i, b in enumerate(region):
+        if 32 <= b < 127:
+            if not cur:
+                start = i
+            cur.append(b)
+        else:
+            if cur:
+                runs.append((start, start + len(cur), cur.decode("latin-1")))
+                cur = bytearray()
+    if cur:
+        runs.append((start, start + len(cur), cur.decode("latin-1")))
+    if len(runs) < n_name:
+        return [r[2] for r in runs]
+    return [r[2] for r in runs[-n_name:]]
 
 
 def read_shape(data: bytes) -> Shape:
@@ -398,6 +429,12 @@ def read_shape(data: bytes) -> Shape:
         s.guard()  # G16
     except Exception:
         shape.meshes_complete = False
+
+    # If a lower-detail mesh aborted the parse before the names block, recover the
+    # names (node/object/detail names) straight from the 8-bit region. Node anims
+    # are matched to bones by name, so this is essential for skinned export.
+    if len(shape.names) < n_name:
+        shape.names = _recover_names(data, s.base8, s.end_buffer, n_name)
 
     # validate full buffer consumption
     shape._cursor_check = {

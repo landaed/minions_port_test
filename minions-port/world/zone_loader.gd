@@ -47,6 +47,18 @@ void fragment() {
 var zone_name := ""
 var base := ""
 
+# Interiors that should be walk-through (no collision): decorative monuments /
+# spawn markers the player stands at or passes through. The bindpoint monument
+# (a tall obelisk ringed by boulders) is exactly where a new character spawns, so
+# colliding geometry there traps the player — in the original you pass through it.
+const PASSTHROUGH_INTERIORS := ["architecture_bindpoint"]
+
+func _is_passthrough(rel: String) -> bool:
+	for key in PASSTHROUGH_INTERIORS:
+		if rel.findn(key) != -1:
+			return true
+	return false
+
 
 ## Build the zone. `with_environment` lets the live game opt out if it manages
 ## lighting itself. Returns true on success.
@@ -96,6 +108,12 @@ func _build_terrain(data: Dictionary) -> void:
 	for mi in _mesh_instances(terr):
 		mi.lod_bias = 64.0
 		mi.create_trimesh_collision()
+		# Tag the terrain collider with bit 3 (value 4) in addition to bit 1, so the
+		# client's NPC ground-snap ray can hit terrain only (climb hills, ignore
+		# building roofs) while the player still collides via bit 1.
+		for c in mi.get_children():
+			if c is StaticBody3D:
+				c.collision_layer = c.collision_layer | 4
 
 
 func _place_items(items, collide: bool) -> void:
@@ -112,13 +130,51 @@ func _place_items(items, collide: bool) -> void:
 		var b := Basis(ax.normalized(), deg_to_rad(rot[3])) if ax.length() > 0.001 else Basis()
 		b = b.scaled(Vector3(scl[0], scl[1], scl[2]))
 		inst.transform = Transform3D(b, Vector3(pos[0], pos[1], pos[2]))
+		# Tag with the source glb name so the client can report which building the
+		# player is looking at (debug panel) — handy for pinning down the gate.
+		inst.set_meta("zone_glb", str(rel).get_file().get_basename())
 		add_child(inst)
+		var do_collide := collide and not _is_passthrough(str(rel))
 		for mi in _mesh_instances(inst):
 			# Auto-generated mesh LODs decimate alpha-card foliage (leaves vanish
 			# at distance); keep full detail.
 			mi.lod_bias = 64.0
-			if collide:
+			if do_collide:
 				mi.create_trimesh_collision()
+		if do_collide:
+			_add_fallback_floor(inst)
+
+
+func _add_fallback_floor(inst: Node3D) -> void:
+	# Some converted interiors are missing floor collision (the player/NPCs fall
+	# through and get stuck under the building). Add a thin collision slab at the
+	# building's base, covering its footprint, as a safety net. Only real buildings
+	# get one (small props are skipped).
+	var meshes := _mesh_instances(inst)
+	if meshes.is_empty():
+		return
+	var aabb: AABB
+	var have := false
+	for mi in meshes:
+		var a: AABB = mi.global_transform * mi.get_aabb()
+		if not have:
+			aabb = a
+			have = true
+		else:
+			aabb = aabb.merge(a)
+	if not have or aabb.size.x < 4.0 or aabb.size.z < 4.0 or aabb.size.y < 3.0:
+		return
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	body.set_meta("zone_glb", inst.get_meta("zone_glb", "building") + " (floor)")
+	var cs := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(maxf(aabb.size.x - 1.0, 1.0), 0.4, maxf(aabb.size.z - 1.0, 1.0))
+	cs.shape = box
+	body.add_child(cs)
+	add_child(body)
+	body.global_position = Vector3(aabb.position.x + aabb.size.x * 0.5,
+		aabb.position.y + 0.2, aabb.position.z + aabb.size.z * 0.5)
 
 
 func _texture_terrain(node: Node, texdict) -> void:

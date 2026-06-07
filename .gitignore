@@ -17,3 +17,7 @@ main.cs.dso
 mom.cfg
 data/master/
 data/character/
+
+# Godot extracts embedded glTF character textures on import (glb is self-contained)
+minions-port/assets/characters/*.jpg
+minions-port/assets/characters/*.png
