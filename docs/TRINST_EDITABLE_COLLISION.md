@@ -1,20 +1,14 @@
 # Trinst editable scene and collision baking
 
-The live Godot client now uses `res://world/zones/trinst.tscn` as the canonical
-editable Trinst scene. That scene has been materialized from `scene.json`: terrain,
-statics, and interiors are placed as instances of editable wrapper scenes under
-`res://assets/trinst/editable/` instead of being assembled only at runtime.
+The live Godot client should use `res://world/zones/trinst.tscn` as the canonical
+editable Trinst scene. That scene is supplied by the scene-conversion branch on
+`master`; this branch keeps only the reusable editable GLB wrapper scenes under
+`res://assets/trinst/editable/` plus optional bake tooling.
 
-The loader checks these paths in order:
-
-1. `res://world/zones/trinst.tscn` — the preferred committed editor scene.
-2. `res://world/trinst_baked.tscn` — an optional generated fallback for checkouts
-   that only have `scene.json` plus imported GLBs.
-3. The original runtime JSON/GLB loader path.
-
-Because `res://world/zones/trinst.tscn` is now committed here, you do **not** need
-to bake another scene for normal editing. Open the canonical scene or an editable
-wrapper scene directly in Godot and adjust collision/nodes there.
+Normal editing should happen in `res://world/zones/trinst.tscn` or in one of the
+wrapper scenes under `res://assets/trinst/editable/`. This branch intentionally no
+longer commits its own generated `trinst.tscn`, so the `master` scene can merge
+without an add/add conflict.
 
 ## Why this exists
 
@@ -38,9 +32,9 @@ The script skips already-created wrapper scenes so hand edits to shared asset
 wrappers are not overwritten on later runs. The placed `trinst_baked.tscn` is
 rebuilt from `scene.json` each run.
 
-`zone_loader.gd` automatically prefers `res://world/zones/trinst.tscn` first, then
-`res://world/trinst_baked.tscn`, and only then falls back to the JSON/GLB
-runtime-generation path so the game remains runnable.
+The loader behavior for `res://world/zones/trinst.tscn` is owned by the
+scene-conversion branch on `master`; keep this branch focused on wrappers, bake
+tooling, and vertical replication so those files do not conflict.
 
 ## Collision policy in the bake script
 
