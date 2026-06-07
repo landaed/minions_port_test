@@ -1591,10 +1591,12 @@ class PlayerAvatar(Avatar):
 
         return entities
 
-    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0):
+    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
         """Receive movement input from the Godot client for server-authoritative movement.
 
         The server processes inputs and updates simObject.position directly.
+        ``position_z`` is optional vertical replication from the Godot collider
+        result; it keeps the headless stub aware of stairs and multi-floor rooms.
         """
         try:
             char_index = int(char_index)
@@ -1608,12 +1610,15 @@ class PlayerAvatar(Avatar):
             return
         so = char.mob.simObject
         # Store the input state on the simObject for the movement tick to process
-        so._client_input = {
+        input_state = {
             "move_x": float(move_x),
             "move_y": float(move_y),
             "forward": tuple(float(v) for v in (forward or [0, 0, 0])[:3]),
             "jump": bool(jump),
         }
+        if position_z is not None:
+            input_state["position_z"] = float(position_z)
+        so._client_input = input_state
 
     def perspective_targetEntity(self, entity_id, char_index=0):
         try:

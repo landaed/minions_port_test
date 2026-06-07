@@ -1392,6 +1392,9 @@ func _physics_process(delta):
 			"move_y": input_vec.y,
 			"forward": server_forward,
 			"jump": jump_requested,
+			# Replicate the client-resolved floor height back to the headless server.
+			# The server stores positions as (x, y, z), where z is vertical.
+			"position_z": _godot_to_server_pos(player_body.global_position)[2],
 		}
 		if input_state != _last_sent_input:
 			_last_sent_input = input_state.duplicate()

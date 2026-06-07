@@ -763,12 +763,16 @@ class ProxyProtocol(WebSocketServerProtocol):
 
         if payload is None and command == "player_input":
             # Forward movement input state to the server for authoritative movement.
+            # position_z is the client's collision-resolved vertical coordinate; the
+            # headless stub has no Godot floor colliders, so this keeps replicated
+            # multi-story/stair positions from flattening to the spawn Z.
             move_x = float(msg.get("move_x", 0))
             move_y = float(msg.get("move_y", 0))
             forward = msg.get("forward", [0, 0, 0])
             jump = bool(msg.get("jump", False))
+            position_z = msg.get("position_z", None)
             d = self.session.player_perspective.callRemote(
-                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0
+                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0, position_z
             )
             d.addErrback(lambda f: None)  # silently ignore errors on high-frequency input
             return
