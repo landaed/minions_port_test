@@ -31,7 +31,7 @@ func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
 	# Character, NPC, and monster GLBs can carry inverted normals from the
 	# converter. Repair before collecting mesh references so all actor lighting is
 	# consistent with the already-repaired world geometry.
-	MeshNormalRepairScript.repair_node(inst)
+	MeshNormalRepairScript.repair_node(inst, true)
 	anim_player = _find_anim_player(inst)
 	skinned_meshes = _find_meshes(inst)
 	if anim_player:

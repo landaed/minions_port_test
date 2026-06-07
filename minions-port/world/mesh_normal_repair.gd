@@ -3,18 +3,19 @@ extends RefCounted
 ## Shared repair for converted GLB meshes whose normal data is missing, invalid,
 ## or inverted relative to triangle winding. Character, NPC, monster, and zone
 ## assets all come from the same legacy conversion pipeline, so keep the repair
-## logic in one place.
+## logic in one place. Inverted-normal flipping is opt-in because buildings and
+## terrain were already correct with the older generate-only repair path.
 
 enum RepairMode { NONE, GENERATE, FLIP }
 
 static var _normal_mesh_cache := {}
 
 
-static func repair_node(node: Node) -> void:
+static func repair_node(node: Node, allow_inverted_flip: bool = false) -> void:
 	for mi in mesh_instances(node):
 		if mi.mesh == null:
 			continue
-		var repaired := mesh_with_repaired_normals(mi.mesh)
+		var repaired := mesh_with_repaired_normals(mi.mesh, allow_inverted_flip)
 		if repaired != mi.mesh:
 			mi.mesh = repaired
 
@@ -28,11 +29,11 @@ static func mesh_instances(node: Node) -> Array[MeshInstance3D]:
 	return out
 
 
-static func mesh_with_repaired_normals(mesh: Mesh) -> Mesh:
-	var cache_key := mesh.get_instance_id()
+static func mesh_with_repaired_normals(mesh: Mesh, allow_inverted_flip: bool = false) -> Mesh:
+	var cache_key := "%s:%s" % [mesh.get_instance_id(), allow_inverted_flip]
 	if _normal_mesh_cache.has(cache_key):
 		return _normal_mesh_cache[cache_key]
-	var mode := _normal_repair_mode(mesh)
+	var mode := _normal_repair_mode(mesh, allow_inverted_flip)
 	if mode == RepairMode.NONE:
 		return mesh
 	var repaired: Mesh
@@ -88,7 +89,7 @@ static func _copy_surface_material(source: Mesh, target: ArrayMesh, source_surfa
 		target.surface_set_material(target.get_surface_count() - 1, mat)
 
 
-static func _normal_repair_mode(mesh: Mesh) -> int:
+static func _normal_repair_mode(mesh: Mesh, allow_inverted_flip: bool) -> int:
 	var facing_positive := 0
 	var facing_negative := 0
 	for surface in range(mesh.get_surface_count()):
@@ -112,7 +113,7 @@ static func _normal_repair_mode(mesh: Mesh) -> int:
 		var counts := _surface_normal_facing_counts(arrays, verts, normals)
 		facing_positive += counts.x
 		facing_negative += counts.y
-	if _normals_are_mostly_inverted(facing_positive, facing_negative):
+	if allow_inverted_flip and _normals_are_mostly_inverted(facing_positive, facing_negative):
 		return RepairMode.FLIP
 	return RepairMode.NONE
 

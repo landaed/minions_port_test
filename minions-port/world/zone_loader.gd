@@ -301,6 +301,8 @@ func _add_footprint_fallback_floor(inst: Node3D) -> void:
 
 
 func _repair_mesh_normals(node: Node) -> void:
+	# Keep the original zone behavior: generate missing/invalid normals, but do not
+	# flip authored building or terrain normals that were already visually correct.
 	MeshNormalRepairScript.repair_node(node)
 
 

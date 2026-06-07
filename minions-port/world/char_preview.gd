@@ -58,7 +58,7 @@ func _ready() -> void:
 		return
 	var model := doc.generate_scene(st)
 	add_child(model)
-	MeshNormalRepairScript.repair_node(model)
+	MeshNormalRepairScript.repair_node(model, true)
 
 	# AABB to frame the model
 	var aabb := _scene_aabb(model)
