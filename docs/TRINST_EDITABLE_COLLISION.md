@@ -1,14 +1,13 @@
 # Trinst editable scene and collision baking
 
 The live Godot client should use `res://world/zones/trinst.tscn` as the canonical
-editable Trinst scene. That scene is supplied by the scene-conversion branch on
-`master`; this branch keeps only the reusable editable GLB wrapper scenes under
-`res://assets/trinst/editable/` plus optional bake tooling.
+editable Trinst scene. This branch commits that scene with terrain, statics, and
+interiors placed as instances of editable wrapper scenes under
+`res://assets/trinst/editable/`.
 
-Normal editing should happen in `res://world/zones/trinst.tscn` or in one of the
-wrapper scenes under `res://assets/trinst/editable/`. This branch intentionally no
-longer commits its own generated `trinst.tscn`, so the `master` scene can merge
-without an add/add conflict.
+Normal editing should happen in `res://world/zones/trinst.tscn` for per-placement
+changes, or in one of the wrapper scenes under `res://assets/trinst/editable/` for
+changes shared by every instance of the same converted GLB.
 
 ## Why this exists
 
@@ -32,9 +31,9 @@ The script skips already-created wrapper scenes so hand edits to shared asset
 wrappers are not overwritten on later runs. The placed `trinst_baked.tscn` is
 rebuilt from `scene.json` each run.
 
-The loader behavior for `res://world/zones/trinst.tscn` is owned by the
-scene-conversion branch on `master`; keep this branch focused on wrappers, bake
-tooling, and vertical replication so those files do not conflict.
+`res://world/zones/trinst.tscn` is committed here intentionally: it is the branch's
+editable version of Trinst with unmodifiable imported objects swapped to editable
+wrapper instances.
 
 ## Collision policy in the bake script
 

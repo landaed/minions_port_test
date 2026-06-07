@@ -1,0 +1,1505 @@
+[gd_scene load_steps=63 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/terrain.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__rocks_rock1.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_door_2.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__lanterns_lantern.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_woodtruck.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__plants_weed_1.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__trees_ftree04_ftree04.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bed_single_1.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bench_1.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_4.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_drawers_1.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_candle_1.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_3.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_book_1.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_chair_1.tscn" id="15"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_rug_1.tscn" id="16"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bed_single_2.tscn" id="17"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bottle_1.tscn" id="18"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__rocks_rock3.tscn" id="19"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_pipe_4.tscn" id="20"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_door_1.tscn" id="21"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_1.tscn" id="22"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_tower1.tscn" id="23"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_castle.tscn" id="24"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsa.tscn" id="25"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsc1.tscn" id="26"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallse.tscn" id="27"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsd.tscn" id="28"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsb.tscn" id="29"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_stairs2a.tscn" id="30"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsc2.tscn" id="31"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__prefabs_tower1.tscn" id="32"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__prefabs_tower1wall.tscn" id="33"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_barracks.tscn" id="34"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_greathall.tscn" id="35"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_firept3.tscn" id="36"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_combat1.tscn" id="37"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_priest1.tscn" id="38"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__shops_shoplrg1.tscn" id="39"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_smallforge.tscn" id="40"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_anvil.tscn" id="41"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_odstv.tscn" id="42"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_tent_guard.tscn" id="43"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_prisonerpole.tscn" id="44"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_pit1.tscn" id="45"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavernbig.tscn" id="46"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_guild01.tscn" id="47"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse1.tscn" id="48"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse2.tscn" id="49"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse3.tscn" id="50"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_rogue1.tscn" id="51"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_mage1.tscn" id="52"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_guildhall.tscn" id="53"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_desert_obelisk.tscn" id="54"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_tent1.tscn" id="55"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__hovels_small_cottage.tscn" id="56"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_stonehenge.tscn" id="57"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_bindpoint.tscn" id="58"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_fountain1.tscn" id="59"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_lantern2.tscn" id="60"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavern1.tscn" id="61"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_ruins3.tscn" id="62"]
+
+[node name="Trinst" type="Node3D"]
+metadata/zone = "trinst"
+
+[node name="Terrain" parent="." instance=ExtResource("1")]
+position = Vector3(-1024, 0, 1024)
+metadata/zone_glb = "terrain"
+
+[node name="Statics" type="Node3D" parent="."]
+
+[node name="rocks_rock1_000" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 119.356, 134.917, -61.3617)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="DoorUpperRoom_000" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(-0.102402764, 0, -0.160042725, 0, 0.19, 0, 0.160042725, -0, -0.102402764, 31.6632, 162.059, 255.088)
+metadata/zone_glb = "objects_door_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_2.dts"
+
+[node name="DoorTower_000" parent="Statics" instance=ExtResource("3")]
+transform = Transform3D(-0.107157595, 0, -0.156898852, 0, 0.19, 0, 0.156898852, -0, -0.107157595, 31.2637, 162.059, 254.866)
+metadata/zone_glb = "objects_door_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_2.dts"
+
+[node name="lantern_000" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.207004809, 0, -0.140174923, 0, 0.25, 0, 0.140174923, -0, 0.207004809, 44.7452, 128.473, 267.221)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_001" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.280679978, -0, 0.413785875, 0, 0.5, 0, -0.413785875, 0, 0.280679978, 32.4505, 128.703, 255.447)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_002" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.280023152, 0, -0.414230654, 0, 0.5, 0, 0.414230654, -0, -0.280023152, 45.7252, 128.758, 247.711)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_003" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.496952643, 0, 0.0551186929, 0, 0.5, -0, -0.0551186929, 0, -0.496952643, -365.958, 177.874, -233.976)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_004" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.0277549244, 0, -0.248454552, 0, 0.25, 0, 0.248454552, -0, -0.0277549244, -383.683, 177.589, -225.765)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_005" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.49686463, 0, -0.0559065204, 0, 0.5, 0, 0.0559065204, -0, 0.49686463, -378.982, 177.819, -242.127)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_006" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.499963761, 0, -0.00601980058, 0, 0.5, 0, 0.00601980058, -0, 0.499963761, 118.259, 149.819, -16.5066)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_007" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.499963761, 0, -0.00601980058, 0, 0.5, 0, 0.00601980058, -0, 0.499963761, 131.491, 149.707, -16.517)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_008" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.0115008327, 0, -0.399834629, 0, 0.4, 0, 0.399834629, -0, 0.0115008327, 139.347, 162.653, -26.3562)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="objects_woodtruck_000" parent="Statics" instance=ExtResource("5")]
+transform = Transform3D(-1.01768715, 0, -0.80889608, 0, 1.3, 0, 0.80889608, -0, -1.01768715, 109.513, 147.124, -7.43425)
+metadata/zone_glb = "objects_woodtruck"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/woodtruck.dts"
+
+[node name="lantern_009" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.249994927, 0, -0.00159260217, 0, 0.25, 0, 0.00159260217, -0, -0.249994927, 131.937, 150.837, 14.9059)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_010" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.249994927, 0, -0.00159260217, 0, 0.25, 0, 0.00159260217, -0, -0.249994927, 117.627, 150.917, 14.8776)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="plants_weed_1_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(-0.193703604, 0, -0.0497886906, 0, 0.2, 0, 0.0497886906, -0, -0.193703604, 133.284, 147.052, 5.48532)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_001" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(-0.0317070944, 0, -0.197470656, 0, 0.2, 0, 0.197470656, -0, -0.0317070944, 133.032, 147.032, -0.415132)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_002" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.2, 0, -0, 0, 0.2, 0, 0, -0, 0.2, 116.073, 147.06, -2.54681)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_003" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0816976361, 0, -0.182552722, 0, 0.2, 0, 0.182552722, -0, 0.0816976361, 117.184, 147.092, 0.536572)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_004" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(-0.070306244, 0, -0.187235232, 0, 0.2, 0, 0.187235232, -0, -0.070306244, 113.264, 147.032, 5.05434)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_005" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.196768701, 0, -0.0358061197, 0, 0.2, 0, 0.0358061197, -0, 0.196768701, 115.855, 147.052, 2.3423)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_006" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.196768701, 0, -0.0358061197, 0, 0.2, 0, 0.0358061197, -0, 0.196768701, 113.801, 147.052, -0.112038)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_007" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.196768701, 0, -0.0358061197, 0, 0.2, 0, 0.0358061197, -0, 0.196768701, 136.544, 147.032, 1.43203)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_008" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0101548442, 0, -0.199742031, 0, 0.2, 0, 0.199742031, -0, 0.0101548442, 135.602, 146.972, -1.37684)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="plants_weed_1_009" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0101548442, 0, -0.199742031, 0, 0.2, 0, 0.199742031, -0, 0.0101548442, 134.346, 147.052, 1.13657)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="lantern_011" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.0115008327, 0, -0.399834629, 0, 0.4, 0, 0.399834629, -0, 0.0115008327, 35.0373, 132.099, -271.418)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_012" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.397024923, 0, -0.0486950744, 0, 0.4, 0, 0.0486950744, -0, 0.397024923, 27.2389, 132.429, -320.517)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_013" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.399971009, 0, -0.00481584047, 0, 0.4, 0, 0.00481584047, -0, 0.399971009, 41.4437, 132.449, -320.141)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_014" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.0148778021, 0.00107840903, 0.399721763, -0.0119013191, 0.399820014, -0.0015216459, -0.399546004, -0.0119496375, -0.0148390214, 30.3157, 132.42, -287.55)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_015" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.0148778021, 0.00107840903, 0.399721763, -0.0119013191, 0.399820014, -0.0015216459, -0.399546004, -0.0119496375, -0.0148390214, 9.7201, 132.44, -290.581)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_016" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.0084711819, -0.00177409347, -0.399906354, -0.011901357, 0.399820013, -0.00152160502, 0.399733157, 0.0118663462, -0.00852015543, 57.497, 132.4, -288.287)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_017" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.0118588216, -0, 0.399824172, 0, 0.4, 0, -0.399824172, 0, 0.0118588216, 30.9037, 141.299, -271.766)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="rocks_rock1_001" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -610.081, 246.241, -422.638)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="Tree_000" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(1.25, 0, -0, 0, 1.25, 0, 0, -0, 1.25, 117.705, 130.176, -76.6401)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="Tree_001" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(1.25, 0, -0, 0, 1.25, 0, 0, -0, 1.25, 132.138, 130.439, -76.5252)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="Tree_002" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.346402259, 0, -1.20104349, 0, 1.25, 0, 1.20104349, -0, 0.346402259, 140.094, 127.885, -90.0701)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="Tree_003" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.368446946, 0, -1.19446509, 0, 1.25, 0, 1.19446509, -0, -0.368446946, 140.468, 127.174, -102.213)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="Tree_004" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.368446946, 0, -1.19446509, 0, 1.25, 0, 1.19446509, -0, -0.368446946, 108.623, 128.092, -88.065)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="Tree_005" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.938446334, 0, -0.825723003, 0, 1.25, 0, 0.825723003, -0, -0.938446334, 107.409, 127.493, -103.427)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_000" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(1.7, 0, -0, 0, 1.7, 0, 0, -0, 1.7, 74.0076, 131.272, 226.277)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_001" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.0431080537, 0, -1.39933616, 0, 1.4, 0, 1.39933616, -0, 0.0431080537, 50.1755, 129.841, 223.259)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_002" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.536048703, 0, -1.61327362, 0, 1.7, 0, 1.61327362, -0, 0.536048703, 80.056, 136.891, 193.775)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_003" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.28306244, 0, -0.209166881, 0, 1.3, 0, 0.209166881, -0, -1.28306244, 91.4962, 135.714, 215.794)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_004" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.38175955, 0, -0.225256641, 0, 1.4, 0, 0.225256641, -0, -1.38175955, 120.329, 143.934, 191.117)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_005" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.2937112, 0, 0.127715819, 0, 1.3, -0, -0.127715819, 0, -1.2937112, 101.126, 144.178, 174.313)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_006" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.904075091, 0, -0.427373643, 0, 1, 0, 0.427373643, -0, -0.904075091, 114.051, 148.068, 149.098)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_007" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.686370984, -0, 1.2202028, 0, 1.4, 0, -1.2202028, 0, -0.686370984, 132.547, 148.31, 149.21)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_008" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.38175955, 0, -0.225256641, 0, 1.4, 0, 0.225256641, -0, -1.38175955, 134.533, 151.677, 121.413)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_009" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.57915377, 0, -0.257436161, 0, 1.6, 0, 0.257436161, -0, -1.57915377, 112.494, 148.258, 116.755)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_010" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.2937112, 0, 0.127715819, 0, 1.3, -0, -0.127715819, 0, -1.2937112, 112.466, 148.141, 68.3182)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_011" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-1.49274369, 0, 0.147364407, 0, 1.5, -0, -0.147364407, 0, -1.49274369, 135.182, 148.9, 54.6944)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="lantern_018" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00389149073, 0, -0.249969711, 0, 0.25, 0, 0.249969711, -0, 0.00389149073, 132.092, 129.158, -114.923)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Bed_000" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(4.5924255e-17, -0, 0.75, 0, 0.75, 0, -0.75, 0, 4.5924255e-17, 95.6917, 131.08, -123.854)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts"
+
+[node name="bench_000" parent="Statics" instance=ExtResource("9")]
+transform = Transform3D(-0.5, 0, -6.123234e-17, 0, 0.5, 0, 6.123234e-17, -0, -0.5, 92.3326, 135.159, -125.498)
+metadata/zone_glb = "objects_bench_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bench_1.dts"
+
+[node name="TABLE4_000" parent="Statics" instance=ExtResource("10")]
+transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, -0, 6.123234e-17, 93.7679, 126.797, -117.997)
+metadata/zone_glb = "objects_table_4"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_4.dts"
+
+[node name="Drawers_000" parent="Statics" instance=ExtResource("11")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 96.8988, 131.132, -120.341)
+metadata/zone_glb = "objects_drawers_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/drawers_1.dts"
+
+[node name="CANDLE_000" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.25, 0, -0, 0, 0.25, 0, 0, -0, 0.25, 93.9111, 128.306, -117.935)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="CANDLE_001" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.25, 0, -0, 0, 0.25, 0, 0, -0, 0.25, 96.8657, 132.779, -120.349)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="Table3_000" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 88.1484, 131.147, -124.576)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="BOOK_000" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.139255868, -0, 0.207624187, 0, 0.25, 0, -0.207624187, 0, 0.139255868, 88.237, 132.265, -124.504)
+metadata/zone_glb = "objects_book_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/book_1.dts"
+
+[node name="Chair_000" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.4, 0, -0, 0, 0.4, 0, 0, -0, 0.4, 94.0269, 127.151, -115.844)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_001" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.30593708, -0, 0.257686831, 0, 0.4, 0, -0.257686831, 0, 0.30593708, 96.102, 127.123, -116.695)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Rug_000" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(2.93915232e-17, 0, -0.48, 0, 0.48, 0, 0.48, -0, 2.93915232e-17, 89.4937, 130.655, -115.804)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="Rug_001" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.5, 0, -6.123234e-17, 0, 0.5, 0, 6.123234e-17, -0, -0.5, 95.0129, 130.634, -120.252)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="lantern_019" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.25, 0, -3.061617e-17, 0, 0.25, 0, 3.061617e-17, -0, -0.25, 92.0024, 128.499, -126.137)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_020" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.25, 0, -3.061617e-17, 0, 0.25, 0, 3.061617e-17, -0, -0.25, 71.8354, 128.674, -126.625)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Bed2_000" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(4.5924255e-17, 0, -0.75, 0, 0.75, 0, 0.75, -0, 4.5924255e-17, 73.2705, 131.438, -122.503)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts"
+
+[node name="Table3_001" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.522530254, -0, 0.538016853, 0, 0.75, 0, -0.538016853, 0, 0.522530254, 72.0949, 131.47, -119.698)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="CANDLE_002" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.25, 0, -0, 0, 0.25, 0, 0, -0, 0.25, 72.157, 132.578, -119.778)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="Rug_002" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.5, 0, -6.123234e-17, 0, 0.5, 0, 6.123234e-17, -0, -0.5, 74.5041, 126.55, -120.383)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="lantern_021" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.25, 0, -3.061617e-17, 0, 0.25, 0, 3.061617e-17, -0, -0.25, 59.5179, 128.859, -126.937)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Bed_001" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(4.5924255e-17, 0, -0.75, 0, 0.75, 0, 0.75, -0, 4.5924255e-17, 58.01, 127.065, -121.125)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts"
+
+[node name="Rug_003" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.5, 0, -6.123234e-17, 0, 0.5, 0, 6.123234e-17, -0, -0.5, 60.5266, 126.647, -121.088)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="Chair_002" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.254860382, 0, -0.308295614, 0, 0.4, 0, 0.308295614, -0, 0.254860382, 56.8129, 127.066, -117.492)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Table3_002" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 57.0622, 127.1, -118.67)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="CANDLE_003" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.25, 0, -0, 0, 0.25, 0, 0, -0, 0.25, 57.0994, 128.199, -118.688)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="CANDLE_004" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(-0.208896726, 0, -0.137339572, 0, 0.25, 0, 0.137339572, -0, -0.208896726, 63.0553, 128.259, -103.705)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="Table3_003" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.626690177, 0, -0.412018716, 0, 0.75, 0, 0.412018716, -0, -0.626690177, 63.0765, 127.16, -103.741)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="Chair_003" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.382323364, 0, 0.117596112, 0, 0.4, -0, -0.117596112, 0, -0.382323364, 62.72, 127.126, -105.13)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_004" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.0150418889, -0, 0.399717077, 0, 0.4, 0, -0.399717077, 0, 0.0150418889, 63.744, 127.094, -102.452)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Rug_004" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(-0.418229183, 0, -0.274015238, 0, 0.5, 0, 0.274015238, -0, -0.418229183, 61.916, 126.626, -102.797)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="lantern_022" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00230074781, 0, -0.249989413, 0, 0.25, 0, 0.249989413, -0, 0.00230074781, 54.3964, 128.754, -101.706)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Bed2_001" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 60.4898, 131.146, -105.342)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts"
+
+[node name="Bed2_002" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 56.0143, 131.12, -105.325)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts"
+
+[node name="Table3_004" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.749973461, 0, 0.00630929083, 0, 0.75, -0, -0.00630929083, 0, -0.749973461, 58.2677, 131.147, -106.47)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="CANDLE_005" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(-0.249783803, 0, -0.0103948015, 0, 0.25, 0, 0.0103948015, -0, -0.249783803, 58.3093, 132.262, -106.315)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="Rug_005" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 58.0513, 130.06, -99.994)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="lantern_023" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.249957622, -0, 0.00460295853, 0, 0.25, 0, -0.00460295853, 0, 0.249957622, 58.4388, 128.703, -135.363)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Bed_002" parent="Statics" instance=ExtResource("8")]
+transform = Transform3D(4.5924255e-17, -0, 0.75, 0, 0.75, 0, -0.75, 0, 4.5924255e-17, 56.1876, 131.499, -137.492)
+metadata/zone_glb = "objects_bed_single_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_1.dts"
+
+[node name="Drawers_001" parent="Statics" instance=ExtResource("11")]
+transform = Transform3D(0.789992386, -0, 0.613116652, 0, 1, 0, -0.613116652, 0, 0.789992386, 57.9205, 131.475, -142.094)
+metadata/zone_glb = "objects_drawers_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/drawers_1.dts"
+
+[node name="lantern_024" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.00519721609, 0, -0.249945972, 0, 0.25, 0, 0.249945972, -0, -0.00519721609, 27.1709, 128.742, -141.116)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="TABLE4_001" parent="Statics" instance=ExtResource("10")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 33.9303, 127.088, -142.77)
+metadata/zone_glb = "objects_table_4"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_4.dts"
+
+[node name="Chair_005" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.39983854, 0, 0.0113640548, 0, 0.4, -0, -0.0113640548, 0, -0.39983854, 33.8526, 127.051, -143.931)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_006" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.0129508718, -0, 0.399790289, 0, 0.4, 0, -0.399790289, 0, -0.0129508718, 34.8133, 127.076, -142.651)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_007" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.194438374, -0, 0.349562182, 0, 0.4, 0, -0.349562182, 0, 0.194438374, 34.0162, 127.08, -141.27)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Rug_006" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 31.8845, 130.006, -141.172)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="Bed2_003" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(4.5924255e-17, 0, -0.75, 0, 0.75, 0, 0.75, -0, 4.5924255e-17, 29.8546, 135.044, -142.008)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts"
+
+[node name="Table3_005" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.63077926, 0, -0.405730854, 0, 0.75, 0, 0.405730854, -0, -0.63077926, 28.591, 135.013, -139.827)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="CANDLE_006" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(-0.203237083, 0, -0.145583955, 0, 0.25, 0, 0.145583955, -0, -0.203237083, 28.7108, 136.128, -139.72)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="lantern_025" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.249987498, 0, 0.00250014248, 0, 0.25, -0, -0.00250014248, 0, -0.249987498, 14.4087, 128.641, -126.864)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Table3_006" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.5630678, 0, -0.495433802, 0, 0.75, 0, 0.495433802, -0, -0.5630678, 15.0857, 131.493, -125.213)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="CANDLE_007" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(-0.179200272, 0, -0.174319427, 0, 0.25, 0, 0.174319427, -0, -0.179200272, 15.2202, 132.608, -125.125)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="Chair_008" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.399985846, 0, 0.00336495511, 0, 0.4, -0, -0.00336495511, 0, -0.399985846, 16.7936, 131.501, -125.349)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_009" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.00831624372, 0, -0.399913541, 0, 0.4, 0, 0.399913541, -0, 0.00831624372, 14.8326, 131.503, -123.681)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Bed2_004" parent="Statics" instance=ExtResource("17")]
+transform = Transform3D(4.5924255e-17, 0, -0.75, 0, 0.75, 0, 0.75, -0, 4.5924255e-17, 15.4662, 131.499, -119.849)
+metadata/zone_glb = "objects_bed_single_2"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bed_single_2.dts"
+
+[node name="lantern_026" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.000198967514, -0, 0.249999921, 0, 0.25, 0, -0.249999921, 0, -0.000198967514, 17.9962, 129.205, -144.449)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="Chair_010" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.310629795, 0, -0.252010179, 0, 0.4, 0, 0.252010179, -0, -0.310629795, 6.67379, 127.086, -144.943)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Chair_011" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(-0.284810418, 0, 0.280861221, 0, 0.4, -0, -0.280861221, 0, -0.284810418, 15.937, 127.109, -145.234)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Table3_007" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(-0.00690486131, 0, -0.749968215, 0, 0.75, 0, 0.749968215, -0, -0.00690486131, 14.5961, 127.08, -145.896)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="BOOK_001" parent="Statics" instance=ExtResource("14")]
+transform = Transform3D(0.139255868, -0, 0.207624187, 0, 0.25, 0, -0.207624187, 0, 0.139255868, 14.5862, 128.201, -145.891)
+metadata/zone_glb = "objects_book_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/book_1.dts"
+
+[node name="lantern_027" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00309700754, 0, -0.249980816, 0, 0.25, 0, 0.249980816, -0, 0.00309700754, 8.17276, 128.473, -161.909)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_028" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(-0.249978295, 0, -0.00329421363, 0, 0.25, 0, 0.00329421363, -0, -0.249978295, 32.1858, 128.514, -191.092)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_029" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00150664636, -0, 0.24999546, 0, 0.25, 0, -0.24999546, 0, 0.00150664636, 117.195, 129.022, -120.031)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_030" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00150664636, -0, 0.24999546, 0, 0.25, 0, -0.24999546, 0, 0.00150664636, 117.15, 128.876, -141.206)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_031" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00150664636, -0, 0.24999546, 0, 0.25, 0, -0.24999546, 0, 0.00150664636, 117.203, 129.021, -163.81)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_032" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00150664636, -0, 0.24999546, 0, 0.25, 0, -0.24999546, 0, 0.00150664636, 117.199, 128.983, -176.162)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_033" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00389149073, 0, -0.249969711, 0, 0.25, 0, 0.249969711, -0, 0.00389149073, 132.128, 128.987, -156.08)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="lantern_034" parent="Statics" instance=ExtResource("4")]
+transform = Transform3D(0.00389149073, 0, -0.249969711, 0, 0.25, 0, 0.249969711, -0, 0.00389149073, 132.135, 128.936, -133.303)
+metadata/zone_glb = "lanterns_lantern"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/lanterns/lantern.dts"
+
+[node name="BOTTLE_000" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 182.97, 128.717, -128.415)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts"
+
+[node name="BOTTLE_001" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 183.209, 129.968, -128.448)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts"
+
+[node name="BOTTLE_002" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 184.185, 129.951, -128.455)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts"
+
+[node name="BOTTLE_003" parent="Statics" instance=ExtResource("18")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 183.858, 128.745, -128.475)
+metadata/zone_glb = "objects_bottle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/bottle_1.dts"
+
+[node name="Rock_000" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -431.38, 155.577, 42.7696)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_001" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(-0.27109589, 1.94514808, -0.378029048, -5.9051513e-06, -0.381551251, -1.96326734, -1.98154158, -0.266115737, 0.0517242312, -434.167, 153.391, 42.0405)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_002" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(-1.80551179, -0.211270423, 0.833961618, -0.150114082, 1.98637927, 0.178222166, -0.847108573, 0.0982964198, -1.80907293, -430.538, 156.058, 42.9005)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_003" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(-1.99776837, -0.0426431729, 0.0842798333, 1.41229689e-06, 1.78455813, 0.902968592, -0.0944538538, 0.901961106, -1.78256687, -433.661, 161.372, 42.1297)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_004" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(0.703732779, -0.328610137, 0.629901226, -0.0241954774, 0.875005114, 0.483508665, -0.710052642, -0.355501657, 0.607818901, -416.261, 155.207, 26.7546)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_005" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(-0.915941592, 0.16188915, -0.367209616, -1.58602174e-07, 0.915023535, 0.403400459, 0.401311599, 0.369491317, -0.838108088, -407.843, 154.104, 44.746)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_006" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(0.725708395, -0.169147998, 0.666885507, 0.591381123, 0.648706991, -0.479006897, -0.351590233, 0.742002827, 0.570803042, -388.547, 148.921, 24.1046)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="Rock_007" parent="Statics" instance=ExtResource("19")]
+transform = Transform3D(0.377778823, -4.87127011, -1.06207845, 4.47179724, 0.802043983, -2.08800261, 2.20461167, -0.792119266, 4.4172655, -446.522, 170.855, 21.7458)
+metadata/zone_glb = "rocks_rock3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock3.dts"
+
+[node name="pipe_000" parent="Statics" instance=ExtResource("20")]
+transform = Transform3D(2.40206918, 1.79386187, 0.11010569, -1.7889614, 2.40413429, -0.14055402, -0.172281121, 0.0468818834, 2.99468217, 376.389, 147.895, -291.752)
+metadata/zone_glb = "objects_pipe_4"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/pipe_4.dts"
+
+[node name="GIANTROCKSNAKE_000" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 557.884, 165.656, 76.3955)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="ZoustDoorOut_000" parent="Statics" instance=ExtResource("21")]
+transform = Transform3D(0.0515699092, -0, 0.193237016, 0, 0.2, 0, -0.193237016, 0, 0.0515699092, 519.557, 145.575, -402.135)
+metadata/zone_glb = "objects_door_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts"
+
+[node name="ZoustDoorIn_000" parent="Statics" instance=ExtResource("21")]
+transform = Transform3D(0.0515699092, -0, 0.193237016, 0, 0.2, 0, -0.193237016, 0, 0.0515699092, 519.421, 145.575, -402.171)
+metadata/zone_glb = "objects_door_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts"
+
+[node name="ShneerDoorOut_000" parent="Statics" instance=ExtResource("21")]
+transform = Transform3D(-0.0904340175, -0, 0.178386346, 0, 0.2, 0, -0.178386346, 0, -0.0904340175, 501.813, 149.841, -580.405)
+metadata/zone_glb = "objects_door_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts"
+
+[node name="ShneerDoorIn_000" parent="Statics" instance=ExtResource("21")]
+transform = Transform3D(-0.0904340175, -0, 0.178386346, 0, 0.2, 0, -0.178386346, 0, -0.0904340175, 501.687, 149.841, -580.341)
+metadata/zone_glb = "objects_door_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/door_1.dts"
+
+[node name="trees_ftree04_ftree04_012" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.904075091, 0, -0.427373643, 0, 1, 0, 0.427373643, -0, -0.904075091, 109.819, 146.718, 233.727)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_013" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.904075091, 0, -0.427373643, 0, 1, 0, 0.427373643, -0, -0.904075091, 67.8097, 150.33, 168.605)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_014" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.904075091, 0, -0.427373643, 0, 1, 0, 0.427373643, -0, -0.904075091, 85.3769, 159.615, 107.498)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_015" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.904075091, 0, -0.427373643, 0, 1, 0, 0.427373643, -0, -0.904075091, 166.083, 161.724, 102.858)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_016" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.622856055, 0, 0.782336459, 0, 1, -0, -0.782336459, 0, -0.622856055, 80.9462, 154.339, 151.327)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_017" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.622856055, 0, 0.782336459, 0, 1, -0, -0.782336459, 0, -0.622856055, 86.1608, 146.672, 252.914)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_018" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.622856055, 0, 0.782336459, 0, 1, -0, -0.782336459, 0, -0.622856055, 166.961, 160.451, 136.078)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_019" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.45271404, 0, 0.212249849, 0, 0.5, -0, -0.212249849, 0, -0.45271404, 133.105, 147.514, 3.10983)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_020" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.452037545, 0, -0.213686821, 0, 0.5, 0, 0.213686821, -0, -0.452037545, 136.068, 147.314, 4.06823)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_021" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.452037545, 0, -0.213686821, 0, 0.5, 0, 0.213686821, -0, -0.452037545, 114.154, 147.514, 2.17566)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_022" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.452037545, 0, -0.213686821, 0, 0.5, 0, 0.213686821, -0, -0.452037545, 134.354, 147.314, -0.973314)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_023" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.452037545, 0, -0.213686821, 0, 0.5, 0, 0.213686821, -0, -0.452037545, 115.757, 147.314, -0.351234)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_024" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.26235706, 0, 0.425639252, 0, 0.5, -0, -0.425639252, 0, -0.26235706, 116.65, 147.514, 4.38631)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_025" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.26235706, 0, 0.425639252, 0, 0.5, -0, -0.425639252, 0, -0.26235706, -3.35657, 136.81, 239.47)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_026" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.26235706, 0, 0.425639252, 0, 0.5, -0, -0.425639252, 0, -0.26235706, -4.84541, 127.873, 260.411)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_027" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.207353768, -0, 0.454977378, 0, 0.5, 0, -0.454977378, 0, 0.207353768, -0.802752, 134.82, 246.232)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_028" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.408912717, -0, 0.287733193, 0, 0.5, 0, -0.287733193, 0, 0.408912717, 9.00503, 145.8, 207.15)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_029" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.408912717, -0, 0.287733193, 0, 0.5, 0, -0.287733193, 0, 0.408912717, 26.0115, 150.075, 204.247)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_030" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.408912717, -0, 0.287733193, 0, 0.5, 0, -0.287733193, 0, 0.408912717, 37.4595, 150.515, 179.337)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_031" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.408912717, -0, 0.287733193, 0, 0.5, 0, -0.287733193, 0, 0.408912717, 17.9394, 149.292, 193.567)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_032" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.408912717, -0, 0.287733193, 0, 0.5, 0, -0.287733193, 0, 0.408912717, 56.0584, 134.041, 304.334)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_033" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(0.300187781, 0, -0.399859096, 0, 0.5, 0, 0.399859096, -0, 0.300187781, 71.8561, 139.958, 291.489)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_034" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.0875630807, 0, -0.492273, 0, 0.5, 0, 0.492273, -0, -0.0875630807, 77.5274, 142.534, 274.084)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_035" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.0875630807, 0, -0.492273, 0, 0.5, 0, 0.492273, -0, -0.0875630807, 100.477, 147.539, 255.728)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="trees_ftree04_ftree04_036" parent="Statics" instance=ExtResource("7")]
+transform = Transform3D(-0.122588313, 0, -0.689182201, 0, 0.7, 0, 0.689182201, -0, -0.122588313, 66.3349, 138.443, 292.042)
+metadata/zone_glb = "trees_ftree04_ftree04"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/trees/ftree04/ftree04.dts"
+
+[node name="rocks_rock1_002" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(0.305816612, 0, -0.952090437, 0, 1, 0, 0.952090437, -0, 0.305816612, 56.3771, 132.441, 279.104)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="rocks_rock1_003" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(0.305816612, 0, -0.952090437, 0, 1, 0, 0.952090437, -0, 0.305816612, 55.2607, 126.344, 264.668)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="rocks_rock1_004" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(0.305816612, 0, -0.952090437, 0, 1, 0, 0.952090437, -0, 0.305816612, 48.4279, 128.447, 284.628)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="rocks_rock1_005" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(-0.612493245, 0, -0.790475821, 0, 1, 0, 0.790475821, -0, -0.612493245, 19.3477, 129.136, 252.696)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="rocks_rock1_006" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(-0.612493245, 0, -0.790475821, 0, 1, 0, 0.790475821, -0, -0.612493245, 18.0081, 134.638, 241.792)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="rocks_rock1_007" parent="Statics" instance=ExtResource("2")]
+transform = Transform3D(-0.612493245, 0, -0.790475821, 0, 1, 0, 0.790475821, -0, -0.612493245, 24.2059, 129.449, 246.17)
+metadata/zone_glb = "rocks_rock1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/rocks/rock1.dts"
+
+[node name="Chair_012" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.398127126, 0, -0.0386625368, 0, 0.4, 0, 0.0386625368, -0, 0.398127126, 118.56, 147.082, -22.2711)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="Table3_008" parent="Statics" instance=ExtResource("13")]
+transform = Transform3D(0.531500601, -0, 0.529156982, 0, 0.75, 0, -0.529156982, 0, 0.531500601, 117.335, 147.116, -23.6186)
+metadata/zone_glb = "objects_table_3"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_3.dts"
+
+[node name="Chair_013" parent="Statics" instance=ExtResource("15")]
+transform = Transform3D(0.0652980131, 0, -0.394634222, 0, 0.4, 0, 0.394634222, -0, 0.0652980131, 116.342, 147.05, -25.2412)
+metadata/zone_glb = "objects_chair_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/chair_1.dts"
+
+[node name="CANDLE_008" parent="Statics" instance=ExtResource("12")]
+transform = Transform3D(0.177166867, -0, 0.176385661, 0, 0.25, 0, -0.176385661, 0, 0.177166867, 117.349, 148.215, -23.6581)
+metadata/zone_glb = "objects_candle_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/candle_1.dts"
+
+[node name="BWFlowerA1_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(-0.0343122928, 0.000199880125, 0.197034582, -0.00981136346, 0.199750055, -0.00191122004, -0.196790253, -0.00999378121, -0.0342596063, -249.273, 205.279, -693.733)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA2_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.00151717688, 0.00019989346, 0.199994145, -0.00999497351, 0.199750057, -0.000123826561, -0.199744333, -0.0099937416, 0.00152527049, -246.994, 205.475, -690.622)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA3_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.165829955, 0.000199900161, 0.111805125, -0.00575230031, 0.199750057, 0.00817470252, -0.11165723, -0.00999373605, 0.165628465, -246.426, 205.327, -695.36)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA4_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.196520909, 0.000199944304, -0.037141518, 0.00165974393, 0.199750043, 0.00985725109, 0.0371049537, -0.00999400677, 0.196273641, -243.351, 205.566, -690.326)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA5_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.00152397135, -0.0118536185, 0.199642604, -0.00199910545, 0.199637523, 0.0118685769, -0.199984202, -0.00208596995, 0.00140272615, -243.031, 205.463, -693.533)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA6_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -241.609, 205.627, -688.878)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA7_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -239.899, 205.565, -691.491)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerA8_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -239.127, 205.484, -694.398)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB1_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0547002884, 0.00452691814, 0.192321048, -0.00981137151, 0.199750054, -0.00191121719, -0.192123959, -0.0089119456, 0.0548540043, -243.853, 205.19, -708.712)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB2_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -242.134, 205.22, -705.859)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB3_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.197888137, 0.00452695623, 0.0286320084, -0.00575233282, 0.199750055, 0.00817472061, -0.0284111933, -0.00891190537, 0.197771034, -240.583, 205.138, -708.935)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB4_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0883584456, -0.00976621969, 0.17915749, -0.00199909819, 0.199637524, 0.0118685584, -0.179412343, -0.00703420392, 0.0881006883, -239.174, 205.136, -707.165)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB5_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.160817324, 0.00452708446, -0.118816219, 0.00165974336, 0.199750044, 0.00985724692, 0.118890847, -0.00891210251, 0.160578769, -237.314, 205.127, -703.923)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB6_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0880899578, -0.00695121557, 0.179420846, 0.0159837935, 0.199360234, -0.000123819126, -0.178842606, 0.0143936649, 0.0883637071, -234.675, 205.111, -705.654)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB7_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -234.936, 205.077, -702.245)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWFlowerB8_000" parent="Statics" instance=ExtResource("6")]
+transform = Transform3D(0.0882478789, 0.00452691674, 0.179420787, -0.00999496597, 0.199750057, -0.000123828072, -0.179199365, -0.00891188549, 0.0883638261, -237.191, 205.216, -700.828)
+metadata/zone_glb = "plants_weed_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/plants/weed_1.dts"
+
+[node name="BWTable_000" parent="Statics" instance=ExtResource("22")]
+transform = Transform3D(-0.186573188, 0.00329404448, -0.463874546, -0.00069161939, 0.299989535, 0.00240844537, 0.46388481, 0.00256725321, -0.186559085, -240.353, 206.142, -701.398)
+metadata/zone_glb = "objects_table_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/table_1.dts"
+
+[node name="BWRug_000" parent="Statics" instance=ExtResource("16")]
+transform = Transform3D(1.49247149, 0.0142975965, -0.576475864, -0.0018557883, 0.999798414, 0.0199921695, 0.360403434, -0.0179799537, 0.932623228, -244.312, 205.144, -700.86)
+metadata/zone_glb = "objects_rug_1"
+metadata/source_shape = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/shapes/objects/rug_1.dts"
+
+[node name="Interiors" type="Node3D" parent="."]
+
+[node name="tower_000" parent="Interiors" instance=ExtResource("23")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -110.996, 147.81, -301.139)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
+
+[node name="tower_001" parent="Interiors" instance=ExtResource("23")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 271.736, 148.073, -31.1675)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
+
+[node name="tower_002" parent="Interiors" instance=ExtResource("23")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 333.848, 147.898, -150.731)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
+
+[node name="tower_003" parent="Interiors" instance=ExtResource("23")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, -21.6122, 147.918, -32.7274)
+metadata/zone_glb = "components_city_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_tower1.dif"
+
+[node name="Entrance_000" parent="Interiors" instance=ExtResource("24")]
+transform = Transform3D(1.1, 0, -0, 0, 1.1, 0, 0, -0, 1.1, 124.497, 146.067, -5.66935)
+metadata/zone_glb = "components_city_castle"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_castle.dif"
+
+[node name="WallsA_000" parent="Interiors" instance=ExtResource("25")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 112.677, 148.006, -224.744)
+metadata/zone_glb = "components_city_wallsa"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsa.dif"
+
+[node name="WallsC1_000" parent="Interiors" instance=ExtResource("26")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 112.785, 148.006, -224.13)
+metadata/zone_glb = "components_city_wallsc1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc1.dif"
+
+[node name="WallsE_000" parent="Interiors" instance=ExtResource("27")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 112.775, 148.006, -224.13)
+metadata/zone_glb = "components_city_wallse"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallse.dif"
+
+[node name="WallsD_000" parent="Interiors" instance=ExtResource("28")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 112.79, 148.006, -224.12)
+metadata/zone_glb = "components_city_wallsd"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsd.dif"
+
+[node name="WallsB_000" parent="Interiors" instance=ExtResource("29")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 114.105, 148.006, -224.793)
+metadata/zone_glb = "components_city_wallsb"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsb.dif"
+
+[node name="stairs_000" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 126.695, 141.226, -44.3245)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="stairs_001" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 122.695, 141.226, -44.3245)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="stairs_002" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 126.695, 135.69, -55.38)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="stairs_003" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 122.695, 135.69, -55.38)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="stairs_004" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 122.699, 130.218, -65.8579)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="stairs_005" parent="Interiors" instance=ExtResource("30")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 126.689, 130.218, -65.8579)
+metadata/zone_glb = "architecture_stairs2a"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stairs2a.dif"
+
+[node name="WallsC2_000" parent="Interiors" instance=ExtResource("31")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 112.785, 148.006, -224.138)
+metadata/zone_glb = "components_city_wallsc2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/city_wallsc2.dif"
+
+[node name="GuardTower_000" parent="Interiors" instance=ExtResource("32")]
+transform = Transform3D(1.24069738, 0, -0.843012468, 0, 1.5, 0, 0.843012468, -0, 1.24069738, 40.982, 125.35, 254.041)
+metadata/zone_glb = "prefabs_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif"
+
+[node name="prefabs_tower1wall_000" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(1.01670654, 0, -0.637422789, 0, 1.2, 0, 0.637422789, -0, 1.01670654, 43.3589, 126.049, 252.973)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="prefabs_tower1wall_001" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(0.962516146, 0, -0.716632868, 0, 1.2, 0, 0.716632868, -0, 0.962516146, 16.6068, 125.929, 233.969)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="prefabs_tower1wall_002" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(1.01670654, 0, -0.637422789, 0, 1.2, 0, 0.637422789, -0, 1.01670654, 55.5933, 126.049, 260.643)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="GuardTower_001" parent="Interiors" instance=ExtResource("32")]
+transform = Transform3D(-0.168886577, 0, -1.49046212, 0, 1.5, 0, 1.49046212, -0, -0.168886577, -373.768, 174.466, -235.229)
+metadata/zone_glb = "prefabs_tower1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1.dif"
+
+[node name="prefabs_tower1wall_003" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(-0.0911335471, 0, -1.19653444, 0, 1.2, 0, 1.19653444, -0, -0.0911335471, -371.716, 175.165, -233.622)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="prefabs_tower1wall_004" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(-0.186461469, 0, -1.18542487, 0, 1.2, 0, 1.18542487, -0, -0.186461469, -367.343, 175.045, -266.144)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="prefabs_tower1wall_005" parent="Interiors" instance=ExtResource("33")]
+transform = Transform3D(-0.0911335471, 0, -1.19653444, 0, 1.2, 0, 1.19653444, -0, -0.0911335471, -372.813, 175.165, -219.224)
+metadata/zone_glb = "prefabs_tower1wall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/prefabs/tower1wall.dif"
+
+[node name="barracks_000" parent="Interiors" instance=ExtResource("34")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 276.121, 129.91, -259.235)
+metadata/zone_glb = "buildings_small_barracks"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/barracks.dif"
+
+[node name="Priest_000" parent="Interiors" instance=ExtResource("35")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 221.475, 131.107, -345.824)
+metadata/zone_glb = "buildings_small_greathall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/greathall.dif"
+
+[node name="objects_firept3_000" parent="Interiors" instance=ExtResource("36")]
+transform = Transform3D(0.689498198, 0, -0.724287398, 0, 1, 0, 0.724287398, -0, 0.689498198, 235.487, 128.809, -304.004)
+metadata/zone_glb = "objects_firept3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
+
+[node name="objects_firept3_001" parent="Interiors" instance=ExtResource("36")]
+transform = Transform3D(0.689498198, 0, -0.724287398, 0, 1, 0, 0.724287398, -0, 0.689498198, 206.949, 128.83, -302.459)
+metadata/zone_glb = "objects_firept3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
+
+[node name="CombatantSign_000" parent="Interiors" instance=ExtResource("37")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 251.133, 138.77, -265.29)
+metadata/zone_glb = "signs_combat1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/combat1.dif"
+
+[node name="PriestSign_000" parent="Interiors" instance=ExtResource("38")]
+transform = Transform3D(0.000795870055, 0, -0.999999683, 0, 1, 0, 0.999999683, -0, 0.000795870055, 218.013, 136.215, -298.087)
+metadata/zone_glb = "signs_priest1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/priest1.dif"
+
+[node name="shop_000" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 110.271, 126.901, -162.568)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_001" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 110.271, 126.901, -118.768)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_002" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 110.271, 126.941, -180.568)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_003" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 139.036, 126.901, -116.53)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_004" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 139.036, 126.891, -134.53)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_005" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(-0.75, 0, -9.18485099e-17, 0, 0.75, 0, 9.18485099e-17, -0, -0.75, 139.036, 126.851, -151.93)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="shop_006" parent="Interiors" instance=ExtResource("39")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 110.271, 126.931, -145.368)
+metadata/zone_glb = "shops_shoplrg1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/shops/shoplrg1.dif"
+
+[node name="objects_smallforge_000" parent="Interiors" instance=ExtResource("40")]
+transform = Transform3D(0.281577098, -0, 0.640869985, 0, 0.7, 0, -0.640869985, 0, 0.281577098, 128.59, 136.85, -173.801)
+metadata/zone_glb = "objects_smallforge"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/smallforge.dif"
+
+[node name="objects_anvil_000" parent="Interiors" instance=ExtResource("41")]
+transform = Transform3D(0.999200666, -0, 0.0399753621, 0, 1, 0, -0.0399753621, 0, 0.999200666, 118.85, 140.964, -176.595)
+metadata/zone_glb = "objects_anvil"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/anvil.dif"
+
+[node name="objects_odstv_000" parent="Interiors" instance=ExtResource("42")]
+transform = Transform3D(-0.994843603, 0, 0.101420933, 0, 1, -0, -0.101420933, 0, -0.994843603, 140.958, 141.541, -194.384)
+metadata/zone_glb = "objects_odstv"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/odstv.dif"
+
+[node name="Tent_000" parent="Interiors" instance=ExtResource("43")]
+transform = Transform3D(1.1, 0, -0, 0, 1.1, 0, 0, -0, 1.1, 198.808, 128.778, -226.272)
+metadata/zone_glb = "architecture_tent_guard"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent_guard.dif"
+
+[node name="prisonerpole_000" parent="Interiors" instance=ExtResource("44")]
+transform = Transform3D(0.75, 0, -0, 0, 0.75, 0, 0, -0, 0.75, 208.017, 127.47, -222.868)
+metadata/zone_glb = "architecture_prisonerpole"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/prisonerpole.dif"
+
+[node name="pit_000" parent="Interiors" instance=ExtResource("45")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 234.337, 127.855, -219.937)
+metadata/zone_glb = "architecture_pit1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/pit1.dif"
+
+[node name="buildings_large_tavernbig_000" parent="Interiors" instance=ExtResource("46")]
+transform = Transform3D(-0.0123880302, -0, 0.999923265, 0, 1, 0, -0.999923265, 0, -0.0123880302, 188.092, 128.123, -138.889)
+metadata/zone_glb = "buildings_large_tavernbig"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavernbig.dif"
+
+[node name="Rogue_000" parent="Interiors" instance=ExtResource("47")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -29.824, 127.415, -161.913)
+metadata/zone_glb = "buildings_small_guild01"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_small/guild01.dif"
+
+[node name="houses_cityhouse1_000" parent="Interiors" instance=ExtResource("48")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 92.3136, 126.902, -119.208)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
+
+[node name="houses_cityhouse2_000" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 77.0939, 126.824, -121.852)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
+
+[node name="houses_cityhouse3_000" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(0.0207940992, -0, 0.999783779, 0, 1, 0, -0.999783779, 0, 0.0207940992, 61.4337, 127.167, -118.128)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
+
+[node name="houses_cityhouse2_001" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, -0, 6.123234e-17, 53.0114, 126.864, -140.125)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
+
+[node name="houses_cityhouse1_001" parent="Interiors" instance=ExtResource("48")]
+transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, -0, 6.123234e-17, 61.2976, 126.912, -101.952)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
+
+[node name="houses_cityhouse3_001" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 37.126, 127.197, -119.561)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
+
+[node name="houses_cityhouse1_002" parent="Interiors" instance=ExtResource("48")]
+transform = Transform3D(6.123234e-17, 0, -1, 0, 1, 0, 1, -0, 6.123234e-17, 34.0976, 126.832, -141.552)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
+
+[node name="houses_cityhouse2_002" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 19.6477, 126.874, -122.091)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
+
+[node name="houses_cityhouse3_002" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 9.2593, 127.137, -142.258)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
+
+[node name="houses_cityhouse2_003" parent="Interiors" instance=ExtResource("49")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 12.9093, 126.864, -167.198)
+metadata/zone_glb = "houses_cityhouse2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse2.dif"
+
+[node name="houses_cityhouse3_003" parent="Interiors" instance=ExtResource("50")]
+transform = Transform3D(6.123234e-17, -0, 1, 0, 1, 0, -1, 0, 6.123234e-17, 33.3967, 127.137, -159.4)
+metadata/zone_glb = "houses_cityhouse3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse3.dif"
+
+[node name="houses_cityhouse1_003" parent="Interiors" instance=ExtResource("48")]
+transform = Transform3D(-1, 0, -1.2246468e-16, 0, 1, 0, 1.2246468e-16, -0, -1, 32.5996, 126.832, -184.166)
+metadata/zone_glb = "houses_cityhouse1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/houses/cityhouse1.dif"
+
+[node name="RogueSign_000" parent="Interiors" instance=ExtResource("51")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -9.91404, 131.869, -150.608)
+metadata/zone_glb = "signs_rogue1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/rogue1.dif"
+
+[node name="MageSign_000" parent="Interiors" instance=ExtResource("52")]
+transform = Transform3D(9.18485099e-17, 0, -1.5, 0, 1.5, 0, 1.5, -0, 9.18485099e-17, 35.1723, 141.682, -261.28)
+metadata/zone_glb = "signs_mage1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/signs/mage1.dif"
+
+[node name="MageGuild_000" parent="Interiors" instance=ExtResource("53")]
+transform = Transform3D(0.0207958442, -0, 0.999783743, 0, 1, 0, -0.999783743, 0, 0.0207958442, 33.6826, 128.293, -292.944)
+metadata/zone_glb = "buildings_large_guildhall"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/guildhall.dif"
+
+[node name="obelisk_000" parent="Interiors" instance=ExtResource("54")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -72.9657, 84.5764, 685.545)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
+
+[node name="obelisk_001" parent="Interiors" instance=ExtResource("54")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -102.166, 84.5764, 685.545)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
+
+[node name="obelisk_002" parent="Interiors" instance=ExtResource("54")]
+transform = Transform3D(0.971337921, 0, -0.237702845, 0, 1, 0, 0.237702845, -0, 0.971337921, -68.0385, 102.407, 520.463)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
+
+[node name="obelisk_003" parent="Interiors" instance=ExtResource("54")]
+transform = Transform3D(0.971337921, 0, -0.237702845, 0, 1, 0, 0.237702845, -0, 0.971337921, -96.4018, 102.407, 513.523)
+metadata/zone_glb = "components_desert_obelisk"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/components/desert_obelisk.dif"
+
+[node name="architecture_tent1_000" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(-0.0291986985, 0, -0.999573627, 0, 1, 0, 0.999573627, -0, -0.0291986985, -220.929, 116.288, 415.334)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_001" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.238477524, 0, -0.971148017, 0, 1, 0, 0.971148017, -0, 0.238477524, -229.83, 116.327, 416.291)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_002" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.971338336, 0, -0.23770115, 0, 1, 0, 0.23770115, -0, 0.971338336, 161.086, 139.953, 594.519)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_003" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.985584568, -0, 0.16918351, 0, 1, 0, -0.16918351, 0, 0.985584568, 161.811, 139.807, 583.895)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_004" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.796084397, 0, -0.605185618, 0, 1, 0, 0.605185618, -0, 0.796084397, -258.689, 128.511, 87.935)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_005" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.140332724, 0, -0.990104402, 0, 1, 0, 0.990104402, -0, 0.140332724, -248.289, 128.518, 82.6218)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_006" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(-0.924299756, 0, -0.381667343, 0, 1, 0, 0.381667343, -0, -0.924299756, -258.655, 128.668, 102.52)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="objects_firept3_002" parent="Interiors" instance=ExtResource("36")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -250.971, 128.371, 94.0138)
+metadata/zone_glb = "objects_firept3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
+
+[node name="hovels_small_cottage_000" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.682221708, 0, -0.731145363, 0, 1, 0, 0.731145363, -0, 0.682221708, 385.844, 159.492, 82.3891)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_001" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.738472994, 0, -0.674283055, 0, 1, 0, 0.674283055, -0, 0.738472994, 395.006, 159.358, 73.6099)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_002" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.966391785, 0, -0.25707376, 0, 1, 0, 0.25707376, -0, 0.966391785, 523.953, 145.56, -396.088)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_003" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.96376885, -0, 0.26673883, 0, 1, 0, -0.26673883, 0, 0.96376885, 523.657, 145.505, -413.203)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_004" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.908962732, -0, 0.416877383, 0, 1, 0, -0.416877383, 0, 0.908962732, 516.558, 146.405, -466.902)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_005" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.908962732, -0, 0.416877383, 0, 1, 0, -0.416877383, 0, 0.908962732, 596.743, 167.81, -195.724)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="DruidRing_000" parent="Interiors" instance=ExtResource("57")]
+transform = Transform3D(0.764842701, -0, 0.644217078, 0, 1, 0, -0.644217078, 0, 0.764842701, 483.337, 148.02, -0.0125737)
+metadata/zone_glb = "architecture_stonehenge"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/stonehenge.dif"
+
+[node name="hovels_small_cottage_006" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.877579129, -0, 0.479431822, 0, 1, 0, -0.479431822, 0, 0.877579129, 596.708, 158.511, -510.664)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_007" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.877579129, -0, 0.479431822, 0, 1, 0, -0.479431822, 0, 0.877579129, 585.533, 157.139, -536.031)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_008" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.877579129, -0, 0.479431822, 0, 1, 0, -0.479431822, 0, 0.877579129, 508.881, 149.836, -579.483)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="hovels_small_cottage_009" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.371653028, -0, 0.928371707, 0, 1, 0, -0.928371707, 0, 0.371653028, 500.86, 149.928, -599.289)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="architecture_tent1_007" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.140332724, 0, -0.990104402, 0, 1, 0, 0.990104402, -0, 0.140332724, -534.861, 168.654, 431.26)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_008" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.796084397, 0, -0.605185618, 0, 1, 0, 0.605185618, -0, 0.796084397, -545.26, 168.707, 436.574)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="architecture_tent1_009" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(-0.924299756, 0, -0.381667343, 0, 1, 0, 0.381667343, -0, -0.924299756, -545.227, 168.244, 451.159)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="objects_firept3_003" parent="Interiors" instance=ExtResource("36")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, -537.543, 167.987, 442.652)
+metadata/zone_glb = "objects_firept3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/firept3.dif"
+
+[node name="bindpoint_000" parent="Interiors" instance=ExtResource("58")]
+transform = Transform3D(-0.881583714, 0, -0.472027706, 0, 1, 0, 0.472027706, -0, -0.881583714, 256.707, 147.48, -133.081)
+metadata/zone_glb = "architecture_bindpoint"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/bindpoint.dif"
+
+[node name="fountain_000" parent="Interiors" instance=ExtResource("59")]
+transform = Transform3D(1, 0, -0, 0, 1, 0, 0, -0, 1, 124.586, 127.04, -96.3875)
+metadata/zone_glb = "architecture_fountain1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/fountain1.dif"
+
+[node name="Tent_001" parent="Interiors" instance=ExtResource("55")]
+transform = Transform3D(0.900447108, -0, 0.434965522, 0, 1, 0, -0.434965522, 0, 0.900447108, 308.029, 137.307, -344.47)
+metadata/zone_glb = "architecture_tent1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/architecture/tent1.dif"
+
+[node name="Lamp_000" parent="Interiors" instance=ExtResource("60")]
+transform = Transform3D(0.713254734, 0, -0.362308825, 0, 0.8, 0, 0.362308825, -0, 0.713254734, 110.057, 157.783, 29.6627)
+metadata/zone_glb = "objects_lantern2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif"
+
+[node name="Lamp_001" parent="Interiors" instance=ExtResource("60")]
+transform = Transform3D(0.768844421, 0, -0.221084274, 0, 0.8, 0, 0.221084274, -0, 0.768844421, 119.548, 157.695, 31.6461)
+metadata/zone_glb = "objects_lantern2"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/objects/lantern2.dif"
+
+[node name="Tavern_000" parent="Interiors" instance=ExtResource("61")]
+transform = Transform3D(0.120502428, -0, 0.992713032, 0, 1, 0, -0.992713032, 0, 0.120502428, -450.587, 154.959, 17.2505)
+metadata/zone_glb = "buildings_large_tavern1"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/tavern1.dif"
+
+[node name="buildings_large_ruins3_000" parent="Interiors" instance=ExtResource("62")]
+transform = Transform3D(-1.9386078, 0, 0.491731411, 0, 2, -0, -0.491731411, 0, -1.9386078, -166.272, 150.781, 302.312)
+metadata/zone_glb = "buildings_large_ruins3"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/buildings_large/ruins3.dif"
+
+[node name="hovels_small_cottage_010" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(0.982002581, -0, 0.188867497, 0, 1, 0, -0.188867497, 0, 0.982002581, 731.454, 170.114, -8.30423)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
+
+[node name="BWHouse_000" parent="Interiors" instance=ExtResource("56")]
+transform = Transform3D(-0.932907869, -4.12647861e-08, 0.360115133, -0.00360112777, 0.99995, -0.00932890308, -0.360097127, -0.00999982769, -0.932861224, -243.308, 205.903, -704.309)
+metadata/zone_glb = "hovels_small_cottage"
+metadata/source_interior = "/home/user/minions_port_test/MoMReborn/minions.of.mirth/data/interiors/hovels/small_cottage.dif"
