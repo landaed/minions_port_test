@@ -226,14 +226,14 @@ func _add_walkable_floor_collision(inst: Node3D) -> void:
 	# built from upward-facing visual triangles. Unlike the old full-footprint slab,
 	# this follows actual floor geometry and does not put invisible walls across
 	# tower/gate openings.
-	var faces := PackedVector3Array()
-	var to_zone := global_transform.affine_inverse()
+	var faces: PackedVector3Array = PackedVector3Array()
+	var to_zone: Transform3D = global_transform.affine_inverse()
 	for mi in _mesh_instances(inst):
 		if mi.mesh == null:
 			continue
 		var mesh_to_zone: Transform3D = to_zone * mi.global_transform
 		for surface in range(mi.mesh.get_surface_count()):
-			var arrays := mi.mesh.surface_get_arrays(surface)
+			var arrays: Array = mi.mesh.surface_get_arrays(surface)
 			if arrays.is_empty():
 				continue
 			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
