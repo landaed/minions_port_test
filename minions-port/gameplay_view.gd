@@ -9,6 +9,17 @@ const SERVER_RECONCILE_BLEND := 0.35
 const CAMERA_ZOOM_MIN := 2.5
 const CAMERA_ZOOM_MAX := 14.0
 const CAMERA_ZOOM_STEP := 1.0
+const DOF_ENABLED := true
+const DOF_FOCUS_MIN := 4.0
+const DOF_FOCUS_MAX := 120.0
+const DOF_DEFAULT_FOCUS := 24.0
+const DOF_FOCUS_SMOOTH_SPEED := 8.0
+const DOF_FOCUS_RAY_LENGTH := 160.0
+const DOF_NEAR_MARGIN := 4.0
+const DOF_FAR_MARGIN := 10.0
+const DOF_NEAR_TRANSITION := 3.0
+const DOF_FAR_TRANSITION := 16.0
+const DOF_BLUR_AMOUNT := 0.06
 const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
@@ -51,6 +62,8 @@ var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
+var _camera_attributes: CameraAttributesPractical = null
+var _dof_focus_distance := DOF_DEFAULT_FOCUS
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -109,6 +122,7 @@ func _ready():
 	player_body.add_child(_player_rig)
 	_camera_zoom = camera.position.z
 	_apply_camera_zoom()
+	_setup_dynamic_dof()
 	_build_hud()
 	_rebuild_ability_bar()
 	_update_labels()
@@ -308,6 +322,46 @@ func _apply_camera_zoom() -> void:
 func _adjust_camera_zoom(direction: float) -> void:
 	_camera_zoom = clampf(_camera_zoom + direction * CAMERA_ZOOM_STEP, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
 	_apply_camera_zoom()
+
+
+func _setup_dynamic_dof() -> void:
+	if camera == null or not DOF_ENABLED:
+		return
+	_camera_attributes = CameraAttributesPractical.new()
+	_camera_attributes.dof_blur_near_enabled = true
+	_camera_attributes.dof_blur_far_enabled = true
+	_camera_attributes.dof_blur_amount = DOF_BLUR_AMOUNT
+	_camera_attributes.dof_blur_near_transition = DOF_NEAR_TRANSITION
+	_camera_attributes.dof_blur_far_transition = DOF_FAR_TRANSITION
+	camera.attributes = _camera_attributes
+	_apply_dof_focus(DOF_DEFAULT_FOCUS)
+
+
+func _update_dynamic_dof(delta: float) -> void:
+	if _camera_attributes == null or camera == null or sub_viewport == null:
+		return
+	var target_focus: float = DOF_DEFAULT_FOCUS
+	var center: Vector2 = Vector2(sub_viewport.size) * 0.5
+	var from: Vector3 = camera.project_ray_origin(center)
+	var to: Vector3 = from + camera.project_ray_normal(center) * DOF_FOCUS_RAY_LENGTH
+	var query: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.create(from, to)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.exclude = [player_body]
+	var hit: Dictionary = player_body.get_world_3d().direct_space_state.intersect_ray(query)
+	if hit and hit.has("position"):
+		target_focus = from.distance_to(hit.position)
+	target_focus = clampf(target_focus, DOF_FOCUS_MIN, DOF_FOCUS_MAX)
+	var blend: float = clampf(delta * DOF_FOCUS_SMOOTH_SPEED, 0.0, 1.0)
+	_dof_focus_distance = lerpf(_dof_focus_distance, target_focus, blend)
+	_apply_dof_focus(_dof_focus_distance)
+
+
+func _apply_dof_focus(focus_distance: float) -> void:
+	if _camera_attributes == null:
+		return
+	_camera_attributes.dof_blur_near_distance = maxf(DOF_FOCUS_MIN, focus_distance - DOF_NEAR_MARGIN)
+	_camera_attributes.dof_blur_far_distance = minf(DOF_FOCUS_MAX, focus_distance + DOF_FAR_MARGIN)
 
 
 func _draw_crosshair():
@@ -1336,5 +1390,6 @@ func _physics_process(delta):
 			var ent: Dictionary = body.get_meta("entity", {})
 			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
+	_update_dynamic_dof(delta)
 	_update_look_at()
 	_update_labels()

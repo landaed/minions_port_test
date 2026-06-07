@@ -2,9 +2,9 @@
 
 ## Post-processing effects
 
-There is no post-processing shader attached to `Camera3D` right now. The live
-zone creates a `WorldEnvironment` in `minions-port/world/zone_loader.gd` and all
-current post-processing-style settings live on that `Environment` resource:
+There is no custom post-processing shader attached to `Camera3D` right now. The
+live zone creates a `WorldEnvironment` in `minions-port/world/zone_loader.gd` and
+most global post-processing-style settings live on that `Environment` resource:
 
 - ACES tonemapping (`tonemap_mode`, `tonemap_white`),
 - SSAO/SSIL,
@@ -13,11 +13,17 @@ current post-processing-style settings live on that `Environment` resource:
 - color adjustment contrast/saturation, and
 - sky/ambient lighting.
 
-To adjust global post-processing for Trinst, start in `_setup_environment()` in
-`world/zone_loader.gd`. If you want an editor-authored workflow later, the next
-step should be moving those `Environment` settings into a `.tres` resource and
-having the loader instance/use that resource instead of constructing it fully in
-code.
+Dynamic depth of field is camera-local and lives in `gameplay_view.gd`. It creates
+a `CameraAttributesPractical` on the gameplay `Camera3D`, raycasts from the
+screen center each physics frame, smooths the hit distance, and moves the near/far
+DOF distances around that focus point. Tune it with the `DOF_*` constants in
+`gameplay_view.gd` (`DOF_BLUR_AMOUNT`, focus range, margins, and transitions).
+
+To adjust other global post-processing for Trinst, start in `_setup_environment()`
+in `world/zone_loader.gd`. If you want an editor-authored workflow later, the
+next step should be moving those `Environment` settings into a `.tres` resource
+and having the loader instance/use that resource instead of constructing it fully
+in code.
 
 Camera-specific post effects in Godot are usually done with either:
 
@@ -25,9 +31,9 @@ Camera-specific post effects in Godot are usually done with either:
 2. a full-screen shader pass (for example a `ColorRect`/SubViewport effect or a
    screen-reading shader) for custom color grading, outlines, CRT effects, etc.
 
-Use the built-in `Environment` path first for fog, glow, exposure/tonemap, SSAO,
-and color adjustments; use full-screen shaders only when the effect is not
-available on `Environment`.
+Use the built-in `Environment`/`CameraAttributesPractical` path first for fog,
+glow, exposure/tonemap, SSAO, color adjustments, and depth of field; use
+full-screen shaders only when the effect is not available there.
 
 ## Editing terrain, prop, building, and character materials
 
