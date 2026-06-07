@@ -51,8 +51,24 @@ func _terrain_texture_defaults() -> Dictionary:
 # colliding geometry there traps the player — in the original you pass through it.
 const PASSTHROUGH_INTERIORS := ["architecture_bindpoint"]
 
+# Broad rectangular fallback floors are opt-in only. They can rescue a building
+# with no usable floor triangles at all, but their vertical slab edges are bad
+# around doorways/gates (notably prefabs_tower1). Prefer the triangle-derived
+# walkable floor collision below, and add asset names here only after checking
+# the slab does not cover an entrance.
+const FOOTPRINT_FLOOR_INTERIORS := []
+
+const WALKABLE_FLOOR_NORMAL_Y := 0.62
+
 func _is_passthrough(rel: String) -> bool:
 	for key in PASSTHROUGH_INTERIORS:
+		if rel.findn(key) != -1:
+			return true
+	return false
+
+
+func _uses_footprint_fallback(rel: String) -> bool:
+	for key in FOOTPRINT_FLOOR_INTERIORS:
 		if rel.findn(key) != -1:
 			return true
 	return false
@@ -112,7 +128,9 @@ func _finalize_authored_node(node: Node) -> void:
 				_ensure_mesh_collision(n, true)
 			elif bool(n.get_meta("zone_collide", false)) and not _is_passthrough(rel):
 				_ensure_mesh_collision(n, false)
-				_add_fallback_floor(n)
+				_add_walkable_floor_collision(n)
+				if _uses_footprint_fallback(rel):
+					_add_footprint_fallback_floor(n)
 		_finalize_authored_node(child)
 
 
@@ -197,14 +215,69 @@ func _place_items(items, collide: bool) -> void:
 			if do_collide:
 				mi.create_trimesh_collision()
 		if do_collide:
-			_add_fallback_floor(inst)
+			_add_walkable_floor_collision(inst)
+			if _uses_footprint_fallback(str(rel)):
+				_add_footprint_fallback_floor(inst)
 
 
-func _add_fallback_floor(inst: Node3D) -> void:
-	# Some converted interiors are missing floor collision (the player/NPCs fall
-	# through and get stuck under the building). Add a thin collision slab at the
-	# building's base, covering its footprint, as a safety net. Only real buildings
-	# get one (small props are skipped).
+func _add_walkable_floor_collision(inst: Node3D) -> void:
+	# Some converted DIF->GLB interiors have renderable floors that do not produce
+	# reliable concave collision everywhere. Add a second, floor-only concave shape
+	# built from upward-facing visual triangles. Unlike the old full-footprint slab,
+	# this follows actual floor geometry and does not put invisible walls across
+	# tower/gate openings.
+	var faces := PackedVector3Array()
+	var to_zone := global_transform.affine_inverse()
+	for mi in _mesh_instances(inst):
+		if mi.mesh == null:
+			continue
+		var mesh_to_zone: Transform3D = to_zone * mi.global_transform
+		for surface in range(mi.mesh.get_surface_count()):
+			var arrays := mi.mesh.surface_get_arrays(surface)
+			if arrays.is_empty():
+				continue
+			var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+			if verts.is_empty():
+				continue
+			var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+			if indices.is_empty():
+				for i in range(0, verts.size() - 2, 3):
+					_append_walkable_tri(faces, mesh_to_zone * verts[i], mesh_to_zone * verts[i + 1], mesh_to_zone * verts[i + 2])
+			else:
+				for i in range(0, indices.size() - 2, 3):
+					_append_walkable_tri(faces, mesh_to_zone * verts[indices[i]], mesh_to_zone * verts[indices[i + 1]], mesh_to_zone * verts[indices[i + 2]])
+	if faces.is_empty():
+		return
+	var body := StaticBody3D.new()
+	body.name = str(inst.name) + "_WalkableFloors"
+	body.collision_layer = 1
+	body.set_meta("zone_glb", inst.get_meta("zone_glb", "building") + " (walkable floors)")
+	var cs := CollisionShape3D.new()
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	cs.shape = shape
+	body.add_child(cs)
+	add_child(body)
+	body.transform = Transform3D.IDENTITY
+
+
+func _append_walkable_tri(faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3) -> void:
+	var n := (b - a).cross(c - a)
+	if n.length_squared() < 0.000001:
+		return
+	n = n.normalized()
+	if n.y < WALKABLE_FLOOR_NORMAL_Y:
+		return
+	faces.append(a)
+	faces.append(b)
+	faces.append(c)
+
+
+func _add_footprint_fallback_floor(inst: Node3D) -> void:
+	# Last-resort safety net for simple buildings whose source has no usable floor
+	# triangles at all. Do not use this on gate/tower/wall pieces: a footprint slab
+	# creates an invisible vertical edge across openings. Only real buildings get
+	# one (small props are skipped).
 	var meshes := _mesh_instances(inst)
 	if meshes.is_empty():
 		return

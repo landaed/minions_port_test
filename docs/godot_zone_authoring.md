@@ -48,6 +48,23 @@ practical step is to add editor-side foliage/scatter helpers (for example
 MultiMesh-based grass/tree painters or marker nodes) that raycast against the
 terrain mesh, rather than replacing the terrain format first.
 
+
+## Building collision notes
+
+Authored interiors now receive two collision passes at runtime:
+
+1. normal concave mesh collision for walls and solid geometry, and
+2. an extra floor-only concave collider generated from upward-facing visual
+   triangles.
+
+The second pass is specifically to fix structures whose visible floors did not
+produce reliable collision from the imported GLB. Broad rectangular footprint
+slabs are now opt-in only in `world/zone_loader.gd` because they can create an
+invisible vertical edge across entrances/gates; this is what made
+`prefabs_tower1` gate openings hard to walk through. If a future building truly
+has no usable floor triangles, add its asset key to `FOOTPRINT_FLOOR_INTERIORS`
+only after confirming the slab does not cover a doorway.
+
 ## Regenerating from `scene.json`
 
 If the converted assets or JSON are rebuilt, regenerate the editable scene with:
