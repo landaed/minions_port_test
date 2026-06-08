@@ -265,6 +265,30 @@ class StubSimAvatar:
             return abs(dz) <= self._VISIBILITY_LAYER_MAX_DZ
         return True
 
+    def _same_npc_home_layer(self, so, other):
+        """Return whether two NPCs belong to the same local spawn layer.
+
+        Original live zones delegated visibility to Torque via TGEGenerateCanSee(),
+        so the world server's aggro code received an engine-filtered list instead
+        of every nearby object in a sphere. The stub has no BSP/portal/navmesh
+        query, so keep NPC-vs-NPC aggro conservative around stacked interiors by
+        comparing spawn homes as well as current positions. Players are excluded:
+        player aggro should still be based on the player's current location.
+        """
+        if getattr(so, "isPlayer", False) or getattr(other, "isPlayer", False):
+            return True
+        home = getattr(so, "_home", getattr(so, "position", None))
+        other_home = getattr(other, "_home", getattr(other, "position", None))
+        if home is None or other_home is None:
+            return True
+        dx = home[0] - other_home[0]
+        dy = home[1] - other_home[1]
+        dz = home[2] - other_home[2]
+        return self._same_visibility_layer(dx, dy, dz)
+
+    def _can_see_pair(self, so, other, dx, dy, dz):
+        return self._same_visibility_layer(dx, dy, dz) and self._same_npc_home_layer(so, other)
+
     def _updateCanSee(self):
         """Compute distance-based canSee for every sim object.
 
@@ -288,7 +312,7 @@ class StubSimAvatar:
                     dy = sy - opos[1]
                     dz = sz - opos[2]
                     in_range = dx * dx + dy * dy + dz * dz <= rng
-                    if in_range and self._same_visibility_layer(dx, dy, dz):
+                    if in_range and self._can_see_pair(so, other, dx, dy, dz):
                         visible.append(other.id)
                 so.canSee = visible
             if not getattr(self, '_cansee_logged', False) and objects:
@@ -372,7 +396,7 @@ class StubSimAvatar:
                 dx = tgt.position[0] - so.position[0]
                 dy = tgt.position[1] - so.position[1]
                 dz = tgt.position[2] - so.position[2]
-                if not self._same_visibility_layer(dx, dy, dz):
+                if not self._can_see_pair(so, tgt, dx, dy, dz):
                     # The radius-only stub LOS can leave pre-fix saves with an
                     # invalid cross-floor target. Drop it instead of flying the
                     # NPC down/up through tower floors toward guards/players.
