@@ -9,6 +9,9 @@ const SERVER_RECONCILE_BLEND := 0.35
 const CAMERA_ZOOM_MIN := 2.5
 const CAMERA_ZOOM_MAX := 14.0
 const CAMERA_ZOOM_STEP := 1.0
+const CAMERA_COLLISION_MASK := 1  # world geometry only; ignore entity markers on layer 2
+const CAMERA_COLLISION_PADDING := 0.35
+const CAMERA_COLLISION_MIN_DISTANCE := 1.2
 const DOF_ENABLED := true
 const DOF_FOCUS_MIN := 4.0
 const DOF_FOCUS_MAX := 120.0
@@ -68,6 +71,7 @@ var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
+var _camera_base_local_offset := Vector3.ZERO
 var _camera_attributes: CameraAttributesPractical = null
 var _dof_focus_distance := DOF_DEFAULT_FOCUS
 var _dead_entity_remove_at: Dictionary = {}
@@ -127,7 +131,8 @@ func _ready():
 	_player_rig = CharacterRigScript.new()
 	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
 	player_body.add_child(_player_rig)
-	_camera_zoom = camera.position.z
+	_camera_base_local_offset = camera.position
+	_camera_zoom = _camera_base_local_offset.z
 	_apply_camera_zoom()
 	_setup_dynamic_dof()
 	_build_hud()
@@ -323,7 +328,46 @@ func _apply_camera_zoom() -> void:
 	if camera == null:
 		return
 	_camera_zoom = clampf(_camera_zoom, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
-	camera.position.z = _camera_zoom
+	_update_camera_collision()
+
+
+func _desired_camera_local_offset() -> Vector3:
+	var desired := _camera_base_local_offset
+	if desired == Vector3.ZERO and camera != null:
+		desired = camera.position
+	desired.z = _camera_zoom
+	return desired
+
+
+func _update_camera_collision() -> void:
+	if camera == null or camera_pitch == null or player_body == null:
+		return
+	var desired_local := _desired_camera_local_offset()
+	var desired_len := desired_local.length()
+	if desired_len <= 0.001:
+		camera.position = desired_local
+		return
+	var pivot := camera_pitch.global_position
+	var desired_global := camera_pitch.to_global(desired_local)
+	var world := player_body.get_world_3d()
+	if world == null:
+		camera.position = desired_local
+		return
+	var query := PhysicsRayQueryParameters3D.create(pivot, desired_global)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	query.collision_mask = CAMERA_COLLISION_MASK
+	query.exclude = [player_body]
+	var hit := world.direct_space_state.intersect_ray(query)
+	if hit and hit.has("position"):
+		var clipped_len := clampf(
+			pivot.distance_to(hit.position) - CAMERA_COLLISION_PADDING,
+			CAMERA_COLLISION_MIN_DISTANCE,
+			desired_len
+		)
+		camera.position = desired_local.normalized() * clipped_len
+	else:
+		camera.position = desired_local
 
 
 func _adjust_camera_zoom(direction: float) -> void:
@@ -1406,6 +1450,7 @@ func _input(event):
 		player_body.rotate_y(-event.relative.x * LOOK_SENSITIVITY)
 		camera_pitch.rotate_x(-event.relative.y * LOOK_SENSITIVITY)
 		camera_pitch.rotation.x = clamp(camera_pitch.rotation.x, deg_to_rad(-70), deg_to_rad(70))
+		_update_camera_collision()
 
 func _physics_process(delta: float) -> void:
 	if not visible:
@@ -1445,6 +1490,8 @@ func _physics_process(delta: float) -> void:
 	if player_body.global_position.y < -50.0:
 		player_body.global_position = Vector3(player_body.global_position.x, 5.0, player_body.global_position.z)
 		velocity = Vector3.ZERO
+
+	_update_camera_collision()
 
 	# Send movement inputs to server periodically
 	_input_sync_timer += delta

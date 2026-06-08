@@ -257,8 +257,8 @@ class StubSimAvatar:
     # They then aggro/chase through the floor and get replicated on the ground.
     # Treat close horizontal / large vertical gaps as different visibility layers
     # (floors) while preserving normal long-range outdoor visibility over hills.
-    _VISIBILITY_LAYER_RADIUS_SQ = 35.0 * 35.0
-    _VISIBILITY_LAYER_MAX_DZ = 12.0
+    _VISIBILITY_LAYER_RADIUS_SQ = 60.0 * 60.0
+    _VISIBILITY_LAYER_MAX_DZ = 5.0
 
     def _same_visibility_layer(self, dx, dy, dz):
         if dx * dx + dy * dy <= self._VISIBILITY_LAYER_RADIUS_SQ:
@@ -272,8 +272,8 @@ class StubSimAvatar:
         so the world server's aggro code received an engine-filtered list instead
         of every nearby object in a sphere. The stub has no BSP/portal/navmesh
         query, so keep NPC-vs-NPC aggro conservative around stacked interiors by
-        comparing spawn homes as well as current positions. Players are excluded:
-        player aggro should still be based on the player's current location.
+        comparing spawn homes as well as current positions. Players are excluded
+        here because the current-position layer check still applies to them.
         """
         if getattr(so, "isPlayer", False) or getattr(other, "isPlayer", False):
             return True
