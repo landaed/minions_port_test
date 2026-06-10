@@ -274,12 +274,16 @@ class AutotestDriver:
 			"spawned":
 				if state_t > 4.0 and _once("spawn_shots"):
 					_step_spawn_shots()
+			"npc_first":
+				# Dialog-focused capture: go straight to an NPC from the fresh
+				# spawn (set MOM_AT_SKIP_COMBAT=1), before combat moves the player.
+				_goto("find_npc")
 			"find_npc":
 				_npc_entity = _nearest_entity(false, false, PREFERRED_NPCS)
 				if not _npc_entity.is_empty():
 					_dump_entities()
 					print("[AUTOTEST] walking to NPC '%s'" % _npc_entity.get("name", "?"))
-					_begin_walk_to_entity(_npc_entity, "at_npc", 1.6)
+					_begin_walk_to_entity(_npc_entity, "at_npc", 1.6, 30.0)
 				elif state_t > 10.0:
 					_goto("inventory_check")
 			"walking":
@@ -345,7 +349,10 @@ class AutotestDriver:
 		view.player_body.rotate_y(PI / 2.0)
 		await _shot("spawn_turned")
 		view.player_body.rotate_y(-PI / 2.0)
-		_goto("combat_start")  # the test mob spawns beside us; fight before touring
+		if OS.get_environment("MOM_AT_SKIP_COMBAT") == "1":
+			_goto("find_npc")  # dialog-focused capture from the fresh spawn
+		else:
+			_goto("combat_start")  # the test mob spawns beside us; fight first
 		_busy = false
 
 	func _step_at_npc() -> void:
