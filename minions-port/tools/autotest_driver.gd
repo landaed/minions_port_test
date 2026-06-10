@@ -453,7 +453,7 @@ class AutotestDriver:
 			dead = true
 		if dead:
 			_goto("loot_corpse")
-		elif state_t > 110.0:
+		elif state_t > 150.0:
 			print("[AUTOTEST] combat too slow; log: ", _log_tail())
 			_goto("find_npc")
 

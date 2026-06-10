@@ -169,15 +169,30 @@ class Loot:
     
     
     def generateCorpseLoot(self):
-        
+
         loot = self.items
-        
+
         if self.corpseLootGenerated:
             return (self.tin or len(loot))
-        
+
         spawn = self.mob.spawn
         proto = self.lootProto
         self.corpseLootGenerated = True
+
+        # Dev/test hook: guarantee a known item on every corpse so the loot
+        # window can be exercised deterministically. Off unless MOM_TEST_FORCE_LOOT
+        # names an ItemProto (e.g. MOM_TEST_FORCE_LOOT="Health Potion").
+        import os as _os
+        _force = _os.environ.get("MOM_TEST_FORCE_LOOT")
+        if _force:
+            try:
+                from mud.world.item import ItemProto
+                fproto = ItemProto.byName(_force)
+                fitem = fproto.createInstance()
+                fitem.slot = -1
+                self.items.append(fitem)
+            except Exception:
+                traceback.print_exc()
         
         if proto:
             #$$$, to do, curve these

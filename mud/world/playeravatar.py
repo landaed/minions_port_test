@@ -1862,8 +1862,18 @@ class PlayerAvatar(Avatar):
             if m and m.id == entity_id and m.simObject:
                 target_mob = m
                 break
+        import os as _os
+        _dbg = _os.environ.get("MOM_DEBUG_COMBAT")
         if target_mob is None:
+            if _dbg:
+                print("[selectEntity] id=%s NOT FOUND (active=%d lookup=%d)" % (
+                    entity_id, len(zone.activeMobs), len(zone.mobLookup)))
             return False
+        if _dbg:
+            print("[selectEntity] id=%s found=%s detached=%s genLoot=%s loot=%s dbl=%s" % (
+                entity_id, target_mob.name, target_mob.detached,
+                getattr(target_mob, 'genLoot', '?'),
+                bool(getattr(target_mob, 'loot', None)), double_click))
         try:
             zone.select(char.mob.simObject, target_mob.simObject, char_index,
                         bool(double_click), bool(shift))

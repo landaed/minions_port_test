@@ -43,6 +43,29 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
+from mud.world.shared.playdata import ItemInfo as _ServerItemInfo
+
+
+class ProxyItemInfoGhost(pb.RemoteCache):
+    """Lightweight stand-in for the client's ItemInfoGhost.
+
+    The real ItemInfoGhost.setCopyableState pulls static columns from the local
+    MoM client DB via mud.client.playermind, which imports client-only modules
+    (skillinfo, GUI) that don't exist in the headless proxy. That import blew up
+    every loot/cursor ItemInfo, breaking the loot window. The wire state already
+    carries the dynamic fields the Godot client needs (NAME, BITMAP, SLOT, ARMOR,
+    STATS, FLAGS, LEVEL, WPNDAMAGE, QUALITY, ...), so just capture it verbatim.
+    """
+
+    def setCopyableState(self, state):
+        self.__dict__.update(state)
+
+    def observe_updateChanged(self, state):
+        self.__dict__.update(state)
+
+
+# Override playdata's registration so the proxy decodes ItemInfo with our ghost.
+pb.setUnjellyableForClass(_ServerItemInfo, ProxyItemInfoGhost)
 
 
 def _json_fallback(obj):
@@ -276,8 +299,8 @@ def _journal_entry_row(entry_id):
 
 
 def _serialize_item_ghost(ghost):
-    """Serialize an ItemInfo RemoteCache (its setCopyableState merged the jellied
-    UPPERCASE state plus baseline-DB lookups into __dict__) to plain JSON data."""
+    """Serialize a proxy ItemInfo ghost (UPPERCASE wire state in __dict__) to
+    plain JSON data, filling proto name/slots from the baseline DB by PROTOID."""
     if ghost is None:
         return None
     if isinstance(ghost, dict):
@@ -290,8 +313,37 @@ def _serialize_item_ghost(ghost):
         stats = [[str(s[0]), float(s[1])] for s in stats]
     except Exception:
         stats = []
+    # The wire ItemInfo carries NAME etc. but not the proto's display name/slots;
+    # resolve those from the baseline DB so the loot/vendor windows read fully.
+    proto_id = get("PROTOID")
+    name = str(get("NAME", "") or "")
+    equip_slots = [int(s) for s in (get("SLOTS") or [])]
+    if proto_id is not None:
+        try:
+            row = _baseline_db().execute(
+                "SELECT name, bitmap FROM item_proto WHERE id = ? LIMIT 1;",
+                (int(proto_id),)).fetchone()
+            if row:
+                if not name:
+                    name = str(row[0] or "")
+            if not equip_slots:
+                equip_slots = [int(s[0]) for s in _baseline_db().execute(
+                    "SELECT slot FROM item_slot WHERE item_proto_id = ?;",
+                    (int(proto_id),))]
+        except Exception:
+            pass
+    bitmap = str(get("BITMAP", "") or "")
+    if not bitmap and proto_id is not None:
+        try:
+            row = _baseline_db().execute(
+                "SELECT bitmap FROM item_proto WHERE id = ? LIMIT 1;",
+                (int(proto_id),)).fetchone()
+            if row:
+                bitmap = str(row[0] or "")
+        except Exception:
+            pass
     return {
-        "name": str(get("NAME", "") or ""),
+        "name": name,
         "slot": int(get("SLOT", -1) or -1),
         "stack_count": int(get("STACKCOUNT", 1) or 1),
         "stack_max": int(get("STACKMAX", 1) or 1),
@@ -304,12 +356,12 @@ def _serialize_item_ghost(ghost):
         "damage": float(get("WPNDAMAGE", 0) or 0),
         "delay": float(get("WPNRATE", 0) or 0),
         "wpn_range": float(get("WPNRANGE", 0) or 0),
-        "bitmap": str(get("BITMAP", "") or ""),
+        "bitmap": bitmap,
         "desc": str(get("DESC", "") or get("EFFECTDESC", "") or ""),
         "skill": str(get("SKILL", "") or ""),
         "worth_tin": int(get("WORTHTIN", 0) or 0),
         "stats": stats,
-        "equip_slots": [int(s) for s in (get("SLOTS") or [])],
+        "equip_slots": equip_slots,
         "repair": float(get("REPAIR", 0) or 0),
         "repair_max": float(get("REPAIRMAX", 0) or 0),
     }

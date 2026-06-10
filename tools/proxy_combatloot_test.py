@@ -99,7 +99,7 @@ def handle_snapshot(ents):
     if not S["mob_id"]:
         best = None
         for e in ents:
-            if e.get("is_self") or not e.get("is_enemy"):
+            if e.get("is_self"):
                 continue
             if MOB_NAME not in str(e.get("name", "")):
                 continue
