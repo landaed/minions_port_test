@@ -1,11 +1,12 @@
-[gd_resource type="ShaderMaterial" load_steps=5 format=3]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://31eek0i4q5pb"]
 
-[ext_resource type="Shader" path="res://world/zone_terrain.gdshader" id="1_shader"]
-[ext_resource type="Texture2D" path="res://assets/trinst/textures/grass01.jpg" id="2_grass"]
-[ext_resource type="Texture2D" path="res://assets/trinst/textures/rock009.jpg" id="3_rock"]
-[ext_resource type="Texture2D" path="res://assets/trinst/textures/sand006.jpg" id="4_sand"]
+[ext_resource type="Shader" uid="uid://dn7lupo1v1tjd" path="res://world/zone_terrain.gdshader" id="1_shader"]
+[ext_resource type="Texture2D" uid="uid://dex60tusa88uc" path="res://assets/trinst/textures/grass01.jpg" id="2_grass"]
+[ext_resource type="Texture2D" uid="uid://cbqcb5ecorw7j" path="res://assets/trinst/textures/rock009.jpg" id="3_rock"]
+[ext_resource type="Texture2D" uid="uid://d20fyhsy8pokb" path="res://assets/trinst/textures/sand006.jpg" id="4_sand"]
 
 [resource]
+render_priority = 0
 shader = ExtResource("1_shader")
 shader_parameter/grass_tex = ExtResource("2_grass")
 shader_parameter/rock_tex = ExtResource("3_rock")
