@@ -3,7 +3,7 @@
 
 Exports the highest detail level: for each object, bakes its node's world
 transform into the vertices, converts Torque's Z-up right-handed space to
-glTF/Godot's Y-up (x, z, -y), flips the V texcoord, and writes one glTF mesh
+glTF/Godot's Y-up (x, z, -y), passes V texcoords through unchanged, and writes one glTF mesh
 with one primitive per material group.
 
 Usage: dts_to_gltf.py <in.dts> <out.glb>
@@ -280,7 +280,8 @@ def convert(dts_path, glb_path):
             nrm = glb.acc_f(norms, 3)
         uv = None
         if mesh.tverts and len(mesh.tverts) == len(mesh.verts):
-            uvs = [(u, 1.0 - vv) for (u, vv) in mesh.tverts]
+            # DTS tverts already match glTF's top-left V convention; no flip.
+            uvs = [(u, vv) for (u, vv) in mesh.tverts]
             uv = glb.acc_f(uvs, 2)
 
         for mat, tris in mesh.tris_by_mat.items():

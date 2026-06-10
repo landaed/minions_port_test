@@ -8,6 +8,9 @@ extends Node3D
 ##   VIEW_PATH  asset to load ("" = empty stage)
 ##   OUT_PATH   screenshot path (default /tmp/view.png)
 ##   ORBIT_DEG  camera yaw around asset (default 35)
+##   PART_TEX   per-part texture overrides like "head=/abs/head3.jpg,body=/abs/body2.jpg"
+##              (matches materials named base.<part>, like the game client does)
+##   FOCUS      "head" to frame only the top quarter of the asset (face close-up)
 
 var _frames := 0
 var _out_path := "/tmp/view.png"
@@ -26,13 +29,58 @@ func _ready() -> void:
 		var loaded := _load_asset(view_path)
 		if loaded != null:
 			add_child(loaded)
+			_apply_part_textures(loaded, _env("PART_TEX", ""))
 			aabb = _node_aabb(loaded)
 			print("ASSET_AABB pos=", aabb.position, " size=", aabb.size,
 				" (W=%.2fm H=%.2fm D=%.2fm)" % [aabb.size.x, aabb.size.y, aabb.size.z])
 		else:
 			push_error("Failed to load: " + view_path)
 
+	if _env("FOCUS", "") == "head" and aabb.size != Vector3.ZERO:
+		# True face close-up: camera 0.8 m from the head, narrow FOV, ignoring the
+		# T-pose wingspan and the generic framing's minimum radius.
+		var c := aabb.position + aabb.size * 0.5
+		var head_center := Vector3(c.x, aabb.end.y - aabb.size.y * 0.085, c.z)
+		var cam := Camera3D.new()
+		add_child(cam)
+		var yaw := deg_to_rad(orbit)
+		cam.fov = 40.0
+		cam.position = head_center + Vector3(sin(yaw), 0.12, cos(yaw)).normalized() * 0.8
+		cam.look_at(head_center, Vector3.UP)
+		return
 	_place_camera(aabb, orbit)
+
+func _apply_part_textures(root: Node, spec: String) -> void:
+	# Mirror CharacterRig.apply_appearance: override base.<part> materials with an
+	# external texture so renders match what the live game shows for NPC skins.
+	if spec.strip_edges() == "":
+		return
+	var overrides := {}
+	for pair in spec.split(","):
+		var kv := pair.split("=")
+		if kv.size() == 2:
+			overrides[kv[0].strip_edges().to_lower()] = kv[1].strip_edges()
+	for mi in _all_mesh_instances(root):
+		var m: Mesh = mi.mesh
+		if m == null:
+			continue
+		for si in range(m.get_surface_count()):
+			var mat := m.surface_get_material(si)
+			if mat == null:
+				continue
+			var nm := str(mat.resource_name).to_lower()
+			var dot := nm.rfind(".")
+			var part := nm.substr(dot + 1) if dot >= 0 else nm
+			if not overrides.has(part):
+				continue
+			var img := Image.load_from_file(overrides[part])
+			if img == null:
+				continue
+			var tex := ImageTexture.create_from_image(img)
+			var sm := StandardMaterial3D.new()
+			sm.albedo_texture = tex
+			mi.set_surface_override_material(si, sm)
+			print("PART_TEX applied: ", part, " <- ", overrides[part])
 
 func _process(_delta: float) -> void:
 	_frames += 1

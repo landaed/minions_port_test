@@ -17,6 +17,10 @@ from mud.worlddocs.utils import GetTWikiName
 
 from math import ceil,floor
 from random import randint
+import os
+
+# Per-round combat tracing for the headless port (off unless MOM_DEBUG_COMBAT=1).
+_COMBAT_DEBUG = bool(os.environ.get("MOM_DEBUG_COMBAT"))
 
 
 
@@ -728,6 +732,11 @@ class CombatProcess(Process):
         # - The source Mob is still targeting the destination Mob.
         # - The destination Mob has health.
         while src.target == dst and dst.health:
+            if _COMBAT_DEBUG:
+                print("[combat] round src=%s tgt=%s hp=%s canSee=%s ptimer=%s inhib=%s" % (
+                    getattr(src, 'name', '?'), getattr(dst, 'name', '?'), dst.health,
+                    (dst.simObject.id in src.simObject.canSee) if (src.simObject and dst.simObject) else '?',
+                    src.primaryAttackTimer, src.combatInhibited))
 
             # For NPC AI, if the destination feigns death, then combat will end.
             # Thus, if the source is not associated with a Player and the
@@ -1292,6 +1301,10 @@ class CombatProcess(Process):
             # Thus, the next iteration will start with checking the while loop's
             # conditions.
             yield True
+        if _COMBAT_DEBUG:
+            print("[combat] EXIT loop src=%s tgt=%s src.target=%s dst.health=%s" % (
+                getattr(src, 'name', '?'), getattr(dst, 'name', '?'),
+                getattr(src.target, 'name', None), dst.health))
 
 
     ## @brief Calculates a random damage amount based on the max damage.

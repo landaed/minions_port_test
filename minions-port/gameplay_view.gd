@@ -28,7 +28,11 @@ const LOOK_SENSITIVITY := 0.003
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const PLAYER_FOOT_OFFSET := 0.9
-const PLAYER_STEP_UP_HEIGHT := 0.75
+# Torque's player datablock allowed ~1.0+ step heights and several MoM stair
+# meshes (and the 1.5x-scaled guard towers) have risers above 0.75, so the old
+# limit left the player bumping into stairs. 1.1 climbs every authored staircase
+# without letting the player walk up walls.
+const PLAYER_STEP_UP_HEIGHT := 1.1
 const PLAYER_STEP_FORWARD_SCALE := 0.9
 const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 14.0
@@ -45,6 +49,15 @@ const ZONE_SCENE_ROOT := "res://world/zones/"
 const CharacterRigScript := preload("res://world/character_rig.gd")
 const DEFAULT_ZONE := "trinst"
 const CHAR_ASSET_DIR := "res://assets/characters/"
+const UICommonScript := preload("res://ui/ui_common.gd")
+const GameWindowScript := preload("res://ui/game_window.gd")
+const SlotButtonScript := preload("res://ui/slot_button.gd")
+const InventoryWindowScript := preload("res://ui/inventory_window.gd")
+const LootWindowScript := preload("res://ui/loot_window.gd")
+const NpcWindowScript := preload("res://ui/npc_window.gd")
+const JournalWindowScript := preload("res://ui/journal_window.gd")
+const SpellbookWindowScript := preload("res://ui/spellbook_window.gd")
+const HotbarScript := preload("res://ui/hotbar.gd")
 
 var world_time := {"hour": 0, "minute": 0}
 var current_payload: Dictionary = {}
@@ -95,7 +108,6 @@ var target_frame: PanelContainer
 var target_name_label: Label
 var target_health_bar: ProgressBar
 var target_health_value_label: Label
-var ability_bar: HBoxContainer
 var hint_label: Label
 var combat_log_label: Label
 var crosshair: Control
@@ -112,9 +124,25 @@ var transfer_label: Label
 var _crosshair_color := Color(1, 1, 1, 0.7)
 var _looking_at_entity := false
 var _looking_at_enemy := false
+var _looking_at_dead := false
 var _looked_entity_id := 0
 var _looking_at_world := ""  # name of the building/world geometry under the crosshair (debug)
 var _debug_visible := false
+
+# --- game windows (inventory / loot / NPC dialog / journal / spellbook) ---
+var inventory_window: InventoryWindow
+var loot_window: LootWindow
+var npc_window: NpcWindow
+var journal_window: JournalWindow
+var spellbook_window: SpellbookWindow
+var hotbar: Hotbar
+var cursor_item_ghost: Button   # follows the mouse while an item is on the cursor
+var _interaction_active := false
+var _ui_char_name := ""          # journal/hotbar persistence key
+var _ui_char_id := 0             # server character DB id for inventory/spell calls
+var _last_inventory: Dictionary = {}
+var _last_spellbook: Dictionary = {}
+var _ui_poll_timer := 0.0
 
 func _ready():
 	set_process_input(true)
@@ -136,6 +164,7 @@ func _ready():
 	_apply_camera_zoom()
 	_setup_dynamic_dof()
 	_build_hud()
+	_build_game_windows()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -269,12 +298,11 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab/Click: target   •   Wheel: zoom   •   Q: auto-attack   •   1-8: abilities   •   E: interact   •   U: unstuck   •   F3: debug"
+	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  U: unstuck  •  F3: debug"
 	bottom.add_child(hint_label)
-	ability_bar = HBoxContainer.new()
-	ability_bar.alignment = BoxContainer.ALIGNMENT_CENTER
-	ability_bar.add_theme_constant_override("separation", 4)
-	bottom.add_child(ability_bar)
+	hotbar = HotbarScript.new()
+	hotbar.action_triggered.connect(_on_hotbar_action)
+	bottom.add_child(hotbar)
 
 	# Combat log (bottom-left).
 	var log_panel := PanelContainer.new()
@@ -323,6 +351,187 @@ func _build_hud():
 	transfer_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	transfer_label.add_theme_font_size_override("font_size", 11)
 	dv.add_child(transfer_label)
+
+# ---------------------------------------------------------------------------
+# Game windows: inventory / loot / NPC dialog+vendor / journal / spellbook
+# ---------------------------------------------------------------------------
+func _build_game_windows():
+	inventory_window = InventoryWindowScript.new()
+	inventory_window.position = Vector2(620, 90)
+	inventory_window.inv_slot_clicked.connect(_on_inventory_slot_clicked)
+	inventory_window.destroy_cursor_requested.connect(_on_destroy_cursor)
+	add_child(inventory_window)
+
+	loot_window = LootWindowScript.new()
+	loot_window.position = Vector2(360, 200)
+	loot_window.loot_slot_clicked.connect(_on_loot_slot_clicked)
+	loot_window.take_all_requested.connect(_on_take_all_loot)
+	loot_window.looting_ended.connect(func(): _request_server_command("end_looting"))
+	add_child(loot_window)
+
+	npc_window = NpcWindowScript.new()
+	npc_window.position = Vector2(280, 110)
+	npc_window.choice_selected.connect(_on_dialog_choice)
+	npc_window.buy_requested.connect(func(index): _request_server_command("buy_item", {"index": index}))
+	npc_window.sell_requested.connect(func(slot): _request_server_command("sell_item", {"slot": slot}))
+	npc_window.interaction_ended.connect(_on_interaction_window_closed)
+	add_child(npc_window)
+
+	journal_window = JournalWindowScript.new()
+	journal_window.position = Vector2(120, 120)
+	add_child(journal_window)
+
+	spellbook_window = SpellbookWindowScript.new()
+	spellbook_window.position = Vector2(460, 120)
+	spellbook_window.cast_spell.connect(func(book_slot): _request_server_command("spell_slot", {"char_id": _ui_char_id, "slot": book_slot}))
+	spellbook_window.use_skill.connect(func(skill_name): _request_server_command("use_ability", {"ability_name": skill_name}))
+	add_child(spellbook_window)
+
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+		w.visibility_changed.connect(_on_window_visibility_changed)
+
+	# Item-on-cursor ghost that follows the mouse while rearranging inventory.
+	cursor_item_ghost = Button.new()
+	cursor_item_ghost.visible = false
+	cursor_item_ghost.disabled = true
+	cursor_item_ghost.custom_minimum_size = Vector2(40, 40)
+	cursor_item_ghost.expand_icon = true
+	cursor_item_ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cursor_item_ghost.z_index = 200
+	UICommonScript.style_button(cursor_item_ghost)
+	add_child(cursor_item_ghost)
+
+func _on_window_visibility_changed():
+	# Free the mouse while any window is up; back to mouselook when all close.
+	if not visible:
+		return
+	if _ui_open():
+		_release_mouse()
+	else:
+		_capture_mouse()
+
+func _toggle_inventory():
+	if inventory_window.visible:
+		inventory_window.close_window()
+	else:
+		_request_server_command("get_inventory")
+		inventory_window.open_window()
+
+func _toggle_journal():
+	journal_window.toggle_window()
+
+func _toggle_spellbook():
+	if spellbook_window.visible:
+		spellbook_window.close_window()
+	else:
+		_request_server_command("get_spellbook")
+		spellbook_window.apply_skills(_abilities())
+		spellbook_window.open_window()
+
+func _on_inventory_slot_clicked(slot: int, alt: bool, ctrl: bool):
+	if ctrl:
+		_request_server_command("inv_use", {"char_id": _ui_char_id, "slot": slot})
+	elif alt:
+		_request_server_command("inv_click_alt", {"char_id": _ui_char_id, "slot": slot})
+	else:
+		_request_server_command("inv_click", {"char_id": _ui_char_id, "slot": slot})
+
+func _on_destroy_cursor():
+	_request_server_command("destroy_cursor")
+	_push_log("Destroyed the item on the cursor.")
+
+func _on_loot_slot_clicked(slot: int):
+	_request_server_command("loot_item", {"slot": slot, "alt": true})
+
+func _on_take_all_loot():
+	# Loot slot 0 repeatedly: the server compacts the table after each take and
+	# pushes a refresh, so taking the head of the list drains everything.
+	_request_server_command("loot_item", {"slot": 0, "alt": true})
+
+func _on_dialog_choice(index: int):
+	_request_server_command("dialog_choice", {"index": index})
+
+func _on_interaction_window_closed():
+	if _interaction_active:
+		_interaction_active = false
+		_request_server_command("end_interaction")
+
+func _ensure_interaction(npc: String):
+	if not _interaction_active:
+		_interaction_active = true
+		npc_window.begin(npc)
+	elif not npc.is_empty():
+		npc_window.title_label.text = npc
+
+func handle_ui_message(data: Dictionary):
+	match str(data.get("type", "")):
+		"inventory":
+			_last_inventory = data
+			_ui_char_id = int(data.get("char_id", _ui_char_id))
+			var cname := str(data.get("char_name", ""))
+			if not cname.is_empty() and cname != _ui_char_name:
+				_ui_char_name = cname
+				journal_window.load_for(cname)
+				hotbar.load_for(cname)
+				_rebuild_ability_bar()
+			inventory_window.apply_snapshot(data)
+			npc_window.set_sellables(data.get("items", []))
+			_update_cursor_ghost(data.get("cursor"))
+		"cursor_item":
+			var item = data.get("item")
+			inventory_window.set_cursor_item(item if item is Dictionary else {})
+			_update_cursor_ghost(item)
+		"loot":
+			var items = data.get("items", {})
+			loot_window.apply_loot(items if items is Dictionary else {})
+		"npc_window":
+			_ensure_interaction(str(data.get("name", "")))
+		"npc_dialog_start":
+			_ensure_interaction(str(data.get("npc", "")))
+			if bool(data.get("has_dialog", false)):
+				npc_window.add_line(str(data.get("text", "")), data.get("choices", []))
+			_maybe_add_journal(data.get("journal"))
+		"npc_dialog":
+			_ensure_interaction("")
+			npc_window.add_line(str(data.get("text", "")), data.get("choices", []))
+			_maybe_add_journal(data.get("journal"))
+		"npc_window_close":
+			_interaction_active = false
+			if npc_window.visible:
+				npc_window.visible = false
+				_on_window_visibility_changed()
+		"vendor_stock":
+			if bool(data.get("is_vendor", false)):
+				_ensure_interaction("")
+				npc_window.set_stock(data.get("items", []), float(data.get("markup", 1.0)))
+				npc_window.set_sellables(_last_inventory.get("items", []))
+				_request_server_command("get_inventory")
+		"journal_entry":
+			_maybe_add_journal(data)
+		"spellbook":
+			_last_spellbook = data
+			_ui_char_id = int(data.get("char_id", _ui_char_id))
+			spellbook_window.apply_spellbook(data)
+			hotbar.update_cooldowns(_abilities(), data.get("spells", []))
+
+func _maybe_add_journal(journal) -> void:
+	if not (journal is Dictionary) or journal.is_empty():
+		return
+	var topic := str(journal.get("topic", ""))
+	var entry := str(journal.get("entry", ""))
+	var text := str(journal.get("text", ""))
+	if topic.is_empty() and entry.is_empty():
+		return
+	if journal_window.add_entry(topic, entry, text):
+		_push_log("Journal updated: %s — %s  (press J)" % [topic, entry])
+
+func _update_cursor_ghost(item) -> void:
+	if item is Dictionary and not item.is_empty():
+		cursor_item_ghost.icon = UICommonScript.item_icon(str(item.get("bitmap", "")))
+		cursor_item_ghost.text = "" if cursor_item_ghost.icon != null else str(item.get("name", "?")).left(8)
+		cursor_item_ghost.visible = true
+	else:
+		cursor_item_ghost.visible = false
 
 func _apply_camera_zoom() -> void:
 	if camera == null:
@@ -455,18 +664,21 @@ func _update_look_at():
 	query.collide_with_bodies = true
 	var result := player_body.get_world_3d().direct_space_state.intersect_ray(query)
 	_looking_at_world = ""
+	var dead := false
 	if not result.is_empty():
 		var collider = result.get("collider")
 		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
 			looking = true
 			var ent: Dictionary = collider.get_meta("entity", {})
 			enemy = bool(ent.get("is_enemy", false))
+			dead = bool(ent.get("dead", false)) or float(ent.get("health", 1.0)) <= 0.0
 			_looked_entity_id = int(collider.get_meta("entity_id", 0))
 		elif collider != null and collider is Node:
 			# World geometry — report which building, to help identify e.g. the gate.
 			_looking_at_world = _find_zone_glb_name(collider)
 	_looking_at_entity = looking
 	_looking_at_enemy = enemy
+	_looking_at_dead = dead
 	var new_col: Color
 	if enemy:
 		new_col = Color(1.0, 0.3, 0.3, 1.0)
@@ -780,6 +992,12 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 	qt.collision_mask = TERRAIN_MASK
 	var ht: Dictionary = space.intersect_ray(qt)
 	var ter_y := float(ht.position.y) if (ht and ht.has("position")) else fallback
+	# The server height is authoritative for which *floor* an entity is on. If it
+	# says the entity sits well above the terrain (tower/upper-storey spawns) but
+	# no walkable surface was found near that height, keep the server height —
+	# dropping to the terrain teleports interior mobs to the ground floor and
+	# makes them visibly "fall" through the building.
+	var elevated := (fallback - ter_y) > 3.0
 	# First solid from above (terrain or building floor; entities are on layer 2).
 	var qa := PhysicsRayQueryParameters3D.create(from, to)
 	qa.collide_with_areas = false
@@ -788,12 +1006,10 @@ func _ground_y(x: float, z: float, fallback: float) -> float:
 	if ha and ha.has("position"):
 		var any_y := float(ha.position.y)
 		# A high hit far from the server's expected height is probably a roof/canopy.
-		# Keep the old terrain fallback for those, but allow elevated floors when they
-		# were close enough to the authoritative fallback height to be found above.
 		if ht and (any_y - ter_y) > 5.0:
-			return ter_y
+			return fallback if elevated else ter_y
 		return any_y
-	return ter_y
+	return fallback if elevated else ter_y
 
 func _godot_direction_to_server(godot_dir: Vector3) -> Array:
 	"""Convert a Godot direction vector to server coordinates (no origin offset)."""
@@ -810,33 +1026,42 @@ func _godot_world_to_server(godot_pos: Vector3) -> Array:
 	var server_space_pos := godot_pos - _server_origin_offset
 	return [server_space_pos.x, -server_space_pos.z, server_space_pos.y]
 
-func _try_step_up(horizontal_motion: Vector3, was_on_floor: bool) -> void:
-	# CharacterBody3D has slope snapping but no built-in stair stepping. When a
-	# grounded move hits a low vertical riser, probe the same horizontal move from a
-	# small lifted position and settle back down onto the first floor below. This
-	# keeps Trinst stairs walkable without letting server reconciliation tunnel the
-	# player through full-height walls.
+func _try_step_up(horizontal_motion: Vector3, was_on_floor: bool, pre_move_pos: Vector3) -> void:
+	# CharacterBody3D has slope snapping but no built-in stair stepping. Whenever a
+	# grounded move was meaningfully blocked horizontally (stair riser, raised
+	# doorstep, ledge built into a larger mesh), retry it from a lifted position
+	# and settle onto the first floor below. The classic up-forward-down sweep.
 	if not was_on_floor or horizontal_motion.length_squared() < 0.000001:
 		return
-	var hit_riser := false
-	for i in range(player_body.get_slide_collision_count()):
-		var collision := player_body.get_slide_collision(i)
-		if collision != null and absf(collision.get_normal().y) < 0.25:
-			hit_riser = true
-			break
-	if not hit_riser:
+	# Trigger on lost horizontal progress, not just on near-vertical contact
+	# normals: trimesh stair edges often report tilted normals that the old
+	# riser-only check missed, which is why many staircases were unclimbable.
+	var actual := player_body.global_position - pre_move_pos
+	var actual_h := Vector2(actual.x, actual.z)
+	var wanted_h := Vector2(horizontal_motion.x, horizontal_motion.z)
+	if actual_h.length() >= wanted_h.length() * 0.55:
 		return
 
 	var original_pos := player_body.global_position
-	var up := Vector3.UP * PLAYER_STEP_UP_HEIGHT
-	if player_body.move_and_collide(up, true) != null:
-		return
-	var lifted_pos := original_pos + up
+	# Find the real headroom (may be under a low stairwell ceiling): lift as far
+	# as possible up to the step height instead of giving up on any contact.
+	var lift := PLAYER_STEP_UP_HEIGHT
+	var up_hit := player_body.move_and_collide(Vector3.UP * lift, true)
+	if up_hit != null:
+		lift = maxf(up_hit.get_travel().y - 0.02, 0.0)
+		if lift < 0.15:
+			return  # not enough clearance to step
+	var lifted_pos := original_pos + Vector3.UP * lift
 	player_body.global_position = lifted_pos
 	var step_motion := horizontal_motion * PLAYER_STEP_FORWARD_SCALE
-	if player_body.move_and_collide(step_motion, true) != null:
-		player_body.global_position = original_pos
-		return
+	var fwd_hit := player_body.move_and_collide(step_motion, true)
+	if fwd_hit != null:
+		# Take whatever forward travel is free; if there is almost none the
+		# obstacle is a real wall, so bail out.
+		step_motion = fwd_hit.get_travel()
+		if Vector2(step_motion.x, step_motion.z).length() < 0.02:
+			player_body.global_position = original_pos
+			return
 
 	var candidate_pos := lifted_pos + step_motion
 	var world := player_body.get_world_3d()
@@ -844,7 +1069,7 @@ func _try_step_up(horizontal_motion: Vector3, was_on_floor: bool) -> void:
 		player_body.global_position = original_pos
 		return
 	var q := PhysicsRayQueryParameters3D.create(
-		candidate_pos, candidate_pos - Vector3.UP * (PLAYER_STEP_UP_HEIGHT + player_body.floor_snap_length + 0.25))
+		candidate_pos, candidate_pos - Vector3.UP * (lift + player_body.floor_snap_length + 0.25))
 	q.collide_with_areas = false
 	q.collision_mask = 1
 	q.exclude = [player_body]
@@ -1078,6 +1303,9 @@ func _sync_entity_markers():
 				player_body.global_position = Vector3(0.0, 2.0, 0.0)
 				print("[Godot] SPAWN from entity snapshot: raw=%s  converted=%s  offset=%s" % [str(raw_pos), str(server_pos_raw), str(_server_origin_offset)])
 				_load_zone_art()
+				# Prime the UI data (inventory for char/journal identity, spellbook).
+				_request_server_command("get_inventory")
+				_request_server_command("get_spellbook")
 				break
 			var server_pos := _server_to_godot(raw_pos)
 			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:
@@ -1105,17 +1333,11 @@ func _sync_entity_markers():
 		var entity_key := _entity_key(entity)
 		var entity_dead := bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0
 		if entity_dead:
-			# Keep a dead entity visible briefly so its death animation (when present)
-			# can read before it disappears. This is much clearer than instantly
-			# removing it on the same snapshot that reports 0 HP.
+			# Corpses stay visible (and clickable for looting) for as long as the
+			# server streams them — the server removes them once fully looted or
+			# on the corpse timer. Clear any combat highlight, keep the body.
 			if entity_key == _highlighted_entity_key:
 				_highlight_entity("")
-			if not server_target_description.is_empty() and _entity_key(server_target_description) == entity_key:
-				server_target_description = {}
-			if not _dead_entity_remove_at.has(entity_key):
-				_dead_entity_remove_at[entity_key] = now_seconds + ENTITY_DEATH_DESPAWN_DELAY
-			if now_seconds >= float(_dead_entity_remove_at.get(entity_key, now_seconds)):
-				continue
 			var dead_entity: Dictionary = entity.duplicate(true)
 			dead_entity["dead"] = true
 			dead_entity["health"] = 0.0
@@ -1192,67 +1414,19 @@ func _ability_signature() -> String:
 			])
 	return "|".join(names)
 
-func _button_label(slot_index: int, ability: Dictionary) -> String:
-	var name := str(ability.get("name", DEFAULT_ABILITY_NAMES[min(slot_index, DEFAULT_ABILITY_NAMES.size() - 1)]))
-	var prefix := "%d: %s" % [slot_index + 1, name]
-	var cooldown_seconds := int(ability.get("cooldown_seconds", 0))
-	if bool(ability.get("cooldown_active", false)):
-		prefix += " (%ds)" % max(cooldown_seconds, 1)
-	return prefix
-
 func _rebuild_ability_bar():
-	if ability_bar == null:
+	# Feed the hotbar + spellbook "Abilities" tab from the server skill list.
+	if hotbar == null:
 		return
 	var signature := _ability_signature()
 	if signature == last_abilities_signature:
 		return
 	last_abilities_signature = signature
-	for child in ability_bar.get_children():
-		child.queue_free()
 	var abilities := _abilities()
-	for i in range(8):
-		var button := Button.new()
-		button.focus_mode = Control.FOCUS_NONE
-		button.custom_minimum_size = Vector2(96, 44)
-		button.clip_text = true
-		var filled := i < abilities.size() and abilities[i] is Dictionary
-		if filled:
-			var ability: Dictionary = abilities[i]
-			button.text = _button_label(i, ability)
-			button.disabled = bool(ability.get("cooldown_active", false))
-			button.tooltip_text = _ability_tooltip(ability)
-		else:
-			button.text = "%d" % [i + 1]
-			button.disabled = true
-		_style_ability_button(button, filled)
-		button.pressed.connect(_on_ability_pressed.bind(i))
-		ability_bar.add_child(button)
-
-func _style_ability_button(button: Button, filled: bool):
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = Color(0.13, 0.15, 0.19, 0.92) if filled else Color(0.08, 0.09, 0.11, 0.8)
-	normal.border_color = Color(0.45, 0.62, 0.85) if filled else Color(0.22, 0.24, 0.28)
-	normal.set_border_width_all(1)
-	normal.set_corner_radius_all(4)
-	var hover := normal.duplicate()
-	hover.bg_color = Color(0.20, 0.24, 0.30, 0.95)
-	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("hover", hover)
-	button.add_theme_stylebox_override("pressed", hover)
-	button.add_theme_stylebox_override("disabled", normal)
-	button.add_theme_font_size_override("font_size", 12)
-	button.add_theme_color_override("font_color", Color(0.92, 0.94, 0.98) if filled else Color(0.45, 0.48, 0.54))
-	button.add_theme_color_override("font_disabled_color", Color(0.5, 0.54, 0.6) if filled else Color(0.35, 0.38, 0.43))
-
-func _ability_tooltip(ability: Dictionary) -> String:
-	var source := str(ability.get("source", "server"))
-	var name := str(ability.get("name", "Ability"))
-	var tooltip := "%s\nRank: %s\nSource: %s" % [name, str(ability.get("rank", 1)), source]
-	if source == "server":
-		tooltip += "\nUses the legacy server skill list from RootInfo."
-	else:
-		tooltip += "\nFallback only because no server skills were available."
-	return tooltip
+	hotbar.default_fill_from_skills(abilities)
+	hotbar.update_cooldowns(abilities, _last_spellbook.get("spells", []))
+	if spellbook_window:
+		spellbook_window.apply_skills(abilities)
 
 func _bridge_status_text() -> String:
 	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
@@ -1345,6 +1519,18 @@ func _request_server_command(command_type: String, payload: Dictionary = {}):
 	command_requested.emit(command_type, payload)
 
 func _send_interact_command():
+	# E does the contextual thing: loot the dead entity in front of you (or the
+	# dead target), otherwise INTERACT (dialog/vendor/trainer) with the target.
+	if _looking_at_entity and _looking_at_dead and _looked_entity_id > 0:
+		interaction_message = "Looting corpse %d." % _looked_entity_id
+		_request_server_command("select_entity", {"entity_id": _looked_entity_id, "double_click": true})
+		return
+	var tgt_dead := bool(server_target_description.get("dead", false))
+	var tgt_id := int(server_target_description.get("id", 0))
+	if tgt_dead and tgt_id > 0:
+		interaction_message = "Looting corpse %d." % tgt_id
+		_request_server_command("select_entity", {"entity_id": tgt_id, "double_click": true})
+		return
 	interaction_message = "Sent INTERACT to the legacy world server."
 	_request_server_command("interact")
 
@@ -1356,15 +1542,15 @@ func _toggle_autoattack():
 	interaction_message = "Sent ATTACK toggle to the legacy world server."
 	_request_server_command("attack_toggle")
 
-func _activate_ability(slot_index: int):
-	var abilities := _abilities()
-	if slot_index < 0 or slot_index >= abilities.size():
-		interaction_message = "That ability slot is empty."
-		return
-	var ability: Dictionary = abilities[slot_index]
-	var ability_name := str(ability.get("name", "Ability"))
-	if str(ability.get("source", "server")) != "server":
-		interaction_message = "%s is only a fallback placeholder because no server skill data was available." % ability_name
+func _on_hotbar_action(payload: Dictionary):
+	var action := str(payload.get("action", "skill"))
+	var ability_name := str(payload.get("name", ""))
+	if action == "spell":
+		interaction_message = "Casting %s." % ability_name
+		_request_server_command("spell_slot", {
+			"char_id": _ui_char_id,
+			"slot": int(payload.get("book_slot", 0)),
+		})
 		return
 	interaction_message = "Sent SKILL %s to the legacy world server." % ability_name
 	# Play the attack swing locally for immediate feedback (server confirms via the
@@ -1390,29 +1576,52 @@ func _target_entity_from_click(screen_position: Vector2) -> bool:
 	if entity_id <= 0:
 		return false
 	var entity: Dictionary = collider.get_meta("entity", {})
+	if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
+		interaction_message = "Looting %s." % str(entity.get("name", "corpse"))
+		_request_server_command("select_entity", {"entity_id": entity_id, "double_click": true})
+		return true
 	interaction_message = "Targeted %s on the legacy world server." % str(entity.get("public_name", entity.get("name", "entity")))
 	_request_server_command("target_entity", {"entity_id": entity_id})
 	return true
 
-func _on_ability_pressed(slot_index: int):
-	_activate_ability(slot_index)
+func _ui_open() -> bool:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+		if w != null and w.visible:
+			return true
+	return false
+
+func _close_all_windows():
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+		if w != null and w.visible:
+			w.close_window()
 
 func _input(event):
 	if not visible:
 		return
+	var ui_open := _ui_open()
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		if ui_open:
+			return
 		_adjust_camera_zoom(-1.0)
 		_capture_mouse()
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		if ui_open:
+			return
 		_adjust_camera_zoom(1.0)
 		_capture_mouse()
 	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if ui_open:
+			return  # windows take the mouse; world clicks resume when they close
 		var selected := _target_entity_from_click(event.position)
 		_capture_mouse()
 		if selected:
 			_update_labels()
 	elif event.is_action_pressed("ui_cancel"):
-		_release_mouse()
+		if ui_open:
+			_close_all_windows()
+			_capture_mouse()
+		else:
+			_release_mouse()
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_SPACE:
@@ -1425,22 +1634,32 @@ func _input(event):
 				_toggle_autoattack()
 			KEY_TAB:
 				_cycle_target()
+			KEY_I:
+				_toggle_inventory()
+			KEY_J:
+				_toggle_journal()
+			KEY_P, KEY_B:
+				_toggle_spellbook()
 			KEY_1, KEY_KP_1:
-				_activate_ability(0)
+				hotbar.activate(0)
 			KEY_2, KEY_KP_2:
-				_activate_ability(1)
+				hotbar.activate(1)
 			KEY_3, KEY_KP_3:
-				_activate_ability(2)
+				hotbar.activate(2)
 			KEY_4, KEY_KP_4:
-				_activate_ability(3)
+				hotbar.activate(3)
 			KEY_5, KEY_KP_5:
-				_activate_ability(4)
+				hotbar.activate(4)
 			KEY_6, KEY_KP_6:
-				_activate_ability(5)
+				hotbar.activate(5)
 			KEY_7, KEY_KP_7:
-				_activate_ability(6)
+				hotbar.activate(6)
 			KEY_8, KEY_KP_8:
-				_activate_ability(7)
+				hotbar.activate(7)
+			KEY_9, KEY_KP_9:
+				hotbar.activate(8)
+			KEY_0, KEY_KP_0:
+				hotbar.activate(9)
 			KEY_F3:
 				_debug_visible = not _debug_visible
 				if debug_panel:
@@ -1483,9 +1702,10 @@ func _physics_process(delta: float) -> void:
 	jump_requested = false
 	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
+	var pre_move_pos := player_body.global_position
 	player_body.velocity = velocity
 	player_body.move_and_slide()
-	_try_step_up(horizontal_motion, was_on_floor)
+	_try_step_up(horizontal_motion, was_on_floor, pre_move_pos)
 	# Safety net: teleport back above the platform if player falls
 	if player_body.global_position.y < -50.0:
 		player_body.global_position = Vector3(player_body.global_position.x, 5.0, player_body.global_position.z)
@@ -1522,6 +1742,10 @@ func _physics_process(delta: float) -> void:
 
 	# Interpolate replicated entity positions toward server targets, and drive each
 	# NPC's animation from how fast its marker is actually moving.
+	var entity_space: PhysicsDirectSpaceState3D = null
+	var entity_world := sub_viewport.find_world_3d() if sub_viewport else null
+	if entity_world != null:
+		entity_space = entity_world.direct_space_state
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
@@ -1529,8 +1753,37 @@ func _physics_process(delta: float) -> void:
 		var prev_xz := Vector2(body.position.x, body.position.z)
 		if body.position.distance_to(target_position) > ENTITY_SNAP_DISTANCE:
 			body.position = target_position
+			body.set_meta("stuck_time", 0.0)
 		else:
-			body.position = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+			var desired: Vector3 = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
+			# The headless server has no world collision, so a chasing/returning
+			# mob's straight-line path can cross walls. Clamp each interpolation
+			# step against world geometry at knee height; if the marker stays
+			# blocked while the server target keeps moving away, snap to the
+			# server position so the mob can't be left behind forever.
+			var step_vec: Vector3 = desired - body.position
+			var step_h := Vector3(step_vec.x, 0.0, step_vec.z)
+			if entity_space != null and step_h.length() > 0.002:
+				var ray_from: Vector3 = body.position + Vector3(0, 0.55, 0)
+				var rq := PhysicsRayQueryParameters3D.create(ray_from, ray_from + step_h)
+				rq.collide_with_areas = false
+				rq.collision_mask = 1
+				var rh: Dictionary = entity_space.intersect_ray(rq)
+				if rh and rh.has("position"):
+					var free := maxf(ray_from.distance_to(rh.position) - 0.25, 0.0)
+					var dir := step_h.normalized()
+					desired.x = body.position.x + dir.x * free
+					desired.z = body.position.z + dir.z * free
+			body.position = desired
+			var lag := Vector2(body.position.x - target_position.x, body.position.z - target_position.z).length()
+			if lag > 1.5:
+				var stuck := float(body.get_meta("stuck_time", 0.0)) + delta
+				if stuck >= 2.0:
+					body.position = target_position
+					stuck = 0.0
+				body.set_meta("stuck_time", stuck)
+			else:
+				body.set_meta("stuck_time", 0.0)
 		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
 		var inst_speed := moved / maxf(delta, 0.001)
 		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
@@ -1539,6 +1792,19 @@ func _physics_process(delta: float) -> void:
 		if rig != null and is_instance_valid(rig):
 			var ent: Dictionary = body.get_meta("entity", {})
 			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
+
+	# Cursor-item ghost follows the mouse while a window is open.
+	if cursor_item_ghost and cursor_item_ghost.visible:
+		cursor_item_ghost.position = get_local_mouse_position() + Vector2(14, 10)
+
+	# Periodically refresh open windows so cooldowns/charges stay current.
+	_ui_poll_timer += delta
+	if _ui_poll_timer >= 2.0:
+		_ui_poll_timer = 0.0
+		if inventory_window and inventory_window.visible:
+			_request_server_command("get_inventory")
+		if spellbook_window and spellbook_window.visible:
+			_request_server_command("get_spellbook")
 
 	_update_dynamic_dof(delta)
 	_update_look_at()

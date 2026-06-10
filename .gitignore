@@ -21,3 +21,6 @@ data/character/
 # Godot extracts embedded glTF character textures on import (glb is self-contained)
 minions-port/assets/characters/*.jpg
 minions-port/assets/characters/*.png
+
+# Godot editor/import cache
+minions-port/.godot/
