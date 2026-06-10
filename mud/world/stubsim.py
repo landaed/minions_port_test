@@ -252,6 +252,42 @@ class StubSimAvatar:
     # ---- visibility updates (replaces SimMind.updateCanSee) ----
 
     _VISIBILITY_RANGE_SQ = 500.0 * 500.0
+    # The headless sim has no Torque BSP/portal LOS queries, so a pure radius
+    # test makes NPCs on stacked tower floors see guards directly below them.
+    # They then aggro/chase through the floor and get replicated on the ground.
+    # Treat close horizontal / large vertical gaps as different visibility layers
+    # (floors) while preserving normal long-range outdoor visibility over hills.
+    _VISIBILITY_LAYER_RADIUS_SQ = 60.0 * 60.0
+    _VISIBILITY_LAYER_MAX_DZ = 5.0
+
+    def _same_visibility_layer(self, dx, dy, dz):
+        if dx * dx + dy * dy <= self._VISIBILITY_LAYER_RADIUS_SQ:
+            return abs(dz) <= self._VISIBILITY_LAYER_MAX_DZ
+        return True
+
+    def _same_npc_home_layer(self, so, other):
+        """Return whether two NPCs belong to the same local spawn layer.
+
+        Original live zones delegated visibility to Torque via TGEGenerateCanSee(),
+        so the world server's aggro code received an engine-filtered list instead
+        of every nearby object in a sphere. The stub has no BSP/portal/navmesh
+        query, so keep NPC-vs-NPC aggro conservative around stacked interiors by
+        comparing spawn homes as well as current positions. Players are excluded
+        here because the current-position layer check still applies to them.
+        """
+        if getattr(so, "isPlayer", False) or getattr(other, "isPlayer", False):
+            return True
+        home = getattr(so, "_home", getattr(so, "position", None))
+        other_home = getattr(other, "_home", getattr(other, "position", None))
+        if home is None or other_home is None:
+            return True
+        dx = home[0] - other_home[0]
+        dy = home[1] - other_home[1]
+        dz = home[2] - other_home[2]
+        return self._same_visibility_layer(dx, dy, dz)
+
+    def _can_see_pair(self, so, other, dx, dy, dz):
+        return self._same_visibility_layer(dx, dy, dz) and self._same_npc_home_layer(so, other)
 
     def _updateCanSee(self):
         """Compute distance-based canSee for every sim object.
@@ -275,7 +311,8 @@ class StubSimAvatar:
                     dx = sx - opos[0]
                     dy = sy - opos[1]
                     dz = sz - opos[2]
-                    if dx * dx + dy * dy + dz * dz <= rng:
+                    in_range = dx * dx + dy * dy + dz * dz <= rng
+                    if in_range and self._can_see_pair(so, other, dx, dy, dz):
                         visible.append(other.id)
                 so.canSee = visible
             if not getattr(self, '_cansee_logged', False) and objects:
@@ -359,6 +396,12 @@ class StubSimAvatar:
                 dx = tgt.position[0] - so.position[0]
                 dy = tgt.position[1] - so.position[1]
                 dz = tgt.position[2] - so.position[2]
+                if not self._can_see_pair(so, tgt, dx, dy, dz):
+                    # The radius-only stub LOS can leave pre-fix saves with an
+                    # invalid cross-floor target. Drop it instead of flying the
+                    # NPC down/up through tower floors toward guards/players.
+                    so.moveTarget = None
+                    continue
                 dist = sqrt(dx * dx + dy * dy + dz * dz)
                 # Always face target, even when arrived
                 if abs(dx) > 0.01 or abs(dy) > 0.01:
