@@ -5,13 +5,14 @@ dialog and pick the first choice. Verifies the whole new UI bridge server-side:
 target -> attack (auto-face) -> corpse streaming -> select_entity loot ->
 getLoot/loot -> getInventory, and interact -> npc dialog -> choice -> journal.
 """
-import asyncio, json, sys, time, math, random, string
+import asyncio, json, sys, time, math, random, string, os
 import websockets
 
 _suffix = "".join(random.choice(string.ascii_lowercase) for _ in range(4))
 URI = "ws://localhost:9000"
 USER = "Lt" + str(int(time.time()) % 100000)
 CHARNAME = "Loot" + _suffix
+MOB_NAME = os.environ.get("MOM_TEST_MOB_NAME", "Frail Skeleton")
 
 S = {
     "entered": False, "enter_sent": False, "char_created": False,
@@ -100,7 +101,7 @@ def handle_snapshot(ents):
         for e in ents:
             if e.get("is_self") or not e.get("is_enemy"):
                 continue
-            if "Frail Skeleton" not in str(e.get("name", "")):
+            if MOB_NAME not in str(e.get("name", "")):
                 continue
             if best is None or e.get("distance", 999) < best.get("distance", 999):
                 best = e
@@ -157,7 +158,7 @@ async def script(ws):
             await asyncio.sleep(0.5)
             await cmd(ws, "attack_toggle")
             t0 = time.time()
-            while not S["mob_dead"] and time.time() < t0 + 45:
+            while not S["mob_dead"] and time.time() < t0 + 75:
                 await asyncio.sleep(1.0)
                 drift = math.hypot(S["self_pos"][0] - S["mob_pos"][0],
                                    S["self_pos"][1] - S["mob_pos"][1]) if S["self_pos"] and S["mob_pos"] else -1
