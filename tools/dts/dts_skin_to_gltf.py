@@ -324,7 +324,10 @@ def convert(model_path, out_path, anims, tex_dir=None, tex_indices=None, single_
                 nrm = glb.acc_f([axisC(n) for n in mesh.normals], 3)
             uv = None
             if mesh.tverts and len(mesh.tverts) == len(mesh.verts):
-                uv = glb.acc_f([(u, 1.0 - vv) for (u, vv) in mesh.tverts], 2)
+                # DTS tverts already use the D3D/glTF top-left V convention; pass
+                # through unchanged. (A 1-v flip here rendered every face/skin
+                # texture upside down in Godot.)
+                uv = glb.acc_f([(u, vv) for (u, vv) in mesh.tverts], 2)
             # per-vertex up-to-4 (joint, weight)
             acc = [[] for _ in range(len(mesh.verts))]
             for (vi, bone, w) in mesh.influences:
@@ -364,7 +367,7 @@ def convert(model_path, out_path, anims, tex_dir=None, tex_indices=None, single_
             verts = mesh.verts
             pos = glb.acc_f([(v[0], v[1], v[2]) for v in verts], 3, minmax=True)
             nrm = glb.acc_f(mesh.normals, 3) if mesh.normals and len(mesh.normals) == len(verts) else None
-            uv = glb.acc_f([(u, 1.0 - vv) for (u, vv) in mesh.tverts], 2) \
+            uv = glb.acc_f([(u, vv) for (u, vv) in mesh.tverts], 2) \
                 if mesh.tverts and len(mesh.tverts) == len(verts) else None
             for mat, tris in mesh.tris_by_mat.items():
                 idx = [i for tri in tris for i in tri]

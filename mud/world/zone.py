@@ -619,7 +619,11 @@ class ZoneInstance:
         except ValueError:
             pass
         
-        map(Mob.detachMob,self.activeMobs,repeat(mob,len(self.activeMobs)))
+        # NOTE: must be eagerly evaluated — a bare map() is lazy on Python 3 and
+        # silently skipped, leaving live mobs holding targets/haters pointing at
+        # the dead mob.
+        for other in self.activeMobs:
+            other.detachMob(mob)
         
         if mob.interacting:
             mob.interacting.endInteraction()

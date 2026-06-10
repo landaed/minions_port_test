@@ -1691,6 +1691,197 @@ class PlayerAvatar(Avatar):
         skills.sort(key=lambda s: str(s["name"]))
         return skills
 
+    # ------------------------------------------------------------------
+    # Plain-data getters for the Godot bridge (no PB cacheables involved).
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _item_to_dict(item):
+        """Serialize an ItemInstance to plain JSON-able data for the proxy."""
+        if item is None:
+            return None
+        proto = getattr(item, 'itemProto', None)
+        stats = []
+        try:
+            raw_stats = getattr(item, 'stats', None)
+            if raw_stats:
+                for st in raw_stats:
+                    if isinstance(st, (tuple, list)) and len(st) >= 2:
+                        stats.append([str(st[0]), float(st[1])])
+                    else:
+                        stats.append([str(st.statname), float(st.value)])
+            elif proto is not None:
+                for st in proto.stats:
+                    stats.append([str(st.statname), float(st.value)])
+        except Exception:
+            pass
+        slots = []
+        try:
+            if proto is not None:
+                slots = [int(s) for s in proto.slots]
+        except Exception:
+            pass
+        classes = []
+        try:
+            if proto is not None:
+                classes = [str(c.classname) for c in proto.classes]
+        except Exception:
+            pass
+        d = {
+            "name": str(getattr(item, 'name', '') or ''),
+            "slot": int(getattr(item, 'slot', -1)),
+            "stack_count": int(getattr(item, 'stackCount', 1) or 1),
+            "use_charges": int(getattr(item, 'useCharges', 0) or 0),
+            "quality": int(getattr(item, 'quality', 0) or 0),
+            "repair": float(getattr(item, 'repair', 0) or 0),
+            "repair_max": float(getattr(item, 'repairMax', 0) or 0),
+            "bitmap": str(getattr(item, 'bitmap', '') or (getattr(proto, 'bitmap', '') if proto else '') or ''),
+            "desc": str(getattr(item, 'descOverride', '') or (getattr(proto, 'desc', '') if proto else '') or ''),
+            "stats": stats,
+            "equip_slots": slots,
+            "classes": classes,
+        }
+        if proto is not None:
+            level = int(getattr(item, 'levelOverride', 0) or 0) or int(getattr(proto, 'level', 1) or 1)
+            d.update({
+                "level": level,
+                "flags": int(getattr(proto, 'flags', 0) or 0),
+                "armor": int(getattr(proto, 'armor', 0) or 0),
+                "damage": float(getattr(proto, 'wpnDamage', 0) or 0),
+                "delay": float(getattr(proto, 'wpnRate', 0) or 0),
+                "wpn_range": float(getattr(proto, 'wpnRange', 0) or 0),
+                "stack_max": int(getattr(proto, 'stackMax', 1) or 1),
+                "use_max": int(getattr(proto, 'useMax', 0) or 0),
+                "skill": str(getattr(proto, 'skill', '') or ''),
+                "worth_tin": int(getattr(proto, 'worthTin', 0) or 0) + int(getattr(item, 'worthIncreaseTin', 0) or 0),
+                "spell": str(proto.spellProto.name) if getattr(proto, 'spellProto', None) else "",
+            })
+        return d
+
+    def perspective_getInventory(self, char_index=0):
+        """Whole inventory/equipment snapshot for one party character, plus the
+        player's cursor item and money, as plain data."""
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return {}
+        char = self.player.party.members[char_index]
+        if not char:
+            return {}
+        items = []
+        for item in char.items:
+            d = self._item_to_dict(item)
+            if d is not None:
+                items.append(d)
+        tin = int(self.player.tin)
+        tin += self.player.copper * 100
+        tin += self.player.silver * 10000
+        tin += self.player.gold * 1000000
+        tin += self.player.platinum * 100000000
+        return {
+            "char_id": int(char.id),
+            "char_name": str(char.name),
+            "items": items,
+            "cursor": self._item_to_dict(self.player.cursorItem),
+            "tin": tin,
+        }
+
+    def perspective_getSpellbook(self, char_index=0):
+        """The character's learned spells (spellbook slots) as plain data."""
+        try:
+            char_index = int(char_index)
+        except Exception:
+            char_index = 0
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return {}
+        char = self.player.party.members[char_index]
+        if not char or not char.mob:
+            return {}
+        mob = char.mob
+        spells = []
+        try:
+            for cspell in char.spells:
+                proto = cspell.spellProto
+                recast_left = 0
+                try:
+                    recast_left = int(mob.recastTimers.get(proto, 0) or 0)
+                except Exception:
+                    recast_left = 0
+                spells.append({
+                    "slot": int(cspell.slot),
+                    "power_level": int(getattr(cspell, 'level', 1) or 1),
+                    "name": str(proto.name),
+                    "mana": int(getattr(proto, 'manaCost', 0) or 0),
+                    "cast_time": float(getattr(proto, 'castTime', 0) or 0) / 6.0,
+                    "recast_time": float(getattr(proto, 'recastTime', 0) or 0) / 6.0,
+                    "recast_left": recast_left,
+                    "cast_range": float(getattr(proto, 'castRange', 0) or 0),
+                    "target": int(getattr(proto, 'target', 0) or 0),
+                    "skill": str(getattr(proto, 'skillname', '') or ''),
+                    "desc": str(getattr(proto, 'desc', '') or ''),
+                    "icon": str(getattr(proto, 'spellbookPic', '') or ''),
+                })
+        except Exception:
+            print_exc()
+        spells.sort(key=lambda s: s["slot"])
+        return {"char_id": int(char.id), "spells": spells}
+
+    def perspective_getLoot(self):
+        """Current loot table of the corpse being looted, as plain data. The
+        legacy flow only pushed setLoot once at loot-start; slot indices shift
+        as items are removed, so the Godot client refreshes via this."""
+        mob = self.player.looting
+        if not mob or not getattr(mob, 'loot', None):
+            return {"items": {}}
+        items = {}
+        for i, item in enumerate(mob.loot.items):
+            d = self._item_to_dict(item)
+            if d is not None:
+                items[str(i)] = d
+        return {"items": items}
+
+    def perspective_selectEntity(self, entity_id, char_index=0, double_click=False, shift=False):
+        """Bridge for the legacy zone.select GUI path (the Torque sim used to call
+        it on world clicks). Double-clicking a corpse opens looting; shift asks
+        for the target description window."""
+        try:
+            entity_id = int(entity_id)
+            char_index = int(char_index)
+        except Exception:
+            return False
+        if char_index < 0 or char_index >= len(self.player.party.members):
+            return False
+        char = self.player.party.members[char_index]
+        if not char or not char.mob or not char.mob.zone or not char.mob.simObject:
+            return False
+        zone = char.mob.zone
+        target_mob = None
+        for m in list(zone.activeMobs) + list(zone.mobLookup.values()):
+            if m and m.id == entity_id and m.simObject:
+                target_mob = m
+                break
+        import os as _os
+        _dbg = _os.environ.get("MOM_DEBUG_COMBAT")
+        if target_mob is None:
+            if _dbg:
+                print("[selectEntity] id=%s NOT FOUND (active=%d lookup=%d)" % (
+                    entity_id, len(zone.activeMobs), len(zone.mobLookup)))
+            return False
+        if _dbg:
+            print("[selectEntity] id=%s found=%s detached=%s genLoot=%s loot=%s dbl=%s" % (
+                entity_id, target_mob.name, target_mob.detached,
+                getattr(target_mob, 'genLoot', '?'),
+                bool(getattr(target_mob, 'loot', None)), double_click))
+        try:
+            zone.select(char.mob.simObject, target_mob.simObject, char_index,
+                        bool(double_click), bool(shift))
+        except Exception:
+            print_exc()
+            return False
+        return True
+
 
     #cast or memorize spell, empty spell slot should be caught on client
     def perspective_onSpellSlot(self,cid,slot):

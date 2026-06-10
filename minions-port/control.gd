@@ -437,6 +437,11 @@ func handle_response(data: Dictionary):
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
 				gameplay_view.append_game_text(str(data.get("message", "")))
 
+		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
+		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook":
+			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
+				gameplay_view.handle_ui_message(data)
+
 		"error":
 			create_world_account_button.disabled = false
 			login_world_button.disabled = false

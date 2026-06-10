@@ -169,15 +169,30 @@ class Loot:
     
     
     def generateCorpseLoot(self):
-        
+
         loot = self.items
-        
+
         if self.corpseLootGenerated:
             return (self.tin or len(loot))
-        
+
         spawn = self.mob.spawn
         proto = self.lootProto
         self.corpseLootGenerated = True
+
+        # Dev/test hook: guarantee a known item on every corpse so the loot
+        # window can be exercised deterministically. Off unless MOM_TEST_FORCE_LOOT
+        # names an ItemProto (e.g. MOM_TEST_FORCE_LOOT="Health Potion").
+        import os as _os
+        _force = _os.environ.get("MOM_TEST_FORCE_LOOT")
+        if _force:
+            try:
+                from mud.world.item import ItemProto
+                fproto = ItemProto.byName(_force)
+                fitem = fproto.createInstance()
+                fitem.slot = -1
+                self.items.append(fitem)
+            except Exception:
+                traceback.print_exc()
         
         if proto:
             #$$$, to do, curve these
@@ -301,7 +316,7 @@ class Loot:
         if len(loot) < 16:
             # The higher level the mob, the higher the chance
             #  to carry a zone potion.
-            chance = 35 - spawn.plevel / 3
+            chance = int(35 - spawn.plevel / 3)
             if not randint(0,chance):
                 # Success, try to get an appropriate zone potion.
                 try:
@@ -318,7 +333,7 @@ class Loot:
         if len(loot) < 16:
             # The higher level the mob, the higher the chance
             #  to carry Moon Powder.
-            chance = 35 - spawn.plevel / 4
+            chance = int(35 - spawn.plevel / 4)
             if not randint(0,chance):
                 # Success, try to add one Moon Powder to
                 #  this mobs loot table.
@@ -340,7 +355,7 @@ class Loot:
             if len(loot) < 16:
                 # The higher level the mob, the higher the chance
                 #  to carry a stat potion.
-                chance = (110 - spawn.plevel) / 2
+                chance = int((110 - spawn.plevel) / 2)
                 if not randint(0,chance):
                     try:
                         index = randint(0,len(STAT_POTIONS) - 1)
@@ -349,7 +364,7 @@ class Loot:
                         # Mobs above level 25 may even carry an Elixir
                         #  instead of a normal stat potion.
                         if spawn.plevel >= 25:
-                            chance = (110 - spawn.plevel) / 3
+                            chance = int((110 - spawn.plevel) / 3)
                             if not randint(0,chance):
                                 potion = "Elixir of %s"%stat
                         
@@ -410,12 +425,12 @@ class Loot:
         num = 2 if self.mob.uniqueVariant else 1
         for x in range(0,num):
             if len(loot) < 16:
-                chance = (110 - spawn.plevel) / 2
+                chance = int((110 - spawn.plevel) / 2)
                 if not randint(0,chance):
                     try:
                         iname = "Scroll of Learning"
                         if spawn.plevel >= 60:
-                            chance = (110 - spawn.plevel) / 3
+                            chance = int((110 - spawn.plevel) / 3)
                             if not randint(0,chance):
                                 iname = "Book of Learning"
                         
@@ -529,7 +544,7 @@ class Loot:
                 if item.repairMax == 1:
                     item.repair = 1
                 else:
-                    item.repair = randint(1,item.repairMax)
+                    item.repair = randint(1,int(item.repairMax))
         
         # Return True if this mob got something to loot,
         #  otherwise False.

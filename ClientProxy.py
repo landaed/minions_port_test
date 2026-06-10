@@ -43,6 +43,29 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 # We need PB datatypes to be unjelly-able (deserializable)
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
+from mud.world.shared.playdata import ItemInfo as _ServerItemInfo
+
+
+class ProxyItemInfoGhost(pb.RemoteCache):
+    """Lightweight stand-in for the client's ItemInfoGhost.
+
+    The real ItemInfoGhost.setCopyableState pulls static columns from the local
+    MoM client DB via mud.client.playermind, which imports client-only modules
+    (skillinfo, GUI) that don't exist in the headless proxy. That import blew up
+    every loot/cursor ItemInfo, breaking the loot window. The wire state already
+    carries the dynamic fields the Godot client needs (NAME, BITMAP, SLOT, ARMOR,
+    STATS, FLAGS, LEVEL, WPNDAMAGE, QUALITY, ...), so just capture it verbatim.
+    """
+
+    def setCopyableState(self, state):
+        self.__dict__.update(state)
+
+    def observe_updateChanged(self, state):
+        self.__dict__.update(state)
+
+
+# Override playdata's registration so the proxy decodes ItemInfo with our ghost.
+pb.setUnjellyableForClass(_ServerItemInfo, ProxyItemInfoGhost)
 
 
 def _json_fallback(obj):
@@ -233,6 +256,142 @@ def _serialize_root_info(root_info, session):
         "world_name": session.current_world.get("name", "") if session.current_world else "",
     }
 
+_BASELINE_DB = None
+
+
+def _baseline_db():
+    """Read-only connection to the shipped baseline world DB. The original MoM
+    client kept a local copy of static tables (dialog_line text, journal_entry,
+    item_proto, ...) and looked rows up by id; the proxy plays that role for the
+    Godot client."""
+    global _BASELINE_DB
+    if _BASELINE_DB is None:
+        import sqlite3
+        path = os.path.join(os.getcwd(), "minions.of.mirth", "data", "worlds",
+                            "multiplayer.baseline", "world.db")
+        _BASELINE_DB = sqlite3.connect(path)
+    return _BASELINE_DB
+
+
+def _dialog_line_text(line_id):
+    try:
+        row = _baseline_db().execute(
+            "SELECT text, journal_entry_id FROM dialog_line WHERE id = ? LIMIT 1;",
+            (int(line_id),)).fetchone()
+        if row:
+            return str(row[0] or ""), int(row[1] or 0)
+    except Exception:
+        traceback.print_exc()
+    return "", 0
+
+
+def _journal_entry_row(entry_id):
+    try:
+        row = _baseline_db().execute(
+            "SELECT topic, entry, text FROM journal_entry WHERE id = ? LIMIT 1;",
+            (int(entry_id),)).fetchone()
+        if row:
+            return {"topic": str(row[0] or ""), "entry": str(row[1] or ""),
+                    "text": str(row[2] or "")}
+    except Exception:
+        traceback.print_exc()
+    return None
+
+
+def _serialize_item_ghost(ghost):
+    """Serialize a proxy ItemInfo ghost (UPPERCASE wire state in __dict__) to
+    plain JSON data, filling proto name/slots from the baseline DB by PROTOID."""
+    if ghost is None:
+        return None
+    if isinstance(ghost, dict):
+        src = ghost
+        get = lambda k, d=None: src.get(k, src.get(k.upper(), d))
+    else:
+        get = lambda k, d=None: getattr(ghost, k.upper(), d)
+    stats = get("STATS") or []
+    try:
+        stats = [[str(s[0]), float(s[1])] for s in stats]
+    except Exception:
+        stats = []
+    # The wire ItemInfo carries NAME etc. but not the proto's display name/slots;
+    # resolve those from the baseline DB so the loot/vendor windows read fully.
+    proto_id = get("PROTOID")
+    name = str(get("NAME", "") or "")
+    equip_slots = [int(s) for s in (get("SLOTS") or [])]
+    if proto_id is not None:
+        try:
+            row = _baseline_db().execute(
+                "SELECT name, bitmap FROM item_proto WHERE id = ? LIMIT 1;",
+                (int(proto_id),)).fetchone()
+            if row:
+                if not name:
+                    name = str(row[0] or "")
+            if not equip_slots:
+                equip_slots = [int(s[0]) for s in _baseline_db().execute(
+                    "SELECT slot FROM item_slot WHERE item_proto_id = ?;",
+                    (int(proto_id),))]
+        except Exception:
+            pass
+    bitmap = str(get("BITMAP", "") or "")
+    if not bitmap and proto_id is not None:
+        try:
+            row = _baseline_db().execute(
+                "SELECT bitmap FROM item_proto WHERE id = ? LIMIT 1;",
+                (int(proto_id),)).fetchone()
+            if row:
+                bitmap = str(row[0] or "")
+        except Exception:
+            pass
+    return {
+        "name": name,
+        "slot": int(get("SLOT", -1) or -1),
+        "stack_count": int(get("STACKCOUNT", 1) or 1),
+        "stack_max": int(get("STACKMAX", 1) or 1),
+        "use_charges": int(get("USECHARGES", 0) or 0),
+        "use_max": int(get("USEMAX", 0) or 0),
+        "quality": int(get("QUALITY", 0) or 0),
+        "level": int(get("LEVEL", 1) or 1),
+        "flags": int(get("FLAGS", 0) or 0),
+        "armor": int(get("ARMOR", 0) or 0),
+        "damage": float(get("WPNDAMAGE", 0) or 0),
+        "delay": float(get("WPNRATE", 0) or 0),
+        "wpn_range": float(get("WPNRANGE", 0) or 0),
+        "bitmap": bitmap,
+        "desc": str(get("DESC", "") or get("EFFECTDESC", "") or ""),
+        "skill": str(get("SKILL", "") or ""),
+        "worth_tin": int(get("WORTHTIN", 0) or 0),
+        "stats": stats,
+        "equip_slots": equip_slots,
+        "repair": float(get("REPAIR", 0) or 0),
+        "repair_max": float(get("REPAIRMAX", 0) or 0),
+    }
+
+
+class ProxyInteractPane(pb.Referenceable):
+    """Stands in for the original client's InteractPane: the world server pushes
+    follow-up dialog lines at it after each choice."""
+
+    def __init__(self, session):
+        self.session = session
+
+    def remote_set(self, text, choices, journalEntryID=None):
+        payload = {
+            "type": "npc_dialog",
+            "text": str(text or ""),
+            "choices": [str(c) for c in (choices or [])],
+        }
+        if journalEntryID:
+            entry = _journal_entry_row(journalEntryID)
+            if entry:
+                payload["journal"] = entry
+        self.session.send(payload)
+        return True
+
+    def remote_close(self):
+        self.session.send({"type": "npc_window_close"})
+        return True
+
+
 def _local_world_access_password(world_name):
     """Best-effort lookup for locally hosted player-world access passwords."""
     candidates = []
@@ -324,12 +483,13 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setCursorItem(self, itemInfo):
-        self.session.send(
-            {
-                "type": "cursor_item",
-                "message": "Received cursor item from world server.",
-            }
-        )
+        self.session.send({
+            "type": "cursor_item",
+            "item": _serialize_item_ghost(itemInfo),
+        })
+        # Cursor changes always accompany an inventory change; push a fresh
+        # snapshot so the Godot inventory window stays exact.
+        self.session.push_inventory()
         return True
 
     def remote_setZoneOptions(self, zoptions):
@@ -358,10 +518,15 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_setLoot(self, loot):
-        self.session.send({
-            "type": "loot",
-            "message": "Received loot from world server.",
-        })
+        items = {}
+        try:
+            for slot, info in dict(loot or {}).items():
+                d = _serialize_item_ghost(info)
+                if d is not None:
+                    items[str(int(slot))] = d
+        except Exception:
+            traceback.print_exc()
+        self.session.send({"type": "loot", "items": items})
         return True
 
     def remote_mouseSelect(self, charIndex, targetId):
@@ -437,13 +602,59 @@ class ProxyPlayerMind(pb.Referenceable):
         return True
 
     def remote_openNPCWnd(self, name, *args):
-        self.session.send({"type": "npc_window", "name": str(name)})
+        banker = bool(args[0]) if args else False
+        self.session.send({"type": "npc_window", "name": str(name), "banker": banker})
         return True
 
-    def remote_setVendorStock(self, *args):
+    def remote_closeNPCWnd(self):
+        self.session.send({"type": "npc_window_close"})
         return True
 
-    def remote_setInitialInteraction(self, *args):
+    def remote_setVendorStock(self, isVendor, stock, markup):
+        items = []
+        if isVendor and stock:
+            try:
+                # The server sends {ItemInfo: index}; invert into an index-sorted list.
+                by_index = sorted(dict(stock).items(), key=lambda kv: int(kv[1]))
+                for info, index in by_index:
+                    d = _serialize_item_ghost(info)
+                    if d is not None:
+                        d["vendor_index"] = int(index)
+                        items.append(d)
+            except Exception:
+                traceback.print_exc()
+        self.session.send({
+            "type": "vendor_stock",
+            "is_vendor": bool(isVendor),
+            "items": items,
+            "markup": float(markup or 1.0),
+        })
+        return True
+
+    def remote_setInitialInteraction(self, dialogLine, choices, title=None):
+        if dialogLine is None:
+            self.session.send({"type": "npc_dialog_start", "has_dialog": False,
+                               "npc": str(title or "")})
+            return True
+        text, journal_id = _dialog_line_text(dialogLine)
+        payload = {
+            "type": "npc_dialog_start",
+            "has_dialog": True,
+            "npc": str(title or ""),
+            "text": text,
+            "choices": [str(c) for c in (choices or [])],
+        }
+        if journal_id:
+            entry = _journal_entry_row(journal_id)
+            if entry:
+                payload["journal"] = entry
+        self.session.send(payload)
+        return True
+
+    def remote_addJournalEntry(self, journalEntryID):
+        entry = _journal_entry_row(journalEntryID)
+        if entry:
+            self.session.send({"type": "journal_entry", **entry})
         return True
 
     def remote_openPetWindow(self):
@@ -493,7 +704,32 @@ class GodotClientSession:
         self.active_skills = []
         self.last_gameplay_payload = None
         self.last_entity_payload = None
+        self.interact_pane = None
         self._closed = False
+
+    def push_inventory(self):
+        """Fetch and forward a fresh plain-data inventory snapshot."""
+        if self._closed or not self.player_perspective:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getInventory", 0)
+        d.addCallback(lambda inv: self.send({"type": "inventory", **(inv or {})}))
+        d.addErrback(lambda f: None)
+
+    def push_spellbook(self):
+        """Fetch and forward the character's spellbook."""
+        if self._closed or not self.player_perspective:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getSpellbook", 0)
+        d.addCallback(lambda sb: self.send({"type": "spellbook", **(sb or {})}))
+        d.addErrback(lambda f: None)
+
+    def push_loot(self):
+        """Re-fetch the active loot table (slot indices shift after each take)."""
+        if self._closed or not self.player_perspective:
+            return
+        d = self.player_perspective.callRemote("PlayerAvatar", "getLoot")
+        d.addCallback(lambda lt: self.send({"type": "loot", **(lt or {"items": {}})}))
+        d.addErrback(lambda f: None)
 
     def send(self, msg_dict):
         """Send a JSON message to the Godot client."""
@@ -761,6 +997,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
             return
 
+        if payload is None and self._handle_ui_command(command, msg):
+            return
+
         if payload is None and command == "player_input":
             # Forward movement input state to the server for authoritative movement.
             # position_z is the client's collision-resolved vertical coordinate; the
@@ -789,6 +1028,86 @@ class ProxyProtocol(WebSocketServerProtocol):
     def _on_gameplay_command_failed(self, reason, command, world_command):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
         self._send_gameplay_command_result(False, command, f"{world_command} failed: {msg}")
+
+    def _handle_ui_command(self, command, msg):
+        """Inventory / loot / dialog / vendor / spellbook bridge commands.
+
+        Returns True when the command was recognized (whether or not it
+        ultimately succeeds server-side)."""
+        session = self.session
+        perspective = session.player_perspective
+
+        def call(method, *args, refresh_inventory=False, refresh_spellbook=False):
+            d = perspective.callRemote("PlayerAvatar", method, *args)
+            if refresh_inventory:
+                d.addCallback(lambda _r: session.push_inventory())
+            if refresh_spellbook:
+                d.addCallback(lambda _r: session.push_spellbook())
+            d.addErrback(self._on_gameplay_command_failed, command, method.upper())
+            return d
+
+        if command == "get_inventory":
+            session.push_inventory()
+            return True
+        if command == "get_spellbook":
+            session.push_spellbook()
+            return True
+        if command == "inv_click":
+            call("onInvSlot", int(msg.get("char_id", 0)), int(msg.get("slot", -1)),
+                 refresh_inventory=True)
+            return True
+        if command == "inv_click_alt":
+            call("onInvSlotAlt", int(msg.get("char_id", 0)), int(msg.get("slot", -1)),
+                 refresh_inventory=True)
+            return True
+        if command == "inv_use":
+            call("onInvSlotCtrl", int(msg.get("char_id", 0)), int(msg.get("slot", -1)),
+                 refresh_inventory=True, refresh_spellbook=True)
+            return True
+        if command == "destroy_cursor":
+            call("expungeItem", refresh_inventory=True)
+            return True
+        if command == "select_entity":
+            call("selectEntity", int(msg.get("entity_id", 0)), 0,
+                 bool(msg.get("double_click", False)), bool(msg.get("shift", False)))
+            return True
+        if command == "loot_item":
+            d = call("loot", 0, int(msg.get("slot", 0)), bool(msg.get("alt", True)),
+                     refresh_inventory=True)
+            d.addCallback(lambda _r: session.push_loot())
+            return True
+        if command == "end_looting":
+            call("endLooting")
+            return True
+        if command == "destroy_corpse":
+            call("destroyCorpse")
+            return True
+        if command == "dialog_choice":
+            if session.interact_pane is None:
+                session.interact_pane = ProxyInteractPane(session)
+            call("onInteractionChoice", int(msg.get("index", 0)), session.interact_pane,
+                 refresh_inventory=True)
+            return True
+        if command == "end_interaction":
+            call("endInteraction")
+            return True
+        if command == "buy_item":
+            call("buyItem", 0, int(msg.get("index", 0)), refresh_inventory=True)
+            return True
+        if command == "sell_item":
+            call("sellItem", 0, int(msg.get("slot", 0)), refresh_inventory=True)
+            return True
+        if command == "spell_slot":
+            # Cast (or memorize a scroll into) a spellbook slot.
+            call("onSpellSlot", int(msg.get("char_id", 0)), int(msg.get("slot", 0)),
+                 refresh_spellbook=True)
+            return True
+        if command == "spell_slot_swap":
+            call("onSpellSlotSwap", int(msg.get("char_id", 0)),
+                 int(msg.get("src", 0)), int(msg.get("dest", 0)),
+                 refresh_spellbook=True)
+            return True
+        return False
 
     @staticmethod
     def _character_info_to_dict(cinfo):

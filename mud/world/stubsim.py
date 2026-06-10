@@ -26,6 +26,26 @@ def _yaw_toward(dx, dy):
         return (0.0, 0.0, -1.0, -angle)
 
 
+def _marker_rotation_to_sim(rot):
+    """Convert a mission-file marker rotation to the sim's yaw convention.
+
+    Mission .mis rotations are true CCW axis-angle around +Z; the sim (combat
+    isFacing, the Godot client decode, _yaw_toward) measures yaw clockwise from
+    +Y. Without this, freshly spawned idle NPCs face mirrored left<->right until
+    something makes them turn.
+    """
+    if not rot or len(rot) < 4:
+        return (0.0, 0.0, 1.0, 0.0)
+    az = rot[2]
+    if abs(az) < 0.001:
+        return (0.0, 0.0, 1.0, 0.0)
+    true_angle = rot[3] if az >= 0.0 else -rot[3]
+    sim_angle = -true_angle  # CCW-from-+Y -> CW-from-+Y
+    if sim_angle >= 0:
+        return (0.0, 0.0, 1.0, sim_angle)
+    return (0.0, 0.0, -1.0, -sim_angle)
+
+
 _next_stub_id = 90000
 
 
@@ -169,8 +189,12 @@ class StubSimAvatar:
     def spawnBot(self, spawn, transform, wanderGroup, mobInfo):
         """Create a stub sim object for a spawned mob."""
         pos, rot = _parse_transform(transform)
-        so = StubSimObject(position=pos, rotation=rot)
+        so = StubSimObject(position=pos, rotation=_marker_rotation_to_sim(rot))
         so._home = pos  # anchor for idle wander/patrol
+        # Only mobs in a real wander group may roam; -1 markers (town vendors,
+        # guards, tower mobs, ...) stood still in the original engine. Letting
+        # them all wander walked NPCs through walls and off interior floors.
+        so.wanderGroup = wanderGroup if wanderGroup is not None else -1
         self.addSimObject(so)
         return defer.succeed(so)
 
@@ -333,6 +357,13 @@ class StubSimAvatar:
             tgt = self.simLookup.get(tgtId) if tgtId else None
             if src and hasattr(src, 'brain'):
                 src.brain.setTarget(tgt)
+            # Player sims have no brain; remember the selection so the movement
+            # tick can auto-face it. The legacy Torque client auto-faced the
+            # character at its target during combat — without this the facing
+            # combat check fails constantly at melee range, where camera yaw,
+            # interpolation lag and the 60-degree cone disagree.
+            if src is not None and getattr(src, 'isPlayer', False):
+                src.selectedTarget = tgt
         return defer.succeed(None)
 
     # ---- start the zone ----
@@ -429,6 +460,8 @@ class StubSimAvatar:
         """Idle wander/patrol around the spawn home. Returns True if the NPC moved.
         Only the horizontal plane (x,y) changes; height is left to the client's
         ground-snap. Combat (moveTarget) always overrides this."""
+        if getattr(so, 'wanderGroup', -1) < 0:
+            return False  # stationary spawn (matches original WanderGroup=-1)
         home = getattr(so, '_home', None)
         if home is None:
             home = so.position
@@ -464,8 +497,11 @@ class StubSimAvatar:
         by the combat facing check (camera facing alone often isn't aimed at the
         target). Mirrors how NPCs auto-face their chase target. Runs every tick,
         independent of client input, so a stationary auto-attacker still faces."""
-        tgt = getattr(so, "moveTarget", None)
+        tgt = getattr(so, "selectedTarget", None) or getattr(so, "moveTarget", None)
         if tgt is None or getattr(tgt, "position", None) is None:
+            return
+        if tgt not in self.simObjects:
+            so.selectedTarget = None  # target despawned/died
             return
         dx = tgt.position[0] - so.position[0]
         dy = tgt.position[1] - so.position[1]
@@ -595,13 +631,16 @@ def spawn_test_mobs(zone, player_pos):
     offsets = all_offsets[:mob_count]
 
     try:
-        # "Skeleton" is level 3, realm=Monster(3), flags=128(AGGRESSIVE), aggroRange=20
+        # Default "Skeleton" is level 3, realm=Monster(3), flags=128(AGGRESSIVE),
+        # aggroRange=20. MOM_TEST_MOB_NAME picks a different spawn (e.g. a
+        # non-aggressive "Frail Skeleton" for scripted client tests).
+        mob_name = os.environ.get("MOM_TEST_MOB_NAME", "skeleton").lower()
         con = Spawn._connection.getConnection()
         row = con.execute(
-            "SELECT id FROM spawn WHERE lower(name)='skeleton' LIMIT 1;"
+            "SELECT id FROM spawn WHERE lower(name)=? LIMIT 1;", (mob_name,)
         ).fetchone()
         if not row:
-            print("[spawn_test_mobs] WARNING: Spawn 'Skeleton' not found in DB")
+            print("[spawn_test_mobs] WARNING: Spawn '%s' not found in DB" % mob_name)
             return
         spawn = Spawn.get(row[0])
         print("[spawn_test_mobs] Using spawn: %s (level=%d, realm=%d, flags=%d, aggroRange=%d)" % (

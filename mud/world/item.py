@@ -1168,7 +1168,7 @@ class ItemInstance:
                 freeCharges = neededCharges
             # Recalculate charge and stack count.
             useCharges = freeCharges % useMax
-            stackCount = freeCharges / useMax
+            stackCount = freeCharges // useMax  # Py3: keep stack count integral
             # First update charges on both items.
             self.useCharges += useCharges
             item.useCharges -= useCharges
