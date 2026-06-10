@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_woodtruck_0.jpg" id="1_gftuo"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_woodtruck_0_ao.png" id="2_no8pv"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_woodtruck_0_normal.png" id="3_t068r"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_woodtruck_0_rough.png" id="4_j5i5j"]
+
+[resource]
+resource_name = "WoodTruck512_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_gftuo")
+metallic_specular = 0.38
+roughness = 0.82
+roughness_texture = ExtResource("4_j5i5j")
+normal_enabled = true
+normal_texture = ExtResource("3_t068r")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_no8pv")

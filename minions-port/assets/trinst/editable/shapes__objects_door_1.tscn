@@ -1,6 +1,49 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=4]
 
-[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_door_1.glb" id="1"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_door_1_0.jpg" id="1_6qom4"]
+[ext_resource type="Material" path="res://assets/trinst/materials/generated/objects_door_1_0.tres" id="2_56vsj"]
 
-[node name="objects_door_1" instance=ExtResource("1")]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yteo5"]
+resource_name = "wood2"
+cull_mode = 2
+albedo_texture = ExtResource("1_6qom4")
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_7cw2v"]
+_surfaces = [{
+"aabb": AABB(-9.5, 3.8146973e-07, -0.15865791, 19, 23.25, 0.37775695),
+"format": 34896613377,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAQAEAAIAAwACAAQABQABAAAABQAAAAMABQAGAAEAAQAGAAQABQADAAcABgAFAAcAAwAEAAcABgAHAAQA"),
+"name": "wood2",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("AAD//wAAAAD/////AAAAAP//AAAAAAAAAAAAAAAAAAD//wAA//8AAAAA/////wAA////////AAAAAAAA//8AAA==")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_rofuw"]
+resource_name = "objects_door_1_mesh"
+_surfaces = [{
+"aabb": AABB(-9.5, 3.8146973e-07, -0.15865791, 19, 23.25, 0.37775695),
+"attribute_data": PackedByteArray("//8AAAAAAAAAAP//////////AAAAAAAAAAD///////8AAP///////wAAAAD//wAAAAD//////////wAAAAAAAP//AAAAAAAAAAD///////8="),
+"format": 34896613399,
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAAACAAMABAAFAAYABAAGAAcABAAIAAkABAAKAAgACwAKAAwACwAMAA0ADgAMAAcADgAPAAwAEAARABIAEAASABMA"),
+"material": SubResource("StandardMaterial3D_yteo5"),
+"name": "wood2",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 20,
+"vertex_data": PackedByteArray("AAD//wAA////////AAD/////AAAAAP//AAAAAAAA//8AAP////+49AAA//8AAP+/AAAAAAAA/78AAAAA//+q6f////8AAP//AAD//wAA//////////+q6f////8AAP+///8AAP//uPT//wAAAAD/vwAAAAAAAP////8AAAAA//////////8AgAAA/////wCAAAAAAP//AID//wAA//8AgP9/////f////3////9///9rdDW6/3////9////6ygjq/3//v/9//78ENfYV/38AAJOLyUX/fwAA/3//P/9//z//f////3////9/////f///")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_7cw2v")
+
+[node name="objects_door_1" type="Node3D" unique_id=689839620]
 metadata/source_glb = "res://assets/trinst/shapes/objects_door_1.glb"
+
+[node name="door_1" type="MeshInstance3D" parent="." unique_id=266033148]
+mesh = SubResource("ArrayMesh_rofuw")
+surface_material_override/0 = ExtResource("2_56vsj")

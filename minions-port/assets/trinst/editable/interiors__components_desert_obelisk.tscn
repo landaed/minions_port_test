@@ -1,6 +1,80 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=4]
 
-[ext_resource type="PackedScene" path="res://assets/trinst/interiors/components_desert_obelisk.glb" id="1"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_desert_obelisk_0.jpg" id="1_gqufm"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_desert_obelisk_1.jpg" id="2_u1w8h"]
+[ext_resource type="Material" path="res://assets/trinst/materials/generated/components_desert_obelisk_0.tres" id="3_yvumt"]
+[ext_resource type="Material" path="res://assets/trinst/materials/generated/components_desert_obelisk_1.tres" id="4_s2ph3"]
 
-[node name="components_desert_obelisk" instance=ExtResource("1")]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gio0f"]
+resource_name = "egypt_tile1"
+cull_mode = 2
+albedo_texture = ExtResource("1_gqufm")
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3ro8h"]
+resource_name = "granite01"
+cull_mode = 2
+albedo_texture = ExtResource("2_u1w8h")
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_6th2g"]
+_surfaces = [{
+"aabb": AABB(-1.4315546, 8.5, -1.4623692, 2.890273, 17.75, 2.8904123),
+"format": 34896613377,
+"index_count": 102,
+"index_data": PackedByteArray("AAABAAIAAAACAAMABAAAAAMAAwACAAUAAwAFAAQABAAGAAAABQAGAAQABgABAAAAAgAHAAUAAQAHAAIABQAHAAgABQAIAAYAAQAJAAcABwAKAAgACQAKAAcACAAKAAsACAALAAYACgAJAAwACgAMAAsAAQANAAkADQAMAAkABgANAAEADgAMAA0ACwAMAA4ADwAOAA0ADwANAAYACwAOABAADwAGABEABgALABEAEgAPABEAEwALABAAEwAQABIACwATABEAEQATABIA"),
+"name": "egypt_tile1",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 20,
+"vertex_data": PackedByteArray("PhyEzVocAAA+HITNXBwAAJ1z//+fcwAAXoz//59zAACf44TNWhwAAF6M//9fjAAAn+OEzVscAACgc///X4wAAKLjhM2m4wAAWhyEzaHjAABaHITNo+MAAKLjhM2h4wAAWxyEzaHjAABaHITNXBwAAAEAAAD+/wAAAAAAAAAAAAD//wAA//8AAKLjhM1bHAAA/v8AAAAAAACi44TNoeMAAA==")
+}, {
+"aabb": AABB(-1.8615228, 0, -1.892589, 3.7500575, 8.5, 3.750362),
+"format": 34896613377,
+"index_count": 72,
+"index_data": PackedByteArray("AAABAAIAAAACAAMABAAAAAMAAwAFAAQABAAGAAAABQAGAAQABgABAAAAAQAHAAIABQAHAAgABQAIAAYABwAJAAgACgAJAAcACQAKAAgAAQAKAAcABgALAAEACwAMAAEAAQAMAA0ACgABAA0ADgALAAYACgAPAAgACgANAA8ACAAPAAYADQAOAA8ADwAOAAYA"),
+"name": "granite01",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 16,
+"vertex_data": PackedByteArray("AAD/////AAAAAP//qeIAAAAAAAD//wAA//8AAP//AAD///////8AAP//AAAAAAAA/////6niAAAAAAAAAAAAAP////8AAAAAAAD//wAAAAAAAP//Xh0AAKfi//+p4gAAWx3//6niAABaHf//Xh0AAKfi//9dHQAA/////10dAAA=")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_l0roy"]
+resource_name = "components_desert_obelisk_mesh"
+_surfaces = [{
+"aabb": AABB(-1.4315546, 8.5, -1.4623692, 2.890273, 17.75, 2.8904123),
+"attribute_data": PackedByteArray("zDRRYM00UWD4SS+A+U8vgCRlUmAkZVJgFmBgghVaYIJBdYNiQXWDYulEg2LqRINiM3AugDNqL4BehVJgB1VSYKF6UmD+qlJgy48vgMyVL4DLj0CEzJVAhMuPs4bLlbOGvGRJPdaiST2dazG69JsxukF1HP/qRBz/Inw0ggg+NILpRBz/6UQc/wg+NIIAAFiDnxT//yN8NIIruliDQXUc/0J1HP+Mpf//oHovgveqMIKgejCC96owgveqMIKheueVoXrnlf6q55X+queV96rnlf6q55X3queV96owgveqMIKheueVoHqfqaB655Wgep+p"),
+"format": 34896613399,
+"index_count": 102,
+"index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABgAHAAgABwAJAAgABwAKAAkACgALAAkADAANAA4ADQAPAA4AEAARABIAEQATABIAFAAVABYAFQAXABYAGAAZABoAGQAbABoAHAAdAB4AHQAfAB4AIAAhACIAIQAjACIAIQAkACMAJQAmACcAJgAoACcAJgApACgAKgArACwAKwAtACwAKwAuAC0ALwAwADEAMAAyADEAMAAzADIANAA1ADYANQA3ADYAOAA5ADoAOQA7ADoA"),
+"material": SubResource("StandardMaterial3D_gio0f"),
+"name": "egypt_tile1",
+"primitive": 3,
+"uv_scale": Vector4(2.97878, 7.3032937, 0, 0),
+"vertex_count": 60,
+"vertex_data": PackedByteArray("PhyEzVocGvg+HITNXBwX+J1z//+fcxn4oHP//1+MGfhaHITNoeMY+FochM2j4xb4Xoz//59zGvhejP//X4wa+J/jhM1aHBr4n+OEzVscGvii44TNpuMa+KLjhM2h41TVXoz//1+M0PSgc///X4zQ9KLjhM2m49D0WhyEzaPj0PSf44TNWhz//z4chM1aHP//Xoz//59z//+dc///n3P//16M//+fc///nXP//59z//9ejP//X4z//6Bz//9fjP//AAAAAAAAWf8BAAAA/v9Z/1ochM1cHFn/WxyEzaHjWf+i44TNWxxZ/6LjhM2h41n//v8AAAAAWf///wAA//9Z/6LjhM2h4xT/ouOEzaHjFP///wAA//8U/wEAAAD+/xT/WxyEzaHjFP/+/wAAAAAq/gAAAAAAACr+ouOEzVscKP6f44TNWxwp/lochM1cHCr+ouOEzabj//9aHITNo+P//6LjhM2h4///WxyEzaHj//9aHITNoeP//5/jhM1aHP//n+OEzVsc//8+HITNWhz//z4chM1cHP//WhyEzVwc//8+HITNXBz//1ochM1cHP//WhyEzaHj//9bHITNoeP//5/jhM1bHP//ouOEzaHj//+i44TNWxz//6LjhM2h4///QAgOxEMIHMRFCB7ERQgexEQIHcRFCBnEIkS7dyJEu3ciRLt3IkS7dyJEu3dUVVRVAAD+fwAA/n8AAP5/AAD+f/9/eHD/f3hw/394cP9/eHD/f/8//3//P/9//z//f/8/tgBawLYAWsC2AFrAtgBawFtASH9bQEh/W0BIf1tASH/8Agt96QIefdcCL33XAi991wIvffd/k373f5N+93+Tfvd/k373f5N+/3//v/9//7//f/+//3//v/9//7//f/+//3//v/9//7//f/+//3//v/9//7//f/+//3//v/9//7//f/8//3//P/9//z//f/8/")
+}, {
+"aabb": AABB(-1.8615228, 0, -1.892589, 3.7500575, 8.5, 3.750362),
+"attribute_data": PackedByteArray("tID/h31//4e0gAAAGHYAAFB3/4cYdv+H+XP/A5V+/wP5c/+LMXX/i5V+/4teff+LrvT/hxLq/4eu9AAAEuoAAAAAAACbCgAAAAD/h5sK/4ebCv5HmwrgTgAA/UcAAOBOZAngTjcB4E6bCuBOmwoefWQJ4E5kCR59AADgTjcB4E4AAB99NwEffQAA/4MAAB99mwr/g5sKHn03AR99ZAkefQ=="),
+"format": 34896613399,
+"index_count": 72,
+"index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABgAHAAgABwAJAAgABwAKAAkACgALAAkADAANAA4ADQAPAA4AEAARABIAEQATABIAFAAVABYAFQAXABYAFQAYABcAGAAZABcAGgAbABwAGwAdABwAHgAfACAAHwAhACAAIgAjACQAIwAlACQAIwAmACUAJgAnACUA"),
+"material": SubResource("StandardMaterial3D_3ro8h"),
+"name": "granite01",
+"primitive": 3,
+"uv_scale": Vector4(45.250023, 8, 0, 0),
+"vertex_count": 40,
+"vertex_data": PackedByteArray("AAD///////8AAP//qeL//wAAAAD/////AAAAAAAA//8AAP//Xh3//wAA//8AAP////8AAP///////wAAAAD//////////////////6ni////////AAD///////9dHf+///////////8AAP//////////AAD/////AAAAAP///////wAAAAD//wAAAAAAAP///////wAA//8AAP//AAD//wAA//8AAP//AAD//14d////////AAD///////9dHVTVWh3//14dVNWn4v//XR0AAAAA//9eHf//AAD//6ni//9aHf//Xh3//1sd//+p4v///////10d//+n4v//XR3///////+p4v//p+L//6ni//////////////////+p4v//AAD///////8AAP//qeJU1afi//+p4lTVWx3//6niAAD/v/9//7//f/+//3//v/9//7//f/+//3//P/9//z//f/8//3//P/9//z//f////3////9/////f////3////9//3//f/9//3//f/9//3//f/9//z//f/8//3//PwAA/38AAP9//7////9//z//f/8//3//P/9//z//f/8//3//P/9//z//f/8//3//P/9//z//f/8/AAD/fwAA/3//f/+/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_6th2g")
+
+[node name="components_desert_obelisk" type="Node3D" unique_id=367012457]
 metadata/source_glb = "res://assets/trinst/interiors/components_desert_obelisk.glb"
+
+[node name="desert_obelisk" type="MeshInstance3D" parent="." unique_id=1258247409]
+mesh = SubResource("ArrayMesh_l0roy")
+surface_material_override/0 = ExtResource("3_yvumt")
+surface_material_override/1 = ExtResource("4_s2ph3")

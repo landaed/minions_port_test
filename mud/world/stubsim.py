@@ -231,16 +231,32 @@ class StubSimAvatar:
             db_groups.add(sg.groupName)
         spawnpoints = []
 
+        # Spawn marker source of truth, in priority order:
+        #   1. Godot zone scene (minions-port/world/zones/<zone>.tscn): editor-
+        #      placed MoMSpawnPoint nodes, so designers can move spawns visually.
+        #   2. Legacy mission file markers (.mis) for zones not yet authored in
+        #      the Godot editor.
+        # Either way only the marker transform/group/wander come from the file;
+        # what spawns, respawn timers, loot and AI stay DB/server-authoritative.
+        markers = []
+        try:
+            from mud.world.godotspawns import parse_godot_spawnpoints
+            markers = parse_godot_spawnpoints(self.zone.zone.name)
+            if markers:
+                print("[StubSimAvatar] %s: %d spawn markers from Godot zone scene" % (
+                    self.zone.name, len(markers)))
+        except Exception:
+            traceback.print_exc()
         # Recover the real per-marker spawn positions from the mission file. The
         # DB only has spawn *groups* (no positions) and the headless stub can't
         # query the Torque engine, so without this every NPC spawned at the origin
         # (far from the player) and was never streamed.
-        markers = []
-        try:
-            from mud.world.misspawns import find_and_parse_spawn_points
-            markers = find_and_parse_spawn_points(getattr(zone_obj, "missionFile", "") or "")
-        except Exception:
-            traceback.print_exc()
+        if not markers:
+            try:
+                from mud.world.misspawns import find_and_parse_spawn_points
+                markers = find_and_parse_spawn_points(getattr(zone_obj, "missionFile", "") or "")
+            except Exception:
+                traceback.print_exc()
 
         used_groups = set()
         for mk in markers:
@@ -406,7 +422,15 @@ class StubSimAvatar:
     def _updateMovement(self):
         """Move NPCs toward their targets and process player input."""
         try:
-            dt = self._MOVE_INTERVAL
+            # Integrate real elapsed time, not the nominal interval: under load the
+            # reactor fires this tick late, and a fixed dt makes every mover
+            # (especially the player) slower than wall clock. The client predicts at
+            # true 8 u/s, so a fixed dt here meant the server fell further behind the
+            # longer you held a key -- the source of the old multi-unit "drift".
+            now = reactor.seconds()
+            last = getattr(self, '_last_move_time', None)
+            self._last_move_time = now
+            dt = self._MOVE_INTERVAL if last is None else min(max(now - last, 0.0), 0.25)
             moved = 0
             for so in list(self.simObjects):
                 if so.isPlayer:

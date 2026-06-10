@@ -3,9 +3,17 @@ extends Control
 signal command_requested(command_type: String, payload: Dictionary)
 
 const MOVE_SPEED := 8.0
-const SERVER_RECONCILE_THRESHOLD := 2.0
-const SERVER_RECONCILE_SNAP_THRESHOLD := 12.0
-const SERVER_RECONCILE_BLEND := 0.35
+# --- server reconciliation (see _update_reconcile_error) ---
+# Entity snapshots describe where the server thought the player was one poll
+# interval + transit ago, so while moving the raw client-vs-server difference is
+# mostly latency, not drift. Desync is therefore measured against the client's
+# recent trajectory (position history), which lets the dead zone be ~6x smaller
+# than the old 2u (originally 8u) threshold without rubber-banding.
+const SERVER_RECONCILE_SNAP_THRESHOLD := 12.0  # true teleports: jump immediately
+const RECONCILE_DEAD_ZONE := 0.35       # ignore drift below this (jitter floor)
+const RECONCILE_HISTORY_WINDOW := 0.8   # seconds of client positions to match against
+const RECONCILE_RATE := 8.0             # fraction of the error consumed per second
+const RECONCILE_MAX_SPEED := 10.0       # cap correction speed (units/sec)
 const CAMERA_ZOOM_MIN := 2.5
 const CAMERA_ZOOM_MAX := 14.0
 const CAMERA_ZOOM_STEP := 1.0
@@ -84,6 +92,8 @@ var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
+var _pos_history: Array = []        # recent [{t, pos}] samples for latency-aware reconcile
+var _reconcile_error := Vector3.ZERO  # smoothed-out correction toward the server position
 var _camera_base_local_offset := Vector3.ZERO
 var _camera_attributes: CameraAttributesPractical = null
 var _dof_focus_distance := DOF_DEFAULT_FOCUS
@@ -1026,6 +1036,59 @@ func _godot_world_to_server(godot_pos: Vector3) -> Array:
 	var server_space_pos := godot_pos - _server_origin_offset
 	return [server_space_pos.x, -server_space_pos.z, server_space_pos.y]
 
+func _record_position_history() -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	_pos_history.append({"t": now, "pos": player_body.global_position})
+	while not _pos_history.is_empty() and now - float(_pos_history[0]["t"]) > RECONCILE_HISTORY_WINDOW:
+		_pos_history.pop_front()
+
+func _update_reconcile_error(server_pos: Vector3) -> void:
+	# Measure true drift: the server position should lie somewhere on the client's
+	# recent path (it is the same input stream integrated slightly later). The
+	# residual against the closest history sample is real client/server divergence;
+	# the raw difference against the current position would also include snapshot
+	# latency and punish the player for simply moving.
+	var current := player_body.global_position
+	var best := Vector2(server_pos.x - current.x, server_pos.z - current.z)
+	for sample in _pos_history:
+		var p: Vector3 = sample["pos"]
+		var d := Vector2(server_pos.x - p.x, server_pos.z - p.z)
+		if d.length_squared() < best.length_squared():
+			best = d
+	var drift := best.length()
+	if drift <= RECONCILE_DEAD_ZONE:
+		_reconcile_error = Vector3.ZERO
+		return
+	if drift >= SERVER_RECONCILE_SNAP_THRESHOLD:
+		# A real teleport (server moved the player), not drift: jump straight there.
+		player_body.global_position.x = server_pos.x
+		player_body.global_position.z = server_pos.z
+		_pos_history.clear()
+		_reconcile_error = Vector3.ZERO
+		velocity.x = 0.0
+		velocity.z = 0.0
+		return
+	_reconcile_error = Vector3(best.x, 0.0, best.y)
+
+func _consume_correction(delta: float) -> Vector3:
+	# Hand a slice of the reconcile error to this frame's move_and_slide (bounded
+	# speed) instead of teleporting on snapshot arrival, so corrections read as a
+	# gentle glide rather than 3-10 Hz stutter. Riding along with move_and_slide
+	# (not a separate move_and_collide) matters: a raw collide stops dead on the
+	# first slope/wall contact, which silently disabled corrections on uneven
+	# terrain, while sliding follows the ground like ordinary movement — and still
+	# can't be dragged through walls.
+	if _reconcile_error == Vector3.ZERO:
+		return Vector3.ZERO
+	var step: Vector3 = _reconcile_error * clampf(delta * RECONCILE_RATE, 0.0, 1.0)
+	var max_step := RECONCILE_MAX_SPEED * delta
+	if step.length() > max_step:
+		step = step.normalized() * max_step
+	_reconcile_error -= step
+	if _reconcile_error.length() < 0.01:
+		_reconcile_error = Vector3.ZERO
+	return step
+
 func _try_step_up(horizontal_motion: Vector3, was_on_floor: bool, pre_move_pos: Vector3) -> void:
 	# CharacterBody3D has slope snapping but no built-in stair stepping. Whenever a
 	# grounded move was meaningfully blocked horizontally (stair riser, raised
@@ -1309,17 +1372,7 @@ func _sync_entity_markers():
 				break
 			var server_pos := _server_to_godot(raw_pos)
 			if server_pos != Vector3.ZERO and _server_origin_offset != Vector3.ZERO:
-				var current_pos := player_body.global_position
-				var diff_xz := Vector2(server_pos.x - current_pos.x, server_pos.z - current_pos.z)
-				var desync := diff_xz.length()
-				if desync > SERVER_RECONCILE_THRESHOLD:
-					# Reconcile toward the authoritative server position, but still use
-					# CharacterBody collision so server snapshots cannot drag the client
-					# straight through buildings. Tighter than the old 8u tolerance so
-					# visible client/server disagreement is smaller.
-					var factor := 1.0 if desync > SERVER_RECONCILE_SNAP_THRESHOLD else SERVER_RECONCILE_BLEND
-					var corr := Vector3(server_pos.x - current_pos.x, 0.0, server_pos.z - current_pos.z) * factor
-					player_body.move_and_collide(corr)
+				_update_reconcile_error(server_pos)
 			break
 
 	var incoming_keys: Dictionary = {}
@@ -1703,9 +1756,11 @@ func _physics_process(delta: float) -> void:
 	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
 	var pre_move_pos := player_body.global_position
-	player_body.velocity = velocity
+	var correction := _consume_correction(delta)
+	player_body.velocity = velocity + correction / delta
 	player_body.move_and_slide()
 	_try_step_up(horizontal_motion, was_on_floor, pre_move_pos)
+	_record_position_history()
 	# Safety net: teleport back above the platform if player falls
 	if player_body.global_position.y < -50.0:
 		player_body.global_position = Vector3(player_body.global_position.x, 5.0, player_body.global_position.z)

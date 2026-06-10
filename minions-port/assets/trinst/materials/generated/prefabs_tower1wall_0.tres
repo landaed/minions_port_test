@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0.jpg" id="1_68eom"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_ao.png" id="2_5g2o0"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_normal.png" id="3_m04bu"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_rough.png" id="4_fgsyl"]
+
+[resource]
+resource_name = "s31_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_68eom")
+metallic_specular = 0.45
+roughness = 0.88
+roughness_texture = ExtResource("4_fgsyl")
+normal_enabled = true
+normal_scale = 1.4
+normal_texture = ExtResource("3_m04bu")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_5g2o0")

@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_1.jpg" id="1_ugjwx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_1_ao.png" id="2_efy84"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_1_normal.png" id="3_osiir"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_1_rough.png" id="4_cn4wg"]
+
+[resource]
+resource_name = "back04S_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_ugjwx")
+metallic_specular = 0.25
+roughness = 0.92
+roughness_texture = ExtResource("4_cn4wg")
+normal_enabled = true
+normal_scale = 0.7
+normal_texture = ExtResource("3_osiir")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_efy84")

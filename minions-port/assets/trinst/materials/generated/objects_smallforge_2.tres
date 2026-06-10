@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_smallforge_2.jpg" id="1_6ax28"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_smallforge_2_ao.png" id="2_3c1cy"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_smallforge_2_normal.png" id="3_lt1sj"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_smallforge_2_rough.png" id="4_1gtce"]
+
+[resource]
+resource_name = "BRICKS1_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_6ax28")
+metallic_specular = 0.45
+roughness = 0.88
+roughness_texture = ExtResource("4_1gtce")
+normal_enabled = true
+normal_scale = 1.4
+normal_texture = ExtResource("3_lt1sj")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_3c1cy")

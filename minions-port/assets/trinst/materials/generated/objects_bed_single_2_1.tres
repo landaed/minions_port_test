@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_bed_single_2_1.jpg" id="1_5pftm"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_bed_single_2_1_ao.png" id="2_gbjyi"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_bed_single_2_1_normal.png" id="3_n03ri"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_bed_single_2_1_rough.png" id="4_6h42k"]
+
+[resource]
+resource_name = "fabric05_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_5pftm")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_6h42k")
+normal_enabled = true
+normal_texture = ExtResource("3_n03ri")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_gbjyi")

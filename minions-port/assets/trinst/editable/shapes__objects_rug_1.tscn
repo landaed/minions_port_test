@@ -1,6 +1,80 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=4]
 
-[ext_resource type="PackedScene" path="res://assets/trinst/shapes/objects_rug_1.glb" id="1"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_0.jpg" id="1_m1jlk"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_rug_1_1.jpg" id="2_a5xvv"]
+[ext_resource type="Material" path="res://assets/trinst/materials/generated/objects_rug_1_0.tres" id="3_wk1e2"]
+[ext_resource type="Material" path="res://assets/trinst/materials/generated/objects_rug_1_1.tres" id="4_eq88u"]
 
-[node name="objects_rug_1" instance=ExtResource("1")]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f0bby"]
+resource_name = "carpet03"
+cull_mode = 2
+albedo_texture = ExtResource("1_m1jlk")
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2b2c6"]
+resource_name = "back04S"
+cull_mode = 2
+albedo_texture = ExtResource("2_a5xvv")
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_gc1ei"]
+_surfaces = [{
+"aabb": AABB(-1.495363, 1.1268362, -2.252829, 2.8861122, 1e-05, 4.7115154),
+"format": 34896613377,
+"index_count": 6,
+"index_data": PackedByteArray("AAABAAIAAQAAAAMA"),
+"name": "carpet03",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("AAAAAP//AAD//wAAAAAAAAAAAAAAAAAA//8AAP//AAA=")
+}, {
+"aabb": AABB(-1.676479, 1.0340515, -2.5484967, 3.248344, 0.09278464, 5.3028507),
+"format": 34896613377,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAQAAAAMAAgAEAAAAAwAFAAEABAACAAYABQADAAcABgAHAAQABwAGAAUA"),
+"name": "back04S",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("//8AAP//AAC58f//RQ4AALnx//+58QAA//8AAAAAAAAAAAAA//8AAEUO//9FDgAARQ7//7nxAAAAAAAAAAAAAA==")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_a1vav"]
+resource_name = "objects_rug_1_mesh"
+_surfaces = [{
+"aabb": AABB(-1.495363, 1.1268362, -2.252829, 2.8861122, 1e-05, 4.7115154),
+"attribute_data": PackedByteArray("//8AAAAA////////AAAAAA=="),
+"format": 34896613399,
+"index_count": 6,
+"index_data": PackedByteArray("AAABAAIAAQAAAAMA"),
+"material": SubResource("StandardMaterial3D_f0bby"),
+"name": "carpet03",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 4,
+"vertex_data": PackedByteArray("AAAAAP///////wAAAAD//wAAAAAAAP////8AAP//////f/+//3//v/9//7//f/+/")
+}, {
+"aabb": AABB(-1.676479, 1.0340515, -2.5484967, 3.248344, 0.09278464, 5.3028507),
+"attribute_data": PackedByteArray("AAAAALQI1eO0CHQNAABJ8RmcAABlk9XjZZN0DRmcSfE="),
+"format": 34896613399,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAQAAAAMAAgAEAAAAAwAFAAEABAACAAYABQADAAcABgAHAAQABwAGAAUA"),
+"material": SubResource("StandardMaterial3D_2b2c6"),
+"name": "back04S",
+"primitive": 3,
+"uv_scale": Vector4(10.922482, 2.6069133, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("//8AAP//v/a58f//RQ6697nx//+58TX6//8AAAAA5/sAAAAA///T+kUO//9FDmf8RQ7//7nxfPYAAAAAAADO9hM4jwnYPlkJnjfnA55DiQWSe1W31Hk5w6p2OLhidlS+")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_gc1ei")
+
+[node name="objects_rug_1" type="Node3D" unique_id=1938204056]
 metadata/source_glb = "res://assets/trinst/shapes/objects_rug_1.glb"
+
+[node name="rug_1" type="MeshInstance3D" parent="." unique_id=1183399578]
+mesh = SubResource("ArrayMesh_a1vav")
+surface_material_override/0 = ExtResource("3_wk1e2")
+surface_material_override/1 = ExtResource("4_eq88u")

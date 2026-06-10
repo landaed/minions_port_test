@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_0.jpg" id="1_y5760"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_0_ao.png" id="2_ue71k"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_0_normal.png" id="3_scnce"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_0_rough.png" id="4_hwyd7"]
+
+[resource]
+resource_name = "09_multicol_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_y5760")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_hwyd7")
+normal_enabled = true
+normal_texture = ExtResource("3_scnce")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_ue71k")

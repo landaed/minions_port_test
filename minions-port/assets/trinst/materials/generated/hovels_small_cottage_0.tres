@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/hovels_small_cottage_0.jpg" id="1_oa7n3"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/hovels_small_cottage_0_ao.png" id="2_qx4jo"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/hovels_small_cottage_0_normal.png" id="3_nugu7"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/hovels_small_cottage_0_rough.png" id="4_ccxux"]
+
+[resource]
+resource_name = "stonewall_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_oa7n3")
+metallic_specular = 0.45
+roughness = 0.88
+roughness_texture = ExtResource("4_ccxux")
+normal_enabled = true
+normal_scale = 1.4
+normal_texture = ExtResource("3_nugu7")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_qx4jo")
