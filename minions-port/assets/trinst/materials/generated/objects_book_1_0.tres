@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cyx53wxtngpgq"]
+
+[ext_resource type="Texture2D" uid="uid://bscscvn7hdq43" path="res://assets/trinst/shapes/objects_book_1_0.jpg" id="1_sibxr"]
+[ext_resource type="Texture2D" uid="uid://bjwj0mtrndl83" path="res://assets/trinst/shapes/objects_book_1_0_ao.png" id="2_kd78o"]
+[ext_resource type="Texture2D" uid="uid://d0yj3kojnrxw1" path="res://assets/trinst/shapes/objects_book_1_0_normal.png" id="3_f26qp"]
+[ext_resource type="Texture2D" uid="uid://c0ik4jwh65sdr" path="res://assets/trinst/shapes/objects_book_1_0_rough.png" id="4_m00ty"]
+
+[resource]
+resource_name = "BOOK_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_sibxr")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_m00ty")
+normal_enabled = true
+normal_texture = ExtResource("3_f26qp")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_kd78o")

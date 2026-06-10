@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cymil6xvgc8hh"]
+
+[ext_resource type="Texture2D" uid="uid://bsiulqqfeqncs" path="res://assets/trinst/interiors/objects_smallforge_8.jpg" id="1_oe4ee"]
+[ext_resource type="Texture2D" uid="uid://dakdtir7n6abq" path="res://assets/trinst/interiors/objects_smallforge_8_ao.png" id="2_3cqqg"]
+[ext_resource type="Texture2D" uid="uid://clr1sgw6wc7mf" path="res://assets/trinst/interiors/objects_smallforge_8_normal.png" id="3_mpan1"]
+[ext_resource type="Texture2D" uid="uid://c0s6bffswa4kf" path="res://assets/trinst/interiors/objects_smallforge_8_rough.png" id="4_pu22l"]
+
+[resource]
+resource_name = "RM1_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_oe4ee")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_pu22l")
+normal_enabled = true
+normal_texture = ExtResource("3_mpan1")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_3cqqg")

@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c5b3fwcuf8ghm"]
+
+[ext_resource type="Texture2D" uid="uid://cia0vjsa578n2" path="res://assets/trinst/interiors/buildings_large_guildhall_2.jpg" id="1_qc54p"]
+[ext_resource type="Texture2D" uid="uid://bcg86vwb2stsw" path="res://assets/trinst/interiors/buildings_large_guildhall_2_ao.png" id="2_l3joo"]
+[ext_resource type="Texture2D" uid="uid://cfmoi47uo4xov" path="res://assets/trinst/interiors/buildings_large_guildhall_2_normal.png" id="3_dciky"]
+[ext_resource type="Texture2D" uid="uid://cv5ylnlbe0x0p" path="res://assets/trinst/interiors/buildings_large_guildhall_2_rough.png" id="4_fekdu"]
+
+[resource]
+resource_name = "architecture_seamless01_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_qc54p")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_fekdu")
+normal_enabled = true
+normal_texture = ExtResource("3_dciky")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_l3joo")

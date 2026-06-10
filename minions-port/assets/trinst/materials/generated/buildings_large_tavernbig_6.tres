@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cog7mgq217o"]
+
+[ext_resource type="Texture2D" uid="uid://b835q8xp2le5i" path="res://assets/trinst/interiors/buildings_large_tavernbig_6.jpg" id="1_glph1"]
+[ext_resource type="Texture2D" uid="uid://cgpvxmnbw41ph" path="res://assets/trinst/interiors/buildings_large_tavernbig_6_ao.png" id="2_umxkt"]
+[ext_resource type="Texture2D" uid="uid://bc72hje1de1vx" path="res://assets/trinst/interiors/buildings_large_tavernbig_6_normal.png" id="3_ca7o3"]
+[ext_resource type="Texture2D" uid="uid://5ofgd1lrrtw8" path="res://assets/trinst/interiors/buildings_large_tavernbig_6_rough.png" id="4_hwvk4"]
+
+[resource]
+resource_name = "025noyer_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_glph1")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_hwvk4")
+normal_enabled = true
+normal_texture = ExtResource("3_ca7o3")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_umxkt")

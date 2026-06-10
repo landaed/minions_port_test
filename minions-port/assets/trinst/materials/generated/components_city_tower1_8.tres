@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cpdkvqdmrtwll"]
+
+[ext_resource type="Texture2D" uid="uid://3idh6ongcejj" path="res://assets/trinst/interiors/components_city_tower1_8.jpg" id="1_jiuyy"]
+[ext_resource type="Texture2D" uid="uid://bqdkmarwxpvgd" path="res://assets/trinst/interiors/components_city_tower1_8_ao.png" id="2_v3qf7"]
+[ext_resource type="Texture2D" uid="uid://ccds5ksnryphd" path="res://assets/trinst/interiors/components_city_tower1_8_normal.png" id="3_10yah"]
+[ext_resource type="Texture2D" uid="uid://bj0ljm32cfa8h" path="res://assets/trinst/interiors/components_city_tower1_8_rough.png" id="4_oxka5"]
+
+[resource]
+resource_name = "oak2_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_jiuyy")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_oxka5")
+normal_enabled = true
+normal_texture = ExtResource("3_10yah")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_v3qf7")

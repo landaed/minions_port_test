@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bgfihy46ax5p3"]
+
+[ext_resource type="Texture2D" uid="uid://dbw7txvesptdi" path="res://assets/trinst/interiors/buildings_large_tavern1_4.jpg" id="1_8rku1"]
+[ext_resource type="Texture2D" uid="uid://bxwlpf3tsbt6r" path="res://assets/trinst/interiors/buildings_large_tavern1_4_ao.png" id="2_vsvv8"]
+[ext_resource type="Texture2D" uid="uid://ceyycwldnv1fi" path="res://assets/trinst/interiors/buildings_large_tavern1_4_normal.png" id="3_7lhuk"]
+[ext_resource type="Texture2D" uid="uid://nh4dsx6d0a6b" path="res://assets/trinst/interiors/buildings_large_tavern1_4_rough.png" id="4_4ajtw"]
+
+[resource]
+resource_name = "s17_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_8rku1")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_4ajtw")
+normal_enabled = true
+normal_texture = ExtResource("3_7lhuk")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_vsvv8")

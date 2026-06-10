@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://4nvxoe47mvtu"]
+
+[ext_resource type="Texture2D" uid="uid://bbiq2bj5m1kmd" path="res://assets/trinst/interiors/architecture_fountain1_4.jpg" id="1_wi0ae"]
+[ext_resource type="Texture2D" uid="uid://b1rewsq4w7ol5" path="res://assets/trinst/interiors/architecture_fountain1_4_ao.png" id="2_1al4r"]
+[ext_resource type="Texture2D" uid="uid://xlkbdptyct6" path="res://assets/trinst/interiors/architecture_fountain1_4_normal.png" id="3_gom2u"]
+[ext_resource type="Texture2D" uid="uid://bv2qwqiecc0io" path="res://assets/trinst/interiors/architecture_fountain1_4_rough.png" id="4_870od"]
+
+[resource]
+resource_name = "rm1_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_wi0ae")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_870od")
+normal_enabled = true
+normal_texture = ExtResource("3_gom2u")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_1al4r")

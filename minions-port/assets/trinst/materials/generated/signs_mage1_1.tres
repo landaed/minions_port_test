@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dneqqt8skg7xn"]
+
+[ext_resource type="Texture2D" uid="uid://dvbv127mnh36t" path="res://assets/trinst/interiors/signs_mage1_1.jpg" id="1_5prgq"]
+[ext_resource type="Texture2D" uid="uid://cshlo61rxvnb" path="res://assets/trinst/interiors/signs_mage1_1_ao.png" id="2_p2f6a"]
+[ext_resource type="Texture2D" uid="uid://dwrgk11ufrsvx" path="res://assets/trinst/interiors/signs_mage1_1_normal.png" id="3_lv7mc"]
+[ext_resource type="Texture2D" uid="uid://od6ipxv5bvne" path="res://assets/trinst/interiors/signs_mage1_1_rough.png" id="4_ndksg"]
+
+[resource]
+resource_name = "sign_mage_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_5prgq")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_ndksg")
+normal_enabled = true
+normal_texture = ExtResource("3_lv7mc")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_p2f6a")

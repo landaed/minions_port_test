@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bepu4jc7il7ds"]
+
+[ext_resource type="Texture2D" uid="uid://b1opwe7c3a0ps" path="res://assets/trinst/interiors/buildings_small_barracks_0.jpg" id="1_dtelk"]
+[ext_resource type="Texture2D" uid="uid://dik6xem3w8qip" path="res://assets/trinst/interiors/buildings_small_barracks_0_ao.png" id="2_n543p"]
+[ext_resource type="Texture2D" uid="uid://b2if5qi1h6egi" path="res://assets/trinst/interiors/buildings_small_barracks_0_normal.png" id="3_f0rk1"]
+[ext_resource type="Texture2D" uid="uid://jspq7h316ril" path="res://assets/trinst/interiors/buildings_small_barracks_0_rough.png" id="4_ki1cr"]
+
+[resource]
+resource_name = "wood32_brown_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_dtelk")
+metallic_specular = 0.38
+roughness = 0.82
+roughness_texture = ExtResource("4_ki1cr")
+normal_enabled = true
+normal_texture = ExtResource("3_f0rk1")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_n543p")

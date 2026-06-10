@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dutqe2lf8uqda"]
+
+[ext_resource type="Texture2D" uid="uid://cxpkvky7pdrv0" path="res://assets/trinst/interiors/shops_shoplrg1_3.jpg" id="1_37aox"]
+[ext_resource type="Texture2D" uid="uid://cnw86sflclla7" path="res://assets/trinst/interiors/shops_shoplrg1_3_ao.png" id="2_huug1"]
+[ext_resource type="Texture2D" uid="uid://dst04i20vm5k6" path="res://assets/trinst/interiors/shops_shoplrg1_3_normal.png" id="3_67pub"]
+[ext_resource type="Texture2D" uid="uid://bt82mboyidit" path="res://assets/trinst/interiors/shops_shoplrg1_3_rough.png" id="4_44i6g"]
+
+[resource]
+resource_name = "shingle4_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_37aox")
+metallic_specular = 0.35
+roughness = 0.9
+roughness_texture = ExtResource("4_44i6g")
+normal_enabled = true
+normal_scale = 1.2
+normal_texture = ExtResource("3_67pub")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_huug1")

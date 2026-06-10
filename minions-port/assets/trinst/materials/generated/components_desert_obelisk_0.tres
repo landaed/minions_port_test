@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://lhhtyq6xmxtb"]
+
+[ext_resource type="Texture2D" uid="uid://bnjpvrxsasgv8" path="res://assets/trinst/interiors/components_desert_obelisk_0.jpg" id="1_tot88"]
+[ext_resource type="Texture2D" uid="uid://svg5mm2dabs3" path="res://assets/trinst/interiors/components_desert_obelisk_0_ao.png" id="2_db8j1"]
+[ext_resource type="Texture2D" uid="uid://dy3v38rbbapyd" path="res://assets/trinst/interiors/components_desert_obelisk_0_normal.png" id="3_7m4m5"]
+[ext_resource type="Texture2D" uid="uid://2g1dksx3xu74" path="res://assets/trinst/interiors/components_desert_obelisk_0_rough.png" id="4_im61o"]
+
+[resource]
+resource_name = "egypt_tile1_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_tot88")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_im61o")
+normal_enabled = true
+normal_texture = ExtResource("3_7m4m5")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_db8j1")

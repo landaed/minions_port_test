@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://y4e5ikdem08u"]
+
+[ext_resource type="Texture2D" uid="uid://x7a0iwp8xju4" path="res://assets/trinst/interiors/houses_cityhouse3_4.jpg" id="1_68kpj"]
+[ext_resource type="Texture2D" uid="uid://tgiulw4n20cv" path="res://assets/trinst/interiors/houses_cityhouse3_4_ao.png" id="2_17jga"]
+[ext_resource type="Texture2D" uid="uid://cuw48v8reloj3" path="res://assets/trinst/interiors/houses_cityhouse3_4_normal.png" id="3_idl2a"]
+[ext_resource type="Texture2D" uid="uid://ci0gkcsroc5qp" path="res://assets/trinst/interiors/houses_cityhouse3_4_rough.png" id="4_0vsp0"]
+
+[resource]
+resource_name = "bricks10_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_68kpj")
+metallic_specular = 0.45
+roughness = 0.88
+roughness_texture = ExtResource("4_0vsp0")
+normal_enabled = true
+normal_scale = 1.4
+normal_texture = ExtResource("3_idl2a")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_17jga")

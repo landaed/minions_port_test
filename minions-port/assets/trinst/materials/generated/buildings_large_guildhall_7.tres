@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cr4w1sh5qy5pm"]
+
+[ext_resource type="Texture2D" uid="uid://cvum0cy7swk10" path="res://assets/trinst/interiors/buildings_large_guildhall_7.jpg" id="1_iux83"]
+[ext_resource type="Texture2D" uid="uid://memefbx8sr23" path="res://assets/trinst/interiors/buildings_large_guildhall_7_ao.png" id="2_7neud"]
+[ext_resource type="Texture2D" uid="uid://bgubomij16r0s" path="res://assets/trinst/interiors/buildings_large_guildhall_7_normal.png" id="3_y1yk2"]
+[ext_resource type="Texture2D" uid="uid://vh2b2cj1u6b1" path="res://assets/trinst/interiors/buildings_large_guildhall_7_rough.png" id="4_2bntp"]
+
+[resource]
+resource_name = "patternborder_14_v5_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_iux83")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_2bntp")
+normal_enabled = true
+normal_texture = ExtResource("3_y1yk2")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_7neud")

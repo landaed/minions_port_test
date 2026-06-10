@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://m2470o5457qx"]
+
+[ext_resource type="Texture2D" uid="uid://dfq7i038hxd3m" path="res://assets/trinst/shapes/objects_table_1_1.jpg" id="1_qbm0u"]
+[ext_resource type="Texture2D" uid="uid://b5p0rc37ri1ae" path="res://assets/trinst/shapes/objects_table_1_1_ao.png" id="2_k6b0p"]
+[ext_resource type="Texture2D" uid="uid://6hi0gcrqlloj" path="res://assets/trinst/shapes/objects_table_1_1_normal.png" id="3_qmx5p"]
+[ext_resource type="Texture2D" uid="uid://bl8rjo16r5l45" path="res://assets/trinst/shapes/objects_table_1_1_rough.png" id="4_40jde"]
+
+[resource]
+resource_name = "Marbl06_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_qbm0u")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_40jde")
+normal_enabled = true
+normal_texture = ExtResource("3_qmx5p")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_k6b0p")

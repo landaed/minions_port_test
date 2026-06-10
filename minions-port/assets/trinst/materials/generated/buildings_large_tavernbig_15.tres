@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cmx3xibm7su3c"]
+
+[ext_resource type="Texture2D" uid="uid://cx4lh6b3v7wov" path="res://assets/trinst/interiors/buildings_large_tavernbig_15.jpg" id="1_ogi55"]
+[ext_resource type="Texture2D" uid="uid://b0ouqpal0bunu" path="res://assets/trinst/interiors/buildings_large_tavernbig_15_ao.png" id="2_1jlqr"]
+[ext_resource type="Texture2D" uid="uid://drcv8bg0bgwy3" path="res://assets/trinst/interiors/buildings_large_tavernbig_15_normal.png" id="3_wu8d6"]
+[ext_resource type="Texture2D" uid="uid://dwpw0f6n1e845" path="res://assets/trinst/interiors/buildings_large_tavernbig_15_rough.png" id="4_gkbho"]
+
+[resource]
+resource_name = "butzenglas2a_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_ogi55")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_gkbho")
+normal_enabled = true
+normal_texture = ExtResource("3_wu8d6")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_1jlqr")

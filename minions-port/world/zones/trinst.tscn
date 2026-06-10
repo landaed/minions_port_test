@@ -3,10 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://b5hnbgd25yedb" path="res://assets/trinst/editable/terrain.tscn" id="1"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__rocks_rock1.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_door_2.tscn" id="3"]
-[ext_resource type="PackedScene" uid="uid://dgo8bskrb222m" path="res://assets/trinst/editable/shapes__lanterns_lantern.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__lanterns_lantern.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_woodtruck.tscn" id="5"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__plants_weed_1.tscn" id="6"]
-[ext_resource type="PackedScene" uid="uid://bsas1v0j6kyr7" path="res://assets/trinst/editable/shapes__trees_ftree04_ftree04.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__trees_ftree04_ftree04.tscn" id="7"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bed_single_1.tscn" id="8"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_bench_1.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_4.tscn" id="10"]
@@ -23,22 +23,22 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_door_1.tscn" id="21"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/shapes__objects_table_1.tscn" id="22"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_tower1.tscn" id="23"]
-[ext_resource type="PackedScene" uid="uid://btkswlsaeq45c" path="res://assets/trinst/editable/interiors__components_city_castle.tscn" id="24"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_castle.tscn" id="24"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsa.tscn" id="25"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsc1.tscn" id="26"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallse.tscn" id="27"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsd.tscn" id="28"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsb.tscn" id="29"]
-[ext_resource type="PackedScene" uid="uid://dkkiu2rglkb6e" path="res://assets/trinst/editable/interiors__architecture_stairs2a.tscn" id="30"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_stairs2a.tscn" id="30"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_city_wallsc2.tscn" id="31"]
-[ext_resource type="PackedScene" uid="uid://cgg4xhj5irt4u" path="res://assets/trinst/editable/interiors__prefabs_tower1.tscn" id="32"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__prefabs_tower1.tscn" id="32"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__prefabs_tower1wall.tscn" id="33"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_barracks.tscn" id="34"]
-[ext_resource type="PackedScene" uid="uid://dladc4nb5jl2c" path="res://assets/trinst/editable/interiors__buildings_small_greathall.tscn" id="35"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_greathall.tscn" id="35"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_firept3.tscn" id="36"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_combat1.tscn" id="37"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_priest1.tscn" id="38"]
-[ext_resource type="PackedScene" uid="uid://uwbb8bfk8ddh" path="res://assets/trinst/editable/interiors__shops_shoplrg1.tscn" id="39"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__shops_shoplrg1.tscn" id="39"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_smallforge.tscn" id="40"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_anvil.tscn" id="41"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__objects_odstv.tscn" id="42"]
@@ -46,13 +46,13 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_prisonerpole.tscn" id="44"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_pit1.tscn" id="45"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavernbig.tscn" id="46"]
-[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_guild01.tscn" id="47"]
+[ext_resource type="PackedScene" uid="uid://c6erouw8qkrxh" path="res://assets/trinst/editable/interiors__buildings_small_guild01.tscn" id="47"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse1.tscn" id="48"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse2.tscn" id="49"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse3.tscn" id="50"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_rogue1.tscn" id="51"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_mage1.tscn" id="52"]
-[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_guildhall.tscn" id="53"]
+[ext_resource type="PackedScene" uid="uid://ccmypjlm0g7mj" path="res://assets/trinst/editable/interiors__buildings_large_guildhall.tscn" id="53"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_desert_obelisk.tscn" id="54"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_tent1.tscn" id="55"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__hovels_small_cottage.tscn" id="56"]
@@ -73,6 +73,8 @@
 [ext_resource type="Script" uid="uid://deo0gxkmk2ahd" path="res://addons/sky_3d/src/Sky3D.gd" id="71_p7wbs"]
 [ext_resource type="Script" uid="uid://b4tkplvh7fq40" path="res://addons/sky_3d/src/SkyDome.gd" id="72_xuc06"]
 [ext_resource type="Script" uid="uid://cjmkcj8hwm7ts" path="res://addons/sky_3d/src/TimeOfDay.gd" id="73_pf3fp"]
+[ext_resource type="Script" path="res://world/spawn_point.gd" id="74_u7glr"]
+[ext_resource type="Shader" uid="uid://c3d638behmwd8" path="res://shaders/water.gdshader" id="75_i6eom"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjim3"]
 shader = ExtResource("64_1i4f0")
@@ -103,7 +105,7 @@ shader_parameter/moon_texture_flip_u = false
 shader_parameter/moon_texture_flip_v = false
 shader_parameter/moon_size = 0.07
 shader_parameter/atm_moon_mie_tint = Color(0.137255, 0.184314, 0.292196, 1)
-shader_parameter/atm_moon_mie_intensity = 0.14378283232450484
+shader_parameter/atm_moon_mie_intensity = 0.0
 shader_parameter/atm_moon_partial_mie_phase = Vector3(0.36, 1.64, 1.6)
 shader_parameter/starmap_color = Color(0.709804, 0.709804, 0.709804, 0.854902)
 shader_parameter/starmap_texture = ExtResource("70_uvqbc")
@@ -111,7 +113,7 @@ shader_parameter/starmap_flip_u = false
 shader_parameter/starmap_flip_v = false
 shader_parameter/starmap_alignment = Vector3(2.68288, -0.25891, 0.40101)
 shader_parameter/star_rotation_offset = 9.38899
-shader_parameter/star_rotation = -11.490573627788597
+shader_parameter/star_rotation = -11.721117292845692
 shader_parameter/star_tilt = -1.2915436464758039
 shader_parameter/star_field_color = Color(1, 1, 1, 1)
 shader_parameter/star_field_texture = ExtResource("69_bsgbu")
@@ -127,8 +129,8 @@ shader_parameter/cirrus_absorption = 2.0
 shader_parameter/cirrus_sky_tint_fade = 0.5
 shader_parameter/cirrus_size = 1.0
 shader_parameter/cirrus_uv = Vector2(0.16, 0.11)
-shader_parameter/cirrus_position1 = Vector2(0.14103131, 0.14103131)
-shader_parameter/cirrus_position2 = Vector2(0.14103131, 0.14103131)
+shader_parameter/cirrus_position1 = Vector2(0.23678742, 0.23678742)
+shader_parameter/cirrus_position2 = Vector2(0.23678742, 0.23678742)
 shader_parameter/cirrus_texture = ExtResource("65_u7glr")
 shader_parameter/cumulus_visible = true
 shader_parameter/cumulus_intensity = 0.6
@@ -138,7 +140,7 @@ shader_parameter/cumulus_absorption = 2.0
 shader_parameter/cumulus_noise_freq = 2.7
 shader_parameter/cumulus_sky_tint_fade = 0.0
 shader_parameter/cumulus_size = 0.5
-shader_parameter/cumulus_position = Vector2(0.70505714, 0.70505714)
+shader_parameter/cumulus_position = Vector2(1.1838096, 1.1838096)
 shader_parameter/cumulus_texture = ExtResource("66_i6eom")
 shader_parameter/cumulus_partial_mie_phase = Vector3(0.957564, 1.042436, 0.412)
 shader_parameter/cumulus_mie_intensity = 1.0
@@ -148,7 +150,7 @@ shader_parameter/azimuthal_grid_rotation_offset = 0.03
 shader_parameter/show_equatorial_grid = false
 shader_parameter/equatorial_grid_color = Color(0, 0.75, 1, 1)
 shader_parameter/equatorial_grid_rotation_offset = 0.03
-shader_parameter/moon_matrix = Basis(0.9484736, -0.30458197, -0.08733747, 0.11112989, 0.5778964, -0.8085085, 0.2967291, 0.7571431, 0.5819676)
+shader_parameter/moon_matrix = Basis(0.8452338, -0.51369536, -0.14729977, 0.081106566, 0.39575773, -0.91476667, 0.5282062, 0.7612445, 0.37617183)
 
 [sub_resource type="Sky" id="Sky_f2k76"]
 sky_material = SubResource("ShaderMaterial_hjim3")
@@ -163,6 +165,62 @@ tonemap_mode = 3
 tonemap_white = 6.0
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_vkqfl"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_q7ioi"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_hbrt2"]
+noise_type = 3
+frequency = 0.092
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_bsgbu"]
+noise = SubResource("FastNoiseLite_hbrt2")
+as_normal_map = true
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_uvqbc"]
+noise_type = 4
+seed = 3
+frequency = 0.0339
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_p7wbs"]
+noise = SubResource("FastNoiseLite_uvqbc")
+as_normal_map = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xuc06"]
+render_priority = 0
+shader = ExtResource("75_i6eom")
+shader_parameter/color_shallow = Color(0.01, 0.2, 0.3, 1)
+shader_parameter/color_deep = Color(0, 0.6146647, 0.90695953, 1)
+shader_parameter/transparency = 0.90999997965968
+shader_parameter/metallic = 0.0
+shader_parameter/roughness = 0.25
+shader_parameter/max_visible_depth = 48.5000007227082
+shader_parameter/wave_move_direction_a = Vector2(-1, 0)
+shader_parameter/wave_move_direction_b = Vector2(0, 1)
+shader_parameter/wave_noise_scale_a = 15.0
+shader_parameter/wave_noise_scale_b = 15.0
+shader_parameter/wave_time_scale_a = 0.15
+shader_parameter/wave_time_scale_b = 0.15
+shader_parameter/wave_height_scale = 1.0
+shader_parameter/wave_normal_flatness = 50.0
+shader_parameter/surface_normals_a = SubResource("NoiseTexture2D_bsgbu")
+shader_parameter/surface_normals_b = SubResource("NoiseTexture2D_p7wbs")
+shader_parameter/surface_normals_move_direction_a = Vector2(-1, 0.2)
+shader_parameter/surface_normals_move_direction_b = Vector2(0.2, 1)
+shader_parameter/surface_texture_roughness = 0.10999999754128
+shader_parameter/surface_texture_scale = 0.10000000475000001
+shader_parameter/surface_texture_time_scale = 0.06
+shader_parameter/ssr_resolution = 1.0
+shader_parameter/ssr_max_travel = 30.0
+shader_parameter/ssr_max_diff = 4.0
+shader_parameter/ssr_mix_strength = 0.7
+shader_parameter/ssr_screen_border_fadeout = 0.5000000074506
+shader_parameter/refraction_intensity = 0.77999998256544
+shader_parameter/border_color = Color(1, 1, 1, 1)
+shader_parameter/border_scale = 2.0
+shader_parameter/border_near = 0.5
+shader_parameter/border_far = 300.0
+shader_parameter/cut_out_x = 0.0
+shader_parameter/cut_out_z = 0.0
 
 [node name="Trinst" type="Node3D" unique_id=784430246]
 script = ExtResource("63")
@@ -1245,29 +1303,3185 @@ transform = Transform3D(-0.9329079, -4.1264787e-08, 0.36011514, -0.0036011278, 0
 environment = SubResource("Environment_swo6e")
 camera_attributes = SubResource("CameraAttributesPractical_vkqfl")
 script = ExtResource("71_p7wbs")
-current_time = 12.86285333333208
+editor_time_enabled = false
+current_time = 13.61
+minutes_per_day = 40.0
 wind_direction = 2.35619451204804
 metadata/_custom_type_script = "uid://deo0gxkmk2ahd"
 
 [node name="SunLight" type="DirectionalLight3D" parent="Sky3D" unique_id=1384144399]
-transform = Transform3D(0.93389034, 0.26777816, -0.2369466, 0, 0.6626773, 0.74890506, 0.35755956, -0.6993952, 0.61886793, -0.2369466, 0.74890506, 0.61886793)
+transform = Transform3D(0.8298896, 0.3860934, -0.40275952, 0, 0.72188485, 0.6920133, 0.5579277, -0.5742947, 0.5990847, -0.4027595, 0.69201326, 0.5990846)
 shadow_enabled = true
 
 [node name="MoonLight" type="DirectionalLight3D" parent="Sky3D" unique_id=1720757131]
-transform = Transform3D(0, -0.95496166, 0.2967291, 0.6094146, 0.23526216, 0.757143, -0.7928517, 0.18083103, 0.5819676, 0.2967291, 0.757143, 0.5819676)
+transform = Transform3D(0, -0.8491162, 0.52820617, 0.4430157, 0.47354415, 0.7612444, -0.8965139, 0.23400362, 0.37617177, 0.52820617, 0.7612444, 0.37617177)
 light_color = Color(0.572549, 0.776471, 0.956863, 1)
 light_energy = 0.0
 
 [node name="SkyDome" type="Node" parent="Sky3D" unique_id=1490180408]
 script = ExtResource("72_xuc06")
-sun_azimuth = -3.507246
-sun_altitude = -0.7243881
-moon_azimuth = -2.6700785
-moon_altitude = -0.71186787
+sun_azimuth = -3.7334793
+sun_altitude = -0.8065221
+moon_azimuth = -2.1896424
+moon_altitude = -0.70556635
 wind_direction = 2.35619451204804
 
 [node name="TimeOfDay" type="Node" parent="Sky3D" unique_id=924469247]
 script = ExtResource("73_pf3fp")
+editor_time_enabled = false
 dome_path = NodePath("../SkyDome")
-current_time = 12.86285333333208
-day = 2
+minutes_per_day = 40.0
+current_time = 13.61
+day = 4
+
+[node name="Spawns" type="Node3D" parent="." unique_id=1425247625]
+
+[node name="SP_FRIZZLE_FRY" type="Node3D" parent="Spawns" unique_id=151377909]
+transform = Transform3D(0.33853588, 0, 0.9409535, 0, 1, 0, -0.9409535, 0, 0.33853588, 21.6444, 131.046, -287.349)
+script = ExtResource("74_u7glr")
+spawn_group = "FRIZZLE_FRY"
+preview_name = "Frizzle Fry"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_OLAMIAN_CRONDAN" type="Node3D" parent="Spawns" unique_id=858747623]
+transform = Transform3D(-0.84072727, 0, 0.54145885, 0, 1, 0, -0.54145885, 0, -0.84072727, 21.0567, 131.046, -308.529)
+script = ExtResource("74_u7glr")
+spawn_group = "OLAMIAN_CRONDAN"
+preview_name = "Olamian Crondan"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_COLAVRI_ARDA" type="Node3D" parent="Spawns" unique_id=832498293]
+transform = Transform3D(-0.3861958, 0, -0.9224168, 0, 1, 0, 0.9224168, 0, -0.3861958, 291.568, 132.431, -271.439)
+script = ExtResource("74_u7glr")
+spawn_group = "COLAVRI_ARDA"
+preview_name = "Colavri Arda"
+preview_model = "human_male"
+preview_info = "Lv100"
+
+[node name="SP_DINZER_PINZ" type="Node3D" parent="Spawns" unique_id=1436188246]
+transform = Transform3D(0.34013999, 0, 0.9403748, 0, 1, 0, -0.9403748, 0, 0.34013999, -34.0414, 134.676, -158.763)
+script = ExtResource("74_u7glr")
+spawn_group = "DINZER_PINZ"
+preview_name = "Dinzer Pinz"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_SAPRE_ENTHIRN" type="Node3D" parent="Spawns" unique_id=2026083865]
+transform = Transform3D(0.96657324, 0, -0.2563906, 0, 1, 0, 0.2563906, 0, 0.96657324, -28.9832, 139.428, -159.418)
+script = ExtResource("74_u7glr")
+spawn_group = "SAPRE_ENTHIRN"
+preview_name = "Sapre Enthirn"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_JOBEECH_RIC" type="Node3D" parent="Spawns" unique_id=986477811]
+transform = Transform3D(-0.99979544, 0, -0.020227093, 0, 1, 0, 0.020227093, 0, -0.99979544, 297.466, 138.927, -262.384)
+script = ExtResource("74_u7glr")
+spawn_group = "JOBEECH_RIC"
+preview_name = "Jobeech Ric"
+preview_model = "human_male"
+preview_info = "Lv100"
+
+[node name="SP_ISTRI_SANSMIL" type="Node3D" parent="Spawns" unique_id=129444785]
+transform = Transform3D(-0.9283626, 0, -0.37167576, 0, 1, 0, 0.37167576, 0, -0.9283626, 226.504, 133.901, -366.752)
+script = ExtResource("74_u7glr")
+spawn_group = "ISTRI_SANSMIL"
+preview_name = "Istri Sansmil"
+preview_model = "halfling_female"
+preview_info = "Lv100"
+
+[node name="SP_HU" type="Node3D" parent="Spawns" unique_id=1999201929]
+transform = Transform3D(-0.9999239, 0, -0.012339128, 0, 1, 0, 0.012339128, 0, -0.9999239, 217.315, 133.889, -366.852)
+script = ExtResource("74_u7glr")
+spawn_group = "HU"
+preview_name = "Hu"
+preview_model = "human_female"
+preview_info = "Lv100"
+
+[node name="SP_GREDO_HACHU" type="Node3D" parent="Spawns" unique_id=415575618]
+transform = Transform3D(0.012733549, 0, 0.99991894, 0, 1, 0, -0.99991894, 0, 0.012733549, 212.286, 131.703, -333.317)
+script = ExtResource("74_u7glr")
+spawn_group = "GREDO_HACHU"
+preview_name = "Gredo Hachu"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_HAZEK_LATHIAN" type="Node3D" parent="Spawns" unique_id=1639205259]
+transform = Transform3D(0.056924507, 0, -0.9983785, 0, 1, 0, 0.9983785, 0, 0.056924507, 230.024, 131.776, -340.983)
+script = ExtResource("74_u7glr")
+spawn_group = "HAZEK_LATHIAN"
+preview_name = "Hazek Lathian"
+preview_model = "human_male"
+preview_info = "Lv100"
+
+[node name="SP_HARAGORER" type="Node3D" parent="Spawns" unique_id=2017579082]
+transform = Transform3D(0.97310734, 0, -0.23035206, 0, 1, 0, 0.23035206, 0, 0.97310734, 272.064, 132.172, -250.584)
+script = ExtResource("74_u7glr")
+spawn_group = "HARAGORER"
+preview_name = "Haragorer"
+preview_model = "titan_male"
+preview_info = "Lv100"
+
+[node name="SP_ZORLAK_DURGHAST" type="Node3D" parent="Spawns" unique_id=1871948005]
+transform = Transform3D(-0.14776629, 0, 0.9890223, 0, 1, 0, -0.9890223, 0, -0.14776629, 261.622, 132.175, -256.479)
+script = ExtResource("74_u7glr")
+spawn_group = "ZORLAK_DURGHAST"
+preview_name = "Zorlak Durghast"
+preview_model = "dwarf_male"
+preview_info = "Lv100"
+
+[node name="SP_RASIL_ITHIAN" type="Node3D" parent="Spawns" unique_id=1398403508]
+transform = Transform3D(0.68384063, 0, -0.72963136, 0, 1, 0, 0.72963136, 0, 0.68384063, 281.161, 139.014, -251.424)
+script = ExtResource("74_u7glr")
+spawn_group = "RASIL_ITHIAN"
+preview_name = "Rasil Ithian"
+preview_model = "human_male"
+preview_info = "Lv100"
+
+[node name="SP_CAPTAIN_PEDRAIL" type="Node3D" parent="Spawns" unique_id=1548176236]
+transform = Transform3D(0.99834025, 0, 0.057591382, 0, 1, 0, -0.057591382, 0, 0.99834025, 125.599, 160.922, -20.9752)
+script = ExtResource("74_u7glr")
+spawn_group = "CAPTAIN PEDRAIL"
+preview_name = "Captain Pedrail"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_GOVERNOR_SLEEZIK" type="Node3D" parent="Spawns" unique_id=583144924]
+transform = Transform3D(-0.7217602, 0, -0.6921432, 0, 1, 0, 0.6921432, 0, -0.7217602, 301.039, 137.499, -341.489)
+script = ExtResource("74_u7glr")
+spawn_group = "GOVERNOR SLEEZIK"
+preview_name = "Governor Sleezik"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_LOSHI_ALLIA" type="Node3D" parent="Spawns" unique_id=2021437936]
+transform = Transform3D(-0.7897162, 0, 0.6134724, 0, 1, 0, -0.6134724, 0, -0.7897162, 198.632, 128.791, -223.593)
+script = ExtResource("74_u7glr")
+spawn_group = "LOSHI ALLIA"
+preview_name = "Loshi Allia"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_SORD_ASAL" type="Node3D" parent="Spawns" unique_id=1235036935]
+transform = Transform3D(0.5386399, 0, -0.8425361, 0, 1, 0, 0.8425361, 0, 0.5386399, 390.863, 160.316, 78.6231)
+script = ExtResource("74_u7glr")
+spawn_group = "SORD ASAL"
+preview_name = "Sord Asal"
+preview_model = "human_male"
+preview_info = "Lv40"
+
+[node name="SP_THORVALD_FARAN" type="Node3D" parent="Spawns" unique_id=477811327]
+transform = Transform3D(0.32180473, 0, 0.9468061, 0, 1, 0, -0.9468061, 0, 0.32180473, 14.3601, 127, -127.952)
+script = ExtResource("74_u7glr")
+spawn_group = "THORVALD FARAN"
+preview_name = "Thorvald Faran"
+preview_model = "elf_male"
+preview_info = "Lv60"
+
+[node name="SP_YASHA_HORD" type="Node3D" parent="Spawns" unique_id=585250305]
+transform = Transform3D(-0.9997613, 0, -0.021849887, 0, 1, 0, 0.021849887, 0, -0.9997613, 124.27, 127.031, -177.069)
+script = ExtResource("74_u7glr")
+spawn_group = "YASHA HORD"
+wander_group = 9
+preview_name = "Yasha Hord"
+preview_model = "human_female"
+preview_info = "Lv60"
+
+[node name="SP_CERDIC_DENSK" type="Node3D" parent="Spawns" unique_id=1402081661]
+transform = Transform3D(-0.7419641, 0, -0.6704396, 0, 1, 0, 0.6704396, 0, -0.7419641, 132.768, 127.031, -104.259)
+script = ExtResource("74_u7glr")
+spawn_group = "CERDIC DENSK"
+preview_name = "Cerdic Densk"
+preview_model = "titan_male"
+preview_info = "Lv50"
+
+[node name="SP_GILDAS_MORT" type="Node3D" parent="Spawns" unique_id=1660776542]
+transform = Transform3D(0.9917466, 0, -0.12821333, 0, 1, 0, 0.12821333, 0, 0.9917466, 96.3361, 133.424, -118.013)
+script = ExtResource("74_u7glr")
+spawn_group = "GILDAS MORT"
+preview_name = "Gildas Mort"
+preview_model = "human_male"
+preview_info = "Lv60"
+
+[node name="SP_ANHAGA_KAIET" type="Node3D" parent="Spawns" unique_id=896451614]
+transform = Transform3D(0.37649435, 0, -0.9264189, 0, 1, 0, 0.9264189, 0, 0.37649435, 63.6288, 128.024, -100.514)
+script = ExtResource("74_u7glr")
+spawn_group = "ANHAGA KAIET"
+preview_name = "Anhaga Kaiet"
+preview_model = "dwarf_female"
+preview_info = "Lv60"
+
+[node name="SP_AMIN_PRUET" type="Node3D" parent="Spawns" unique_id=1277227269]
+transform = Transform3D(0.9962388, 0, 0.08665012, 0, 1, 0, -0.08665012, 0, 0.9962388, 49.6766, 127.013, -102.849)
+script = ExtResource("74_u7glr")
+spawn_group = "AMIN PRUET"
+wander_group = 10
+preview_name = "Amin Pruet"
+preview_model = "halfling_female"
+preview_info = "Lv60"
+
+[node name="SP_EGIL_GEST" type="Node3D" parent="Spawns" unique_id=2043539298]
+transform = Transform3D(-0.53981435, 0, 0.84178406, 0, 1, 0, -0.84178406, 0, -0.53981435, 72.5656, 133.731, -125.267)
+script = ExtResource("74_u7glr")
+spawn_group = "EGIL GEST"
+preview_name = "Egil Gest"
+preview_model = "dwarf_male"
+preview_info = "Lv20"
+
+[node name="SP_THRAND_REMI" type="Node3D" parent="Spawns" unique_id=2082820239]
+transform = Transform3D(-0.45882013, 0, 0.8885292, 0, 1, 0, -0.8885292, 0, -0.45882013, 48.2732, 127.762, 228.783)
+script = ExtResource("74_u7glr")
+spawn_group = "THRAND REMI"
+preview_name = "Thrand Remi"
+preview_model = "halfling_male"
+preview_info = "Lv60"
+
+[node name="SP_FYREN_ASAL" type="Node3D" parent="Spawns" unique_id=1193781666]
+transform = Transform3D(0.66042244, 0, -0.75089425, 0, 1, 0, 0.75089425, 0, 0.66042244, 14.1199, 129.363, -163.111)
+script = ExtResource("74_u7glr")
+spawn_group = "FYREN ASAL"
+preview_name = "Fyren Asal"
+preview_model = "halfling_female"
+preview_info = "Lv60"
+
+[node name="SP_NAN_SORB" type="Node3D" parent="Spawns" unique_id=471595405]
+transform = Transform3D(0.10198517, 0, -0.9947859, 0, 1, 0, 0.9947859, 0, 0.10198517, 596.42, 168.653, -198.719)
+script = ExtResource("74_u7glr")
+spawn_group = "NAN SORB"
+preview_name = "Nan Sorb"
+preview_model = "halfling_male"
+preview_info = "Lv60"
+
+[node name="SP_DIA_THERSK" type="Node3D" parent="Spawns" unique_id=980666751]
+transform = Transform3D(0.37370178, 0, -0.9275489, 0, 1, 0, 0.9275489, 0, 0.37370178, 556.878, 148.087, -317.311)
+script = ExtResource("74_u7glr")
+spawn_group = "DIA THERSK"
+preview_name = "Dia Thersk"
+preview_model = "gnome_female"
+preview_info = "Lv60"
+
+[node name="SP_Prisoner" type="Node3D" parent="Spawns" unique_id=713482456]
+transform = Transform3D(-0.54402405, 0, 0.83906966, 0, 1, 0, -0.83906966, 0, -0.54402405, 212.687, 133.959, -223.534)
+script = ExtResource("74_u7glr")
+spawn_group = "Prisoner"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_ORAIN_SANSMIL" type="Node3D" parent="Spawns" unique_id=468603877]
+transform = Transform3D(0.9943204, 0, -0.10642824, 0, 1, 0, 0.10642824, 0, 0.9943204, 16.9791, 132.351, -122.737)
+script = ExtResource("74_u7glr")
+spawn_group = "ORAIN SANSMIL"
+preview_name = "Orain Sansmil"
+preview_model = "elf_female"
+preview_info = "Lv60"
+
+[node name="SP_ASHEERI" type="Node3D" parent="Spawns" unique_id=733499332]
+transform = Transform3D(0.98385036, 0, 0.17899282, 0, 1, 0, -0.17899282, 0, 0.98385036, 125.646, 171.787, -33.3513)
+script = ExtResource("74_u7glr")
+spawn_group = "ASHEERI"
+preview_name = "Asheeri the Ethereal"
+preview_model = "elemental/elemental.dts"
+preview_info = "Lv90"
+
+[node name="SP_IOLES" type="Node3D" parent="Spawns" unique_id=2011972458]
+transform = Transform3D(0.7095326, 0, 0.70467263, 0, 1, 0, -0.70467263, 0, 0.7095326, 21.5881, 129.094, -122.325)
+script = ExtResource("74_u7glr")
+spawn_group = "IOLES"
+preview_name = "Ioles the Indigent"
+preview_model = "dwarf_male"
+preview_info = "Lv85"
+
+[node name="SP_SKELETONS" type="Node3D" parent="Spawns" unique_id=215963105]
+transform = Transform3D(0.9918332, 0, 0.1275417, 0, 1, 0, -0.1275417, 0, 0.9918332, 210.099, 124.181, 369.929)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_MIRKBONE" type="Node3D" parent="Spawns" unique_id=781313743]
+transform = Transform3D(0.36515632, 0, -0.93094623, 0, 1, 0, 0.93094623, 0, 0.36515632, 269.68, 115.719, 293.185)
+script = ExtResource("74_u7glr")
+spawn_group = "MIRKBONE"
+wander_group = 1
+preview_name = "Captain Mirkbone"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv5"
+
+[node name="SP_SKELETONS_2" type="Node3D" parent="Spawns" unique_id=1838695575]
+transform = Transform3D(-0.6199023, 0, -0.784679, 0, 1, 0, 0.784679, 0, -0.6199023, 242.913, 115, 277.626)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_3" type="Node3D" parent="Spawns" unique_id=1134678169]
+transform = Transform3D(0.10208941, 0, -0.99477524, 0, 1, 0, 0.99477524, 0, 0.10208941, 150.79, 115, 296.277)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_4" type="Node3D" parent="Spawns" unique_id=92793108]
+transform = Transform3D(0.08395786, 0, 0.9964693, 0, 1, 0, -0.9964693, 0, 0.08395786, 159.286, 115.406, 353.401)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_ROGUES" type="Node3D" parent="Spawns" unique_id=1151396344]
+transform = Transform3D(-0.9934528, 0, 0.11424354, 0, 1, 0, -0.11424354, 0, -0.9934528, -220.94, 116.32, 422.392)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_2" type="Node3D" parent="Spawns" unique_id=735999522]
+transform = Transform3D(-0.9876665, 0, 0.15657243, 0, 1, 0, -0.15657243, 0, -0.9876665, -229.167, 116.344, 421.47)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_3" type="Node3D" parent="Spawns" unique_id=179656660]
+transform = Transform3D(-0.92543477, 0, -0.37890702, 0, 1, 0, 0.37890702, 0, -0.92543477, -203.797, 116.138, 424.884)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 4
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_4" type="Node3D" parent="Spawns" unique_id=1705644945]
+transform = Transform3D(-0.030102398, 0, 0.9995468, 0, 1, 0, -0.9995468, 0, -0.030102398, -276.497, 116.344, 453.097)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 4
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_5" type="Node3D" parent="Spawns" unique_id=1141624168]
+transform = Transform3D(-0.948854, 0, 0.3157152, 0, 1, 0, -0.3157152, 0, -0.948854, -262.101, 119.853, 402.467)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_DUST_MITES" type="Node3D" parent="Spawns" unique_id=7644963]
+transform = Transform3D(0.42918897, 0, 0.9032147, 0, 1, 0, -0.9032147, 0, 0.42918897, -99.799, 108.58, 511.024)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_ROGUES_6" type="Node3D" parent="Spawns" unique_id=1979367719]
+transform = Transform3D(0.60509527, 0, -0.79615307, 0, 1, 0, 0.79615307, 0, 0.60509527, 154.381, 140.166, 602.509)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_7" type="Node3D" parent="Spawns" unique_id=1724653050]
+transform = Transform3D(-0.2879122, 0, -0.9576568, 0, 1, 0, 0.9576568, 0, -0.2879122, 154.055, 139.891, 588.44)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_8" type="Node3D" parent="Spawns" unique_id=589769635]
+transform = Transform3D(0.92472947, 0, 0.38062498, 0, 1, 0, -0.38062498, 0, 0.92472947, -251.886, 128.81, 99.5566)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_9" type="Node3D" parent="Spawns" unique_id=1550173768]
+transform = Transform3D(-0.7680601, 0, 0.6403778, 0, 1, 0, -0.6403778, 0, -0.7680601, -253.268, 128.714, 91.7185)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_10" type="Node3D" parent="Spawns" unique_id=1027387081]
+transform = Transform3D(-0.85776895, 0, -0.5140354, 0, 1, 0, 0.5140354, 0, -0.85776895, -238.81, 128.912, 91.1791)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 6
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_11" type="Node3D" parent="Spawns" unique_id=873469046]
+transform = Transform3D(0.12075881, 0, 0.99268186, 0, 1, 0, -0.99268186, 0, 0.12075881, -248.302, 129.041, 113.329)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 6
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_SKELETONS_5" type="Node3D" parent="Spawns" unique_id=1992411726]
+transform = Transform3D(-0.8966642, 0, 0.44271132, 0, 1, 0, -0.44271132, 0, -0.8966642, -221.316, 164.236, 262.576)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_6" type="Node3D" parent="Spawns" unique_id=1002998614]
+transform = Transform3D(-0.2872936, 0, 0.9578426, 0, 1, 0, -0.9578426, 0, -0.2872936, -228.736, 150.167, 313.792)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_7" type="Node3D" parent="Spawns" unique_id=1914430948]
+transform = Transform3D(0.22642013, 0, 0.9740297, 0, 1, 0, -0.9740297, 0, 0.22642013, -172.936, 152.206, 341.779)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_8" type="Node3D" parent="Spawns" unique_id=1131865807]
+transform = Transform3D(-0.67595047, 0, 0.73694706, 0, 1, 0, -0.73694706, 0, -0.67595047, -56.0092, 124.117, 266.135)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_9" type="Node3D" parent="Spawns" unique_id=1751255484]
+transform = Transform3D(-0.072681226, 0, -0.9973552, 0, 1, 0, 0.9973552, 0, -0.072681226, 372.639, 162.579, 158.501)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_10" type="Node3D" parent="Spawns" unique_id=442660934]
+transform = Transform3D(0.62711644, 0, -0.7789255, 0, 1, 0, 0.7789255, 0, 0.62711644, 422.599, 157.731, 122.309)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_11" type="Node3D" parent="Spawns" unique_id=2137679785]
+transform = Transform3D(0.5692853, 0, -0.82214004, 0, 1, 0, 0.82214004, 0, 0.5692853, 331.757, 158.691, 90.8724)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_12" type="Node3D" parent="Spawns" unique_id=37009214]
+transform = Transform3D(0.89652973, 0, -0.44298357, 0, 1, 0, 0.44298357, 0, 0.89652973, -268.066, 159.264, -234.79)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_BONE_GOLEM" type="Node3D" parent="Spawns" unique_id=1226732723]
+transform = Transform3D(-0.36204755, 0, 0.9321596, 0, 1, 0, -0.9321596, 0, -0.36204755, -352.102, 173.719, -225.907)
+script = ExtResource("74_u7glr")
+spawn_group = "BONE GOLEM"
+wander_group = 7
+preview_name = "Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv3  +1 variants"
+
+[node name="SP_NIGHTWRAITH" type="Node3D" parent="Spawns" unique_id=841938927]
+transform = Transform3D(-0.99771625, 0, 0.06754512, 0, 1, 0, -0.06754512, 0, -0.99771625, 377.181, 158.654, -701.846)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_DUST_MITES_2" type="Node3D" parent="Spawns" unique_id=875499582]
+transform = Transform3D(0.7760002, 0, 0.63073266, 0, 1, 0, -0.63073266, 0, 0.7760002, -107.33, 88.6786, 685.557)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_NIGHTWRAITH_2" type="Node3D" parent="Spawns" unique_id=1141491591]
+transform = Transform3D(-0.18952388, 0, 0.98187613, 0, 1, 0, -0.98187613, 0, -0.18952388, 74.119, 153.592, -623.898)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_ROGUES_12" type="Node3D" parent="Spawns" unique_id=1236587363]
+transform = Transform3D(-0.574191, 0, -0.8187214, 0, 1, 0, 0.8187214, 0, -0.574191, -216.364, 131.58, 97.32)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_SKELETONS_13" type="Node3D" parent="Spawns" unique_id=1702260523]
+transform = Transform3D(-0.9888943, 0, 0.14862055, 0, 1, 0, -0.14862055, 0, -0.9888943, -532.921, 208.889, -389.183)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_BLOODSKULL" type="Node3D" parent="Spawns" unique_id=736362056]
+transform = Transform3D(0.5896757, 0, 0.80764014, 0, 1, 0, -0.80764014, 0, 0.5896757, -513.963, 192.865, -324.996)
+script = ExtResource("74_u7glr")
+spawn_group = "BLOODSKULL"
+preview_name = "Captain Bloodskull"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv7"
+
+[node name="SP_SKELETONS_14" type="Node3D" parent="Spawns" unique_id=1704062525]
+transform = Transform3D(-0.19661354, 0, 0.9804811, 0, 1, 0, -0.9804811, 0, -0.19661354, -469.936, 178.141, -274.672)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_15" type="Node3D" parent="Spawns" unique_id=867069026]
+transform = Transform3D(0.91722494, 0, -0.3983697, 0, 1, 0, 0.3983697, 0, 0.91722494, -435.392, 175.373, -270.601)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_16" type="Node3D" parent="Spawns" unique_id=746253516]
+transform = Transform3D(-0.65549254, 0, 0.75520164, 0, 1, 0, -0.75520164, 0, -0.65549254, -411.697, 175.121, -250.293)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_17" type="Node3D" parent="Spawns" unique_id=1994394228]
+transform = Transform3D(0.6274794, 0, 0.7786332, 0, 1, 0, -0.7786332, 0, 0.6274794, -331.232, 170.781, -217.179)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_18" type="Node3D" parent="Spawns" unique_id=1315922498]
+transform = Transform3D(0.98326063, 0, -0.18220463, 0, 1, 0, 0.18220463, 0, 0.98326063, -557.629, 211.761, -389.581)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_KINTCH" type="Node3D" parent="Spawns" unique_id=366841102]
+transform = Transform3D(0.91711783, 0, -0.39861622, 0, 1, 0, 0.39861622, 0, 0.91711783, 39.8697, 168.733, 257.596)
+script = ExtResource("74_u7glr")
+spawn_group = "KINTCH"
+preview_name = "Kintch"
+preview_model = "troll_female"
+preview_info = "Lv6"
+
+[node name="SP_GHOULS" type="Node3D" parent="Spawns" unique_id=1008952729]
+transform = Transform3D(0.80685925, 0, -0.59074366, 0, 1, 0, 0.59074366, 0, 0.80685925, 40.1521, 165.015, 260.716)
+script = ExtResource("74_u7glr")
+spawn_group = "GHOULS"
+preview_name = "Rancid Ghoul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_ALIPKA" type="Node3D" parent="Spawns" unique_id=79071494]
+transform = Transform3D(-0.8781584, 0, 0.47836995, 0, 1, 0, -0.47836995, 0, -0.8781584, 38.9128, 165.018, 241.929)
+script = ExtResource("74_u7glr")
+spawn_group = "ALIPKA"
+preview_name = "Alipka"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv6"
+
+[node name="SP_GHOULS_2" type="Node3D" parent="Spawns" unique_id=476211876]
+transform = Transform3D(-0.34243008, 0, -0.9395433, 0, 1, 0, 0.9395433, 0, -0.34243008, 48.5402, 165.021, 248.663)
+script = ExtResource("74_u7glr")
+spawn_group = "GHOULS"
+preview_name = "Rancid Ghoul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_GHOULS_3" type="Node3D" parent="Spawns" unique_id=747257842]
+transform = Transform3D(0.9292938, 0, 0.36934128, 0, 1, 0, -0.36934128, 0, 0.9292938, 40.4273, 159.014, 260.1)
+script = ExtResource("74_u7glr")
+spawn_group = "GHOULS"
+preview_name = "Rancid Ghoul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_GHOULS_4" type="Node3D" parent="Spawns" unique_id=213162682]
+transform = Transform3D(-0.3681245, 0, -0.9297765, 0, 1, 0, 0.9297765, 0, -0.3681245, 47.449, 159.017, 247.694)
+script = ExtResource("74_u7glr")
+spawn_group = "GHOULS"
+preview_name = "Rancid Ghoul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_RATS" type="Node3D" parent="Spawns" unique_id=1889768349]
+transform = Transform3D(-0.41667747, 0, 0.9090544, 0, 1, 0, -0.9090544, 0, -0.41667747, 37.1324, 159.02, 244.888)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_RATS_2" type="Node3D" parent="Spawns" unique_id=25614186]
+transform = Transform3D(0.7859368, 0, -0.61830693, 0, 1, 0, 0.61830693, 0, 0.7859368, 38.3316, 153.015, 259.942)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_SPIDERS" type="Node3D" parent="Spawns" unique_id=1182208416]
+transform = Transform3D(-0.841124, 0, 0.54084235, 0, 1, 0, -0.54084235, 0, -0.841124, 39.2868, 153.018, 242.757)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_2" type="Node3D" parent="Spawns" unique_id=1561928636]
+transform = Transform3D(0.96295625, 0, -0.2696577, 0, 1, 0, 0.2696577, 0, 0.96295625, 42.7763, 147.016, 257.715)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_3" type="Node3D" parent="Spawns" unique_id=1657251499]
+transform = Transform3D(-0.9451486, 0, 0.3266407, 0, 1, 0, -0.3266407, 0, -0.9451486, 41.8435, 147.018, 243.739)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_4" type="Node3D" parent="Spawns" unique_id=1373475534]
+transform = Transform3D(-0.8518366, 0, -0.5238076, 0, 1, 0, 0.5238076, 0, -0.8518366, 37.6618, 141.018, 248.46)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_5" type="Node3D" parent="Spawns" unique_id=2071849024]
+transform = Transform3D(-0.7256987, 0, -0.68801266, 0, 1, 0, 0.68801266, 0, -0.7256987, 45.4613, 139.92, 248.056)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_RATS_3" type="Node3D" parent="Spawns" unique_id=1939788731]
+transform = Transform3D(0.5574018, 0, -0.83024293, 0, 1, 0, 0.83024293, 0, 0.5574018, 46.3442, 153.014, 246.852)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_MOATRAT" type="Node3D" parent="Spawns" unique_id=563465659]
+transform = Transform3D(0.9602469, 0, 0.279152, 0, 1, 0, -0.279152, 0, 0.9602469, 15.7921, 122.934, 57.2261)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_MOATRAT_2" type="Node3D" parent="Spawns" unique_id=2082093382]
+transform = Transform3D(0.9299608, 0, 0.36765876, 0, 1, 0, -0.36765876, 0, 0.9299608, -5.04854, 121.973, 56.2769)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_MOATRAT_3" type="Node3D" parent="Spawns" unique_id=1518905848]
+transform = Transform3D(0.9395642, 0, 0.34237275, 0, 1, 0, -0.34237275, 0, 0.9395642, -39.9449, 122.529, 57.7574)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_MOATRAT_4" type="Node3D" parent="Spawns" unique_id=851164383]
+transform = Transform3D(-0.38223192, 0, 0.9240664, 0, 1, 0, -0.9240664, 0, -0.38223192, -66.4523, 110.629, 15.3227)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_MOATRAT_5" type="Node3D" parent="Spawns" unique_id=1934265110]
+transform = Transform3D(-0.1192167, 0, 0.99286824, 0, 1, 0, -0.99286824, 0, -0.1192167, -26.84, 106.669, 20.5734)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_MOATRAT_6" type="Node3D" parent="Spawns" unique_id=1368157640]
+transform = Transform3D(-0.09007987, 0, -0.99593455, 0, 1, 0, 0.99593455, 0, -0.09007987, 58.4955, 126.495, 14.6304)
+script = ExtResource("74_u7glr")
+spawn_group = "MOATRAT"
+wander_group = 16
+preview_name = "Moat Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv4  +1 variants"
+
+[node name="SP_WOOD_MITES" type="Node3D" parent="Spawns" unique_id=598037579]
+transform = Transform3D(0.712712, 0, -0.7014568, 0, 1, 0, 0.7014568, 0, 0.712712, 171.316, 147.149, -136.587)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_2" type="Node3D" parent="Spawns" unique_id=1180004368]
+transform = Transform3D(0.14212796, 0, -0.9898483, 0, 1, 0, 0.9898483, 0, 0.14212796, 187.934, 140.96, -135.159)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_3" type="Node3D" parent="Spawns" unique_id=1719562696]
+transform = Transform3D(-0.76328886, 0, 0.64605737, 0, 1, 0, -0.64605737, 0, -0.76328886, 161.925, 140.891, -144.809)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_4" type="Node3D" parent="Spawns" unique_id=1407017116]
+transform = Transform3D(0.9662678, 0, 0.25753924, 0, 1, 0, -0.25753924, 0, 0.9662678, 170.352, 140.906, -132.759)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_5" type="Node3D" parent="Spawns" unique_id=1364692439]
+transform = Transform3D(0.6401325, 0, 0.76826453, 0, 1, 0, -0.76826453, 0, 0.6401325, 160.634, 147.336, -135.434)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_6" type="Node3D" parent="Spawns" unique_id=955888900]
+transform = Transform3D(-0.87543076, 0, -0.48334348, 0, 1, 0, 0.48334348, 0, -0.87543076, 161.377, 134.816, -145.516)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_7" type="Node3D" parent="Spawns" unique_id=395671951]
+transform = Transform3D(0.98501736, 0, 0.17245537, 0, 1, 0, -0.17245537, 0, 0.98501736, 161.068, 134.796, -132.426)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_8" type="Node3D" parent="Spawns" unique_id=1102982276]
+transform = Transform3D(-0.621353, 0, -0.7835308, 0, 1, 0, 0.7835308, 0, -0.621353, 184.835, 134.767, -146.25)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_WOOD_MITES_9" type="Node3D" parent="Spawns" unique_id=1762826627]
+transform = Transform3D(0.95658904, 0, -0.29144022, 0, 1, 0, 0.29144022, 0, 0.95658904, 170.015, 134.854, -131.753)
+script = ExtResource("74_u7glr")
+spawn_group = "WOOD MITES"
+preview_name = "Wood Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv4"
+preview_scale = 0.5
+
+[node name="SP_SKELETONS_I" type="Node3D" parent="Spawns" unique_id=1151909871]
+transform = Transform3D(-0.9154098, 0, -0.4025231, 0, 1, 0, 0.4025231, 0, -0.9154098, -365.226, 188.009, -242.427)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_2" type="Node3D" parent="Spawns" unique_id=857854869]
+transform = Transform3D(0.9680501, 0, 0.2507568, 0, 1, 0, -0.2507568, 0, 0.9680501, -371.446, 196.126, -233.454)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_3" type="Node3D" parent="Spawns" unique_id=1189105705]
+transform = Transform3D(-0.3294764, 0, 0.9441638, 0, 1, 0, -0.9441638, 0, -0.3294764, -364.554, 196.128, -243.142)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_19" type="Node3D" parent="Spawns" unique_id=408385765]
+transform = Transform3D(0.6972702, 0, 0.7168084, 0, 1, 0, -0.7168084, 0, 0.6972702, -380.597, 202.124, -234.781)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_20" type="Node3D" parent="Spawns" unique_id=1956109864]
+transform = Transform3D(-0.1860611, 0, 0.98253816, 0, 1, 0, -0.98253816, 0, -0.1860611, -367.481, 202.125, -232.123)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_21" type="Node3D" parent="Spawns" unique_id=1198695661]
+transform = Transform3D(-0.9606144, 0, -0.2778848, 0, 1, 0, 0.2778848, 0, -0.9606144, -365.483, 202.126, -241.584)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_22" type="Node3D" parent="Spawns" unique_id=264864638]
+transform = Transform3D(0.6437417, 0, 0.7652428, 0, 1, 0, -0.7652428, 0, 0.6437417, -372.991, 208.128, -231.737)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_23" type="Node3D" parent="Spawns" unique_id=1290650589]
+transform = Transform3D(-0.99932134, 0, 0.036835592, 0, 1, 0, -0.036835592, 0, -0.99932134, -366.681, 208.126, -238.288)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III" type="Node3D" parent="Spawns" unique_id=1077169400]
+transform = Transform3D(0.7569791, 0, 0.6534391, 0, 1, 0, -0.6534391, 0, 0.7569791, -380.114, 214.126, -234.156)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_2" type="Node3D" parent="Spawns" unique_id=1926961517]
+transform = Transform3D(0.034388393, 0, 0.99940854, 0, 1, 0, -0.99940854, 0, 0.034388393, -365.403, 214.127, -230.823)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_3" type="Node3D" parent="Spawns" unique_id=422512519]
+transform = Transform3D(-0.35866117, 0, 0.9334678, 0, 1, 0, -0.9334678, 0, -0.35866117, -364.457, 214.129, -243.365)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_4" type="Node3D" parent="Spawns" unique_id=380080429]
+transform = Transform3D(0.09943615, 0, -0.99504393, 0, 1, 0, 0.99504393, 0, 0.09943615, -371.965, 220.146, -244.661)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_BONEBASHER" type="Node3D" parent="Spawns" unique_id=400445573]
+transform = Transform3D(0.8011034, 0, -0.598526, 0, 1, 0, 0.598526, 0, 0.8011034, -367.325, 220.134, -235.801)
+script = ExtResource("74_u7glr")
+spawn_group = "BONEBASHER"
+preview_name = "Bonebasher"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv8"
+
+[node name="SP_SKELETONS_I_4" type="Node3D" parent="Spawns" unique_id=475645622]
+transform = Transform3D(-0.044963736, 0, -0.9989886, 0, 1, 0, 0.9989886, 0, -0.044963736, -373.379, 190.131, -240.856)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_DUNE_GIANT" type="Node3D" parent="Spawns" unique_id=1560314355]
+transform = Transform3D(0.9984625, 0, 0.055431504, 0, 1, 0, -0.055431504, 0, 0.9984625, -82.0759, 97.0246, 618.441)
+script = ExtResource("74_u7glr")
+spawn_group = "DUNE GIANT"
+wander_group = 21
+preview_name = "Wayward Dune Giant"
+preview_model = "giant/giant.dts"
+preview_info = "Lv35"
+preview_scale = 6.5
+
+[node name="SP_BATS" type="Node3D" parent="Spawns" unique_id=1280203417]
+transform = Transform3D(-0.6713974, 0, 0.7410975, 0, 1, 0, -0.7410975, 0, -0.6713974, 251.23, 141.849, 401.578)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 23
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_2" type="Node3D" parent="Spawns" unique_id=30398994]
+transform = Transform3D(-0.5964911, 0, 0.8026197, 0, 1, 0, -0.8026197, 0, -0.5964911, 178.788, 141.588, 454.462)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 23
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_3" type="Node3D" parent="Spawns" unique_id=1468635234]
+transform = Transform3D(0.8291557, 0, -0.5590178, 0, 1, 0, 0.5590178, 0, 0.8291557, 153.304, 136.789, 431.993)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 23
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_4" type="Node3D" parent="Spawns" unique_id=2087352267]
+transform = Transform3D(0.20904689, 0, 0.97790563, 0, 1, 0, -0.97790563, 0, 0.20904689, 61.0107, 117.371, 462.66)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 23
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_5" type="Node3D" parent="Spawns" unique_id=405456538]
+transform = Transform3D(0.849462, 0, 0.5276498, 0, 1, 0, -0.5276498, 0, 0.849462, 193.222, 143.777, 523.138)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 23
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_6" type="Node3D" parent="Spawns" unique_id=2055208020]
+transform = Transform3D(-0.6713974, 0, 0.7410975, 0, 1, 0, -0.7410975, 0, -0.6713974, -211.556, 152.216, 318.725)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 24
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_7" type="Node3D" parent="Spawns" unique_id=323103844]
+transform = Transform3D(-0.6713974, 0, 0.7410975, 0, 1, 0, -0.7410975, 0, -0.6713974, -142.144, 153.572, 276.075)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 25
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_8" type="Node3D" parent="Spawns" unique_id=740786672]
+transform = Transform3D(-0.87472963, 0, 0.4846112, 0, 1, 0, -0.4846112, 0, -0.87472963, -45.7204, 119.702, 288.437)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 26
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_9" type="Node3D" parent="Spawns" unique_id=597392482]
+transform = Transform3D(-0.87472963, 0, 0.4846112, 0, 1, 0, -0.4846112, 0, -0.87472963, 373.299, 162.587, 110.117)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 27
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_BATS_10" type="Node3D" parent="Spawns" unique_id=305930922]
+transform = Transform3D(-0.87472963, 0, 0.4846112, 0, 1, 0, -0.4846112, 0, -0.87472963, 442.275, 158.097, 97.5915)
+script = ExtResource("74_u7glr")
+spawn_group = "BATS"
+wander_group = 27
+preview_name = "Vicious Bat"
+preview_model = "animal/bat.dts"
+preview_info = "Lv4  +3 variants"
+
+[node name="SP_SKELETONS_I_5" type="Node3D" parent="Spawns" unique_id=665810948]
+transform = Transform3D(0.10506654, 0, -0.9944652, 0, 1, 0, 0.9944652, 0, 0.10506654, 52.316, 126.652, 261.096)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_ROGUES_13" type="Node3D" parent="Spawns" unique_id=36182167]
+transform = Transform3D(-0.14320245, 0, 0.9896934, 0, 1, 0, -0.9896934, 0, -0.14320245, -478.788, 161.64, 461.652)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_14" type="Node3D" parent="Spawns" unique_id=1564115716]
+transform = Transform3D(-0.2331229, 0, 0.9724473, 0, 1, 0, -0.9724473, 0, -0.2331229, -463.176, 159.849, 442.488)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_15" type="Node3D" parent="Spawns" unique_id=1225266749]
+transform = Transform3D(-0.8973662, 0, 0.44128656, 0, 1, 0, -0.44128656, 0, -0.8973662, -489.888, 168.675, 427.928)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_16" type="Node3D" parent="Spawns" unique_id=1028736908]
+transform = Transform3D(-0.6282346, 0, 0.7780239, 0, 1, 0, -0.7780239, 0, -0.6282346, -517.837, 172.287, 420.054)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_17" type="Node3D" parent="Spawns" unique_id=1606869125]
+transform = Transform3D(0.033006947, 0, 0.9994551, 0, 1, 0, -0.9994551, 0, 0.033006947, -533.523, 169.025, 469.413)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_18" type="Node3D" parent="Spawns" unique_id=34506393]
+transform = Transform3D(0.9398048, 0, 0.3417118, 0, 1, 0, -0.3417118, 0, 0.9398048, -537.334, 170.182, 446.503)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_19" type="Node3D" parent="Spawns" unique_id=1728826691]
+transform = Transform3D(-0.67063373, 0, -0.7417886, 0, 1, 0, 0.7417886, 0, -0.67063373, -534.585, 170.377, 439.759)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_SKELETONS_I_6" type="Node3D" parent="Spawns" unique_id=255857361]
+transform = Transform3D(0.83172065, 0, -0.5551943, 0, 1, 0, 0.5551943, 0, 0.83172065, 75.4384, 123.67, 426.682)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_7" type="Node3D" parent="Spawns" unique_id=1318627909]
+transform = Transform3D(0.6277566, 0, -0.7784097, 0, 1, 0, 0.7784097, 0, 0.6277566, 54.6114, 119.711, 399.285)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_8" type="Node3D" parent="Spawns" unique_id=609060451]
+transform = Transform3D(0.115772836, 0, -0.9932757, 0, 1, 0, 0.9932757, 0, 0.115772836, 28.9943, 115.449, 423.734)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_9" type="Node3D" parent="Spawns" unique_id=764401502]
+transform = Transform3D(-0.99792576, 0, -0.06437553, 0, 1, 0, 0.06437553, 0, -0.99792576, 45.1447, 116.538, 446.522)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_10" type="Node3D" parent="Spawns" unique_id=743001143]
+transform = Transform3D(0.9492456, 0, 0.31453592, 0, 1, 0, -0.31453592, 0, 0.9492456, 92.6874, 118.978, 387.504)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_11" type="Node3D" parent="Spawns" unique_id=1664512030]
+transform = Transform3D(0.80426157, 0, -0.5942755, 0, 1, 0, 0.5942755, 0, 0.80426157, 64.6973, 117.688, 374.648)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_NIGHTWRAITH_3" type="Node3D" parent="Spawns" unique_id=694155949]
+transform = Transform3D(-0.69978803, 0, -0.7143506, 0, 1, 0, 0.7143506, 0, -0.69978803, 44.2352, 148.878, -585.121)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_4" type="Node3D" parent="Spawns" unique_id=1151938347]
+transform = Transform3D(-0.96852237, 0, 0.2489266, 0, 1, 0, -0.2489266, 0, -0.96852237, 117.686, 149.63, -581.906)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_5" type="Node3D" parent="Spawns" unique_id=110674958]
+transform = Transform3D(-0.90742576, 0, -0.42021245, 0, 1, 0, 0.42021245, 0, -0.90742576, 86.0902, 148.296, -560.172)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_DUST_MITES_3" type="Node3D" parent="Spawns" unique_id=1932646753]
+transform = Transform3D(-0.4931981, 0, -0.86991704, 0, 1, 0, 0.86991704, 0, -0.4931981, 293.026, 135.75, 181.807)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_BLACKBEAR" type="Node3D" parent="Spawns" unique_id=1995519223]
+transform = Transform3D(0.05610375, 0, -0.99842495, 0, 1, 0, 0.99842495, 0, 0.05610375, 101.34, 143.926, 231.741)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_2" type="Node3D" parent="Spawns" unique_id=286973274]
+transform = Transform3D(-0.98969144, 0, -0.14321631, 0, 1, 0, 0.14321631, 0, -0.98969144, 7.4398, 144.126, 218.246)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_3" type="Node3D" parent="Spawns" unique_id=1782882828]
+transform = Transform3D(-0.47401133, 0, 0.88051873, 0, 1, 0, -0.88051873, 0, -0.47401133, 86.2435, 145.855, 259.654)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 18
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_ROGUES_20" type="Node3D" parent="Spawns" unique_id=1644198974]
+transform = Transform3D(-0.5484246, 0, 0.8362, 0, 1, 0, -0.8362, 0, -0.5484246, -198.936, 136.975, 149.216)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_BLACKBEAR_4" type="Node3D" parent="Spawns" unique_id=792529136]
+transform = Transform3D(0.43391383, 0, 0.90095437, 0, 1, 0, -0.90095437, 0, 0.43391383, 91.3558, 157.519, 94.7652)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_5" type="Node3D" parent="Spawns" unique_id=705547633]
+transform = Transform3D(0.7269236, 0, -0.6867184, 0, 1, 0, 0.6867184, 0, 0.7269236, 82.3409, 154.934, 67.6207)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_6" type="Node3D" parent="Spawns" unique_id=624038156]
+transform = Transform3D(-0.3999492, 0, 0.91653734, 0, 1, 0, -0.91653734, 0, -0.3999492, 124.009, 146.015, 241.005)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 18
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_DUST_MITES_4" type="Node3D" parent="Spawns" unique_id=1962500104]
+transform = Transform3D(-0.0641422, 0, -0.9979408, 0, 1, 0, 0.9979408, 0, -0.0641422, 257.187, 129.485, 173.471)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_5" type="Node3D" parent="Spawns" unique_id=1837785168]
+transform = Transform3D(-0.25605318, 0, -0.9666627, 0, 1, 0, 0.9666627, 0, -0.25605318, 317.273, 141.656, 253.842)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SKELETONS_I_12" type="Node3D" parent="Spawns" unique_id=43456194]
+transform = Transform3D(-0.8377091, 0, 0.54611665, 0, 1, 0, -0.54611665, 0, -0.8377091, 53.836, 145.019, 252.118)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_13" type="Node3D" parent="Spawns" unique_id=635550893]
+transform = Transform3D(-0.8082675, 0, 0.5888155, 0, 1, 0, -0.5888155, 0, -0.8082675, 70.1075, 145.019, 261.85)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_BLACKBEAR_7" type="Node3D" parent="Spawns" unique_id=1759578110]
+transform = Transform3D(-0.35776502, 0, 0.93381166, 0, 1, 0, -0.93381166, 0, -0.35776502, -136.112, 146.157, 366.308)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_8" type="Node3D" parent="Spawns" unique_id=1795222957]
+transform = Transform3D(-0.98917526, 0, 0.14673905, 0, 1, 0, -0.14673905, 0, -0.98917526, -136.137, 142.952, 395.749)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_9" type="Node3D" parent="Spawns" unique_id=1677135043]
+transform = Transform3D(-0.33102503, 0, -0.943622, 0, 1, 0, 0.943622, 0, -0.33102503, -170.358, 152.932, 356.508)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_10" type="Node3D" parent="Spawns" unique_id=1193611270]
+transform = Transform3D(-0.7633565, 0, -0.64597744, 0, 1, 0, 0.64597744, 0, -0.7633565, -155.477, 144.881, 385.074)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SKELETONS_III_5" type="Node3D" parent="Spawns" unique_id=28947650]
+transform = Transform3D(-0.9371054, 0, -0.3490465, 0, 1, 0, 0.3490465, 0, -0.9371054, -387.811, 191.286, -277.22)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_6" type="Node3D" parent="Spawns" unique_id=151325318]
+transform = Transform3D(0.12869172, 0, 0.9916847, 0, 1, 0, -0.9916847, 0, 0.12869172, -358.938, 200.469, -290.681)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_7" type="Node3D" parent="Spawns" unique_id=30404205]
+transform = Transform3D(-0.5199814, 0, 0.8541776, 0, 1, 0, -0.8541776, 0, -0.5199814, -361.169, 193.791, -263.357)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_8" type="Node3D" parent="Spawns" unique_id=248975753]
+transform = Transform3D(-0.9155082, 0, 0.40229923, 0, 1, 0, -0.40229923, 0, -0.9155082, -338.522, 184.227, -250.524)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_SKELETONS_III_9" type="Node3D" parent="Spawns" unique_id=458955774]
+transform = Transform3D(-0.990598, 0, -0.1368049, 0, 1, 0, 0.1368049, 0, -0.990598, -344.419, 176.71, -238.53)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS III"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +2 variants"
+
+[node name="SP_NIGHTWRAITH_6" type="Node3D" parent="Spawns" unique_id=1720463183]
+transform = Transform3D(-0.72992367, 0, 0.68352866, 0, 1, 0, -0.68352866, 0, -0.72992367, 434.769, 152.577, -646.777)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_7" type="Node3D" parent="Spawns" unique_id=1868903414]
+transform = Transform3D(-0.99907017, 0, 0.043113604, 0, 1, 0, -0.043113604, 0, -0.99907017, 424.153, 160.712, -687.509)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_RATS_4" type="Node3D" parent="Spawns" unique_id=306105203]
+transform = Transform3D(0.42698538, 0, -0.90425855, 0, 1, 0, 0.90425855, 0, 0.42698538, 461.924, 124.69, -254.812)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_RATS_5" type="Node3D" parent="Spawns" unique_id=603459332]
+transform = Transform3D(-0.2333945, 0, -0.9723821, 0, 1, 0, 0.9723821, 0, -0.2333945, 461.309, 124.427, -274.823)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_RATS_6" type="Node3D" parent="Spawns" unique_id=851767992]
+transform = Transform3D(-0.77418274, 0, -0.6329621, 0, 1, 0, 0.6329621, 0, -0.77418274, 458.985, 124.467, -284.649)
+script = ExtResource("74_u7glr")
+spawn_group = "RATS"
+preview_name = "Filthy Rat"
+preview_model = "animal/rat.dts"
+preview_info = "Lv2  +1 variants"
+
+[node name="SP_SKELETONS_I_14" type="Node3D" parent="Spawns" unique_id=991317161]
+transform = Transform3D(-0.21940349, 0, 0.9756342, 0, 1, 0, -0.9756342, 0, -0.21940349, 108.83, 116.947, 319.404)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_15" type="Node3D" parent="Spawns" unique_id=340364964]
+transform = Transform3D(0.98075056, 0, -0.19526494, 0, 1, 0, 0.19526494, 0, 0.98075056, 136.271, 116.993, 346.057)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+wander_group = 1
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_16" type="Node3D" parent="Spawns" unique_id=82849737]
+transform = Transform3D(0.9795935, 0, 0.20098902, 0, 1, 0, -0.20098902, 0, 0.9795935, 139.136, 121.949, 384.521)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_DUST_MITES_6" type="Node3D" parent="Spawns" unique_id=1324989192]
+transform = Transform3D(-0.9725367, 0, 0.23274958, 0, 1, 0, -0.23274958, 0, -0.9725367, -63.9528, 106.762, 522.392)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_7" type="Node3D" parent="Spawns" unique_id=1626611985]
+transform = Transform3D(-0.45150062, 0, -0.8922708, 0, 1, 0, 0.8922708, 0, -0.45150062, -73.7505, 88.3403, 690.9)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_8" type="Node3D" parent="Spawns" unique_id=1845574385]
+transform = Transform3D(-0.9725367, 0, 0.23274958, 0, 1, 0, -0.23274958, 0, -0.9725367, -63.9528, 106.762, 522.392)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_9" type="Node3D" parent="Spawns" unique_id=586601313]
+transform = Transform3D(-0.9603034, 0, -0.27895764, 0, 1, 0, 0.27895764, 0, -0.9603034, 270.913, 130.66, 176.165)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SKELETONS_I_17" type="Node3D" parent="Spawns" unique_id=1242930222]
+transform = Transform3D(0.35683578, 0, 0.93416715, 0, 1, 0, -0.93416715, 0, 0.35683578, 346.864, 163.927, 149.308)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_SKELETONS_I_18" type="Node3D" parent="Spawns" unique_id=1880005925]
+transform = Transform3D(0.103945225, 0, 0.994583, 0, 1, 0, -0.994583, 0, 0.103945225, 354.565, 162.977, 126.005)
+script = ExtResource("74_u7glr")
+spawn_group = "SKELETONS I"
+preview_name = "Frail Skeleton"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv1  +1 variants"
+
+[node name="SP_ROGUES_21" type="Node3D" parent="Spawns" unique_id=2110140816]
+transform = Transform3D(0.9248537, 0, 0.38032314, 0, 1, 0, -0.38032314, 0, 0.9248537, -579.919, 173.828, 575.813)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_22" type="Node3D" parent="Spawns" unique_id=1271101595]
+transform = Transform3D(0.71215105, 0, 0.7020263, 0, 1, 0, -0.7020263, 0, 0.71215105, -591.997, 175.004, 536.34)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_23" type="Node3D" parent="Spawns" unique_id=1105598615]
+transform = Transform3D(0.003467986, 0, 0.999994, 0, 1, 0, -0.999994, 0, 0.003467986, -605.543, 173.814, 507.713)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_24" type="Node3D" parent="Spawns" unique_id=1816814854]
+transform = Transform3D(0.46690065, 0, 0.88430977, 0, 1, 0, -0.88430977, 0, 0.46690065, -595.332, 173.836, 471.717)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_25" type="Node3D" parent="Spawns" unique_id=786698190]
+transform = Transform3D(-0.9722067, 0, 0.23412412, 0, 1, 0, -0.23412412, 0, -0.9722067, -595.026, 174.038, 468.76)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_26" type="Node3D" parent="Spawns" unique_id=153126078]
+transform = Transform3D(-0.040079508, 0, 0.99919647, 0, 1, 0, -0.99919647, 0, -0.040079508, -569.986, 172.175, 457.864)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 201
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_27" type="Node3D" parent="Spawns" unique_id=1546104629]
+transform = Transform3D(-0.90484196, 0, 0.42574766, 0, 1, 0, -0.42574766, 0, -0.90484196, -570.44, 179.758, 407.66)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_28" type="Node3D" parent="Spawns" unique_id=1864761756]
+transform = Transform3D(-0.9994209, 0, 0.034027357, 0, 1, 0, -0.034027357, 0, -0.9994209, -556.07, 179.809, 399.491)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_29" type="Node3D" parent="Spawns" unique_id=109027106]
+transform = Transform3D(-0.5463505, 0, 0.83755666, 0, 1, 0, -0.83755666, 0, -0.5463505, -550.694, 180.644, 385.983)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_30" type="Node3D" parent="Spawns" unique_id=2056306849]
+transform = Transform3D(-0.83293086, 0, -0.55337703, 0, 1, 0, 0.55337703, 0, -0.83293086, -546.893, 180.549, 383.641)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_31" type="Node3D" parent="Spawns" unique_id=1159636369]
+transform = Transform3D(-0.9415176, 0, 0.33696386, 0, 1, 0, -0.33696386, 0, -0.9415176, -528.991, 177.536, 392.415)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_32" type="Node3D" parent="Spawns" unique_id=1454702681]
+transform = Transform3D(-0.98946273, 0, 0.14478792, 0, 1, 0, -0.14478792, 0, -0.98946273, -252.097, 132.135, 46.3334)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_33" type="Node3D" parent="Spawns" unique_id=1015519333]
+transform = Transform3D(-0.8896077, 0, 0.45672542, 0, 1, 0, -0.45672542, 0, -0.8896077, -305.818, 133.943, 48.8308)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_34" type="Node3D" parent="Spawns" unique_id=1528357273]
+transform = Transform3D(0.0787462, 0, 0.9968947, 0, 1, 0, -0.9968947, 0, 0.0787462, -309.16, 134.255, 51.2845)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_ROGUES_35" type="Node3D" parent="Spawns" unique_id=1972431782]
+transform = Transform3D(-0.27510047, 0, 0.96141547, 0, 1, 0, -0.96141547, 0, -0.27510047, -281.951, 131.269, 101.94)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+wander_group = 5
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_DUST_MITES_10" type="Node3D" parent="Spawns" unique_id=349307177]
+transform = Transform3D(0.58746463, 0, -0.8092498, 0, 1, 0, 0.8092498, 0, 0.58746463, 320.594, 146.451, 226.489)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_11" type="Node3D" parent="Spawns" unique_id=2101341810]
+transform = Transform3D(0.69747657, 0, 0.7166076, 0, 1, 0, -0.7166076, 0, 0.69747657, 414.994, 156.199, 190.836)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_12" type="Node3D" parent="Spawns" unique_id=1980325045]
+transform = Transform3D(-0.6515028, 0, 0.75864625, 0, 1, 0, -0.75864625, 0, -0.6515028, 452.055, 150.234, 138.328)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SPIDERS_6" type="Node3D" parent="Spawns" unique_id=1862745733]
+transform = Transform3D(0.27700442, 0, -0.96086866, 0, 1, 0, 0.96086866, 0, 0.27700442, 385.233, 161.799, 185.783)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_7" type="Node3D" parent="Spawns" unique_id=1103628418]
+transform = Transform3D(-0.857356, 0, -0.51472384, 0, 1, 0, 0.51472384, 0, -0.857356, 362.356, 167.387, 215.629)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_DUST_MITES_13" type="Node3D" parent="Spawns" unique_id=1529924860]
+transform = Transform3D(0.1610147, 0, 0.986952, 0, 1, 0, -0.986952, 0, 0.1610147, 371.02, 166.863, 214.203)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_14" type="Node3D" parent="Spawns" unique_id=1907104855]
+transform = Transform3D(-0.34374163, 0, -0.93906426, 0, 1, 0, 0.93906426, 0, -0.34374163, 353.341, 159.581, 253.547)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_15" type="Node3D" parent="Spawns" unique_id=1116601408]
+transform = Transform3D(0.86408514, 0, -0.5033457, 0, 1, 0, 0.5033457, 0, 0.86408514, 345.576, 165.379, 176.504)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SPIDERS_8" type="Node3D" parent="Spawns" unique_id=945787483]
+transform = Transform3D(0.64132375, 0, -0.7672704, 0, 1, 0, 0.7672704, 0, 0.64132375, 339.085, 163.824, 166.954)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_9" type="Node3D" parent="Spawns" unique_id=579979741]
+transform = Transform3D(0.62636983, 0, 0.77952605, 0, 1, 0, -0.77952605, 0, 0.62636983, 372.353, 162.989, 168.131)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_ROGUES_36" type="Node3D" parent="Spawns" unique_id=1371942470]
+transform = Transform3D(0.7468042, 0, -0.665044, 0, 1, 0, 0.665044, 0, 0.7468042, 166.325, 138.552, 547.139)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_DUST_MITES_16" type="Node3D" parent="Spawns" unique_id=1246418590]
+transform = Transform3D(0.8455434, 0, -0.53390676, 0, 1, 0, 0.53390676, 0, 0.8455434, 337.785, 162.604, 189.8)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_17" type="Node3D" parent="Spawns" unique_id=450962262]
+transform = Transform3D(-0.20716052, 0, -0.97830695, 0, 1, 0, 0.97830695, 0, -0.20716052, 435.061, 149.93, 242.46)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_DUST_MITES_18" type="Node3D" parent="Spawns" unique_id=1620116922]
+transform = Transform3D(0.61765784, 0, 0.7864469, 0, 1, 0, -0.7864469, 0, 0.61765784, 445.391, 145.723, 211.178)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SPIDERS_10" type="Node3D" parent="Spawns" unique_id=437115859]
+transform = Transform3D(0.79959244, 0, -0.600543, 0, 1, 0, 0.600543, 0, 0.79959244, 381.271, 162.104, 112.835)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_11" type="Node3D" parent="Spawns" unique_id=595556090]
+transform = Transform3D(0.8245817, 0, 0.56574297, 0, 1, 0, -0.56574297, 0, 0.8245817, 397.224, 159.024, 114.533)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_ROGUES_37" type="Node3D" parent="Spawns" unique_id=558202007]
+transform = Transform3D(0.8506386, 0, -0.5257508, 0, 1, 0, 0.5257508, 0, 0.8506386, 165.168, 142.208, 623.071)
+script = ExtResource("74_u7glr")
+spawn_group = "ROGUES"
+preview_name = "Dreaded Stalker"
+preview_model = "human_male"
+preview_info = "Lv3  +11 variants"
+
+[node name="SP_BLACKBEAR_11" type="Node3D" parent="Spawns" unique_id=609993575]
+transform = Transform3D(-0.9699782, 0, -0.24319185, 0, 1, 0, 0.24319185, 0, -0.9699782, 540.669, 152.876, -95.5912)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 202
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_12" type="Node3D" parent="Spawns" unique_id=1896432738]
+transform = Transform3D(0.77238446, 0, 0.63515526, 0, 1, 0, -0.63515526, 0, 0.77238446, 506.484, 150.572, -84.221)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 202
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_13" type="Node3D" parent="Spawns" unique_id=1895476987]
+transform = Transform3D(0.0708724, 0, 0.9974854, 0, 1, 0, -0.9974854, 0, 0.0708724, 519.461, 150.462, -66.4633)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 202
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_14" type="Node3D" parent="Spawns" unique_id=1349927338]
+transform = Transform3D(0.9750475, 0, 0.2219961, 0, 1, 0, -0.2219961, 0, 0.9750475, 536.963, 150.691, -61.819)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 202
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_15" type="Node3D" parent="Spawns" unique_id=1374882390]
+transform = Transform3D(0.57357216, 0, -0.81915504, 0, 1, 0, 0.81915504, 0, 0.57357216, 560.48, 151.544, -58.5137)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 202
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_DUST_MITES_19" type="Node3D" parent="Spawns" unique_id=250113499]
+transform = Transform3D(0.08621676, 0, -0.9962764, 0, 1, 0, 0.9962764, 0, 0.08621676, 576.012, 149.844, -47.9941)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES"
+preview_name = "Stink Beetle"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv1  +4 variants"
+preview_scale = 2.0
+
+[node name="SP_SPIDERS_12" type="Node3D" parent="Spawns" unique_id=346431063]
+transform = Transform3D(-0.905983, 0, -0.42331412, 0, 1, 0, 0.42331412, 0, -0.905983, 588.731, 149.906, -27.1632)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_13" type="Node3D" parent="Spawns" unique_id=874615596]
+transform = Transform3D(-0.8192721, 0, -0.5734049, 0, 1, 0, 0.5734049, 0, -0.8192721, -140.603, 148.708, 129.095)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_14" type="Node3D" parent="Spawns" unique_id=306287428]
+transform = Transform3D(0.8375414, 0, 0.5463739, 0, 1, 0, -0.5463739, 0, 0.8375414, -118.69, 149.239, 90.7521)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_15" type="Node3D" parent="Spawns" unique_id=550981704]
+transform = Transform3D(0.22075023, 0, -0.97533035, 0, 1, 0, 0.97533035, 0, 0.22075023, -154.839, 151.155, 80.6272)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_16" type="Node3D" parent="Spawns" unique_id=698007272]
+transform = Transform3D(0.31039608, 0, -0.9506073, 0, 1, 0, 0.9506073, 0, 0.31039608, -183.163, 148.748, 69.8444)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_17" type="Node3D" parent="Spawns" unique_id=1467611598]
+transform = Transform3D(0.9874786, 0, -0.15775307, 0, 1, 0, 0.15775307, 0, 0.9874786, -183.471, 148.245, 48.9089)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_18" type="Node3D" parent="Spawns" unique_id=79869363]
+transform = Transform3D(0.4516454, 0, -0.89219755, 0, 1, 0, 0.89219755, 0, 0.4516454, -210.772, 143.616, 35.2119)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_19" type="Node3D" parent="Spawns" unique_id=1682276369]
+transform = Transform3D(0.97965276, 0, 0.20070006, 0, 1, 0, -0.20070006, 0, 0.97965276, -207.205, 141.945, 18.7679)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_SPIDERS_20" type="Node3D" parent="Spawns" unique_id=1288941564]
+transform = Transform3D(-0.8547761, 0, 0.51899695, 0, 1, 0, -0.51899695, 0, -0.8547761, -218.663, 143.458, 12.2223)
+script = ExtResource("74_u7glr")
+spawn_group = "SPIDERS"
+wander_group = 203
+preview_name = "Black Widow"
+preview_model = "insects/spider.dts"
+preview_info = "Lv1  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_GUARD_MELLION" type="Node3D" parent="Spawns" unique_id=1162495847]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.8387, 164.256, -14.492)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD MELLION"
+wander_group = 2
+preview_name = "Guard Mellion"
+preview_model = "human_female"
+preview_info = "Lv20"
+
+[node name="SP_GUARD_KAI" type="Node3D" parent="Spawns" unique_id=1394111757]
+transform = Transform3D(-0.9999803, 0, -0.006283091, 0, 1, 0, 0.006283091, 0, -0.9999803, 197.785, 162.975, -12.8007)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD KAI"
+wander_group = 3
+preview_name = "Guard Kai"
+preview_model = "elf_male"
+preview_info = "Lv20"
+
+[node name="SP_GUARD_TRAMBOC" type="Node3D" parent="Spawns" unique_id=1753787758]
+transform = Transform3D(-0.9244662, 0, -0.381264, 0, 1, 0, 0.381264, 0, -0.9244662, 130.754, 147, 38.8869)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD TRAMBOC"
+preview_name = "Guard Tramboc"
+preview_model = "human_male"
+preview_info = "Lv20"
+
+[node name="SP_GUARD_CHARVOR" type="Node3D" parent="Spawns" unique_id=650297427]
+transform = Transform3D(-0.7038908, 0, 0.7103082, 0, 1, 0, -0.7103082, 0, -0.7038908, 120.28, 148.587, -6.98378)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD CHARVOR"
+preview_name = "Guard Charvor"
+preview_model = "dwarf_male"
+preview_info = "Lv50"
+
+[node name="SP_GUARD_TARDONY" type="Node3D" parent="Spawns" unique_id=1343540887]
+transform = Transform3D(0.24701084, 0, -0.96901274, 0, 1, 0, 0.96901274, 0, 0.24701084, -143.105, 148, -294.246)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD TARDONY"
+preview_name = "Guard Tardony"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_GUARD_DAIL" type="Node3D" parent="Spawns" unique_id=785415138]
+transform = Transform3D(0.38815907, 0, -0.9215924, 0, 1, 0, 0.9215924, 0, 0.38815907, -142.527, 148, -282.306)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD DAIL"
+preview_name = "Guard Dail"
+preview_model = "elf_male"
+preview_info = "Lv50"
+
+[node name="SP_GUARD_SOITHAR" type="Node3D" parent="Spawns" unique_id=1723472856]
+transform = Transform3D(-0.8068984, 0, -0.59069026, 0, 1, 0, 0.59069026, 0, -0.8068984, 37.9202, 125.72, 276.5973)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD SOITHAR"
+preview_name = "Guard Soithar"
+preview_model = "elf_male"
+preview_info = "Lv50"
+
+[node name="SP_GUARD_CLESK" type="Node3D" parent="Spawns" unique_id=679332965]
+transform = Transform3D(-0.9286542, 0, -0.37094656, 0, 1, 0, 0.37094656, 0, -0.9286542, 27.8435, 125.386, 261.949)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD CLESK"
+wander_group = 19
+preview_name = "Guard Clesk"
+preview_model = "dwarf_male"
+preview_info = "Lv50"
+
+[node name="SP_GUARD_THARBIS" type="Node3D" parent="Spawns" unique_id=779468598]
+transform = Transform3D(0.98563546, 0, 0.16888694, 0, 1, 0, -0.16888694, 0, 0.98563546, -19.6837, 165.29, -34.5186)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD THARBIS"
+preview_name = "Guard Tharbis"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_CHANCELLOR_TOLIP" type="Node3D" parent="Spawns" unique_id=1816212881]
+transform = Transform3D(-0.93525887, 0, -0.35396457, 0, 1, 0, 0.35396457, 0, -0.93525887, 36.4442, 125.914, 250.456)
+script = ExtResource("74_u7glr")
+spawn_group = "CHANCELLOR TOLIP"
+preview_name = "Chancellor Tolip"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_SPAZNA" type="Node3D" parent="Spawns" unique_id=861602782]
+transform = Transform3D(0.8164733, 0, -0.5773832, 0, 1, 0, 0.5773832, 0, 0.8164733, 468.454, 168.611, 420.664)
+script = ExtResource("74_u7glr")
+spawn_group = "SPAZNA"
+wander_group = 15
+preview_name = "Spazna Litigok"
+preview_model = "gnome_female"
+preview_info = "Lv50"
+
+[node name="SP_BANKER" type="Node3D" parent="Spawns" unique_id=1747908992]
+transform = Transform3D(-0.5253083, 0, 0.850912, 0, 1, 0, -0.850912, 0, -0.5253083, 167.999, 129.793, -145.256)
+script = ExtResource("74_u7glr")
+spawn_group = "BANKER"
+preview_name = "Banker Letza"
+preview_model = "human_female"
+preview_info = "Lv100"
+
+[node name="SP_ASCENDANTTRANQUILITY" type="Node3D" parent="Spawns" unique_id=1057678164]
+transform = Transform3D(0.06664478, 0, 0.99777675, 0, 1, 0, -0.99777675, 0, 0.06664478, -477.44, 244.206, -44.2672)
+script = ExtResource("74_u7glr")
+spawn_group = "ASCENDANTTRANQUILITY"
+preview_name = "Ascendant of Tranquility"
+preview_model = "halfling/halfling_male_1.dts"
+preview_info = "Lv97"
+preview_scale = 2.0
+
+[node name="SP_GUILDMASTER" type="Node3D" parent="Spawns" unique_id=1700751227]
+transform = Transform3D(-0.7976366, 0, -0.6031383, 0, 1, 0, 0.6031383, 0, -0.7976366, 138.373, 148.718, -9.54623)
+script = ExtResource("74_u7glr")
+spawn_group = "GUILDMASTER"
+preview_name = "Guild Master Khallan"
+preview_model = "titan_male"
+preview_info = "Lv100"
+
+[node name="SP_FOODVENDOR1" type="Node3D" parent="Spawns" unique_id=2077679306]
+transform = Transform3D(0.843578, 0, 0.5370067, 0, 1, 0, -0.5370067, 0, 0.843578, 179.34, 129.443, -129.908)
+script = ExtResource("74_u7glr")
+spawn_group = "FOODVENDOR1"
+preview_name = "Rhenddra Jelqom"
+preview_model = "human_female"
+preview_info = "Lv50"
+
+[node name="SP_LOREMASTER" type="Node3D" parent="Spawns" unique_id=275679702]
+transform = Transform3D(-0.8491469, 0, 0.5281567, 0, 1, 0, -0.5281567, 0, -0.8491469, 186.586, 123.093, -132.361)
+script = ExtResource("74_u7glr")
+spawn_group = "LOREMASTER"
+preview_name = "Loremaster of Trinst"
+preview_model = "elf_female"
+preview_info = "Lv100"
+
+[node name="SP_GHAQUA" type="Node3D" parent="Spawns" unique_id=555012875]
+transform = Transform3D(-0.8491469, 0, 0.5281567, 0, 1, 0, -0.5281567, 0, -0.8491469, 255, 62, -491)
+script = ExtResource("74_u7glr")
+spawn_group = "GHAQUA"
+preview_name = "Ghaqua"
+preview_model = "amphibian/monster4.dts"
+preview_info = "Lv17"
+preview_scale = 0.9
+
+[node name="SP_CHAUL_SLER" type="Node3D" parent="Spawns" unique_id=777714164]
+transform = Transform3D(-0.12334864, 0, 0.9923634, 0, 1, 0, -0.9923634, 0, -0.12334864, 108.868, 129.197, -143.371)
+script = ExtResource("74_u7glr")
+spawn_group = "CHAUL SLER"
+preview_name = "Chaul Sler"
+preview_model = "elf_female"
+preview_info = "Lv50"
+
+[node name="SP_SHAFRA_KRI" type="Node3D" parent="Spawns" unique_id=1038303924]
+transform = Transform3D(-0.032987732, 0, 0.99945575, 0, 1, 0, -0.99945575, 0, -0.032987732, 107.294, 129.166, -117.707)
+script = ExtResource("74_u7glr")
+spawn_group = "SHAFRA KRI"
+preview_name = "Shafra Kri"
+preview_model = "human_female"
+preview_info = "Lv50"
+
+[node name="SP_DREY_ALEELMA" type="Node3D" parent="Spawns" unique_id=1087628950]
+transform = Transform3D(0.10947932, 0, -0.99398905, 0, 1, 0, 0.99398905, 0, 0.10947932, 141.694, 129.098, -118.124)
+script = ExtResource("74_u7glr")
+spawn_group = "DREY ALEELMA"
+preview_name = "Drey Aleelma"
+preview_model = "human_male"
+preview_info = "Lv50"
+
+[node name="SP_SAN_ALBEY" type="Node3D" parent="Spawns" unique_id=587414760]
+transform = Transform3D(0.035986118, 0, -0.9993523, 0, 1, 0, 0.9993523, 0, 0.035986118, 142.347, 129.109, -135.92)
+script = ExtResource("74_u7glr")
+spawn_group = "SAN ALBEY"
+preview_name = "San Albey"
+preview_model = "dwarf_male"
+preview_info = "Lv50"
+
+[node name="SP_VINA_KEESANE" type="Node3D" parent="Spawns" unique_id=2074826725]
+transform = Transform3D(0.33538583, 0, -0.94208086, 0, 1, 0, 0.94208086, 0, 0.33538583, 140.694, 128.921, -151.437)
+script = ExtResource("74_u7glr")
+spawn_group = "VINA KEESANE"
+preview_name = "Vina Keesane"
+preview_model = "elf_female"
+preview_info = "Lv50"
+
+[node name="SP_ISHAUL_YON" type="Node3D" parent="Spawns" unique_id=2048707050]
+transform = Transform3D(-0.051272713, 0, 0.9986847, 0, 1, 0, -0.9986847, 0, -0.051272713, 108.414, 129.117, -160.561)
+script = ExtResource("74_u7glr")
+spawn_group = "ISHAUL YON"
+preview_name = "Ishaul Yon"
+preview_model = "elf_male"
+preview_info = "Lv50"
+
+[node name="SP_MUAN_CORD" type="Node3D" parent="Spawns" unique_id=1286544068]
+transform = Transform3D(-0.10236201, 0, 0.9947472, 0, 1, 0, -0.9947472, 0, -0.10236201, 108.515, 129.206, -179.08)
+script = ExtResource("74_u7glr")
+spawn_group = "MUAN CORD"
+preview_name = "Muan Cord"
+preview_model = "gnome_male"
+preview_info = "Lv50"
+
+[node name="SP_INNKEEPER_DUR" type="Node3D" parent="Spawns" unique_id=633425864]
+transform = Transform3D(0.8067768, 0, -0.5908563, 0, 1, 0, 0.5908563, 0, 0.8067768, 185.103, 128.155, -139.291)
+script = ExtResource("74_u7glr")
+spawn_group = "INNKEEPER DUR"
+preview_name = "Innkeeper Dur"
+preview_model = "human_male"
+preview_info = "Lv100"
+
+[node name="SP_BARKEEPER_MEERI" type="Node3D" parent="Spawns" unique_id=231284327]
+transform = Transform3D(0.9544223, 0, -0.2984595, 0, 1, 0, 0.2984595, 0, 0.9544223, 185.217, 128.209, -129.465)
+script = ExtResource("74_u7glr")
+spawn_group = "BARKEEPER MEERI"
+preview_name = "Barkeeper Meeri"
+preview_model = "titan_female"
+preview_info = "Lv100"
+
+[node name="SP_DANGAR" type="Node3D" parent="Spawns" unique_id=1499240221]
+transform = Transform3D(-0.78988755, 0, 0.6132517, 0, 1, 0, -0.6132517, 0, -0.78988755, 131.015, 127.791, -186.177)
+script = ExtResource("74_u7glr")
+spawn_group = "DANGAR"
+preview_name = "Dangar Metalbender"
+preview_model = "dwarf_male"
+preview_info = "Lv100"
+
+[node name="SP_BRUNO" type="Node3D" parent="Spawns" unique_id=1527566871]
+transform = Transform3D(-0.7854033, 0, 0.61898434, 0, 1, 0, -0.61898434, 0, -0.7854033, 129.031, 127.971, -186.775)
+script = ExtResource("74_u7glr")
+spawn_group = "BRUNO"
+preview_name = "Bruno Oremaster"
+preview_model = "dwarf_male"
+preview_info = "Lv100"
+preview_scale = 1.3
+
+[node name="SP_TENLAIN" type="Node3D" parent="Spawns" unique_id=1427559669]
+transform = Transform3D(-0.29036823, 0, -0.95691496, 0, 1, 0, 0.95691496, 0, -0.29036823, 141.225, 128.921, -154.965)
+script = ExtResource("74_u7glr")
+spawn_group = "TENLAIN"
+preview_name = "Tenlain Silverwolf"
+preview_model = "elf_male"
+preview_info = "Lv100"
+
+[node name="SP_ALTAIR" type="Node3D" parent="Spawns" unique_id=1926082811]
+transform = Transform3D(0.95890594, 0, 0.28372416, 0, 1, 0, -0.28372416, 0, 0.95890594, 29.4587, 127.66, -187.666)
+script = ExtResource("74_u7glr")
+spawn_group = "ALTAIR"
+preview_name = "Altair"
+preview_model = "human_male"
+preview_info = "Lv35"
+
+[node name="SP_GUARD_HELIN" type="Node3D" parent="Spawns" unique_id=619587577]
+transform = Transform3D(0.0004555742, 0, 0.9999999, 0, 1, 0, -0.9999999, 0, 0.0004555742, -432.551, 155.09, 34.0826)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD HELIN"
+preview_name = "Guard Helin"
+preview_model = "human_female"
+preview_info = "Lv13"
+
+[node name="SP_GUARD_GRIMAL" type="Node3D" parent="Spawns" unique_id=1119559070]
+transform = Transform3D(-0.2996237, 0, 0.95405746, 0, 1, 0, -0.95405746, 0, -0.2996237, -431.675, 154.972, 25.5145)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD GRIMAL"
+preview_name = "Guard Grimal"
+preview_model = "human_male"
+preview_info = "Lv12"
+
+[node name="SP_INITIATE_LAIN" type="Node3D" parent="Spawns" unique_id=1689594338]
+transform = Transform3D(0.9755023, 0, 0.21998923, 0, 1, 0, -0.21998923, 0, 0.9755023, -452.399, 157.261, 39.5899)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE LAIN"
+preview_name = "Initiate Lain"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_GUARD_PRAISAL" type="Node3D" parent="Spawns" unique_id=430286048]
+transform = Transform3D(0.9782183, 0, 0.20757878, 0, 1, 0, -0.20757878, 0, 0.9782183, -439.561, 163.764, 56.8526)
+script = ExtResource("74_u7glr")
+spawn_group = "GUARD PRAISAL"
+wander_group = 11
+preview_name = "Guard Praisal"
+preview_model = "human_female"
+preview_info = "Lv13"
+
+[node name="SP_GOBLIN_EMISSARY" type="Node3D" parent="Spawns" unique_id=513247913]
+transform = Transform3D(0.6538684, 0, 0.7566083, 0, 1, 0, -0.7566083, 0, 0.6538684, -455.941, 163.785, 54.4716)
+script = ExtResource("74_u7glr")
+spawn_group = "GOBLIN EMISSARY"
+preview_name = "Goblin Emissary"
+preview_model = "goblin_male"
+preview_info = "Lv15"
+preview_scale = 1.75
+
+[node name="SP_MASTER_SHOLIN" type="Node3D" parent="Spawns" unique_id=1336913577]
+transform = Transform3D(-0.9899596, 0, -0.14135055, 0, 1, 0, 0.14135055, 0, -0.9899596, -434.736, 163.772, 4.38058)
+script = ExtResource("74_u7glr")
+spawn_group = "MASTER SHOLIN"
+preview_name = "Master Sholin"
+preview_model = "human_male"
+preview_info = "Lv20"
+
+[node name="SP_ORAZUL" type="Node3D" parent="Spawns" unique_id=737608387]
+transform = Transform3D(0.9861999, 0, 0.16555884, 0, 1, 0, -0.16555884, 0, 0.9861999, -449.372, 163.781, 10.3532)
+script = ExtResource("74_u7glr")
+spawn_group = "ORAZUL"
+wander_group = 12
+preview_name = "Orazul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +1 variants"
+
+[node name="SP_ACOLYTE_ASHIR" type="Node3D" parent="Spawns" unique_id=876846125]
+transform = Transform3D(-0.98011565, 0, 0.19842722, 0, 1, 0, -0.19842722, 0, -0.98011565, -451.382, 163.786, 15.4331)
+script = ExtResource("74_u7glr")
+spawn_group = "ACOLYTE ASHIR"
+preview_name = "Acolyte Ashir"
+preview_model = "human_male"
+preview_info = "Lv15"
+
+[node name="SP_ELUETH_HAION" type="Node3D" parent="Spawns" unique_id=1404939616]
+transform = Transform3D(0.980551, 0, 0.19626448, 0, 1, 0, -0.19626448, 0, 0.980551, -452.983, 163.784, 39.0067)
+script = ExtResource("74_u7glr")
+spawn_group = "ELUETH HAION"
+preview_name = "Elueth Haion"
+preview_model = "elf_female"
+preview_info = "Lv18"
+
+[node name="SP_INITIATE" type="Node3D" parent="Spawns" unique_id=2051328454]
+transform = Transform3D(0.1400459, 0, 0.990145, 0, 1, 0, -0.990145, 0, 0.1400459, -450.767, 157.715, -24.7221)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_2" type="Node3D" parent="Spawns" unique_id=1178464241]
+transform = Transform3D(-0.65179396, 0, 0.7583961, 0, 1, 0, -0.7583961, 0, -0.65179396, -449.562, 157.716, -29.2786)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_3" type="Node3D" parent="Spawns" unique_id=377369018]
+transform = Transform3D(0.7486538, 0, 0.6629611, 0, 1, 0, -0.6629611, 0, 0.7486538, -451.946, 157.719, 23.6045)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_4" type="Node3D" parent="Spawns" unique_id=850078109]
+transform = Transform3D(0.9778658, 0, 0.20923287, 0, 1, 0, -0.20923287, 0, 0.9778658, -445.134, 157.722, 52.1216)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_5" type="Node3D" parent="Spawns" unique_id=2143505524]
+transform = Transform3D(0.25998718, 0, 0.96561205, 0, 1, 0, -0.96561205, 0, 0.25998718, -450.34, 157.722, 48.6229)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_6" type="Node3D" parent="Spawns" unique_id=1004454733]
+transform = Transform3D(-0.8915763, 0, 0.4528705, 0, 1, 0, -0.4528705, 0, -0.8915763, -449.495, 164.215, 3.56643)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_7" type="Node3D" parent="Spawns" unique_id=1242649765]
+transform = Transform3D(-0.4076931, 0, -0.913119, 0, 1, 0, 0.913119, 0, -0.4076931, -435.39, 157.429, -30.8489)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_8" type="Node3D" parent="Spawns" unique_id=2086092041]
+transform = Transform3D(-0.60546064, 0, 0.79587525, 0, 1, 0, -0.79587525, 0, -0.60546064, -448.314, 157.429, 1.39574)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_9" type="Node3D" parent="Spawns" unique_id=2022498162]
+transform = Transform3D(0.6250342, 0, 0.7805973, 0, 1, 0, -0.7805973, 0, 0.6250342, -448.453, 157.429, 6.6749)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_10" type="Node3D" parent="Spawns" unique_id=1940301497]
+transform = Transform3D(0.8415089, 0, -0.54024327, 0, 1, 0, 0.54024327, 0, 0.8415089, -437.488, 157.429, 19.864)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_11" type="Node3D" parent="Spawns" unique_id=1356488891]
+transform = Transform3D(-0.45790493, 0, -0.88900113, 0, 1, 0, 0.88900113, 0, -0.45790493, -438.968, 163.929, 38.2958)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_12" type="Node3D" parent="Spawns" unique_id=1091057729]
+transform = Transform3D(0.51074255, 0, -0.8597337, 0, 1, 0, 0.8597337, 0, 0.51074255, -435.258, 163.929, 20.6818)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_13" type="Node3D" parent="Spawns" unique_id=119884534]
+transform = Transform3D(-0.08930457, 0, 0.99600434, 0, 1, 0, -0.99600434, 0, -0.08930457, -410.391, 156.585, 49.1596)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_INITIATE_14" type="Node3D" parent="Spawns" unique_id=151359344]
+transform = Transform3D(0.35293114, 0, 0.9356493, 0, 1, 0, -0.9356493, 0, 0.35293114, -399.948, 156.501, 59.4425)
+script = ExtResource("74_u7glr")
+spawn_group = "INITIATE"
+preview_name = "Sholin Initiate"
+preview_model = "human_male"
+preview_info = "Lv13"
+
+[node name="SP_CENATI_REMAINS" type="Node3D" parent="Spawns" unique_id=1435947148]
+transform = Transform3D(0.55037874, 0, 0.8349151, 0, 1, 0, -0.8349151, 0, 0.55037874, -430.749, 181.489, -123.159)
+script = ExtResource("74_u7glr")
+spawn_group = "CENATI REMAINS"
+wander_group = 13
+preview_name = "Cenati's Remains"
+preview_model = "undead/undead2.dts"
+preview_info = "Lv14"
+preview_scale = 1.5
+
+[node name="SP_NIGHTWRAITH_8" type="Node3D" parent="Spawns" unique_id=1767352961]
+transform = Transform3D(0.051816568, 0, -0.99865663, 0, 1, 0, 0.99865663, 0, 0.051816568, -122.497, 148.854, 262.64)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_9" type="Node3D" parent="Spawns" unique_id=1285451391]
+transform = Transform3D(-0.18777557, 0, 0.98221195, 0, 1, 0, -0.98221195, 0, -0.18777557, -179.364, 154.622, 253.759)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_10" type="Node3D" parent="Spawns" unique_id=645889322]
+transform = Transform3D(-0.88827276, 0, 0.4593164, 0, 1, 0, -0.4593164, 0, -0.88827276, -225.12, 164.848, 245.714)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_11" type="Node3D" parent="Spawns" unique_id=1849121376]
+transform = Transform3D(-0.89573497, 0, -0.44458836, 0, 1, 0, 0.44458836, 0, -0.89573497, -258.077, 161.618, 275.753)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_12" type="Node3D" parent="Spawns" unique_id=499268310]
+transform = Transform3D(-0.31490374, 0, 0.9491236, 0, 1, 0, -0.9491236, 0, -0.31490374, -256.039, 163.215, 234.216)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_13" type="Node3D" parent="Spawns" unique_id=7994040]
+transform = Transform3D(0.44072896, 0, 0.8976402, 0, 1, 0, -0.8976402, 0, 0.44072896, -210.011, 155.215, 201.896)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_14" type="Node3D" parent="Spawns" unique_id=1724921920]
+transform = Transform3D(-0.01892172, 0, 0.99982095, 0, 1, 0, -0.99982095, 0, -0.01892172, -172.999, 146.962, 207.839)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_15" type="Node3D" parent="Spawns" unique_id=1781284480]
+transform = Transform3D(0.8826188, 0, -0.4700894, 0, 1, 0, 0.4700894, 0, 0.8826188, -138.823, 139.228, 207.982)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 14
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_16" type="Node3D" parent="Spawns" unique_id=1785179879]
+transform = Transform3D(-0.43675467, 0, 0.89958066, 0, 1, 0, -0.89958066, 0, -0.43675467, 257.717, 152.834, -706.195)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 15
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_17" type="Node3D" parent="Spawns" unique_id=1472972813]
+transform = Transform3D(-0.59170365, 0, 0.80615556, 0, 1, 0, -0.80615556, 0, -0.59170365, 377.044, 151.993, -671.468)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 15
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_18" type="Node3D" parent="Spawns" unique_id=1291027737]
+transform = Transform3D(-0.9587751, 0, -0.2841659, 0, 1, 0, 0.2841659, 0, -0.9587751, 118.957, 151.399, -631.92)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 15
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_19" type="Node3D" parent="Spawns" unique_id=1030637746]
+transform = Transform3D(0.89613897, 0, 0.4437736, 0, 1, 0, -0.4437736, 0, 0.89613897, 243.47, 157.293, -643.093)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+wander_group = 15
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_NIGHTWRAITH_20" type="Node3D" parent="Spawns" unique_id=1458894977]
+transform = Transform3D(0.89613897, 0, 0.4437736, 0, 1, 0, -0.4437736, 0, 0.89613897, 243.47, 157.293, -643.093)
+script = ExtResource("74_u7glr")
+spawn_group = "NIGHTWRAITH"
+preview_name = "Night Wraith"
+preview_model = "undead/undead.dts"
+preview_info = "Lv8  +3 variants"
+preview_scale = 1.1
+
+[node name="SP_DUST_MITES_II" type="Node3D" parent="Spawns" unique_id=1599231250]
+transform = Transform3D(-0.9882977, 0, 0.1525374, 0, 1, 0, -0.1525374, 0, -0.9882977, 48.3638, 126.714, 255.98)
+script = ExtResource("74_u7glr")
+spawn_group = "DUST MITES II"
+preview_name = "Dust Mite"
+preview_model = "insects/beetle.dts"
+preview_info = "Lv2"
+preview_scale = 0.5
+
+[node name="SP_VAGN_GREENBLADE" type="Node3D" parent="Spawns" unique_id=1425257690]
+transform = Transform3D(-0.03325116, 0, 0.99944705, 0, 1, 0, -0.99944705, 0, -0.03325116, 201.896, 129.007, -228.631)
+script = ExtResource("74_u7glr")
+spawn_group = "VAGN GREENBLADE"
+preview_name = "Vagn Greenblade"
+preview_model = "human_male"
+preview_info = "Lv45"
+
+[node name="SP_SERYB_TILYEOLD" type="Node3D" parent="Spawns" unique_id=1304766147]
+transform = Transform3D(-0.86286676, 0, 0.5054314, 0, 1, 0, -0.5054314, 0, -0.86286676, 60.3129, 128.969, -114.915)
+script = ExtResource("74_u7glr")
+spawn_group = "SERYB TILYEOLD"
+preview_name = "Seryb Tilyeold"
+preview_model = "human_male"
+preview_info = "Lv5"
+
+[node name="SP_ULLYPHO_SHADOWBORNE" type="Node3D" parent="Spawns" unique_id=2127252213]
+transform = Transform3D(-0.328504, 0, 0.9445026, 0, 1, 0, -0.9445026, 0, -0.328504, 102.63, 161.787, -8.69765)
+script = ExtResource("74_u7glr")
+spawn_group = "ULLYPHO SHADOWBORNE"
+preview_name = "Ullypho Shadowborne"
+preview_model = "elf_female"
+preview_info = "Lv20"
+
+[node name="SP_VASSI_THORGISON" type="Node3D" parent="Spawns" unique_id=19009488]
+transform = Transform3D(0.45155817, 0, -0.89224166, 0, 1, 0, 0.89224166, 0, 0.45155817, 45.3055, 131.046, -287.758)
+script = ExtResource("74_u7glr")
+spawn_group = "VASSI THORGISON"
+preview_name = "Vassi Thorgison"
+preview_model = "human_female"
+preview_info = "Lv30"
+
+[node name="SP_VILLAGER" type="Node3D" parent="Spawns" unique_id=984337472]
+transform = Transform3D(0.860414, 0, -0.50959563, 0, 1, 0, 0.50959563, 0, 0.860414, 726.65, 170, 4.13965)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_SUMARLIDI_GRIMSSON" type="Node3D" parent="Spawns" unique_id=915412948]
+transform = Transform3D(-0.4953828, 0, -0.8686748, 0, 1, 0, 0.8686748, 0, -0.4953828, 732.317, 171.784, -14.7855)
+script = ExtResource("74_u7glr")
+spawn_group = "SUMARLIDI GRIMSSON"
+preview_name = "Sumarlidi Grimsson"
+preview_model = "drakken_male"
+preview_info = "Lv50"
+
+[node name="SP_VILLAGER_2" type="Node3D" parent="Spawns" unique_id=789089790]
+transform = Transform3D(-0.6897332, 0, -0.7240636, 0, 1, 0, 0.7240636, 0, -0.6897332, 737.454, 170.693, -26.507)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_3" type="Node3D" parent="Spawns" unique_id=1903765803]
+transform = Transform3D(0.80940974, 0, -0.58724433, 0, 1, 0, 0.58724433, 0, 0.80940974, 733.758, 170.045, 2.16847)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_4" type="Node3D" parent="Spawns" unique_id=380156333]
+transform = Transform3D(-0.71647245, 0, -0.6976154, 0, 1, 0, 0.6976154, 0, -0.71647245, 728.38, 170.145, -32.3831)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_5" type="Node3D" parent="Spawns" unique_id=556986440]
+transform = Transform3D(-0.26809597, 0, -0.9633922, 0, 1, 0, 0.9633922, 0, -0.26809597, 698.017, 164.198, -26.043)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_6" type="Node3D" parent="Spawns" unique_id=843868618]
+transform = Transform3D(-0.9995218, 0, -0.030922338, 0, 1, 0, 0.030922338, 0, -0.9995218, 729.881, 170, -22.0824)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_7" type="Node3D" parent="Spawns" unique_id=1715445903]
+transform = Transform3D(0.98513585, 0, 0.17177695, 0, 1, 0, -0.17177695, 0, 0.98513585, 730.187, 170.017, -3.04994)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_8" type="Node3D" parent="Spawns" unique_id=431252543]
+transform = Transform3D(0.09805356, 0, 0.99518114, 0, 1, 0, -0.99518114, 0, 0.09805356, 724.239, 170, -5.55579)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_9" type="Node3D" parent="Spawns" unique_id=885818704]
+transform = Transform3D(-0.39105242, 0, 0.9203684, 0, 1, 0, -0.9203684, 0, -0.39105242, 716.928, 169.436, -12.6257)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_10" type="Node3D" parent="Spawns" unique_id=884180789]
+transform = Transform3D(-0.9326705, 0, 0.36072952, 0, 1, 0, -0.36072952, 0, -0.9326705, 716.871, 168.998, -26.6696)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_11" type="Node3D" parent="Spawns" unique_id=487565683]
+transform = Transform3D(-0.059329025, 0, -0.9982385, 0, 1, 0, 0.9982385, 0, -0.059329025, 736.835, 170.037, -4.58684)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_12" type="Node3D" parent="Spawns" unique_id=83704019]
+transform = Transform3D(0.64283174, 0, 0.7660074, 0, 1, 0, -0.7660074, 0, 0.64283174, 718.04, 169.816, 4.9409)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_VILLAGER_13" type="Node3D" parent="Spawns" unique_id=769908315]
+transform = Transform3D(0.38775846, 0, 0.92176104, 0, 1, 0, -0.92176104, 0, 0.38775846, 713.454, 168.962, -4.44828)
+script = ExtResource("74_u7glr")
+spawn_group = "VILLAGER"
+preview_name = "Haunted Villager"
+preview_model = "undead/skeleton.dts"
+preview_info = "Lv35"
+
+[node name="SP_ROCKSNAKE" type="Node3D" parent="Spawns" unique_id=688208312]
+transform = Transform3D(0.57983303, 0, -0.81473535, 0, 1, 0, 0.81473535, 0, 0.57983303, 562.005, 168.456, 72.4895)
+script = ExtResource("74_u7glr")
+spawn_group = "ROCKSNAKE"
+preview_name = "Rock Snake"
+preview_model = "animal/snake.dts"
+preview_info = "Lv10"
+preview_scale = 2.0
+
+[node name="SP_BLACKBEAR_16" type="Node3D" parent="Spawns" unique_id=452668809]
+transform = Transform3D(-0.9878895, 0, 0.1551587, 0, 1, 0, -0.1551587, 0, -0.9878895, 67.0036, 147.367, 181.273)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 17
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_17" type="Node3D" parent="Spawns" unique_id=618120550]
+transform = Transform3D(-0.6256647, 0, 0.78009206, 0, 1, 0, -0.78009206, 0, -0.6256647, 85.3358, 159.414, 121.936)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_BLACKBEAR_18" type="Node3D" parent="Spawns" unique_id=1026945975]
+transform = Transform3D(0.24486235, 0, -0.9695579, 0, 1, 0, 0.9695579, 0, 0.24486235, 160.407, 157.731, 158.169)
+script = ExtResource("74_u7glr")
+spawn_group = "BLACKBEAR"
+wander_group = 18
+preview_name = "Black Bear Cub"
+preview_model = "animal/bear.dts"
+preview_info = "Lv2  +1 variants"
+preview_scale = 0.5
+
+[node name="SP_LUNDEREN" type="Node3D" parent="Spawns" unique_id=814307288]
+transform = Transform3D(0.47061765, 0, -0.8823373, 0, 1, 0, 0.8823373, 0, 0.47061765, 398.393, 160.264, 69.0983)
+script = ExtResource("74_u7glr")
+spawn_group = "LUNDEREN"
+preview_name = "Lunderen the Wise"
+preview_model = "elf_female"
+preview_info = "Lv100"
+
+[node name="SP_FEDRA" type="Node3D" parent="Spawns" unique_id=1969512111]
+transform = Transform3D(-0.61925846, 0, 0.7851872, 0, 1, 0, -0.7851872, 0, -0.61925846, -364.61, 132.242, 504.91)
+script = ExtResource("74_u7glr")
+spawn_group = "FEDRA"
+preview_name = "Fedra the Herbalist"
+preview_model = "halfling_female"
+preview_info = "Lv100"
+
+[node name="SP_ROZ" type="Node3D" parent="Spawns" unique_id=1842405075]
+transform = Transform3D(-0.6499521, 0, -0.75997514, 0, 1, 0, 0.75997514, 0, -0.6499521, 514.921, 147.998, -472.978)
+script = ExtResource("74_u7glr")
+spawn_group = "ROZ"
+preview_name = "Roz Stormecho"
+preview_model = "human_female"
+preview_info = "Lv50"
+
+[node name="SP_LOST_SOUL" type="Node3D" parent="Spawns" unique_id=70052701]
+transform = Transform3D(0.9714506, 0, 0.2372417, 0, 1, 0, -0.2372417, 0, 0.9714506, -148.139, 151.266, 326.374)
+script = ExtResource("74_u7glr")
+spawn_group = "LOST SOUL"
+wander_group = 22
+preview_name = "Lost Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv12  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_RAVAGED_SOUL" type="Node3D" parent="Spawns" unique_id=1998692401]
+transform = Transform3D(0.92150974, 0, -0.38835528, 0, 1, 0, 0.38835528, 0, 0.92150974, -165.957, 152.303, 322.929)
+script = ExtResource("74_u7glr")
+spawn_group = "RAVAGED SOUL"
+preview_name = "Ravaged Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_RAVAGED_SOUL_2" type="Node3D" parent="Spawns" unique_id=23453709]
+transform = Transform3D(0.7466788, 0, 0.66518474, 0, 1, 0, -0.66518474, 0, 0.7466788, -176.417, 152.424, 319.226)
+script = ExtResource("74_u7glr")
+spawn_group = "RAVAGED SOUL"
+preview_name = "Ravaged Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_RAVAGED_SOUL_3" type="Node3D" parent="Spawns" unique_id=1010185547]
+transform = Transform3D(-0.96732086, 0, 0.2535554, 0, 1, 0, -0.2535554, 0, -0.96732086, -173.519, 152.62, 302.263)
+script = ExtResource("74_u7glr")
+spawn_group = "RAVAGED SOUL"
+preview_name = "Ravaged Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_RAVAGED_SOUL_4" type="Node3D" parent="Spawns" unique_id=1746325508]
+transform = Transform3D(-0.38626024, 0, -0.92238986, 0, 1, 0, 0.92238986, 0, -0.38626024, -160.555, 152.496, 306.029)
+script = ExtResource("74_u7glr")
+spawn_group = "RAVAGED SOUL"
+preview_name = "Ravaged Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_KEEPER_OF_SOULS" type="Node3D" parent="Spawns" unique_id=476122114]
+transform = Transform3D(0.9681328, 0, 0.25043744, 0, 1, 0, -0.25043744, 0, 0.9681328, -169.221, 152.538, 315.726)
+script = ExtResource("74_u7glr")
+spawn_group = "KEEPER OF SOULS"
+preview_name = "Ravaged Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv14  +2 variants"
+preview_scale = 1.1
+
+[node name="SP_LOST_SOUL_2" type="Node3D" parent="Spawns" unique_id=2017165245]
+transform = Transform3D(0.32434842, 0, 0.9459377, 0, 1, 0, -0.9459377, 0, 0.32434842, -197.978, 152.204, 313.783)
+script = ExtResource("74_u7glr")
+spawn_group = "LOST SOUL"
+wander_group = 22
+preview_name = "Lost Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv12  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_LOST_SOUL_3" type="Node3D" parent="Spawns" unique_id=56714379]
+transform = Transform3D(0.45311317, 0, 0.891453, 0, 1, 0, -0.891453, 0, 0.45311317, -201.34, 151.477, 334.667)
+script = ExtResource("74_u7glr")
+spawn_group = "LOST SOUL"
+wander_group = 22
+preview_name = "Lost Soul"
+preview_model = "undead/undead.dts"
+preview_info = "Lv12  +1 variants"
+preview_scale = 1.1
+
+[node name="SP_BREMDEN" type="Node3D" parent="Spawns" unique_id=585811303]
+transform = Transform3D(-0.44967762, 0, 0.8931909, 0, 1, 0, -0.8931909, 0, -0.44967762, 584.756, 159.359, -541.359)
+script = ExtResource("74_u7glr")
+spawn_group = "BREMDEN"
+preview_name = "Bremden Paladin"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_HOLLEN" type="Node3D" parent="Spawns" unique_id=2022044149]
+transform = Transform3D(0.0619109, 0, -0.9980817, 0, 1, 0, 0.9980817, 0, 0.0619109, 583.627, 159.359, -537.769)
+script = ExtResource("74_u7glr")
+spawn_group = "HOLLEN"
+preview_name = "Hollen Nembersham"
+preview_model = "halfling_male"
+preview_info = "Lv40"
+
+[node name="SP_BREMDEN_2" type="Node3D" parent="Spawns" unique_id=258318294]
+transform = Transform3D(0.5371318, 0, -0.84349835, 0, 1, 0, 0.84349835, 0, 0.5371318, 596.281, 160.731, -513.512)
+script = ExtResource("74_u7glr")
+spawn_group = "BREMDEN"
+preview_name = "Bremden Paladin"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_BREMDEN_3" type="Node3D" parent="Spawns" unique_id=463866659]
+transform = Transform3D(-0.9626445, 0, -0.27076846, 0, 1, 0, 0.27076846, 0, -0.9626445, 594.57, 160.731, -515.583)
+script = ExtResource("74_u7glr")
+spawn_group = "BREMDEN"
+preview_name = "Bremden Paladin"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_MULDIN" type="Node3D" parent="Spawns" unique_id=914424458]
+transform = Transform3D(0.106347375, 0, -0.99432904, 0, 1, 0, 0.99432904, 0, 0.106347375, 523.384, 147.725, -417.561)
+script = ExtResource("74_u7glr")
+spawn_group = "MULDIN"
+preview_name = "Muldin Fanglow"
+preview_model = "halfling_male"
+preview_info = "Lv37"
+
+[node name="SP_FOLLOWERI" type="Node3D" parent="Spawns" unique_id=2061297716]
+transform = Transform3D(0.8067324, 0, 0.59091693, 0, 1, 0, -0.59091693, 0, 0.8067324, 519.736, 147.725, -413.438)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERI"
+preview_name = "Muldin Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERIA" type="Node3D" parent="Spawns" unique_id=1021879768]
+transform = Transform3D(-0.035042543, 0, 0.99938583, 0, 1, 0, -0.99938583, 0, -0.035042543, 524.611, 147.59, -397.767)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERIA"
+preview_name = "Muldin Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_ZOUST" type="Node3D" parent="Spawns" unique_id=103807031]
+transform = Transform3D(-0.93184966, 0, 0.36284462, 0, 1, 0, -0.36284462, 0, -0.93184966, 527.127, 147.78, -400.3)
+script = ExtResource("74_u7glr")
+spawn_group = "ZOUST"
+preview_name = "Zoust"
+preview_model = "halfling_female"
+preview_info = "Lv39"
+
+[node name="SP_FOLLOWERI_2" type="Node3D" parent="Spawns" unique_id=1873367315]
+transform = Transform3D(0.9355982, 0, -0.35306665, 0, 1, 0, 0.35306665, 0, 0.9355982, 514.875, 144.794, -397.611)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERI"
+preview_name = "Muldin Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERI_3" type="Node3D" parent="Spawns" unique_id=1027518758]
+transform = Transform3D(-0.171513, 0, -0.98518187, 0, 1, 0, 0.98518187, 0, -0.171513, 518.801, 144.98, -409.012)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERI"
+preview_name = "Muldin Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERI_4" type="Node3D" parent="Spawns" unique_id=1163181756]
+transform = Transform3D(-0.98716974, 0, -0.15967448, 0, 1, 0, 0.15967448, 0, -0.98716974, 511.447, 144.906, -419.337)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERI"
+preview_name = "Muldin Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_LUNDA" type="Node3D" parent="Spawns" unique_id=967003692]
+transform = Transform3D(-0.7719354, 0, -0.635701, 0, 1, 0, 0.635701, 0, -0.7719354, 498.934, 152.148, -600.673)
+script = ExtResource("74_u7glr")
+spawn_group = "LUNDA"
+preview_name = "Lunda Hokness"
+preview_model = "halfling_female"
+preview_info = "Lv37"
+
+[node name="SP_FOLLOWERII" type="Node3D" parent="Spawns" unique_id=612511911]
+transform = Transform3D(-0.992433, 0, 0.12278739, 0, 1, 0, -0.12278739, 0, -0.992433, 494.699, 152.148, -600.919)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERII"
+preview_name = "Lunda Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERII_2" type="Node3D" parent="Spawns" unique_id=332337569]
+transform = Transform3D(-0.53170896, 0, 0.84692717, 0, 1, 0, -0.84692717, 0, -0.53170896, 485.815, 151.447, -594.194)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERII"
+preview_name = "Lunda Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERII_3" type="Node3D" parent="Spawns" unique_id=1299958859]
+transform = Transform3D(-0.5298009, 0, -0.84812206, 0, 1, 0, 0.84812206, 0, -0.5298009, 497.688, 151.452, -589.09)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERII"
+preview_name = "Lunda Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_FOLLOWERII_4" type="Node3D" parent="Spawns" unique_id=1205414566]
+transform = Transform3D(0.21011856, 0, 0.9776759, 0, 1, 0, -0.9776759, 0, 0.21011856, 482.063, 151.207, -576.099)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERII"
+preview_name = "Lunda Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_SHNEER" type="Node3D" parent="Spawns" unique_id=700226883]
+transform = Transform3D(-0.6044878, 0, -0.7966144, 0, 1, 0, 0.7966144, 0, -0.6044878, 505.452, 152.056, -584.571)
+script = ExtResource("74_u7glr")
+spawn_group = "SHNEER"
+preview_name = "Shneer"
+preview_model = "halfling_female"
+preview_info = "Lv39"
+
+[node name="SP_FOLLOWERIIA" type="Node3D" parent="Spawns" unique_id=591733275]
+transform = Transform3D(0.21832721, 0, -0.9758756, 0, 1, 0, 0.9758756, 0, 0.21832721, 509.717, 152.056, -581.554)
+script = ExtResource("74_u7glr")
+spawn_group = "FOLLOWERIIA"
+preview_name = "Lunda Follower"
+preview_model = "halfling_male"
+preview_info = "Lv33"
+
+[node name="SP_GALEEL" type="Node3D" parent="Spawns" unique_id=1594431615]
+transform = Transform3D(-0.8973431, 0, -0.44133356, 0, 1, 0, 0.44133356, 0, -0.8973431, 207.919, 131.202, -306.558)
+script = ExtResource("74_u7glr")
+spawn_group = "GALEEL"
+preview_name = "Lady Galeel"
+preview_model = "human_female"
+preview_info = "Lv100"
+
+[node name="SP_Thrakal" type="Node3D" parent="Spawns" unique_id=1088332584]
+transform = Transform3D(-0.10780151, 0, -0.99417245, 0, 1, 0, 0.99417245, 0, -0.10780151, 265.959, 143.892, -255.61)
+script = ExtResource("74_u7glr")
+spawn_group = "Thrakal"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_BellWitch" type="Node3D" parent="Spawns" unique_id=1302417394]
+transform = Transform3D(-0.29732487, 0, 0.95477635, 0, 1, 0, -0.95477635, 0, -0.29732487, -248.995, 207.309, -699.913)
+script = ExtResource("74_u7glr")
+spawn_group = "BellWitch"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_BATSCATS" type="Node3D" parent="Spawns" unique_id=1856341049]
+transform = Transform3D(-0.69821537, 0, -0.7158878, 0, 1, 0, 0.7158878, 0, -0.69821537, -237.016, 206.405, -681.265)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_2" type="Node3D" parent="Spawns" unique_id=408406844]
+transform = Transform3D(-0.19271034, 0, -0.9812557, 0, 1, 0, 0.9812557, 0, -0.19271034, -254.194, 206.062, -672.94)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_3" type="Node3D" parent="Spawns" unique_id=2097222071]
+transform = Transform3D(-0.27367383, 0, 0.96182257, 0, 1, 0, -0.96182257, 0, -0.27367383, -204.316, 202.859, -723.079)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_4" type="Node3D" parent="Spawns" unique_id=898411750]
+transform = Transform3D(0.6754589, 0, -0.7373976, 0, 1, 0, 0.7373976, 0, 0.6754589, -245.777, 207.265, -702.453)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_5" type="Node3D" parent="Spawns" unique_id=860878682]
+transform = Transform3D(-0.80620724, 0, -0.59163326, 0, 1, 0, 0.59163326, 0, -0.80620724, -213.041, 203.927, -710.071)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+wander_group = 51
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_6" type="Node3D" parent="Spawns" unique_id=1502369205]
+transform = Transform3D(0.10262932, 0, -0.9947197, 0, 1, 0, 0.9947197, 0, 0.10262932, -219.032, 204.82, -690.585)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+wander_group = 52
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_7" type="Node3D" parent="Spawns" unique_id=2044425208]
+transform = Transform3D(0.12475311, 0, 0.9921878, 0, 1, 0, -0.9921878, 0, 0.12475311, -236.823, 206.652, -718.665)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+wander_group = 53
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_BATSCATS_8" type="Node3D" parent="Spawns" unique_id=1103435035]
+transform = Transform3D(0.509923, 0, -0.86022, 0, 1, 0, 0.86022, 0, 0.509923, -246.781, 206.663, -712.55)
+script = ExtResource("74_u7glr")
+spawn_group = "BATSCATS"
+wander_group = 54
+preview_name = "Bat Familiar"
+preview_model = "animal/bat.dts"
+preview_info = "Lv6  +1 variants"
+preview_scale = 0.6
+
+[node name="SP_GORMICH" type="Node3D" parent="Spawns" unique_id=823154376]
+transform = Transform3D(0.23225038, 0, 0.972656, 0, 1, 0, -0.972656, 0, 0.23225038, -491.194, 251.648, 15.5089)
+script = ExtResource("74_u7glr")
+spawn_group = "GORMICH"
+preview_name = "Gormich"
+preview_model = "gnome_male"
+preview_info = "Lv20"
+
+[node name="SP_Kanee" type="Node3D" parent="Spawns" unique_id=1113502045]
+transform = Transform3D(0.86404467, 0, 0.5034151, 0, 1, 0, -0.5034151, 0, 0.86404467, 343.013, 153.315, -421.667)
+script = ExtResource("74_u7glr")
+spawn_group = "Kanee"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1" type="Node3D" parent="Spawns" unique_id=1962323952]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -541.572, 254.118, 46.7999)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1_2" type="Node3D" parent="Spawns" unique_id=1154813510]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -540.327, 253.741, 49.7407)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1_3" type="Node3D" parent="Spawns" unique_id=822158921]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -542.793, 254.219, 43.9139)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1_4" type="Node3D" parent="Spawns" unique_id=1044435787]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -538.528, 253.67, 48.979)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1_5" type="Node3D" parent="Spawns" unique_id=875248645]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -539.953, 254.041, 46.1144)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS1_1_6" type="Node3D" parent="Spawns" unique_id=1065992293]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -541.174, 254.219, 43.2284)
+script = ExtResource("74_u7glr")
+spawn_group = "GS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS2_1" type="Node3D" parent="Spawns" unique_id=1746360506]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -542.116, 253.876, 49.8518)
+script = ExtResource("74_u7glr")
+spawn_group = "GS2_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS2_1_2" type="Node3D" parent="Spawns" unique_id=1896137036]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -544.354, 254.219, 44.5809)
+script = ExtResource("74_u7glr")
+spawn_group = "GS2_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_GS2_2" type="Node3D" parent="Spawns" unique_id=1179591526]
+transform = Transform3D(0.3737585, 0, 0.92752606, 0, 1, 0, -0.92752606, 0, 0.3737585, -543.283, 254.219, 47.0921)
+script = ExtResource("74_u7glr")
+spawn_group = "GS2_2"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1" type="Node3D" parent="Spawns" unique_id=616468043]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -489.897, 251.604, 13.3573)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1_2" type="Node3D" parent="Spawns" unique_id=178192981]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -488.858, 251.54, 16.4475)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1_3" type="Node3D" parent="Spawns" unique_id=458727031]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -489.502, 251.599, 14.8253)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1_4" type="Node3D" parent="Spawns" unique_id=319182479]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -493.411, 251.703, 14.0585)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1_5" type="Node3D" parent="Spawns" unique_id=1899575895]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -491.639, 251.472, 17.8666)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS1_1_6" type="Node3D" parent="Spawns" unique_id=1253103539]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -492.483, 251.68, 16.0532)
+script = ExtResource("74_u7glr")
+spawn_group = "MS1_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS2_1" type="Node3D" parent="Spawns" unique_id=290749077]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -492.149, 251.666, 13.5469)
+script = ExtResource("74_u7glr")
+spawn_group = "MS2_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS2_1_2" type="Node3D" parent="Spawns" unique_id=1744712330]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -490.393, 251.513, 17.1294)
+script = ExtResource("74_u7glr")
+spawn_group = "MS2_1"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_MS2_2" type="Node3D" parent="Spawns" unique_id=1435905855]
+transform = Transform3D(-0.4386064, 0, -0.89867926, 0, 1, 0, 0.89867926, 0, -0.4386064, -491.225, 251.648, 15.4235)
+script = ExtResource("74_u7glr")
+spawn_group = "MS2_2"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_Eranu" type="Node3D" parent="Spawns" unique_id=449231]
+transform = Transform3D(0.25881907, 0, 0.9659258, 0, 1, 0, -0.9659258, 0, 0.25881907, 30.6521, 132.047, -142.724)
+script = ExtResource("74_u7glr")
+spawn_group = "Eranu"
+preview_info = "group NOT in DB (ignored by server)"
+
+[node name="SP_FEDMA" type="Node3D" parent="Spawns" unique_id=201615483]
+transform = Transform3D(-0.99984276, 0, -0.01773154, 0, 1, 0, 0.01773154, 0, -0.99984276, 124.664, 128.265, -91.1348)
+script = ExtResource("74_u7glr")
+spawn_group = "FEDMA"
+preview_name = "Handmaiden Fedma"
+preview_model = "human_female"
+preview_info = "Lv100"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1043401193]
+transform = Transform3D(327.5248, 0, 0, 0, 0.139, 0, 0, 0, 415.2499, 125.394394, 121.0119, -233.15082)
+mesh = SubResource("PlaneMesh_q7ioi")
+surface_material_override/0 = SubResource("ShaderMaterial_xuc06")

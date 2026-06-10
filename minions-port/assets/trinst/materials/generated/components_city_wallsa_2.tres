@@ -1,0 +1,20 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dc0xigca38jov"]
+
+[ext_resource type="Texture2D" uid="uid://bvxauqc1jm8wn" path="res://assets/trinst/interiors/components_city_wallsa_2.jpg" id="1_srvx7"]
+[ext_resource type="Texture2D" uid="uid://brx68b4ipftmc" path="res://assets/trinst/interiors/components_city_wallsa_2_ao.png" id="2_1bb0h"]
+[ext_resource type="Texture2D" uid="uid://dr67e6mex56x7" path="res://assets/trinst/interiors/components_city_wallsa_2_normal.png" id="3_g73nd"]
+[ext_resource type="Texture2D" uid="uid://dyfkefu7mct83" path="res://assets/trinst/interiors/components_city_wallsa_2_rough.png" id="4_yo2wh"]
+
+[resource]
+resource_name = "cb2_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_srvx7")
+metallic_specular = 0.45
+roughness = 0.88
+roughness_texture = ExtResource("4_yo2wh")
+normal_enabled = true
+normal_scale = 1.4
+normal_texture = ExtResource("3_g73nd")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_1bb0h")

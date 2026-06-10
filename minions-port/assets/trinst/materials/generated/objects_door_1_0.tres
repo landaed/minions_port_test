@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://ccrjbsv03iejx"]
+
+[ext_resource type="Texture2D" uid="uid://df38irmstet0l" path="res://assets/trinst/shapes/objects_door_1_0.jpg" id="1_3y1gj"]
+[ext_resource type="Texture2D" uid="uid://cstid40giclad" path="res://assets/trinst/shapes/objects_door_1_0_ao.png" id="2_72377"]
+[ext_resource type="Texture2D" uid="uid://cg27gfu4xsddi" path="res://assets/trinst/shapes/objects_door_1_0_normal.png" id="3_f6b8r"]
+[ext_resource type="Texture2D" uid="uid://bpmgxdnd4ksnj" path="res://assets/trinst/shapes/objects_door_1_0_rough.png" id="4_r7mjw"]
+
+[resource]
+resource_name = "wood2_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_3y1gj")
+metallic_specular = 0.38
+roughness = 0.82
+roughness_texture = ExtResource("4_r7mjw")
+normal_enabled = true
+normal_texture = ExtResource("3_f6b8r")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_72377")

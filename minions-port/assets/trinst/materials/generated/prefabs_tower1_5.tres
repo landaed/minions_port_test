@@ -1,0 +1,19 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b8wx48v1j5w7"]
+
+[ext_resource type="Texture2D" uid="uid://247qflgovksj" path="res://assets/trinst/interiors/prefabs_tower1_5.jpg" id="1_53d8d"]
+[ext_resource type="Texture2D" uid="uid://b8s7qhq4e418n" path="res://assets/trinst/interiors/prefabs_tower1_5_ao.png" id="2_1dkpu"]
+[ext_resource type="Texture2D" uid="uid://dxlb684wk6tq6" path="res://assets/trinst/interiors/prefabs_tower1_5_normal.png" id="3_gy6c8"]
+[ext_resource type="Texture2D" uid="uid://btkbolpdyax4m" path="res://assets/trinst/interiors/prefabs_tower1_5_rough.png" id="4_6vere"]
+
+[resource]
+resource_name = "s15_enhanced"
+cull_mode = 2
+albedo_texture = ExtResource("1_53d8d")
+metallic_specular = 0.4
+roughness = 0.85
+roughness_texture = ExtResource("4_6vere")
+normal_enabled = true
+normal_texture = ExtResource("3_gy6c8")
+ao_enabled = true
+ao_light_affect = 0.35
+ao_texture = ExtResource("2_1dkpu")
