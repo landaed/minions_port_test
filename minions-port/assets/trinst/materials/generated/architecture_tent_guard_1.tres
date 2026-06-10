@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://b24kjd3tnaqdj"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent_guard_1.jpg" id="1_nyyjd"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent_guard_1_ao.png" id="2_7efa6"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent_guard_1_normal.png" id="3_r1paw"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent_guard_1_rough.png" id="4_pyfe1"]
+[ext_resource type="Texture2D" uid="uid://dfon4657ygtd0" path="res://assets/trinst/interiors/architecture_tent_guard_1.jpg" id="1_nyyjd"]
+[ext_resource type="Texture2D" uid="uid://bqdrysaw085y8" path="res://assets/trinst/interiors/architecture_tent_guard_1_ao.png" id="2_7efa6"]
+[ext_resource type="Texture2D" uid="uid://gunks5frek7h" path="res://assets/trinst/interiors/architecture_tent_guard_1_normal.png" id="3_r1paw"]
+[ext_resource type="Texture2D" uid="uid://bylhi6gmfr0ov" path="res://assets/trinst/interiors/architecture_tent_guard_1_rough.png" id="4_pyfe1"]
 
 [resource]
 resource_name = "mat_tent_sides_enhanced"

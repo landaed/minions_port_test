@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bydcmwvw0si8x"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_table_4_0.jpg" id="1_6w8qp"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_table_4_0_ao.png" id="2_6n5u0"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_table_4_0_normal.png" id="3_xkjm8"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/objects_table_4_0_rough.png" id="4_oyf4v"]
+[ext_resource type="Texture2D" uid="uid://dk1amffegg05c" path="res://assets/trinst/shapes/objects_table_4_0.jpg" id="1_6w8qp"]
+[ext_resource type="Texture2D" uid="uid://s1h1f0yojm66" path="res://assets/trinst/shapes/objects_table_4_0_ao.png" id="2_6n5u0"]
+[ext_resource type="Texture2D" uid="uid://dt21kkv37gy6o" path="res://assets/trinst/shapes/objects_table_4_0_normal.png" id="3_xkjm8"]
+[ext_resource type="Texture2D" uid="uid://bswqbu2pvj1xk" path="res://assets/trinst/shapes/objects_table_4_0_rough.png" id="4_oyf4v"]
 
 [resource]
 resource_name = "inn_benc_enhanced"

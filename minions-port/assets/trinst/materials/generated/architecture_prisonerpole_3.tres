@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bkv3clwjyifv0"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_prisonerpole_3.jpg" id="1_cyj1l"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_prisonerpole_3_ao.png" id="2_2qp8u"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_prisonerpole_3_normal.png" id="3_kl6as"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_prisonerpole_3_rough.png" id="4_sxkh8"]
+[ext_resource type="Texture2D" uid="uid://t78ouy7ggp8l" path="res://assets/trinst/interiors/architecture_prisonerpole_3.jpg" id="1_cyj1l"]
+[ext_resource type="Texture2D" uid="uid://dp2gujpkfh4b8" path="res://assets/trinst/interiors/architecture_prisonerpole_3_ao.png" id="2_2qp8u"]
+[ext_resource type="Texture2D" uid="uid://vxfiniqenwm" path="res://assets/trinst/interiors/architecture_prisonerpole_3_normal.png" id="3_kl6as"]
+[ext_resource type="Texture2D" uid="uid://da0ptw23rdiy" path="res://assets/trinst/interiors/architecture_prisonerpole_3_rough.png" id="4_sxkh8"]
 
 [resource]
 resource_name = "mudrust1_enhanced"

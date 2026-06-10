@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://csoj63n45duqg"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_pit1_4.jpg" id="1_7w64d"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_pit1_4_ao.png" id="2_g3eqh"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_pit1_4_normal.png" id="3_g3siw"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_pit1_4_rough.png" id="4_bvl7r"]
+[ext_resource type="Texture2D" uid="uid://on3f6keba28e" path="res://assets/trinst/interiors/architecture_pit1_4.jpg" id="1_7w64d"]
+[ext_resource type="Texture2D" uid="uid://htertmr4cymy" path="res://assets/trinst/interiors/architecture_pit1_4_ao.png" id="2_g3eqh"]
+[ext_resource type="Texture2D" uid="uid://coy4suu103cp" path="res://assets/trinst/interiors/architecture_pit1_4_normal.png" id="3_g3siw"]
+[ext_resource type="Texture2D" uid="uid://ckcsudcfg7b7x" path="res://assets/trinst/interiors/architecture_pit1_4_rough.png" id="4_bvl7r"]
 
 [resource]
 resource_name = "granite_dark_enhanced"

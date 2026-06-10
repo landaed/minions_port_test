@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cubibh86sj7p5"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_ruins3_0.jpg" id="1_bfena"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_ruins3_0_ao.png" id="2_1gux0"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_ruins3_0_normal.png" id="3_vj752"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_ruins3_0_rough.png" id="4_wvqqo"]
+[ext_resource type="Texture2D" uid="uid://bbugtrospv45i" path="res://assets/trinst/interiors/buildings_large_ruins3_0.jpg" id="1_bfena"]
+[ext_resource type="Texture2D" uid="uid://cg36d5vsrqam4" path="res://assets/trinst/interiors/buildings_large_ruins3_0_ao.png" id="2_1gux0"]
+[ext_resource type="Texture2D" uid="uid://d2ui18e8rc77p" path="res://assets/trinst/interiors/buildings_large_ruins3_0_normal.png" id="3_vj752"]
+[ext_resource type="Texture2D" uid="uid://bqby8bc085plf" path="res://assets/trinst/interiors/buildings_large_ruins3_0_rough.png" id="4_wvqqo"]
 
 [resource]
 resource_name = "040roche_enhanced"

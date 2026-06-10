@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://x2heylgd1055"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_bindpoint_2.jpg" id="1_itcmv"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_bindpoint_2_ao.png" id="2_evxdj"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_bindpoint_2_normal.png" id="3_hnl4t"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_bindpoint_2_rough.png" id="4_a3b4o"]
+[ext_resource type="Texture2D" uid="uid://brsnvu1mim3j7" path="res://assets/trinst/interiors/architecture_bindpoint_2.jpg" id="1_itcmv"]
+[ext_resource type="Texture2D" uid="uid://ckaruvyp6agon" path="res://assets/trinst/interiors/architecture_bindpoint_2_ao.png" id="2_evxdj"]
+[ext_resource type="Texture2D" uid="uid://kn45ngdc1bai" path="res://assets/trinst/interiors/architecture_bindpoint_2_normal.png" id="3_hnl4t"]
+[ext_resource type="Texture2D" uid="uid://cwlj0qeraxuf3" path="res://assets/trinst/interiors/architecture_bindpoint_2_rough.png" id="4_a3b4o"]
 
 [resource]
 resource_name = "rock005_enhanced"

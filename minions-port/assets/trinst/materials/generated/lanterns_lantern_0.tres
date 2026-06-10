@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cgxb8qwbsiaea"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/lanterns_lantern_0.jpg" id="1_71gf1"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/lanterns_lantern_0_ao.png" id="2_4mmrr"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/lanterns_lantern_0_normal.png" id="3_es3ta"]
-[ext_resource type="Texture2D" path="res://assets/trinst/shapes/lanterns_lantern_0_rough.png" id="4_kck7p"]
+[ext_resource type="Texture2D" uid="uid://do7neqb67er41" path="res://assets/trinst/shapes/lanterns_lantern_0.jpg" id="1_71gf1"]
+[ext_resource type="Texture2D" uid="uid://jvditjdh1qwp" path="res://assets/trinst/shapes/lanterns_lantern_0_ao.png" id="2_4mmrr"]
+[ext_resource type="Texture2D" uid="uid://dsu1nnp1l5yn8" path="res://assets/trinst/shapes/lanterns_lantern_0_normal.png" id="3_es3ta"]
+[ext_resource type="Texture2D" uid="uid://bhbdb4y7dxmmr" path="res://assets/trinst/shapes/lanterns_lantern_0_rough.png" id="4_kck7p"]
 
 [resource]
 resource_name = "stone_enhanced"

@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://djuv6linkdb3w"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_castle_1.jpg" id="1_j4sk1"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_castle_1_ao.png" id="2_sfcst"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_castle_1_normal.png" id="3_bj4ei"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_castle_1_rough.png" id="4_jmk4q"]
+[ext_resource type="Texture2D" uid="uid://bpwevgo2rtd5h" path="res://assets/trinst/interiors/components_city_castle_1.jpg" id="1_j4sk1"]
+[ext_resource type="Texture2D" uid="uid://mgyptmaaqmgp" path="res://assets/trinst/interiors/components_city_castle_1_ao.png" id="2_sfcst"]
+[ext_resource type="Texture2D" uid="uid://dr84kiu8sn6ql" path="res://assets/trinst/interiors/components_city_castle_1_normal.png" id="3_bj4ei"]
+[ext_resource type="Texture2D" uid="uid://dcjnqwwng55wj" path="res://assets/trinst/interiors/components_city_castle_1_rough.png" id="4_jmk4q"]
 
 [resource]
 resource_name = "cm1_enhanced"

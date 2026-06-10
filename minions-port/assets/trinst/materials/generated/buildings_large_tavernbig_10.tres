@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dt6ofj2x03f00"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_10.jpg" id="1_ji1s2"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_ao.png" id="2_sjy16"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_normal.png" id="3_50q8d"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_rough.png" id="4_l2cpc"]
+[ext_resource type="Texture2D" uid="uid://0w14d1cecsm6" path="res://assets/trinst/interiors/buildings_large_tavernbig_10.jpg" id="1_ji1s2"]
+[ext_resource type="Texture2D" uid="uid://bvet8t68s41kn" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_ao.png" id="2_sjy16"]
+[ext_resource type="Texture2D" uid="uid://bhq35vjiryd82" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_normal.png" id="3_50q8d"]
+[ext_resource type="Texture2D" uid="uid://bu17bjxlbffgf" path="res://assets/trinst/interiors/buildings_large_tavernbig_10_rough.png" id="4_l2cpc"]
 
 [resource]
 resource_name = "020pierres_enhanced"

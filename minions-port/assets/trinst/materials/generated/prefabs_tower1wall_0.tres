@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bbhegtpj3vk8q"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0.jpg" id="1_68eom"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_ao.png" id="2_5g2o0"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_normal.png" id="3_m04bu"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/prefabs_tower1wall_0_rough.png" id="4_fgsyl"]
+[ext_resource type="Texture2D" uid="uid://b0lppp317vrdb" path="res://assets/trinst/interiors/prefabs_tower1wall_0.jpg" id="1_68eom"]
+[ext_resource type="Texture2D" uid="uid://51wsh48v8kmc" path="res://assets/trinst/interiors/prefabs_tower1wall_0_ao.png" id="2_5g2o0"]
+[ext_resource type="Texture2D" uid="uid://butiirw7wcmk6" path="res://assets/trinst/interiors/prefabs_tower1wall_0_normal.png" id="3_m04bu"]
+[ext_resource type="Texture2D" uid="uid://ckpp6qefwhq7j" path="res://assets/trinst/interiors/prefabs_tower1wall_0_rough.png" id="4_fgsyl"]
 
 [resource]
 resource_name = "s31_enhanced"
