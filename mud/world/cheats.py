@@ -109,7 +109,9 @@ def cheat_give_item(player, params):
     if not char:
         return _result(False, "No active character.")
     count = max(1, min(int(params.get("count", 1)), 20))
+    equip = bool(params.get("equip", False))
     given = []
+    equipped = False
     for _ in range(count):
         item = player.giveItem(name, True, True)
         if not item:
@@ -117,12 +119,23 @@ def cheat_give_item(player, params):
         # Mirror GIMME: auto-equip when the item landed on a worn slot.
         if RPG_SLOT_WORN_END > item.slot >= RPG_SLOT_WORN_BEGIN:
             mob.equipItem(item.slot, item)
+            equipped = True
+        elif equip and not equipped:
+            # giveItemInstance prefers free carry slots, so explicitly move the
+            # item into the first FREE worn slot it fits when asked to equip.
+            for slot in item.itemProto.slots:
+                if RPG_SLOT_WORN_END > slot >= RPG_SLOT_WORN_BEGIN and slot not in mob.worn:
+                    item.slot = slot
+                    mob.equipItem(slot, item)
+                    equipped = True
+                    break
         given.append(item.name)
     if not given:
         return _result(False, "Could not give %r (unknown item or no inventory space)." % name)
     char.refreshItems()
     player.cinfoDirty = True
-    return _result(True, "Gave %s x%d." % (given[0], len(given)))
+    suffix = " (equipped)" if equipped else ""
+    return _result(True, "Gave %s x%d.%s" % (given[0], len(given), suffix))
 
 
 def _next_free_spell_slot(char):

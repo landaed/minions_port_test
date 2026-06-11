@@ -148,6 +148,11 @@ var spellbook_window: SpellbookWindow
 var cheat_window: CheatWindow
 var hotbar: Hotbar
 var cursor_item_ghost: Button   # follows the mouse while an item is on the cursor
+var _cast_bar: ProgressBar
+var _cast_started := 0.0
+var _cast_duration := 0.0
+var _self_prev_health := -1.0
+var _self_pain_cooldown := 0.0
 var _interaction_active := false
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
@@ -314,6 +319,24 @@ func _build_hud():
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
 	bottom.add_child(hotbar)
+
+	# Cast bar (bottom-center, above the hotbar; shown while casting).
+	_cast_bar = ProgressBar.new()
+	_cast_bar.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_cast_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_cast_bar.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_cast_bar.offset_bottom = -96
+	_cast_bar.custom_minimum_size = Vector2(260, 16)
+	_cast_bar.min_value = 0.0
+	_cast_bar.max_value = 1.0
+	_cast_bar.show_percentage = false
+	_cast_bar.visible = false
+	_cast_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var cast_fill := StyleBoxFlat.new()
+	cast_fill.bg_color = Color(0.55, 0.65, 1.0)
+	cast_fill.set_corner_radius_all(3)
+	_cast_bar.add_theme_stylebox_override("fill", cast_fill)
+	add_child(_cast_bar)
 
 	# Combat log (bottom-left).
 	var log_panel := PanelContainer.new()
@@ -497,6 +520,9 @@ func handle_ui_message(data: Dictionary):
 				_ui_char_name = cname
 				journal_window.load_for(cname)
 				hotbar.load_for(cname)
+				# load_for cleared the slots; force the next rebuild to refill
+				# them even if the ability/spell signature hasn't changed.
+				last_abilities_signature = ""
 				_rebuild_ability_bar()
 			inventory_window.apply_snapshot(data)
 			npc_window.set_sellables(data.get("items", []))
@@ -543,6 +569,15 @@ func handle_ui_message(data: Dictionary):
 			var cheat_msg := str(data.get("message", ""))
 			if not cheat_msg.is_empty() and str(data.get("action", "")) not in ["list_items", "list_spells", "status"]:
 				_push_log("[Cheat] " + cheat_msg)
+		"begin_casting":
+			# Wind-up: looping spellprepare on the avatar + a cast bar; the
+			# release (spellcast anim, ring, particles) arrives as zone events.
+			var cast_time := float(data.get("cast_time", 0.0))
+			if _player_rig and is_instance_valid(_player_rig):
+				_player_rig.play_overlay("spellprepare", maxf(cast_time, 0.4))
+			_begin_cast_bar(cast_time)
+		"play_sound":
+			VFX.sound_ui(self, str(data.get("sound", "")))
 
 func _maybe_add_journal(journal) -> void:
 	if not (journal is Dictionary) or journal.is_empty():
@@ -753,6 +788,72 @@ func set_zone_transfer(payload: Dictionary):
 func set_target_description(target: Dictionary):
 	server_target_description = target.duplicate(true)
 	_update_labels()
+
+func apply_vfx_events(events: Array):
+	# Zone visual events captured server-side (see stubsim._capture_vfx_call):
+	# skill/spell animations, particles, explosions, casting rings, 3D sounds.
+	if events.is_empty():
+		return
+	for ev in events:
+		if not (ev is Dictionary):
+			continue
+		var etype := str(ev.get("event", ""))
+		var sim_id := int(ev.get("sim_id", 0))
+		if etype == "sound3d":
+			var raw = ev.get("position", [])
+			if raw is Array and raw.size() >= 3 and _server_origin_offset != Vector3.ZERO:
+				var world_root := npc_root.get_parent()
+				VFX.sound3d(world_root, _server_to_godot(raw), str(ev.get("sound", "")), bool(ev.get("big", false)))
+			continue
+		var node := _node_for_sim_id(sim_id)
+		if node == null:
+			continue
+		var rig = _rig_for_node(node)
+		match etype:
+			"anim":
+				if rig:
+					rig.play_overlay(str(ev.get("anim", "")))
+			"particles":
+				VFX.emitter(node, Vector3(0, 1.1, 0), str(ev.get("emitter", "")),
+					str(ev.get("texture", "")), float(ev.get("duration", 1.5)))
+			"particle_nodes":
+				for pn in ev.get("nodes", []):
+					if pn is Dictionary:
+						VFX.emitter(node, Vector3(0, 1.1, 0), str(pn.get("particle", "")),
+							str(pn.get("texture", "")), float(pn.get("duration", 2.0)))
+			"explosion":
+				VFX.explosion(node, Vector3(0, 1.0, 0), str(ev.get("name", "")))
+			"spell_effect":
+				# SimpleZodiacN etc — the casting circle under the character.
+				VFX.casting_ring(node, 2.5)
+			"item_particle":
+				if rig:
+					# server slots: 11 primary -> mount 0, 12 secondary -> mount 1
+					var slot := int(ev.get("slot", 11))
+					var mkey := "0" if slot == 11 else "1"
+					rig.set_mount_particle(mkey, str(ev.get("particle", "")), str(ev.get("texture", "")))
+
+func _node_for_sim_id(sim_id: int) -> Node3D:
+	if sim_id <= 0:
+		return null
+	var self_ent := _self_entity()
+	if int(self_ent.get("sim_id", -1)) == sim_id:
+		return player_body
+	for body in replicated_entity_nodes.values():
+		if body is StaticBody3D and is_instance_valid(body):
+			var ent = body.get_meta("entity", {})
+			if ent is Dictionary and int(ent.get("sim_id", -1)) == sim_id:
+				return body
+	return null
+
+func _rig_for_node(node: Node3D):
+	if node == player_body:
+		return _player_rig
+	if node and node.has_meta("rig"):
+		var rig = node.get_meta("rig")
+		if rig and is_instance_valid(rig):
+			return rig
+	return null
 
 func set_entities(entities: Array):
 	replicated_entities = entities.duplicate(true)
@@ -1277,22 +1378,34 @@ func _appearance_for(entity: Dictionary) -> Dictionary:
 	var tex = entity.get("tex", {})
 	return tex if tex is Dictionary else {}
 
+func _mounts_for(entity: Dictionary) -> Dictionary:
+	# Worn equipment models from the server: {"0": {model, material}, ...}
+	# (mount0 primary hand / 1 off hand / 2 shield / 3 head).
+	var mounts = entity.get("mounts", {})
+	return mounts if mounts is Dictionary else {}
+
 func _ensure_player_model(entity: Dictionary) -> void:
-	# Build/replace the avatar once we know the player's race/sex/model.
+	# Build/replace the avatar once we know the player's race/sex/model, then
+	# keep its armor textures + mounted equipment in sync with the server
+	# (the rig dedupes by signature, so per-snapshot calls are cheap).
 	var path := _glb_for_entity(entity)
-	if path == "" or path == _player_model_key:
+	if path == "":
 		return
-	if _player_rig and is_instance_valid(_player_rig):
-		_player_rig.queue_free()
-	_player_rig = CharacterRigScript.new()
-	_player_rig.position = Vector3(0.0, -0.9, 0.0)
-	player_body.add_child(_player_rig)
-	if _player_rig.setup(path, 0.0):
+	if path != _player_model_key:
+		if _player_rig and is_instance_valid(_player_rig):
+			_player_rig.queue_free()
+		_player_rig = CharacterRigScript.new()
+		_player_rig.position = Vector3(0.0, -0.9, 0.0)
+		player_body.add_child(_player_rig)
+		if not _player_rig.setup(path, 0.0):
+			return
 		_player_model_key = path
-		_player_rig.apply_appearance(_appearance_for(entity))
 		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
 		if capsule_mesh:
 			capsule_mesh.visible = false
+	if _player_rig and is_instance_valid(_player_rig):
+		_player_rig.apply_appearance(_appearance_for(entity))
+		_player_rig.apply_mounts(_mounts_for(entity))
 
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
@@ -1322,6 +1435,7 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 		body.add_child(rig)
 		body.set_meta("rig", rig)
 		rig.apply_appearance(_appearance_for(entity))
+		rig.apply_mounts(_mounts_for(entity))
 	else:
 		fallback_mesh = MeshInstance3D.new()
 		var mesh := CapsuleMesh.new()
@@ -1345,6 +1459,19 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	return body
 
 func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
+	# Hit reaction: flinch when health drops (the original client did this
+	# locally on damage too). Rate-limited so sustained melee doesn't stunlock
+	# the animation; skipped while dead or mid-swing.
+	var prev: Dictionary = body.get_meta("entity", {})
+	var prev_hp := float(prev.get("health", -1.0))
+	var new_hp := float(entity.get("health", -1.0))
+	if prev_hp > 0.0 and new_hp >= 0.0 and new_hp < prev_hp - 0.5 and not bool(entity.get("dead", false)):
+		var now := Time.get_ticks_msec() / 1000.0
+		if now >= float(body.get_meta("pain_cooldown", 0.0)) and not bool(entity.get("attacking", false)):
+			body.set_meta("pain_cooldown", now + 1.6)
+			var pain_rig = body.get_meta("rig", null)
+			if pain_rig and is_instance_valid(pain_rig):
+				pain_rig.play_overlay("pain1" if randi() % 2 == 0 else "pain2")
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	var key := _entity_key(entity)
@@ -1360,6 +1487,11 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 		body.scale = Vector3(scl, scl, scl)
 	var label: Label3D = body.get_meta("label")
 	label.text = _entity_label_text(entity)
+	# Keep armor textures + mounted equipment in sync (rig dedupes by signature).
+	var rig = body.get_meta("rig", null)
+	if rig and is_instance_valid(rig):
+		rig.apply_appearance(_appearance_for(entity))
+		rig.apply_mounts(_mounts_for(entity))
 
 func _sync_entity_markers():
 	if replicated_entities.is_empty():
@@ -1371,6 +1503,15 @@ func _sync_entity_markers():
 			var raw_pos = entity.get("position", [])
 			# Pick the avatar model from the player's own race/sex/model.
 			_ensure_player_model(entity)
+			# Flinch when our own health drops (same as NPC hit reactions).
+			var hp := float(entity.get("health", -1.0))
+			var now_s := Time.get_ticks_msec() / 1000.0
+			if _self_prev_health > 0.0 and hp >= 0.0 and hp < _self_prev_health - 0.5 \
+					and now_s >= _self_pain_cooldown and _player_rig and is_instance_valid(_player_rig):
+				_self_pain_cooldown = now_s + 1.6
+				_player_rig.play_overlay("pain1" if randi() % 2 == 0 else "pain2")
+			if hp >= 0.0:
+				_self_prev_health = hp
 			# Compute spawn offset from first entity snapshot (more reliable than root_info)
 			if not _has_spawned:
 				_has_spawned = true
@@ -1659,6 +1800,24 @@ func _target_entity_from_click(screen_position: Vector2) -> bool:
 	_request_server_command("target_entity", {"entity_id": entity_id})
 	return true
 
+func _begin_cast_bar(cast_time: float) -> void:
+	if _cast_bar == null or cast_time <= 0.05:
+		return
+	_cast_started = Time.get_ticks_msec() / 1000.0
+	_cast_duration = cast_time
+	_cast_bar.value = 0.0
+	_cast_bar.visible = true
+
+func _update_cast_bar() -> void:
+	if _cast_bar == null or not _cast_bar.visible:
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	var t := (now - _cast_started) / maxf(_cast_duration, 0.01)
+	if t >= 1.0:
+		_cast_bar.visible = false
+	else:
+		_cast_bar.value = t
+
 func _typing_in_ui() -> bool:
 	var focus := get_viewport().gui_get_focus_owner()
 	return focus is LineEdit or focus is TextEdit
@@ -1882,6 +2041,8 @@ func _physics_process(delta: float) -> void:
 	# Cursor-item ghost follows the mouse while a window is open.
 	if cursor_item_ghost and cursor_item_ghost.visible:
 		cursor_item_ghost.position = get_local_mouse_position() + Vector2(14, 10)
+
+	_update_cast_bar()
 
 	# Periodically refresh open windows so cooldowns/charges stay current.
 	_ui_poll_timer += delta

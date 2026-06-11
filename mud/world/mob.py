@@ -896,6 +896,10 @@ class Mob:
         self.derivedDirty = True
         self.worn[slot] = item
         self.equipMods[slot] = []
+        # Equipment changed: drop the cached Godot appearance/mount snapshots
+        # so the next entity snapshot streams the new look.
+        self._godot_tex = None
+        self._godot_mounts = None
         
         ip = item.itemProto
         if not reequip and ip.equippedParticle and (slot == RPG_SLOT_PRIMARY or slot == RPG_SLOT_SECONDARY):
@@ -985,6 +989,10 @@ class Mob:
         #self.armor -= item.armor
         
         del self.worn[slot]
+        # Equipment changed: drop the cached Godot appearance/mount snapshots
+        # so the next entity snapshot streams the new look.
+        self._godot_tex = None
+        self._godot_mounts = None
         
         if self.player:
             

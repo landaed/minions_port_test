@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://dlpx1ts1x3qxo"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://dcpdpjl4wwy7k" path="res://assets/trinst/interiors/objects_firept3_0.jpg" id="1_ru4yx"]
-[ext_resource type="Texture2D" uid="uid://db65fydgrea04" path="res://assets/trinst/interiors/objects_firept3_0_ao.png" id="2_aq8gs"]
-[ext_resource type="Texture2D" uid="uid://lx6q1f1p0cd2" path="res://assets/trinst/interiors/objects_firept3_0_normal.png" id="3_1o8dx"]
-[ext_resource type="Texture2D" uid="uid://3kupd17grdob" path="res://assets/trinst/interiors/objects_firept3_0_rough.png" id="4_du4sr"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_firept3_0.jpg" id="1_ru4yx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_firept3_0_ao.png" id="2_aq8gs"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_firept3_0_normal.png" id="3_1o8dx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/objects_firept3_0_rough.png" id="4_du4sr"]
 
 [resource]
 resource_name = "wood19_enhanced"

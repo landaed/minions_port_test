@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://db30i8hqi2jra"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://be6lsig32kn07" path="res://assets/trinst/interiors/components_city_tower1_3.jpg" id="1_h1efx"]
-[ext_resource type="Texture2D" uid="uid://d3jah3fyex16y" path="res://assets/trinst/interiors/components_city_tower1_3_ao.png" id="2_h8mwi"]
-[ext_resource type="Texture2D" uid="uid://c478hcjec11ee" path="res://assets/trinst/interiors/components_city_tower1_3_normal.png" id="3_ua6j5"]
-[ext_resource type="Texture2D" uid="uid://bat7mrxj75fci" path="res://assets/trinst/interiors/components_city_tower1_3_rough.png" id="4_gdu21"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_3.jpg" id="1_h1efx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_3_ao.png" id="2_h8mwi"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_3_normal.png" id="3_ua6j5"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_3_rough.png" id="4_gdu21"]
 
 [resource]
 resource_name = "tile_marble_enhanced"

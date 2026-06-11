@@ -627,6 +627,15 @@ class ProxyPlayerMind(pb.Referenceable):
         self.session.send({"type": "play_sound", "sound": str(sound)})
         return True
 
+    def remote_vocalize(self, sexcode, vset, vox, which):
+        # Targeted vocal (e.g. your own character's death cry): decode the
+        # vocalset path the same way the legacy client did, play as UI sound.
+        from mud.world.stubsim import _vocal_filename
+        filename = _vocal_filename(sexcode, vset, vox, which)
+        if filename:
+            self.session.send({"type": "play_sound", "sound": filename})
+        return True
+
     def remote_beginCasting(self, charIndex, castTime):
         # Cast bar notification. Forward to Godot.
         self.session.send({"type": "begin_casting", "char_index": int(charIndex), "cast_time": float(castTime)})
@@ -864,6 +873,13 @@ class GodotClientSession:
         d.addErrback(self._on_entity_snapshot_failed)
 
     def _on_entity_snapshot(self, entities):
+        # New shape: {"entities": [...], "events": [...]} (zone visual events —
+        # skill/spell animations, particles, explosions, 3D sounds). The bare
+        # list shape is kept for compatibility with an older world server.
+        events = []
+        if isinstance(entities, dict):
+            events = list(entities.get("events", []) or [])
+            entities = entities.get("entities", [])
         if not isinstance(entities, (list, tuple)):
             print(f"[Proxy] entity_snapshot: unexpected type {type(entities).__name__}: {entities!r}")
             self.start_entity_sync()
@@ -895,7 +911,10 @@ class GodotClientSession:
             print(f"[Proxy] entity_snapshot: {len(entities)} total, sending {len(capped)}")
             self._last_entity_count = len(capped)
         # Always send — dedup was suppressing position/rotation updates
-        self.send({"type": "entity_snapshot", "entities": capped})
+        msg = {"type": "entity_snapshot", "entities": capped}
+        if events:
+            msg["events"] = events
+        self.send(msg)
         # Lightweight send-rate meter (logs every 5s) so it's clear how fast
         # entity replication is actually running.
         import time as _t
@@ -1015,6 +1034,12 @@ class ProxyProtocol(WebSocketServerProtocol):
             "target_nearest": ("TARGETNEAREST", ["0"]),
             "interact": ("INTERACT", ["0"]),
             "attack_toggle": ("ATTACK", ["0", "TOGGLE"]),
+            # Emotes — server broadcasts the matching playAnimation event.
+            "emote_dance": ("DANCE", ["0"]),
+            "emote_wave": ("WAVE", ["0"]),
+            "emote_bow": ("BOW", ["0"]),
+            "emote_point": ("POINT", ["0"]),
+            "emote_agree": ("AGREE", ["0"]),
         }
 
         payload = command_map.get(command)

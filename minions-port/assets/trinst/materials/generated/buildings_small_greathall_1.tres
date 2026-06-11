@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://5iasnack0b8k"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://rr3whgeukp03" path="res://assets/trinst/interiors/buildings_small_greathall_1.jpg" id="1_aotky"]
-[ext_resource type="Texture2D" uid="uid://brbp17a66a5es" path="res://assets/trinst/interiors/buildings_small_greathall_1_ao.png" id="2_sask6"]
-[ext_resource type="Texture2D" uid="uid://cje4y4ipgs5w6" path="res://assets/trinst/interiors/buildings_small_greathall_1_normal.png" id="3_rvurs"]
-[ext_resource type="Texture2D" uid="uid://bscf637c3mwe3" path="res://assets/trinst/interiors/buildings_small_greathall_1_rough.png" id="4_2m3ub"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_greathall_1.jpg" id="1_aotky"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_greathall_1_ao.png" id="2_sask6"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_greathall_1_normal.png" id="3_rvurs"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_greathall_1_rough.png" id="4_2m3ub"]
 
 [resource]
 resource_name = "granite_tile2_enhanced"

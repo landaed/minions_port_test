@@ -262,6 +262,14 @@ class AutotestDriver:
 						for i in range(8):
 							cname += letters[randi() % letters.length()]
 						n.text = cname.capitalize()
+						# Optional class override for class-specific captures
+						# (e.g. MOM_AT_CLASS=Wizard for casters).
+						var want_class := OS.get_environment("MOM_AT_CLASS")
+						if not want_class.is_empty():
+							for ci in range(control.class_option.item_count):
+								if control.class_option.get_item_text(ci).nocasecmp_to(want_class) == 0:
+									control.class_option.select(ci)
+									break
 						control._on_create_character_button_pressed()
 						state_t = 0.0
 				elif _once("enter_world"):
@@ -274,6 +282,9 @@ class AutotestDriver:
 			"spawned":
 				if state_t > 4.0 and _once("spawn_shots"):
 					_step_spawn_shots()
+			"closeup":
+				if state_t > 1.0 and _once("closeup"):
+					_step_closeup()
 			"npc_first":
 				# Dialog-focused capture: go straight to an NPC from the fresh
 				# spawn (set MOM_AT_SKIP_COMBAT=1), before combat moves the player.
@@ -311,6 +322,12 @@ class AutotestDriver:
 			"spellbook_check":
 				if state_t > 1.0 and _once("spellbook"):
 					_step_spellbook()
+			"cheat_check":
+				if state_t > 1.0 and _once("cheats"):
+					_step_cheats()
+			"cast_check":
+				if state_t > 1.0 and _once("casting"):
+					_step_casting()
 			"tower_walk":
 				if _once("tower_walk"):
 					# Stop short of the guard tower so the camera stays outside.
@@ -349,10 +366,62 @@ class AutotestDriver:
 		view.player_body.rotate_y(PI / 2.0)
 		await _shot("spawn_turned")
 		view.player_body.rotate_y(-PI / 2.0)
-		if OS.get_environment("MOM_AT_SKIP_COMBAT") == "1":
+		if OS.get_environment("MOM_AT_MODE") == "closeup":
+			_goto("closeup")
+		elif OS.get_environment("MOM_AT_SKIP_COMBAT") == "1":
 			_goto("find_npc")  # dialog-focused capture from the fresh spawn
 		else:
 			_goto("combat_start")  # the test mob spawns beside us; fight first
+		_busy = false
+
+	func _step_closeup() -> void:
+		# Close-quarters captures of the avatar itself: equipped weapon/shield/
+		# helmet mounts and the skill animations (kick / cast overlays).
+		_busy = true
+		# Orbit the camera boom to the FRONT of the avatar (the camera rig is a
+		# child of the body, so rotating the body would spin the camera too).
+		# _update_camera_collision() re-derives camera.position every frame from
+		# _camera_base_local_offset, so override that rather than the camera.
+		var cam_yaw: Node3D = view.player_body.get_node("CameraYaw")
+		cam_yaw.rotation.y = PI
+		view.camera_pitch.rotation.x = 0.22  # counter the camera's baked -0.35 tilt
+		view._camera_base_local_offset = Vector3(0, 0.5, 3.0)
+		view._camera_zoom = 3.0
+		view._apply_camera_zoom()
+		await get_tree().create_timer(2.5).timeout
+		await _shot("closeup_front")
+		# Emote: round-trips through the server, whose playAnimation event
+		# drives the overlay clip — proves the whole anim event chain.
+		view._request_server_command("emote_wave")
+		await get_tree().create_timer(0.7).timeout
+		await _shot("closeup_emote_wave")
+		await get_tree().create_timer(1.5).timeout
+		# Level up (Paladin spells unlock at 9) and give + auto-equip a shield
+		# and helm through the cheat API, then capture the mounts.
+		view._request_server_command("cheat", {"action": "set_level", "params": {"level": 10}})
+		await get_tree().create_timer(0.8).timeout
+		view._request_server_command("cheat", {"action": "give_item", "params": {"name": "Tower Shield", "equip": true}})
+		await get_tree().create_timer(0.8).timeout
+		view._request_server_command("cheat", {"action": "give_item", "params": {"name": "Plain Helm", "equip": true}})
+		await get_tree().create_timer(0.8).timeout
+		view._request_server_command("cheat", {"action": "full_heal", "params": {}})
+		await get_tree().create_timer(1.6).timeout
+		await _shot("closeup_equipped")
+		# Cast for the spellcast overlay + ring/particles up close.
+		var spell_slot := -1
+		for i in range(10):
+			var a = view.hotbar._assignments[i]
+			if a is Dictionary and str(a.get("action", "")) == "spell":
+				spell_slot = i
+				break
+		if spell_slot >= 0:
+			view.hotbar.activate(spell_slot)
+			await get_tree().create_timer(1.1).timeout
+			await _shot("closeup_casting")
+			await get_tree().create_timer(2.2).timeout
+			await _shot("closeup_cast_release")
+		cam_yaw.rotation.y = 0.0
+		_goto("finish")
 		_busy = false
 
 	func _step_at_npc() -> void:
@@ -506,6 +575,66 @@ class AutotestDriver:
 		await get_tree().create_timer(1.5).timeout
 		await _shot("spellbook")
 		view.spellbook_window.close_window()
+		_goto("cheat_check")
+		_busy = false
+
+	func _step_cheats() -> void:
+		# Exercise the F8 cheat window: open it, search items, give a weapon,
+		# set the level, learn the class spell list — screenshots along the way.
+		_busy = true
+		view._toggle_cheats()
+		await get_tree().create_timer(1.2).timeout
+		view.cheat_window.item_search.text = "sword"
+		view.cheat_window._search_items()
+		await get_tree().create_timer(1.2).timeout
+		await _shot("cheat_window")
+		view._request_server_command("cheat", {"action": "set_level", "params": {"level": 10}})
+		await get_tree().create_timer(1.2).timeout
+		view._request_server_command("cheat", {"action": "give_item", "params": {"name": "Longsword"}})
+		await get_tree().create_timer(1.2).timeout
+		view._request_server_command("cheat", {"action": "learn_class_spells", "params": {}})
+		await get_tree().create_timer(1.5).timeout
+		view._request_server_command("cheat", {"action": "give_money", "params": {"platinum": 500}})
+		await get_tree().create_timer(1.0).timeout
+		await _shot("cheat_used")
+		view.cheat_window.close_window()
+		# Refresh data after the grants, then show the inventory + spellbook.
+		view._request_server_command("get_inventory")
+		view._request_server_command("get_spellbook")
+		await get_tree().create_timer(1.5).timeout
+		view._toggle_inventory()
+		await get_tree().create_timer(1.0).timeout
+		await _shot("inventory_after_cheats")
+		view.inventory_window.close_window()
+		view._toggle_spellbook()
+		await get_tree().create_timer(1.0).timeout
+		await _shot("spellbook_after_cheats")
+		view.spellbook_window.close_window()
+		_goto("cast_check")
+		_busy = false
+
+	func _step_casting() -> void:
+		# Cast the first spell on the hotbar and capture the wind-up (cast bar,
+		# spellprepare animation, casting ring/particle events) and the release.
+		_busy = true
+		var spell_slot := -1
+		for i in range(10):
+			var a = view.hotbar._assignments[i]
+			if a is Dictionary and str(a.get("action", "")) == "spell":
+				spell_slot = i
+				break
+		if spell_slot >= 0:
+			# Third-person shot of our own avatar so the cast pose is visible.
+			view.player_body.rotate_y(PI)
+			view.hotbar.activate(spell_slot)
+			await get_tree().create_timer(1.0).timeout
+			await _shot("casting_windup")
+			await get_tree().create_timer(2.2).timeout
+			await _shot("casting_release")
+			view.player_body.rotate_y(PI)
+		else:
+			print("[AUTOTEST] no spell on hotbar to cast; skipping cast shots")
+			_dump_entities()
 		_goto("tower_walk")
 		_busy = false
 

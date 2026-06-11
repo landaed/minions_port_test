@@ -405,6 +405,10 @@ func handle_response(data: Dictionary):
 				var entities_val = data.get("entities", [])
 				if entities_val is Array:
 					view.set_entities(entities_val)
+			if view.has_method("apply_vfx_events"):
+				var events_val = data.get("events", [])
+				if events_val is Array and not events_val.is_empty():
+					view.apply_vfx_events(events_val)
 
 		"game_text":
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
@@ -442,7 +446,7 @@ func handle_response(data: Dictionary):
 
 		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
 		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook", \
-		"cheat_result":
+		"cheat_result", "begin_casting", "play_sound":
 			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
 				gameplay_view.handle_ui_message(data)
 

@@ -33,8 +33,15 @@ def pick(folder, *cands):
 
 
 def anims_for(folder):
-    """Resolve idle/walk/run/attack/death within an animation folder, tolerating
-    the humanoid (1hwalk/unarmedright) vs creature (walk/attack1) naming."""
+    """Resolve the animation set within an animation folder, tolerating the
+    humanoid (1hwalk/unarmedright) vs creature (walk/attack1) naming.
+
+    Beyond the locomotion basics, humanoid folders also carry the skill/spell
+    animations the server triggers by name (playAnimation events): kick1/kick2
+    (Kick / Flying Tiger), spellcast/spellcast2 (casts), spellprepare (looping
+    cast wind-up), pain1/pain2 (hit reactions), bowattack (ranged),
+    shieldblock, 2hslash/1hthrust (weapon-type swings) and a few emotes.
+    Creature folders simply skip the ones they don't have."""
     spec = [
         ("idle", True, ("idle", "swimidle")),
         ("walk", True, ("1hwalk", "walk")),
@@ -42,6 +49,26 @@ def anims_for(folder):
         ("attack", False, ("unarmedright", "1hslashright", "attack1", "1hslash", "attack")),
         ("attack2", False, ("unarmedleft", "1hslashleft", "attack2")),
         ("death", False, ("death",)),
+        # skill / spell / reaction animations (server playAnimation names)
+        ("kick1", False, ("kick1",)),
+        ("kick2", False, ("kick2",)),
+        ("spellcast", False, ("spellcast",)),
+        ("spellcast2", False, ("spellcast2",)),
+        ("spellprepare", True, ("spellprepare",)),
+        ("pain1", False, ("pain1", "pain")),
+        ("pain2", False, ("pain2",)),
+        ("bowattack", False, ("bowattack",)),
+        ("shieldblock", False, ("shieldblock",)),
+        ("2hslash", False, ("2hslash",)),
+        ("2hthrust", False, ("2hthrust",)),
+        ("1hthrust", False, ("1hthrustright", "1hthrust")),
+        # emotes (server /dance /point /agree /disagree /bow /wave commands)
+        ("dance", False, ("dance",)),
+        ("point", False, ("point",)),
+        ("agree", False, ("agree",)),
+        ("disagree", False, ("disagree",)),
+        ("bow", False, ("bow",)),
+        ("wave", False, ("wave",)),
     ]
     out = []
     for name, loop, cands in spec:

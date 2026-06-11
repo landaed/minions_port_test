@@ -46,6 +46,19 @@ def _marker_rotation_to_sim(rot):
     return (0.0, 0.0, -1.0, -sim_angle)
 
 
+def _vocal_filename(sexcode, vset, vox, which):
+    """Vocalset path for a (sex, set, vox, which) tuple — the same formula the
+    legacy client's remote_vocalize used (mud/client/playermind.py)."""
+    try:
+        from mud.world.shared.vocals import VOCALFILENAMES
+        sex = "Female" if int(sexcode) == 1 else "Male"
+        num = "%02d" % int(which)
+        return "vocalsets/%s_LongSet_%s/%s_LS_%s_%s%s.ogg" % (
+            sex, vset, sex, vset, VOCALFILENAMES[int(vox)], num)
+    except Exception:
+        return ""
+
+
 _next_stub_id = 90000
 
 
@@ -109,12 +122,33 @@ class StubSimAvatar:
         self.simObjects = []
         self.playerLookup = {}
         self.mind = self          # self acts as its own "mind" for API compat
+        # Visual-event ring buffer for the Godot client. The legacy engine sent
+        # playAnimation / particle / explosion / 3D-sound calls to the Torque
+        # zone client through this mind; we capture them here and each player
+        # avatar drains them via getVisibleEntities (cursor on vfx_seq).
+        self.vfx_events = []
+        self.vfx_seq = 0
 
     # ---- helpers ----
 
     def addSimObject(self, so):
         self.simObjects.append(so)
         self.simLookup[so.id] = so
+
+    def _push_vfx(self, etype, sim_id, data):
+        self.vfx_seq += 1
+        ev = {"seq": int(self.vfx_seq), "event": str(etype), "sim_id": int(sim_id or 0)}
+        ev.update(data)
+        self.vfx_events.append(ev)
+        if len(self.vfx_events) > 256:
+            del self.vfx_events[:128]
+
+    def vfx_events_since(self, cursor):
+        """Events newer than *cursor*; returns (events, new_cursor)."""
+        if not self.vfx_events:
+            return [], self.vfx_seq
+        out = [e for e in self.vfx_events if e["seq"] > cursor]
+        return out, self.vfx_seq
 
     def error(self, err):
         print("[StubSimAvatar] error:", err)
@@ -366,6 +400,10 @@ class StubSimAvatar:
 
     def callRemote(self, method, *args, **kwargs):
         """Handle remote calls locally."""
+        try:
+            self._capture_vfx_call(method, args)
+        except Exception:
+            traceback.print_exc()
         # setSelection: route to the sim brain (for NPC AI target setting)
         if method == "setSelection":
             srcId, tgtId, charIndex = args[0], args[1], args[2] if len(args) > 2 else 0
@@ -381,6 +419,77 @@ class StubSimAvatar:
             if src is not None and getattr(src, 'isPlayer', False):
                 src.selectedTarget = tgt
         return defer.succeed(None)
+
+    def _capture_vfx_call(self, method, args):
+        """Turn legacy zone-client visual calls into Godot-forwardable events.
+
+        Call shapes (from mud/world/skill.py, spell.py, combat.py, mob.py):
+          playAnimation(simId, animName)
+          triggerParticleNodes(simId, particleNodes)      # SpellParticleNode rows
+          newParticleSystem(simId, emitterName, texture, duration)
+          spawnExplosion(simId, explosionName, delay)
+          newSpellEffect(simId, effectName[, fadeOut])
+          itemParticleNode(simId, slot, particle, texture)
+          playSound(sound, position, bigSound)            # 3D positional
+        """
+        if method == "playAnimation" and len(args) >= 2:
+            self._push_vfx("anim", args[0], {"anim": str(args[1])})
+        elif method == "triggerParticleNodes" and len(args) >= 2:
+            nodes = []
+            for row in (args[1] or []):
+                nodes.append({
+                    "node": str(getattr(row, "node", "") or ""),
+                    "particle": str(getattr(row, "particle", "") or ""),
+                    "texture": str(getattr(row, "texture", "") or ""),
+                    "duration": float(getattr(row, "duration", 0) or 0),
+                })
+            if nodes:
+                self._push_vfx("particle_nodes", args[0], {"nodes": nodes})
+        elif method == "newParticleSystem" and len(args) >= 2:
+            self._push_vfx("particles", args[0], {
+                "emitter": str(args[1] or ""),
+                "texture": str(args[2] or "") if len(args) > 2 else "",
+                "duration": float(args[3] or 0) if len(args) > 3 else 0.0,
+            })
+        elif method == "spawnExplosion" and len(args) >= 2:
+            self._push_vfx("explosion", args[0], {
+                "name": str(args[1] or ""),
+                "delay": float(args[2] or 0) if len(args) > 2 else 0.0,
+            })
+        elif method == "newSpellEffect" and len(args) >= 2:
+            self._push_vfx("spell_effect", args[0], {"name": str(args[1] or "")})
+        elif method == "itemParticleNode" and len(args) >= 4:
+            self._push_vfx("item_particle", args[0], {
+                "slot": int(args[1] or 0),
+                "particle": str(args[2] or ""),
+                "texture": str(args[3] or ""),
+            })
+        elif method == "vocalize" and len(args) >= 5:
+            # vocalize(sexcode, vocalSet, vox, which, position): decode to the
+            # vocalset .ogg path here (same formula as the legacy client) and
+            # reuse the positional-sound event path.
+            filename = _vocal_filename(args[0], args[1], args[2], args[3])
+            pos = args[4]
+            try:
+                pos = [float(pos[0]), float(pos[1]), float(pos[2])]
+            except Exception:
+                pos = None
+            if filename and pos:
+                self._push_vfx("sound3d", 0, {
+                    "sound": filename, "position": pos, "big": False,
+                })
+        elif method == "playSound" and len(args) >= 2 and not isinstance(args[1], str):
+            pos = args[1]
+            try:
+                pos = [float(pos[0]), float(pos[1]), float(pos[2])]
+            except Exception:
+                pos = None
+            if pos:
+                self._push_vfx("sound3d", 0, {
+                    "sound": str(args[0] or ""),
+                    "position": pos,
+                    "big": bool(args[2]) if len(args) > 2 else False,
+                })
 
     # ---- start the zone ----
 

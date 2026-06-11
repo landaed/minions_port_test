@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://c6716e5cal16c"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://cc5bhcq8mbom7" path="res://assets/trinst/shapes/rocks_rock3_0.jpg" id="1_olcd1"]
-[ext_resource type="Texture2D" uid="uid://b47sgwp4mi2wv" path="res://assets/trinst/shapes/rocks_rock3_0_ao.png" id="2_83g4k"]
-[ext_resource type="Texture2D" uid="uid://dcf8olxyaadjb" path="res://assets/trinst/shapes/rocks_rock3_0_normal.png" id="3_3ws15"]
-[ext_resource type="Texture2D" uid="uid://bajf8jg1g10gb" path="res://assets/trinst/shapes/rocks_rock3_0_rough.png" id="4_p1q86"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/rocks_rock3_0.jpg" id="1_olcd1"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/rocks_rock3_0_ao.png" id="2_83g4k"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/rocks_rock3_0_normal.png" id="3_3ws15"]
+[ext_resource type="Texture2D" path="res://assets/trinst/shapes/rocks_rock3_0_rough.png" id="4_p1q86"]
 
 [resource]
 resource_name = "rock2_enhanced"

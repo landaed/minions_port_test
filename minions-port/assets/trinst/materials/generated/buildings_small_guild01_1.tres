@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://c4qt5dj1adxjd"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://do5ol4o5edhiu" path="res://assets/trinst/interiors/buildings_small_guild01_1.jpg" id="1_ixef1"]
-[ext_resource type="Texture2D" uid="uid://e0b762808pxb" path="res://assets/trinst/interiors/buildings_small_guild01_1_ao.png" id="2_4s7tx"]
-[ext_resource type="Texture2D" uid="uid://bw61eoggqlgjv" path="res://assets/trinst/interiors/buildings_small_guild01_1_normal.png" id="3_p3xqi"]
-[ext_resource type="Texture2D" uid="uid://x6lbpmwf3gn7" path="res://assets/trinst/interiors/buildings_small_guild01_1_rough.png" id="4_ac2bl"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_guild01_1.jpg" id="1_ixef1"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_guild01_1_ao.png" id="2_4s7tx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_guild01_1_normal.png" id="3_p3xqi"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_small_guild01_1_rough.png" id="4_ac2bl"]
 
 [resource]
 resource_name = "Bricks10_enhanced"

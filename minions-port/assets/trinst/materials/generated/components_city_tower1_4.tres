@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://com0jggiw1frb"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://udiyc2wg1k06" path="res://assets/trinst/interiors/components_city_tower1_4.jpg" id="1_13rp2"]
-[ext_resource type="Texture2D" uid="uid://djj42cpnnaupc" path="res://assets/trinst/interiors/components_city_tower1_4_ao.png" id="2_ja18s"]
-[ext_resource type="Texture2D" uid="uid://1p7igfnpxvss" path="res://assets/trinst/interiors/components_city_tower1_4_normal.png" id="3_3dgtq"]
-[ext_resource type="Texture2D" uid="uid://soij4wntesl3" path="res://assets/trinst/interiors/components_city_tower1_4_rough.png" id="4_lhq0s"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_4.jpg" id="1_13rp2"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_4_ao.png" id="2_ja18s"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_4_normal.png" id="3_3dgtq"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_4_rough.png" id="4_lhq0s"]
 
 [resource]
 resource_name = "scaleroof_enhanced"

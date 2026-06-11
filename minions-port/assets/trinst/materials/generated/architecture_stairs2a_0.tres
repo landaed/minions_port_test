@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://ddiseyj3x6o64"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://dn5qtowdyu3vq" path="res://assets/trinst/interiors/architecture_stairs2a_0.jpg" id="1_pts3l"]
-[ext_resource type="Texture2D" uid="uid://dtsntjuhyobx2" path="res://assets/trinst/interiors/architecture_stairs2a_0_ao.png" id="2_ptagc"]
-[ext_resource type="Texture2D" uid="uid://bbiwv55dg7rjw" path="res://assets/trinst/interiors/architecture_stairs2a_0_normal.png" id="3_iog4r"]
-[ext_resource type="Texture2D" uid="uid://bxj7cf8ae1ysi" path="res://assets/trinst/interiors/architecture_stairs2a_0_rough.png" id="4_cttcr"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_stairs2a_0.jpg" id="1_pts3l"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_stairs2a_0_ao.png" id="2_ptagc"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_stairs2a_0_normal.png" id="3_iog4r"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_stairs2a_0_rough.png" id="4_cttcr"]
 
 [resource]
 resource_name = "s15_enhanced"

@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://y4e5ikdem08u"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://x7a0iwp8xju4" path="res://assets/trinst/interiors/houses_cityhouse3_4.jpg" id="1_68kpj"]
-[ext_resource type="Texture2D" uid="uid://tgiulw4n20cv" path="res://assets/trinst/interiors/houses_cityhouse3_4_ao.png" id="2_17jga"]
-[ext_resource type="Texture2D" uid="uid://cuw48v8reloj3" path="res://assets/trinst/interiors/houses_cityhouse3_4_normal.png" id="3_idl2a"]
-[ext_resource type="Texture2D" uid="uid://ci0gkcsroc5qp" path="res://assets/trinst/interiors/houses_cityhouse3_4_rough.png" id="4_0vsp0"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_4.jpg" id="1_68kpj"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_4_ao.png" id="2_17jga"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_4_normal.png" id="3_idl2a"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_4_rough.png" id="4_0vsp0"]
 
 [resource]
 resource_name = "bricks10_enhanced"
