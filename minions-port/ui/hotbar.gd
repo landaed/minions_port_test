@@ -88,20 +88,31 @@ func clear_assignment(i: int) -> void:
 	_persist()
 	_refresh_slot(i)
 
-func default_fill_from_skills(abilities: Array) -> void:
-	# Only when the player hasn't customized: mirror active skills into slots.
+func default_fill_from_skills(abilities: Array, spells: Array = []) -> void:
+	# Only when the player hasn't customized: mirror active skills into slots,
+	# then memorized spells (in spellbook order) into the remaining ones — so a
+	# fresh caster spawns with its class spells ready on the bar.
 	if _user_modified:
 		return
-	for i in range(SLOT_COUNT):
-		if i < abilities.size() and abilities[i] is Dictionary:
-			_assignments[i] = {
-				"name": str(abilities[i].get("name", "?")),
+	var fills: Array = []
+	for ab in abilities:
+		if ab is Dictionary:
+			fills.append({
+				"name": str(ab.get("name", "?")),
 				"action": "skill",
 				"book_slot": -1,
-				"icon": "",
-			}
-		else:
-			_assignments[i] = null
+				"icon": str(ab.get("icon", "")),
+			})
+	for sp in spells:
+		if sp is Dictionary:
+			fills.append({
+				"name": str(sp.get("name", "?")),
+				"action": "spell",
+				"book_slot": int(sp.get("slot", 0)),
+				"icon": str(sp.get("icon", "")),
+			})
+	for i in range(SLOT_COUNT):
+		_assignments[i] = fills[i] if i < fills.size() else null
 	_refresh_all()
 
 func activate(i: int) -> void:
@@ -144,9 +155,7 @@ func _refresh_slot(i: int) -> void:
 		b.clear_slot(_key_label(i))
 		b.payload = {}
 		return
-	var icon: Texture2D = null
-	if str(a.get("action", "")) == "spell":
-		icon = UIC.spell_icon(str(a.get("icon", "")))
+	var icon := UIC.spell_icon(str(a.get("icon", "")))
 	b.set_slot(icon, str(a.get("name", "?")).left(8), 0, _key_label(i))
 	b.payload = a.duplicate(true)
 	b.payload["action"] = a.get("action", "skill")

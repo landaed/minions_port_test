@@ -34,7 +34,7 @@ mkdir -p logs
 PIDFILE="logs/servers.pids"
 : > "$PIDFILE"
 
-# Parse flags (order-independent): --setup [--reset], --test-zone
+# Parse flags (order-independent): --setup [--reset], --test-zone, --no-cheats
 DO_SETUP=""
 RESET_FLAG=""
 for arg in "$@"; do
@@ -42,8 +42,16 @@ for arg in "$@"; do
         --setup) DO_SETUP=1 ;;
         --reset) DO_SETUP=1; RESET_FLAG="--reset" ;;
         --test-zone) export MOM_TEST_ZONE=1 ;;
+        --no-cheats) export MOM_ENABLE_CHEATS=0 ;;
     esac
 done
+
+# In-game testing cheats (Godot F8 cheat window: XP/level/money/items/spells).
+# On by default for this local test stack; start with --no-cheats to disable.
+export MOM_ENABLE_CHEATS="${MOM_ENABLE_CHEATS:-1}"
+if [ "$MOM_ENABLE_CHEATS" != "0" ]; then
+    echo "[run] Cheats ENABLED (MOM_ENABLE_CHEATS=$MOM_ENABLE_CHEATS; use --no-cheats to disable)"
+fi
 
 if [ -n "$DO_SETUP" ]; then
     echo "[run] Setting up databases for world '$WORLDNAME' $RESET_FLAG..."

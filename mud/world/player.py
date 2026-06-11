@@ -983,13 +983,17 @@ class Player(Persistent):
     
     
     def backupItems(self):
+        # (Real loops: Py3's map() is lazy and ran nothing as a statement,
+        # so bank items and party inventories were never backed up.)
         try:
-            map(ItemInstance.storeToItem,self.bankList)
+            for _item in self.bankList:
+                _item.storeToItem()
         except:
             # Bank items were never queried, no save needed.
             pass
         if self.party and self.party.members:
-            map(Character.backupItems,self.party.members)
+            for _char in self.party.members:
+                _char.backupItems()
     
     
     # Take away a specified set of item protos from the player. The set

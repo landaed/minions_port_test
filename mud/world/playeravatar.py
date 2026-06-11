@@ -33,6 +33,35 @@ from mud.world.shared.worlddata import CharacterInfo,ZoneConnectionInfo
 from mud.world.shared.playdata import RootInfo,ItemInfo
 
 
+_SKILLINFOS = None
+
+def _skill_icon(skillname):
+    """Icon reference for a skill, from the original client's skillinfo table.
+
+    Values are either "SPELLICON_<sheet>_<index>" sheet refs or loose names
+    under data/ui/icons/; the Godot client resolves both (see ui_common.gd).
+    skillinfo.py is dependency-free data, but lives in the legacy client
+    package whose __init__ pulls in TGE-era modules, so load it by path.
+    """
+    global _SKILLINFOS
+    if _SKILLINFOS is None:
+        try:
+            import importlib.util
+            from os import path
+            p = path.join(path.dirname(__file__), "..", "client", "gui", "skillinfo.py")
+            spec = importlib.util.spec_from_file_location("_mom_skillinfo", p)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            _SKILLINFOS = module.SKILLINFOS
+        except Exception:
+            print_exc()
+            _SKILLINFOS = {}
+    info = _SKILLINFOS.get(skillname)
+    if info and info.icon:
+        return str(info.icon)
+    return ""
+
+
 #also query
 class PlayerAvatar(Avatar):
     
@@ -207,6 +236,7 @@ class PlayerAvatar(Avatar):
                 ret = (0,"%s has been created.  She awaits your command!"%newchar.name)
                 
             char.addStartingGear()
+            char.autoScribeStartingSpells()
             char.backupItems()
             
             #send off the character
@@ -1682,6 +1712,7 @@ class PlayerAvatar(Avatar):
                     "cooldown_active": bool(reuse_key in mob.skillReuse),
                     "cooldown_seconds": int(cooldown),
                     "has_spell": bool(getattr(class_skill, "spellProto", None)) if class_skill else False,
+                    "icon": _skill_icon(name),
                     "source": "server",
                 })
         except Exception:
@@ -1690,6 +1721,13 @@ class PlayerAvatar(Avatar):
 
         skills.sort(key=lambda s: str(s["name"]))
         return skills
+
+    def perspective_cheat(self, action, params=None):
+        """Testing cheats for the Godot client's cheat window (see mud/world/cheats.py).
+
+        Only active when the world server runs with MOM_ENABLE_CHEATS=1."""
+        from mud.world.cheats import DoCheat
+        return DoCheat(self.player, action, params)
 
     # ------------------------------------------------------------------
     # Plain-data getters for the Godot bridge (no PB cacheables involved).

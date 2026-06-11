@@ -593,7 +593,10 @@ class Mob:
             return
         GenerateLoot(self)
         
-        map(self.aiEquipItem,self.loot.items)
+        # (Real loop: Py3's map() is lazy and ran nothing as a statement —
+        # mobs silently spawned without ever equipping their loot.)
+        for _item in self.loot.items:
+            self.aiEquipItem(_item)
         
         self.mobInfo.refresh()
     
@@ -629,7 +632,8 @@ class Mob:
                 if st in RPG_DERIVEDSTATS:
                     self.__dict__[st] += value
         
-        map(ItemSetProto.updateDerived,iter(self.itemSets.keys()),repeat(self,len(self.itemSets)))
+        for _proto in list(self.itemSets.keys()):
+            _proto.updateDerived(self)
         
         #add in derived stuff
         if self.character and hasattr(self,"advancementStats"):
@@ -1054,7 +1058,8 @@ class Mob:
             for p in list(self.playerAggro.keys()):
                 if self.playerAggro[p] > 120:
                     del self.playerAggro[p]
-                    map(self.aggro.__delitem__,list(m for m in self.aggro.keys() if m.player == p))
+                    for _m in list(m for m in self.aggro.keys() if m.player == p):
+                        del self.aggro[_m]
                     try:
                         othermob = self.playerInitiate[p][1]
                         del othermob.playerInitiate[self.player]
@@ -1254,7 +1259,8 @@ class Mob:
                     if xpdmg.amount < 1:
                         remove.append(damager)
             
-            map(self.xpDamage.__delitem__,remove)
+            for _damager in remove:
+                del self.xpDamage[_damager]
         
         #worn procs
         self.wornTimer -= 3
@@ -1395,7 +1401,8 @@ class Mob:
                 else:
                     self.recastTimers[sproto] = tm
         
-        map(self.recastTimers.__delitem__,rm)
+        for _sproto in rm:
+            del self.recastTimers[_sproto]
         
         # tick reuse timers
         if len(self.skillReuse):
@@ -2308,7 +2315,8 @@ class Mob:
                             if st.statname == stat:
                                 processes.append(p)
         
-        map(Process.cancel,processes)
+        for _p in processes:
+            _p.cancel()
         
         if len(processes) and msg and self.player:
             msg = msg.replace("$tgt",self.name)

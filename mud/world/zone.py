@@ -270,7 +270,8 @@ class ZoneInstance:
         except: 
             pass 
             
-        map(self.removeMob,list(mob for mob in self.activeMobs if not mob.master))
+        for _mob in list(mob for mob in self.activeMobs if not mob.master):
+            self.removeMob(_mob)
         
         self.simAvatar.stop()
     

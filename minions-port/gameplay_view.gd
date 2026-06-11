@@ -42,7 +42,6 @@ const PLAYER_FOOT_OFFSET := 0.9
 # without letting the player walk up walls.
 const PLAYER_STEP_UP_HEIGHT := 1.1
 const PLAYER_STEP_FORWARD_SCALE := 0.9
-const DEFAULT_ABILITY_NAMES := ["Attack", "Kick", "Block", "Taunt", "Shout", "Guard", "Heal", "Sprint"]
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
 const ENTITY_DEATH_DESPAWN_DELAY := 2.75
@@ -65,6 +64,7 @@ const LootWindowScript := preload("res://ui/loot_window.gd")
 const NpcWindowScript := preload("res://ui/npc_window.gd")
 const JournalWindowScript := preload("res://ui/journal_window.gd")
 const SpellbookWindowScript := preload("res://ui/spellbook_window.gd")
+const CheatWindowScript := preload("res://ui/cheat_window.gd")
 const HotbarScript := preload("res://ui/hotbar.gd")
 
 var world_time := {"hour": 0, "minute": 0}
@@ -145,6 +145,7 @@ var loot_window: LootWindow
 var npc_window: NpcWindow
 var journal_window: JournalWindow
 var spellbook_window: SpellbookWindow
+var cheat_window: CheatWindow
 var hotbar: Hotbar
 var cursor_item_ghost: Button   # follows the mouse while an item is on the cursor
 var _interaction_active := false
@@ -397,7 +398,13 @@ func _build_game_windows():
 	spellbook_window.use_skill.connect(func(skill_name): _request_server_command("use_ability", {"ability_name": skill_name}))
 	add_child(spellbook_window)
 
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+	cheat_window = CheatWindowScript.new()
+	cheat_window.position = Vector2(540, 60)
+	cheat_window.cheat_requested.connect(func(action, params):
+		_request_server_command("cheat", {"action": action, "params": params}))
+	add_child(cheat_window)
+
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
 		w.visibility_changed.connect(_on_window_visibility_changed)
 
 	# Item-on-cursor ghost that follows the mouse while rearranging inventory.
@@ -437,6 +444,13 @@ func _toggle_spellbook():
 		_request_server_command("get_spellbook")
 		spellbook_window.apply_skills(_abilities())
 		spellbook_window.open_window()
+
+func _toggle_cheats():
+	if cheat_window.visible:
+		cheat_window.close_window()
+	else:
+		_request_server_command("cheat", {"action": "status", "params": {}})
+		cheat_window.open_window()
 
 func _on_inventory_slot_clicked(slot: int, alt: bool, ctrl: bool):
 	if ctrl:
@@ -522,7 +536,13 @@ func handle_ui_message(data: Dictionary):
 			_last_spellbook = data
 			_ui_char_id = int(data.get("char_id", _ui_char_id))
 			spellbook_window.apply_spellbook(data)
+			_rebuild_ability_bar()
 			hotbar.update_cooldowns(_abilities(), data.get("spells", []))
+		"cheat_result":
+			cheat_window.handle_result(data)
+			var cheat_msg := str(data.get("message", ""))
+			if not cheat_msg.is_empty() and str(data.get("action", "")) not in ["list_items", "list_spells", "status"]:
+				_push_log("[Cheat] " + cheat_msg)
 
 func _maybe_add_journal(journal) -> void:
 	if not (journal is Dictionary) or journal.is_empty():
@@ -881,19 +901,12 @@ func _rapid_info() -> Dictionary:
 	return {}
 
 func _abilities() -> Array:
+	# Real active skills streamed from the server. May legitimately be empty
+	# (a fresh caster has no active skills, just spells) — no fake fallback.
 	var abilities: Variant = _player_char_info().get("abilities", [])
-	if abilities is Array and not abilities.is_empty():
+	if abilities is Array:
 		return abilities.slice(0, min(abilities.size(), 8))
-	var fallback: Array = []
-	for ability_name in DEFAULT_ABILITY_NAMES:
-		fallback.append({
-			"name": ability_name,
-			"rank": 1,
-			"cooldown_active": false,
-			"cooldown_seconds": 0,
-			"source": "fallback",
-		})
-	return fallback
+	return []
 
 func _character_summary() -> String:
 	var char_infos: Array = current_payload.get("char_infos", [])
@@ -1465,10 +1478,18 @@ func _ability_signature() -> String:
 				ability.get("cooldown_active", false),
 				ability.get("cooldown_seconds", 0),
 			])
+	for spell in _last_spellbook.get("spells", []):
+		if spell is Dictionary:
+			names.append("sp:%s:%s:%s" % [
+				spell.get("name", ""),
+				spell.get("slot", -1),
+				spell.get("recast_left", 0),
+			])
 	return "|".join(names)
 
 func _rebuild_ability_bar():
-	# Feed the hotbar + spellbook "Abilities" tab from the server skill list.
+	# Feed the hotbar + spellbook "Abilities" tab from the server skill list
+	# and the memorized spellbook spells.
 	if hotbar == null:
 		return
 	var signature := _ability_signature()
@@ -1476,8 +1497,9 @@ func _rebuild_ability_bar():
 		return
 	last_abilities_signature = signature
 	var abilities := _abilities()
-	hotbar.default_fill_from_skills(abilities)
-	hotbar.update_cooldowns(abilities, _last_spellbook.get("spells", []))
+	var spells: Array = _last_spellbook.get("spells", [])
+	hotbar.default_fill_from_skills(abilities, spells)
+	hotbar.update_cooldowns(abilities, spells)
 	if spellbook_window:
 		spellbook_window.apply_skills(abilities)
 
@@ -1637,6 +1659,10 @@ func _target_entity_from_click(screen_position: Vector2) -> bool:
 	_request_server_command("target_entity", {"entity_id": entity_id})
 	return true
 
+func _typing_in_ui() -> bool:
+	var focus := get_viewport().gui_get_focus_owner()
+	return focus is LineEdit or focus is TextEdit
+
 func _ui_open() -> bool:
 	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
 		if w != null and w.visible:
@@ -1676,7 +1702,11 @@ func _input(event):
 		else:
 			_release_mouse()
 	elif event is InputEventKey and event.pressed and not event.echo:
+		if _typing_in_ui():
+			return  # a window text field owns the keyboard
 		match event.keycode:
+			KEY_F8:
+				_toggle_cheats()
 			KEY_SPACE:
 				jump_requested = true
 			KEY_E:
@@ -1727,16 +1757,17 @@ func _input(event):
 func _physics_process(delta: float) -> void:
 	if not visible:
 		return
-	# Gather movement inputs
+	# Gather movement inputs (not while typing into a window text field)
 	var input_vec := Vector2.ZERO
-	if Input.is_key_pressed(KEY_A):
-		input_vec.x -= 1.0
-	if Input.is_key_pressed(KEY_D):
-		input_vec.x += 1.0
-	if Input.is_key_pressed(KEY_W):
-		input_vec.y += 1.0
-	if Input.is_key_pressed(KEY_S):
-		input_vec.y -= 1.0
+	if not _typing_in_ui():
+		if Input.is_key_pressed(KEY_A):
+			input_vec.x -= 1.0
+		if Input.is_key_pressed(KEY_D):
+			input_vec.x += 1.0
+		if Input.is_key_pressed(KEY_W):
+			input_vec.y += 1.0
+		if Input.is_key_pressed(KEY_S):
+			input_vec.y -= 1.0
 
 	# Local prediction: move CharacterBody3D so movement feels responsive
 	var basis: Basis = player_body.global_transform.basis

@@ -76,7 +76,8 @@ class VendorInstance:
     def destroyStock(self):
         self.stock.clear()
         
-        map(ItemInstance.destroySelf,self.playerSubmitted)
+        for _item in self.playerSubmitted:
+            _item.destroySelf()
         self.playerSubmitted = []
     
     

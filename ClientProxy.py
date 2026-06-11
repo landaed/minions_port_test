@@ -44,6 +44,38 @@ from mud.gamesettings import MASTERIP, MASTERPORT
 from mud.world.shared.worlddata import WorldInfo, WorldConfig, NewCharacter, CharacterInfo
 import mud.world.shared.playdata  # registers RootInfo, AllianceInfo, etc. with jelly
 from mud.world.shared.playdata import ItemInfo as _ServerItemInfo
+from mud.world.shared.playdata import SpellInfo as _ServerSpellInfo
+
+
+class ProxySpellInfoGhost(pb.RemoteCache):
+    """Lightweight stand-in for the client's SpellInfoGhost.
+
+    SpellInfo arrives on the wire as just {ID, LEVEL}; the real client ghost
+    hydrates a dozen display columns from the local MoM client DB via
+    mud.client.playermind (client-only imports that crash the headless proxy —
+    same story as ItemInfo below). It fires for any character that has spells
+    scribed, e.g. casters with auto-scribed starting spells. The proxy ships
+    spellbook data through the plain-data getSpellbook getter instead, so the
+    ghost only needs a name/icon for incidental JSON payloads.
+    """
+
+    def setCopyableState(self, state):
+        self.__dict__.update(state)
+        try:
+            row = _baseline_db().execute(
+                "SELECT name, spellbook_pic FROM spell_proto WHERE id = ? LIMIT 1;",
+                (int(state.get("ID", 0)),)).fetchone()
+            if row:
+                self.BASENAME = self.NAME = str(row[0])
+                self.SPELLBOOKPIC = str(row[1] or "")
+        except Exception:
+            pass
+
+    def observe_updateChanged(self, state):
+        self.__dict__.update(state)
+
+
+pb.setUnjellyableForClass(_ServerSpellInfo, ProxySpellInfoGhost)
 
 
 class ProxyItemInfoGhost(pb.RemoteCache):
@@ -204,18 +236,21 @@ def _serialize_root_info(root_info, session):
     # Replace the passive-skill placeholder ability list with the character's
     # real ACTIVE skills (Kick, Shield Bash, ...) fetched from the world server.
     # Passive proficiencies (1H Slash, Block) do nothing when "used", so showing
-    # them on the ability bar made the hotkeys appear broken.
+    # them on the ability bar made the hotkeys appear broken. Once the active
+    # list has been fetched it always wins — even when it's legitimately empty
+    # (a fresh caster has no active skills, just spells).
     active_skills = getattr(session, "active_skills", None)
-    if char_infos and active_skills:
+    if char_infos and getattr(session, "active_skills_ready", False):
         char_infos[0]["abilities"] = [
             {
                 "name": s.get("name", ""),
                 "rank": s.get("rank", 1),
                 "cooldown_active": bool(s.get("cooldown_active", False)),
                 "cooldown_seconds": int(s.get("cooldown_seconds", 0) or 0),
+                "icon": s.get("icon", ""),
                 "source": "server",
             }
-            for s in active_skills[:8]
+            for s in (active_skills or [])[:8]
         ]
 
     position = _get_first_attr(root_info, "POSITION", "position")
@@ -702,6 +737,7 @@ class GodotClientSession:
         self.entity_sync_call = None
         self.skill_sync_call = None
         self.active_skills = []
+        self.active_skills_ready = False
         self.last_gameplay_payload = None
         self.last_entity_payload = None
         self.interact_pane = None
@@ -802,6 +838,7 @@ class GodotClientSession:
     def _on_active_skills(self, skills):
         if isinstance(skills, (list, tuple)):
             self.active_skills = list(skills)
+            self.active_skills_ready = True
         self.start_skill_sync()
 
     def _on_active_skills_failed(self, reason):
@@ -919,6 +956,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             "enter_world": self.handle_enter_world,
             "direct_connect": self.handle_direct_connect,
             "gameplay_command": self.handle_gameplay_command,
+            "cheat": self.handle_cheat,
         }.get(msg_type)
 
         if handler:
@@ -1028,6 +1066,36 @@ class ProxyProtocol(WebSocketServerProtocol):
     def _on_gameplay_command_failed(self, reason, command, world_command):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
         self._send_gameplay_command_result(False, command, f"{world_command} failed: {msg}")
+
+    def handle_cheat(self, msg):
+        """Testing cheats (give XP / level / money / items / spells / skills).
+
+        Forwarded to PlayerAvatar.perspective_cheat; the world server refuses
+        unless it runs with MOM_ENABLE_CHEATS=1. After mutating actions the
+        proxy re-pushes inventory + spellbook so the client UI updates."""
+        if not self._ensure_player_logged_in():
+            return
+        action = str(msg.get("action", "")).strip()
+        params = msg.get("params", {})
+        if not isinstance(params, dict):
+            params = {}
+        session = self.session
+
+        def on_result(result):
+            if not isinstance(result, dict):
+                result = {"success": False, "message": str(result)}
+            session.send({"type": "cheat_result", "action": action, **result})
+            if result.get("success") and action in (
+                    "give_item", "give_money", "learn_spell", "learn_class_spells",
+                    "give_xp", "set_level", "raise_skills", "full_heal"):
+                session.push_inventory()
+                session.push_spellbook()
+
+        d = session.player_perspective.callRemote("PlayerAvatar", "cheat", action, params)
+        d.addCallback(on_result)
+        d.addErrback(lambda f: session.send({
+            "type": "cheat_result", "action": action, "success": False,
+            "message": str(f.value) if hasattr(f, "value") else str(f)}))
 
     def _handle_ui_command(self, command, msg):
         """Inventory / loot / dialog / vendor / spellbook bridge commands.

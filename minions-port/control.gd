@@ -165,6 +165,9 @@ func _ensure_gameplay_view() -> Control:
 	return gameplay_view
 
 func _on_gameplay_view_command_requested(command_type: String, payload: Dictionary = {}):
+	if command_type == "cheat":
+		_send({"type": "cheat", "action": payload.get("action", ""), "params": payload.get("params", {})})
+		return
 	var msg := {"type": "gameplay_command", "command": command_type}
 	for key in payload.keys():
 		msg[key] = payload[key]
@@ -438,7 +441,8 @@ func handle_response(data: Dictionary):
 				gameplay_view.append_game_text(str(data.get("message", "")))
 
 		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
-		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook":
+		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook", \
+		"cheat_result":
 			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
 				gameplay_view.handle_ui_message(data)
 

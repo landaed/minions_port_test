@@ -579,8 +579,11 @@ class Character(Persistent):
     def backupItems(self):
 
         # For all ItemInstances owned by this Character, store to a persistent
-        # Item.
-        map(ItemInstance.storeToItem, self.items)
+        # Item. (Must be a real loop: Py3's map() is lazy, and the original
+        # map() form silently stored nothing — fresh characters lost their
+        # entire StartingGear because creation exported an empty item table.)
+        for item in self.items:
+            item.storeToItem()
 
 
     ## @brief Train an RPG-cass for the Character's Spawn.
@@ -2322,7 +2325,8 @@ class Character(Persistent):
             return
 
         # Unequip any pet slot.
-        map(pet.unequipItem,range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
+        for _slot in range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END):
+            pet.unequipItem(_slot)
         
         # Get a handle to the pets realm.
         myrealm = self.mob.spawn.realm
@@ -3848,6 +3852,39 @@ class Character(Persistent):
                 # credits.
                 if slot == RPG_SLOT_CARRY_END:
                     break
+
+
+    def autoScribeStartingSpells(self):
+        """Scribe the spell scrolls granted by StartingGear into the spellbook.
+
+        The original game shipped casters with class-appropriate scrolls the
+        player had to click onto spellbook slots one by one (Character.
+        onSpellSlot). For the Godot port a new character spawns with those
+        spells already memorized so the class's starting spells are on the
+        hotbar immediately. Mirrors onSpellSlot's learn path: scrolls are the
+        items whose proto carries spellProto; learning consumes the scroll.
+        Called at creation time (no mob yet), so the qualify() check is
+        skipped — StartingGear scrolls are class-correct level-1 spells.
+        """
+        used_slots = set(spell.slot for spell in self.spells)
+        known = set(spell.spellProto for spell in self.spells)
+        slot = 0
+        for item in list(self.items):
+            proto = item.itemProto
+            spellProto = getattr(proto, 'spellProto', None)
+            if not spellProto or item.spellEnhanceLevel:
+                continue
+            if spellProto in known:
+                continue
+            while slot in used_slots:
+                slot += 1
+            CharacterSpell(character=self, spellProto=spellProto, slot=slot, recast=0)
+            used_slots.add(slot)
+            known.add(spellProto)
+            item.stackCount -= 1
+            if 0 >= item.stackCount:
+                item.destroySelf()
+        self.spellsDirty = True
 
 
     ## @brief Checks if the Character has enough free carry slots.

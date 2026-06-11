@@ -531,7 +531,8 @@ class ItemInfo(pb.Cacheable):
                 rm.append(k)
                 traceback.print_exc()
         
-        map(selection.__delitem__,rm)
+        for _k in rm:
+            del selection[_k]
         
         if len(selection):
             for o in self.observers:
