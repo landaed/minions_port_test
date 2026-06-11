@@ -165,6 +165,9 @@ func _ensure_gameplay_view() -> Control:
 	return gameplay_view
 
 func _on_gameplay_view_command_requested(command_type: String, payload: Dictionary = {}):
+	if command_type == "cheat":
+		_send({"type": "cheat", "action": payload.get("action", ""), "params": payload.get("params", {})})
+		return
 	var msg := {"type": "gameplay_command", "command": command_type}
 	for key in payload.keys():
 		msg[key] = payload[key]
@@ -402,6 +405,10 @@ func handle_response(data: Dictionary):
 				var entities_val = data.get("entities", [])
 				if entities_val is Array:
 					view.set_entities(entities_val)
+			if view.has_method("apply_vfx_events"):
+				var events_val = data.get("events", [])
+				if events_val is Array and not events_val.is_empty():
+					view.apply_vfx_events(events_val)
 
 		"game_text":
 			if gameplay_view and gameplay_view.has_method("append_game_text"):
@@ -438,7 +445,8 @@ func handle_response(data: Dictionary):
 				gameplay_view.append_game_text(str(data.get("message", "")))
 
 		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
-		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook":
+		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook", \
+		"cheat_result", "begin_casting", "play_sound":
 			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
 				gameplay_view.handle_ui_message(data)
 

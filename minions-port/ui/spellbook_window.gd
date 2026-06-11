@@ -111,10 +111,12 @@ func _skill_row(ability: Dictionary) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	var slot := SlotButton.new(36)
-	slot.set_slot(null, str(ability.get("name", "?")).left(8))
+	var icon := UIC.spell_icon(str(ability.get("icon", "")))
+	slot.set_slot(icon, str(ability.get("name", "?")).left(8))
 	slot.payload = {
 		"name": str(ability.get("name", "?")),
 		"action": "skill",
+		"icon": str(ability.get("icon", "")),
 	}
 	slot.drag_kind = "action"
 	slot.tooltip_text = "%s\nRank %s" % [str(ability.get("name", "?")), str(ability.get("rank", 1))]

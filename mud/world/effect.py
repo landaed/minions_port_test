@@ -317,13 +317,16 @@ def BreakCharm(effect):
     
     if src.character:
         # Unequip the items given by the Character master.
-        map(pet.unequipItem,range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END))
+        # (Real loop: Py3's map() is lazy and ran nothing as a statement.)
+        for _slot in range(RPG_SLOT_WORN_BEGIN,RPG_SLOT_WORN_END):
+            pet.unequipItem(_slot)
         
         # Refresh the items given by the Character master.
         src.character.refreshPetItems()
         
         # And reequip own gear.
-        map(pet.aiEquipItem,pet.loot.items)
+        for _item in pet.loot.items:
+            pet.aiEquipItem(_item)
         pet.mobInfo.refresh()
     
     zone.setTarget(pet,None)

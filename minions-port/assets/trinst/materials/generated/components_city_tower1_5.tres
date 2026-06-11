@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://dhh5ex0u3kfdb"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://cn7c3bmn7yyp7" path="res://assets/trinst/interiors/components_city_tower1_5.jpg" id="1_r7lot"]
-[ext_resource type="Texture2D" uid="uid://b23d0ubinnpxq" path="res://assets/trinst/interiors/components_city_tower1_5_ao.png" id="2_3bf07"]
-[ext_resource type="Texture2D" uid="uid://dj08ic6bnu6j3" path="res://assets/trinst/interiors/components_city_tower1_5_normal.png" id="3_frqkn"]
-[ext_resource type="Texture2D" uid="uid://dpoyaeqvyj0pe" path="res://assets/trinst/interiors/components_city_tower1_5_rough.png" id="4_8qgxc"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_5.jpg" id="1_r7lot"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_5_ao.png" id="2_3bf07"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_5_normal.png" id="3_frqkn"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/components_city_tower1_5_rough.png" id="4_8qgxc"]
 
 [resource]
 resource_name = "cncrt02_docktopside_enhanced"

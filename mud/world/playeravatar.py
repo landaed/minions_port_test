@@ -33,6 +33,71 @@ from mud.world.shared.worlddata import CharacterInfo,ZoneConnectionInfo
 from mud.world.shared.playdata import RootInfo,ItemInfo
 
 
+def _compute_mounts(mob):
+    """Worn equipment shape paths for the Godot client, keyed by mount index.
+
+    Mirrors the legacy SimMobInfo MOUNT0..MOUNT3 rules (simdata.py): primary
+    weapon on mount0, secondary on mount1, shield on mount2, head item on
+    mount3; a two-handed primary hides the off-hand and shield (unless the mob
+    can Power Wield). Values are {"model": "weapons/sword01.dts",
+    "material": "..."} — the client maps model to assets/equipment/*.glb.
+    """
+    mounts = {}
+    worn = getattr(mob, 'worn', None) or {}
+
+    def put(key, item):
+        if item is None:
+            return
+        model = str(getattr(item, 'model', '') or '')
+        if not model:
+            return
+        mounts[key] = {
+            "model": model,
+            "material": str(getattr(item, 'material', '') or ''),
+        }
+
+    put("2", worn.get(RPG_SLOT_SHIELD))
+    put("3", worn.get(RPG_SLOT_HEAD))
+    secondary = worn.get(RPG_SLOT_SECONDARY)
+    put("1", secondary)
+    primary = worn.get(RPG_SLOT_PRIMARY)
+    put("0", primary)
+    if primary is not None and '2H' in str(getattr(primary, 'skill', '') or ''):
+        if not secondary or not mob.skillLevels.get("Power Wield"):
+            mounts.pop("1", None)
+            mounts.pop("2", None)
+    return mounts
+
+
+_SKILLINFOS = None
+
+def _skill_icon(skillname):
+    """Icon reference for a skill, from the original client's skillinfo table.
+
+    Values are either "SPELLICON_<sheet>_<index>" sheet refs or loose names
+    under data/ui/icons/; the Godot client resolves both (see ui_common.gd).
+    skillinfo.py is dependency-free data, but lives in the legacy client
+    package whose __init__ pulls in TGE-era modules, so load it by path.
+    """
+    global _SKILLINFOS
+    if _SKILLINFOS is None:
+        try:
+            import importlib.util
+            from os import path
+            p = path.join(path.dirname(__file__), "..", "client", "gui", "skillinfo.py")
+            spec = importlib.util.spec_from_file_location("_mom_skillinfo", p)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            _SKILLINFOS = module.SKILLINFOS
+        except Exception:
+            print_exc()
+            _SKILLINFOS = {}
+    info = _SKILLINFOS.get(skillname)
+    if info and info.icon:
+        return str(info.icon)
+    return ""
+
+
 #also query
 class PlayerAvatar(Avatar):
     
@@ -207,6 +272,7 @@ class PlayerAvatar(Avatar):
                 ret = (0,"%s has been created.  She awaits your command!"%newchar.name)
                 
             char.addStartingGear()
+            char.autoScribeStartingSpells()
             char.backupItems()
             
             #send off the character
@@ -1511,6 +1577,20 @@ class PlayerAvatar(Avatar):
                         other_mob._godot_tex = tex
                     except Exception:
                         pass
+                # Worn equipment models for the client to mount on the skeleton
+                # (Mount0 primary hand / 1 off hand / 2 shield / 3 head), same
+                # rules as the legacy SimMobInfo MOUNT0..3 state. Cached on the
+                # mob; equipItem/unequipItem invalidate it.
+                mounts = getattr(other_mob, '_godot_mounts', None)
+                if mounts is None:
+                    try:
+                        mounts = _compute_mounts(other_mob)
+                    except Exception:
+                        mounts = {}
+                    try:
+                        other_mob._godot_mounts = mounts
+                    except Exception:
+                        pass
                 entities.append({
                     "id": int(other_mob.id),
                     "sim_id": int(other_mob.simObject.id),
@@ -1525,6 +1605,7 @@ class PlayerAvatar(Avatar):
                     "is_player": bool(other_mob.player),
                     "is_enemy": is_enemy,
                     "is_self": bool(other_mob == mob),
+                    "is_my_pet": bool(getattr(other_mob, 'master', None) == mob),
                     "realm": int(getattr(other_mob, 'realm', 0)),
                     "race": race_name,
                     "pclass": pclass_name,
@@ -1533,6 +1614,7 @@ class PlayerAvatar(Avatar):
                     "animation": animation_name,
                     "scale": scale_val,
                     "tex": tex,
+                    "mounts": mounts,
                     "level": int(getattr(other_mob, 'plevel', 0)),
                     "health": health,
                     "max_health": max(max_health, 1.0),
@@ -1589,7 +1671,36 @@ class PlayerAvatar(Avatar):
                     len(entities) - 1,
                     str(getattr(mob.simObject, 'position', '?')))
 
-        return entities
+        # Drain zone visual events (playAnimation/particles/explosions/3D sound)
+        # captured by the stub sim since this avatar's last poll, range-filtered
+        # to what this player could actually see/hear. Shipped with the snapshot
+        # so the Godot client can play skill/spell effects.
+        events = []
+        try:
+            if hasattr(sim_avatar, "vfx_events_since"):
+                cursor = getattr(self, "_vfx_cursor", None)
+                if cursor is None:
+                    # First poll: skip history, only stream events from now on.
+                    self._vfx_cursor = sim_avatar.vfx_seq
+                else:
+                    raw_events, self._vfx_cursor = sim_avatar.vfx_events_since(cursor)
+                    if raw_events:
+                        px, py = mob.simObject.position[0], mob.simObject.position[1]
+                        EVENT_RANGE_SQ = 80.0 * 80.0
+                        for ev in raw_events:
+                            pos = ev.get("position")
+                            if pos is None:
+                                so = sim_avatar.simLookup.get(ev.get("sim_id", 0))
+                                pos = so.position if so is not None else None
+                            if pos is not None:
+                                dx, dy = pos[0] - px, pos[1] - py
+                                if dx * dx + dy * dy > EVENT_RANGE_SQ:
+                                    continue
+                            events.append(ev)
+        except Exception:
+            print_exc()
+
+        return {"entities": entities, "events": events}
 
     def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
         """Receive movement input from the Godot client for server-authoritative movement.
@@ -1682,6 +1793,7 @@ class PlayerAvatar(Avatar):
                     "cooldown_active": bool(reuse_key in mob.skillReuse),
                     "cooldown_seconds": int(cooldown),
                     "has_spell": bool(getattr(class_skill, "spellProto", None)) if class_skill else False,
+                    "icon": _skill_icon(name),
                     "source": "server",
                 })
         except Exception:
@@ -1690,6 +1802,13 @@ class PlayerAvatar(Avatar):
 
         skills.sort(key=lambda s: str(s["name"]))
         return skills
+
+    def perspective_cheat(self, action, params=None):
+        """Testing cheats for the Godot client's cheat window (see mud/world/cheats.py).
+
+        Only active when the world server runs with MOM_ENABLE_CHEATS=1."""
+        from mud.world.cheats import DoCheat
+        return DoCheat(self.player, action, params)
 
     # ------------------------------------------------------------------
     # Plain-data getters for the Godot bridge (no PB cacheables involved).

@@ -6,6 +6,8 @@ extends RefCounted
 
 const ITEM_ICON_ROOT := "res://assets/ui/items/"
 const SPELL_ICON_ROOT := "res://assets/ui/spellicons/"
+const UI_ICON_ROOT := "res://assets/ui/icons/"
+const SHEET_CELL := 40  # spells0N.jpg sheets: 6 cells per row, 40px each (256px image)
 
 const SLOT_NAMES := {
 	0: "Head", 1: "L.Ear", 2: "R.Ear", 3: "Neck", 4: "Shoulders", 5: "Back",
@@ -56,6 +58,8 @@ static func money_text(tin: int) -> String:
 	return " ".join(bits)
 
 static func _composite(base_path: String, alpha_path: String) -> Texture2D:
+	if not FileAccess.file_exists(base_path):
+		return null
 	var base_img := Image.load_from_file(ProjectSettings.globalize_path(base_path))
 	if base_img == null:
 		return null
@@ -86,14 +90,50 @@ static func item_icon(bitmap: String) -> Texture2D:
 	_icon_cache[key] = tex
 	return tex
 
+static func _sheet_cell_icon(pic: String) -> Texture2D:
+	# "spellicon_<sheet>_<index>" refers to a 40px cell in data/ui/icons/spells0<sheet>.jpg
+	# (6 cells per row), exactly as the original client's itemInfoWnd decoded it.
+	var parts := pic.split("_")
+	if parts.size() != 3:
+		return null
+	var sheet := int(parts[1])
+	var index := int(parts[2])
+	var sheet_path := "%sspells0%d.jpg" % [UI_ICON_ROOT, sheet]
+	if not FileAccess.file_exists(sheet_path):
+		return null
+	var img := Image.load_from_file(ProjectSettings.globalize_path(sheet_path))
+	if img == null:
+		return null
+	var cell := Image.create(SHEET_CELL, SHEET_CELL, false, img.get_format())
+	var src := Rect2i((index % 6) * SHEET_CELL, floori(index / 6.0) * SHEET_CELL, SHEET_CELL, SHEET_CELL)
+	cell.blit_rect(img, src, Vector2i.ZERO)
+	return ImageTexture.create_from_image(cell)
+
 static func spell_icon(pic: String) -> Texture2D:
+	# Resolves any of the original icon reference styles:
+	#   "spellicon_5_3"  -> 40px cell from the spells0N sheet
+	#   "flame1"         -> data/ui/spellicons/flame1.jpg (+ alpha mask)
+	#   "confusion"      -> data/ui/icons/confusion.jpg (loose status/skill icons)
+	#   "icons/command"  -> explicit ui subdir reference
 	if pic.is_empty():
 		return null
-	var key := "spell:" + pic
+	var key := "spell:" + pic.to_lower()
 	if _icon_cache.has(key):
 		return _icon_cache[key]
-	var base := SPELL_ICON_ROOT + pic.to_lower()
-	var tex := _composite(base + ".jpg", base + ".alpha.jpg")
+	var name := pic.to_lower()
+	var tex: Texture2D = null
+	if name.begins_with("spellicon_"):
+		tex = _sheet_cell_icon(name)
+	else:
+		if name.begins_with("icons/"):
+			name = name.substr(6)
+		elif name.begins_with("spellicons/"):
+			name = name.substr(11)
+		var base := SPELL_ICON_ROOT + name
+		tex = _composite(base + ".jpg", base + ".alpha.jpg")
+		if tex == null:
+			base = UI_ICON_ROOT + name
+			tex = _composite(base + ".jpg", base + ".alpha.jpg")
 	_icon_cache[key] = tex
 	return tex
 

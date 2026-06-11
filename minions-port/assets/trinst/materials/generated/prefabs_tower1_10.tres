@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://dso2bfk68k05b"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://dk8ma7nli1mnk"]
 
 [ext_resource type="Texture2D" uid="uid://bipmdxygngnt3" path="res://assets/trinst/interiors/prefabs_tower1_10.jpg" id="1_t05km"]
 [ext_resource type="Texture2D" uid="uid://cppa6suhxiotj" path="res://assets/trinst/interiors/prefabs_tower1_10_ao.png" id="2_pqxo6"]

@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://co7df3u73pgwl"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://1h1h2adjmth3" path="res://assets/trinst/interiors/architecture_tent1_1.jpg" id="1_qeu74"]
-[ext_resource type="Texture2D" uid="uid://c01lbvlfgfuye" path="res://assets/trinst/interiors/architecture_tent1_1_ao.png" id="2_awnf4"]
-[ext_resource type="Texture2D" uid="uid://c87lxjdgbl6hs" path="res://assets/trinst/interiors/architecture_tent1_1_normal.png" id="3_ecqfc"]
-[ext_resource type="Texture2D" uid="uid://clvcwn8thgk1n" path="res://assets/trinst/interiors/architecture_tent1_1_rough.png" id="4_haaso"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent1_1.jpg" id="1_qeu74"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent1_1_ao.png" id="2_awnf4"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent1_1_normal.png" id="3_ecqfc"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/architecture_tent1_1_rough.png" id="4_haaso"]
 
 [resource]
 resource_name = "COIL_ROPE_enhanced"

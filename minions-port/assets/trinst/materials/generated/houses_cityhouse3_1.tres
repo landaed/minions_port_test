@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://dfkivo8f2tyo2"]
+[gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" uid="uid://x1abj0motwn4" path="res://assets/trinst/interiors/houses_cityhouse3_1.jpg" id="1_x0wmr"]
-[ext_resource type="Texture2D" uid="uid://cdsase8xoe5ng" path="res://assets/trinst/interiors/houses_cityhouse3_1_ao.png" id="2_v8o8y"]
-[ext_resource type="Texture2D" uid="uid://cn3cro6x3w088" path="res://assets/trinst/interiors/houses_cityhouse3_1_normal.png" id="3_gkywu"]
-[ext_resource type="Texture2D" uid="uid://cj8grqqkmyfrx" path="res://assets/trinst/interiors/houses_cityhouse3_1_rough.png" id="4_fpsdx"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_1.jpg" id="1_x0wmr"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_1_ao.png" id="2_v8o8y"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_1_normal.png" id="3_gkywu"]
+[ext_resource type="Texture2D" path="res://assets/trinst/interiors/houses_cityhouse3_1_rough.png" id="4_fpsdx"]
 
 [resource]
 resource_name = "wall108_enhanced"

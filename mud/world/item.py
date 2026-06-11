@@ -1072,12 +1072,14 @@ class ItemInstance:
                     pass
             
             try:
+                # The character has no live mob outside the world (e.g. at
+                # character creation), so guard the unequip paths.
                 # If the item was worn by the character, unequip it now.
-                if RPG_SLOT_WORN_END > self.slot >= RPG_SLOT_WORN_BEGIN:
+                if mob and RPG_SLOT_WORN_END > self.slot >= RPG_SLOT_WORN_BEGIN:
                     mob.unequipItem(self.slot)
-                
+
                 # If the item was equipped by the pet, unequip it now.
-                elif mob.pet and RPG_SLOT_PET_END > self.slot >= RPG_SLOT_PET_BEGIN:
+                elif mob and mob.pet and RPG_SLOT_PET_END > self.slot >= RPG_SLOT_PET_BEGIN:
                     mob.pet.unequipItem(self.slot - RPG_SLOT_PET_BEGIN)
                 
                 # Actually remove the item from characters inventory.

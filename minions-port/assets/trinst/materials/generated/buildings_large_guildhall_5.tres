@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://b3ukmdth8cs8p"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c8loc6cmqlwt3"]
 
 [ext_resource type="Texture2D" uid="uid://dyaf6rk8d18ay" path="res://assets/trinst/interiors/buildings_large_guildhall_5.jpg" id="1_ygd38"]
 [ext_resource type="Texture2D" uid="uid://do0r08f67djst" path="res://assets/trinst/interiors/buildings_large_guildhall_5_ao.png" id="2_smdun"]
@@ -17,4 +17,3 @@ normal_texture = ExtResource("3_8jjb6")
 ao_enabled = true
 ao_light_affect = 0.35
 ao_texture = ExtResource("2_smdun")
-uv1_scale = Vector3(1, -1, 1)

@@ -1,4 +1,4 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://c4qt5dj1adxjd"]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://c65n6wcbvdyhk"]
 
 [ext_resource type="Texture2D" uid="uid://do5ol4o5edhiu" path="res://assets/trinst/interiors/buildings_small_guild01_1.jpg" id="1_ixef1"]
 [ext_resource type="Texture2D" uid="uid://e0b762808pxb" path="res://assets/trinst/interiors/buildings_small_guild01_1_ao.png" id="2_4s7tx"]

@@ -153,7 +153,8 @@ class CharacterServerAvatar(pb.Root):
             for k in EXTRACT_TIMES.keys():
                 if k not in pnames:
                     remove.append(k)
-            map(EXTRACT_TIMES.__delitem__,remove)
+            for _k in remove:
+                del EXTRACT_TIMES[_k]
             
             if extractTarget:
                 p = Player.byPublicName(extractTarget) #already in active chars
