@@ -116,8 +116,30 @@ static func emitter(parent: Node3D, offset: Vector3, emitter_name: String,
 	p.mesh = quad
 	p.emitting = true
 	parent.add_child(p)
-	_free_later(p, maxf(duration, 0.1) + p.lifetime)
+	# Defensive ceiling: server events are seconds, but a malformed duration
+	# must never leave a permanent emitter behind. Persistent equipped-weapon
+	# effects (duration >= 1800) are exempt — they're cleared on re-equip.
+	var ttl := maxf(duration, 0.1)
+	if ttl < 1800.0:
+		ttl = minf(ttl, 30.0)
+	_free_later(p, ttl + p.lifetime)
 	return p
+
+static func stop_emitters(parent: Node3D, tag: String) -> void:
+	# Stop (fade out, then free) every tagged effect under *parent* —
+	# CPUParticles3D emitters and ring meshes alike.
+	for c in parent.get_children():
+		if not (c is Node3D) or str(c.get_meta("vfx_tag", "")) != tag:
+			continue
+		if c is CPUParticles3D:
+			c.emitting = false
+			_free_later(c, c.lifetime)
+		else:
+			c.queue_free()
+
+static func tag_emitter(node: Node3D, tag: String) -> void:
+	if node != null:
+		node.set_meta("vfx_tag", tag)
 
 static func explosion(parent: Node3D, offset: Vector3, name: String) -> void:
 	var lname := name.to_lower()

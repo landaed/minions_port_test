@@ -1605,6 +1605,7 @@ class PlayerAvatar(Avatar):
                     "is_player": bool(other_mob.player),
                     "is_enemy": is_enemy,
                     "is_self": bool(other_mob == mob),
+                    "is_my_pet": bool(getattr(other_mob, 'master', None) == mob),
                     "realm": int(getattr(other_mob, 'realm', 0)),
                     "race": race_name,
                     "pclass": pclass_name,

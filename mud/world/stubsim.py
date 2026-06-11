@@ -82,7 +82,8 @@ class StubSimObject:
         self.rangedAttack = False
         self.dyingMob = None
         self.isPlayer = False
-        self.moveTarget = None   # StubSimObject to chase
+        self.moveTarget = None    # StubSimObject to chase (combat)
+        self.stickyFollow = None  # StubSimObject to heel to (pet follow)
         self.moveSpeed = 5.0     # units per second
         self._client_input = None  # movement input from Godot client (player only)
 
@@ -165,7 +166,11 @@ class StubSimAvatar:
         simObject.moveTarget = targetSimObject
 
     def setFollowTarget(self, simObject, targetSimObject):
-        simObject.moveTarget = targetSimObject
+        # Friendly follow (a pet heeling to its master) is a separate channel
+        # from the combat chase: combat targeting may override it temporarily,
+        # and clearing the combat target resumes the heel — like the original
+        # sim, where follow persisted independently.
+        simObject.stickyFollow = targetSimObject
 
     def clearTarget(self, simObject):
         simObject.moveTarget = None
@@ -221,7 +226,13 @@ class StubSimAvatar:
     # ---- bot spawning ----
 
     def spawnBot(self, spawn, transform, wanderGroup, mobInfo):
-        """Create a stub sim object for a spawned mob."""
+        """Create a stub sim object for a spawned mob.
+
+        Resolves on the next reactor tick rather than synchronously: the legacy
+        flow had a network round-trip here, and world code (DoSummonPet et al)
+        relies on finishing its post-spawnMob setup (pet.master, petSpawning)
+        before mob.spawned() runs from this callback.
+        """
         pos, rot = _parse_transform(transform)
         so = StubSimObject(position=pos, rotation=_marker_rotation_to_sim(rot))
         so._home = pos  # anchor for idle wander/patrol
@@ -230,7 +241,8 @@ class StubSimAvatar:
         # them all wander walked NPCs through walls and off interior floors.
         so.wanderGroup = wanderGroup if wanderGroup is not None else -1
         self.addSimObject(so)
-        return defer.succeed(so)
+        from twisted.internet.task import deferLater
+        return deferLater(reactor, 0, lambda: so)
 
     def botSpawned(self, bot):
         # Already added in spawnBot
@@ -446,11 +458,18 @@ class StubSimAvatar:
             if nodes:
                 self._push_vfx("particle_nodes", args[0], {"nodes": nodes})
         elif method == "newParticleSystem" and len(args) >= 2:
+            # The legacy duration argument is in MILLISECONDS (spell.py uses
+            # t = timer/6*1000 for casting, a flat 3000 for spell-begin bursts);
+            # convert to seconds for the client.
             self._push_vfx("particles", args[0], {
                 "emitter": str(args[1] or ""),
                 "texture": str(args[2] or "") if len(args) > 2 else "",
-                "duration": float(args[3] or 0) if len(args) > 3 else 0.0,
+                "duration": (float(args[3] or 0) if len(args) > 3 else 0.0) / 1000.0,
             })
+        elif method == "casting" and len(args) >= 2:
+            # casting(simId, True) at wind-up, casting(simId, False) on every
+            # completion/interrupt path — lets the client stop cast visuals.
+            self._push_vfx("casting", args[0], {"on": bool(args[1])})
         elif method == "spawnExplosion" and len(args) >= 2:
             self._push_vfx("explosion", args[0], {
                 "name": str(args[1] or ""),
@@ -550,20 +569,28 @@ class StubSimAvatar:
                     self._facePlayerTarget(so)
                     continue
                 tgt = getattr(so, 'moveTarget', None)
+                following = False
                 if not tgt:
-                    # No combat target: idle NPCs wander/patrol near their spawn.
-                    if self._wanderStep(so, dt):
-                        moved += 1
-                    continue
+                    # No combat target: heel to the follow target (pets), else
+                    # idle NPCs wander/patrol near their spawn.
+                    tgt = getattr(so, 'stickyFollow', None)
+                    following = tgt is not None
+                    if not tgt:
+                        if self._wanderStep(so, dt):
+                            moved += 1
+                        continue
                 if not hasattr(tgt, 'position') or tgt.position is None:
                     continue
                 dx = tgt.position[0] - so.position[0]
                 dy = tgt.position[1] - so.position[1]
                 dz = tgt.position[2] - so.position[2]
-                if not self._can_see_pair(so, tgt, dx, dy, dz):
+                if not following and not self._can_see_pair(so, tgt, dx, dy, dz):
                     # The radius-only stub LOS can leave pre-fix saves with an
                     # invalid cross-floor target. Drop it instead of flying the
                     # NPC down/up through tower floors toward guards/players.
+                    # (A pet heeling to its master is exempt: the master can
+                    # outrange the layer check just by running, and mob.tick
+                    # warps lagging pets back anyway.)
                     so.moveTarget = None
                     continue
                 dist = sqrt(dx * dx + dy * dy + dz * dz)

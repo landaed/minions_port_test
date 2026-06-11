@@ -23,7 +23,7 @@ func _init():
 	content.custom_minimum_size = Vector2(440, 0)
 
 	status_label = Label.new()
-	status_label.text = "Server cheats: unknown (press F8 to refresh)"
+	status_label.text = "Server cheats: unknown (press ` to refresh)"
 	status_label.add_theme_font_size_override("font_size", 11)
 	status_label.add_theme_color_override("font_color", Color(0.95, 0.8, 0.45))
 	status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

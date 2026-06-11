@@ -14,7 +14,10 @@ local test stack; start with `./run_servers.sh --no-cheats` (or export
 `mud/world/cheats.py`, exposed as `PlayerAvatar.perspective_cheat` and proxied
 via the `{"type": "cheat", "action": ..., "params": {...}}` WebSocket message.
 
-**Client:** press **F8** in-game to toggle the cheat window. It offers:
+**Client:** press **`** (backquote) in-game to toggle the cheat window
+(F8 also works in standalone builds, but when the game runs embedded in the
+Godot editor, F8 is the editor's own Stop-project shortcut and kills the run).
+It offers:
 
 | Action | UI | Server behavior |
 |---|---|---|
@@ -133,7 +136,30 @@ forwards inside `entity_snapshot.events`.
 - Hit reactions: any entity (and your own avatar) whose health drops plays
   `pain1`/`pain2`, rate-limited.
 
-## 6. Py2 → Py3 lazy `map()` bug sweep
+## 6. Pets (summons)
+
+Summoning was broken three ways in the headless port; all fixed:
+
+- `Mob.__init__` ignored its `master` argument (hardcoded `self.master = None`).
+  The original set `pet.master` *after* `spawnMob()` returned, which worked
+  because the Torque sim's spawn callback was asynchronous; the stub resolved
+  it synchronously, so `mob.spawned()` ran before the master was known and
+  silently skipped the entire pet hookup — `master.pet` never set ("You have
+  no pet"), `PetCmdFollowMe` never issued, `petSpawning` stuck True. The
+  constructor now assigns the master, and `StubSimAvatar.spawnBot` resolves on
+  the next reactor tick to restore the original ordering.
+- The stub conflated combat chase and friendly follow in one `moveTarget`
+  field, and its layer/LOS check dropped follow targets. Follow is now a
+  separate `stickyFollow` channel: combat targeting overrides it temporarily,
+  clearing the combat target resumes the heel, and the LOS drop doesn't apply
+  (the server already warps lagging pets to their master).
+- Pet commands weren't exposed. The proxy now maps `pet_attack` / `pet_follow`
+  / `pet_stay` / `pet_back_off` / `pet_dismiss` to the legacy `PET` command,
+  entity snapshots flag your own pet (`is_my_pet`), and the client shows a pet
+  command bar (left edge, with the pet's name + health) whenever your pet is
+  up. Pets also auto-defend: damage to the master propagates aggro to the pet.
+
+## 7. Py2 → Py3 lazy `map()` bug sweep
 
 `map(f, xs)` as a statement does nothing in Python 3 (lazy iterator). 15 such
 sites were silently dead, including:
@@ -149,7 +175,7 @@ sites were silently dead, including:
 
 All are now real loops.
 
-## 7. Verifying
+## 8. Verifying
 
 ```bash
 ./run_servers.sh --setup          # cheats enabled by default

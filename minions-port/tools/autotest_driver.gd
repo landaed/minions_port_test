@@ -418,7 +418,13 @@ class AutotestDriver:
 			view.hotbar.activate(spell_slot)
 			await get_tree().create_timer(1.1).timeout
 			await _shot("closeup_casting")
-			await get_tree().create_timer(2.2).timeout
+			# Wait out the full cast (summons take 10s) so the release shot
+			# shows the cast visuals STOPPED + any summoned pet standing by.
+			for i in range(30):
+				await get_tree().create_timer(0.5).timeout
+				if view._cast_bar == null or not view._cast_bar.visible:
+					break
+			await get_tree().create_timer(2.5).timeout
 			await _shot("closeup_cast_release")
 		cam_yaw.rotation.y = 0.0
 		_goto("finish")

@@ -391,7 +391,13 @@ class Mob:
         self.petSpawning = False
         self.petMode = RPG_PET_FOLLOWME
         self.petAcceptItemTimer = 0
-        self.master = None
+        # The constructor receives the master (summoner/charmer) but only used
+        # it for realm; callers set mob.master *after* spawnMob() returned,
+        # which worked because the Torque sim's spawn callback was asynchronous.
+        # The headless stub resolves spawnBot synchronously, so spawned() fired
+        # before master was assigned and silently skipped the entire pet hookup
+        # (master.pet never set, no follow). Assign it up front.
+        self.master = master
         self.followTarget = None
         self.petSpeedMod = 0.0
         

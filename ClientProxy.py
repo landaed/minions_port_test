@@ -1040,6 +1040,13 @@ class ProxyProtocol(WebSocketServerProtocol):
             "emote_bow": ("BOW", ["0"]),
             "emote_point": ("POINT", ["0"]),
             "emote_agree": ("AGREE", ["0"]),
+            # Pet commands (summoned/charmed pets): attack my target, stay,
+            # follow me, stop fighting, dismiss.
+            "pet_attack": ("PET", ["0", "ATTACK"]),
+            "pet_stay": ("PET", ["0", "STAY"]),
+            "pet_follow": ("PET", ["0", "FOLLOWME"]),
+            "pet_back_off": ("PET", ["0", "STANDDOWN"]),
+            "pet_dismiss": ("PET", ["0", "DISMISS"]),
         }
 
         payload = command_map.get(command)

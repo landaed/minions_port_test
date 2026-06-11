@@ -153,6 +153,8 @@ var _cast_started := 0.0
 var _cast_duration := 0.0
 var _self_prev_health := -1.0
 var _self_pain_cooldown := 0.0
+var _pet_bar: PanelContainer
+var _pet_label: Label
 var _interaction_active := false
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
@@ -314,11 +316,36 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  U: unstuck  •  F3: debug"
+	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  U: unstuck  •  F3: debug  •  `: cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
 	bottom.add_child(hotbar)
+
+	# Pet command bar (left edge; shown only while a pet is up).
+	_pet_bar = PanelContainer.new()
+	_pet_bar.add_theme_stylebox_override("panel", _panel_style(Color(0.5, 0.75, 0.5)))
+	_pet_bar.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	_pet_bar.offset_left = 16
+	_pet_bar.visible = false
+	add_child(_pet_bar)
+	var pet_box := VBoxContainer.new()
+	pet_box.add_theme_constant_override("separation", 4)
+	_pet_bar.add_child(pet_box)
+	_pet_label = Label.new()
+	_pet_label.text = "Pet"
+	_pet_label.add_theme_font_size_override("font_size", 12)
+	_pet_label.add_theme_color_override("font_color", Color(0.7, 0.95, 0.7))
+	pet_box.add_child(_pet_label)
+	for pet_cmd in [["Attack my target", "pet_attack"], ["Follow me", "pet_follow"],
+			["Stay", "pet_stay"], ["Back off", "pet_back_off"], ["Dismiss", "pet_dismiss"]]:
+		var pb := Button.new()
+		pb.text = pet_cmd[0]
+		pb.focus_mode = Control.FOCUS_NONE
+		UICommonScript.style_button(pb)
+		var cmd: String = pet_cmd[1]
+		pb.pressed.connect(func(): _request_server_command(cmd))
+		pet_box.add_child(pb)
 
 	# Cast bar (bottom-center, above the hotbar; shown while casting).
 	_cast_bar = ProgressBar.new()
@@ -814,8 +841,13 @@ func apply_vfx_events(events: Array):
 				if rig:
 					rig.play_overlay(str(ev.get("anim", "")))
 			"particles":
-				VFX.emitter(node, Vector3(0, 1.1, 0), str(ev.get("emitter", "")),
+				var emitter_name := str(ev.get("emitter", ""))
+				var p := VFX.emitter(node, Vector3(0, 1.1, 0), emitter_name,
 					str(ev.get("texture", "")), float(ev.get("duration", 1.5)))
+				# Tag cast wind-up emitters so the casting-end event (fired on
+				# every completion/interrupt path) can stop them early.
+				if emitter_name.to_lower().contains("casting"):
+					VFX.tag_emitter(p, "casting")
 			"particle_nodes":
 				for pn in ev.get("nodes", []):
 					if pn is Dictionary:
@@ -825,7 +857,17 @@ func apply_vfx_events(events: Array):
 				VFX.explosion(node, Vector3(0, 1.0, 0), str(ev.get("name", "")))
 			"spell_effect":
 				# SimpleZodiacN etc — the casting circle under the character.
-				VFX.casting_ring(node, 2.5)
+				VFX.tag_emitter(VFX.casting_ring(node, 12.0), "casting")
+			"casting":
+				if not bool(ev.get("on", true)):
+					VFX.stop_emitters(node, "casting")
+					if rig:
+						rig.clear_overlay()
+					if node == player_body and _cast_bar:
+						_cast_bar.visible = false
+				elif rig and node != player_body:
+					# NPC cast wind-up (the local player gets begin_casting).
+					rig.play_overlay("spellprepare", 10.0)
 			"item_particle":
 				if rig:
 					# server slots: 11 primary -> mount 0, 12 secondary -> mount 1
@@ -858,6 +900,7 @@ func _rig_for_node(node: Node3D):
 func set_entities(entities: Array):
 	replicated_entities = entities.duplicate(true)
 	_sync_entity_markers()
+	_update_pet_bar()
 	_update_labels()
 
 func on_server_selection(tgt_sim_id: int, _char_index: int):
@@ -1609,6 +1652,21 @@ func _sync_entity_markers():
 				_pending_target_mob_id = 0
 				break
 
+func _update_pet_bar() -> void:
+	if _pet_bar == null:
+		return
+	var pet: Dictionary = {}
+	for entity in replicated_entities:
+		if entity is Dictionary and bool(entity.get("is_my_pet", false)) and not bool(entity.get("dead", false)):
+			pet = entity
+			break
+	if pet.is_empty():
+		_pet_bar.visible = false
+		return
+	_pet_label.text = "%s  %d%%" % [str(pet.get("name", "Pet")),
+		int(round(float(pet.get("health_ratio", 1.0)) * 100.0))]
+	_pet_bar.visible = true
+
 func _ability_signature() -> String:
 	var names: Array = []
 	for ability in _abilities():
@@ -1864,7 +1922,10 @@ func _input(event):
 		if _typing_in_ui():
 			return  # a window text field owns the keyboard
 		match event.keycode:
-			KEY_F8:
+			KEY_QUOTELEFT, KEY_F8:
+				# ` (backquote) is the primary cheat hotkey. F8 also works in a
+				# standalone build, but when the game runs embedded in the Godot
+				# editor F8 is the editor's own Stop shortcut and kills the run.
 				_toggle_cheats()
 			KEY_SPACE:
 				jump_requested = true
