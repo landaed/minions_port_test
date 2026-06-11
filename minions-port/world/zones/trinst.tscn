@@ -46,13 +46,13 @@
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_prisonerpole.tscn" id="44"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_pit1.tscn" id="45"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_tavernbig.tscn" id="46"]
-[ext_resource type="PackedScene" uid="uid://c6erouw8qkrxh" path="res://assets/trinst/editable/interiors__buildings_small_guild01.tscn" id="47"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_small_guild01.tscn" id="47"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse1.tscn" id="48"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse2.tscn" id="49"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__houses_cityhouse3.tscn" id="50"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_rogue1.tscn" id="51"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__signs_mage1.tscn" id="52"]
-[ext_resource type="PackedScene" uid="uid://ccmypjlm0g7mj" path="res://assets/trinst/editable/interiors__buildings_large_guildhall.tscn" id="53"]
+[ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__buildings_large_guildhall.tscn" id="53"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__components_desert_obelisk.tscn" id="54"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__architecture_tent1.tscn" id="55"]
 [ext_resource type="PackedScene" path="res://assets/trinst/editable/interiors__hovels_small_cottage.tscn" id="56"]
@@ -73,7 +73,7 @@
 [ext_resource type="Script" uid="uid://deo0gxkmk2ahd" path="res://addons/sky_3d/src/Sky3D.gd" id="71_p7wbs"]
 [ext_resource type="Script" uid="uid://b4tkplvh7fq40" path="res://addons/sky_3d/src/SkyDome.gd" id="72_xuc06"]
 [ext_resource type="Script" uid="uid://cjmkcj8hwm7ts" path="res://addons/sky_3d/src/TimeOfDay.gd" id="73_pf3fp"]
-[ext_resource type="Script" path="res://world/spawn_point.gd" id="74_u7glr"]
+[ext_resource type="Script" uid="uid://bt0pnebnold0w" path="res://world/spawn_point.gd" id="74_u7glr"]
 [ext_resource type="Shader" uid="uid://c3d638behmwd8" path="res://shaders/water.gdshader" id="75_i6eom"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hjim3"]
@@ -129,8 +129,8 @@ shader_parameter/cirrus_absorption = 2.0
 shader_parameter/cirrus_sky_tint_fade = 0.5
 shader_parameter/cirrus_size = 1.0
 shader_parameter/cirrus_uv = Vector2(0.16, 0.11)
-shader_parameter/cirrus_position1 = Vector2(0.23678742, 0.23678742)
-shader_parameter/cirrus_position2 = Vector2(0.23678742, 0.23678742)
+shader_parameter/cirrus_position1 = Vector2(0.9316633, 0.9316633)
+shader_parameter/cirrus_position2 = Vector2(0.9316633, 0.9316633)
 shader_parameter/cirrus_texture = ExtResource("65_u7glr")
 shader_parameter/cumulus_visible = true
 shader_parameter/cumulus_intensity = 0.6
@@ -140,7 +140,7 @@ shader_parameter/cumulus_absorption = 2.0
 shader_parameter/cumulus_noise_freq = 2.7
 shader_parameter/cumulus_sky_tint_fade = 0.0
 shader_parameter/cumulus_size = 0.5
-shader_parameter/cumulus_position = Vector2(1.1838096, 1.1838096)
+shader_parameter/cumulus_position = Vector2(4.659109, 4.659109)
 shader_parameter/cumulus_texture = ExtResource("66_i6eom")
 shader_parameter/cumulus_partial_mie_phase = Vector3(0.957564, 1.042436, 0.412)
 shader_parameter/cumulus_mie_intensity = 1.0
@@ -163,6 +163,10 @@ ambient_light_color = Color(1, 1, 1, 1)
 reflected_light_source = 2
 tonemap_mode = 3
 tonemap_white = 6.0
+ssr_enabled = true
+ssao_enabled = true
+ssil_enabled = true
+glow_enabled = true
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_vkqfl"]
 
@@ -207,7 +211,7 @@ shader_parameter/surface_normals_b = SubResource("NoiseTexture2D_p7wbs")
 shader_parameter/surface_normals_move_direction_a = Vector2(-1, 0.2)
 shader_parameter/surface_normals_move_direction_b = Vector2(0.2, 1)
 shader_parameter/surface_texture_roughness = 0.10999999754128
-shader_parameter/surface_texture_scale = 0.10000000475000001
+shader_parameter/surface_texture_scale = 0.10000000475
 shader_parameter/surface_texture_time_scale = 0.06
 shader_parameter/ssr_resolution = 1.0
 shader_parameter/ssr_max_travel = 30.0

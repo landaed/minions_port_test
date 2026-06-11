@@ -1,9 +1,9 @@
-[gd_resource type="StandardMaterial3D" format=3]
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://cluubwoateyln"]
 
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_guildhall_7.jpg" id="1_iux83"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_guildhall_7_ao.png" id="2_7neud"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_guildhall_7_normal.png" id="3_y1yk2"]
-[ext_resource type="Texture2D" path="res://assets/trinst/interiors/buildings_large_guildhall_7_rough.png" id="4_2bntp"]
+[ext_resource type="Texture2D" uid="uid://cvum0cy7swk10" path="res://assets/trinst/interiors/buildings_large_guildhall_7.jpg" id="1_iux83"]
+[ext_resource type="Texture2D" uid="uid://memefbx8sr23" path="res://assets/trinst/interiors/buildings_large_guildhall_7_ao.png" id="2_7neud"]
+[ext_resource type="Texture2D" uid="uid://bgubomij16r0s" path="res://assets/trinst/interiors/buildings_large_guildhall_7_normal.png" id="3_y1yk2"]
+[ext_resource type="Texture2D" uid="uid://vh2b2cj1u6b1" path="res://assets/trinst/interiors/buildings_large_guildhall_7_rough.png" id="4_2bntp"]
 
 [resource]
 resource_name = "patternborder_14_v5_enhanced"
