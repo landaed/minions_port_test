@@ -30,6 +30,18 @@ EXTRACT_TIMES = {}
 
 TICK_COUNTER = 6*15 #once every minute
 
+# In-flight savePlayerBuffer calls.  World.shutdown waits on these so a server
+# stop while players are online cannot drop the final logout extraction.
+PENDING_SAVES = []
+
+
+def _track_save(d):
+    PENDING_SAVES.append(d)
+    # Prune anything already delivered so the list stays small.
+    PENDING_SAVES[:] = [p for p in PENDING_SAVES if not p.called]
+    d.addErrback(lambda f: (print("savePlayerBuffer failed:", f), None)[1])
+    return d
+
 
 class CharacterServerAvatar(pb.Root):
     def __init__(self):
@@ -71,11 +83,11 @@ class CharacterServerAvatar(pb.Root):
             except:
                 pass
             
-            AVATAR.mind.callRemote("savePlayerBuffer",publicName,pbuffer, \
-                cbuffer,cvalues,True)
+            _track_save(AVATAR.mind.callRemote("savePlayerBuffer",publicName, \
+                pbuffer,cbuffer,cvalues,True))
         else:
-            AVATAR.mind.callRemote("savePlayerBuffer",player.publicName,None, \
-                None,None,True,False)
+            _track_save(AVATAR.mind.callRemote("savePlayerBuffer", \
+                player.publicName,None,None,None,True,False))
     
     extractLoggingPlayer = staticmethod(extractLoggingPlayer)
     
@@ -115,7 +127,7 @@ class CharacterServerAvatar(pb.Root):
                         cbuf = encodebytes(dumps(cbuffer, 2))
 
                     print("Sending Player/Character buffers: %s (%ik/%ik)"%(pname,len(pbuf)/1024,len(cbuf)/1024))
-                    AVATAR.mind.callRemote("savePlayerBuffer",pname,pbuf,cbuf,cvalues) #xxx add callback/errback
+                    _track_save(AVATAR.mind.callRemote("savePlayerBuffer",pname,pbuf,cbuf,cvalues))
                     EXTRACT_TIMES[pname]=now
                     #should be removing these upon success
                     PLAYER_BUFFERS.remove((pname,pbuffer,cbuffer,cvalues))

@@ -219,6 +219,11 @@ def RemoveInstalledCharacter(dstCursor, cname):
 def InstallCharacterBuffer(playerID,cname,buffer):
     from mud.world.player import Player
     tm = time.time()
+    # The schema caches (TATTR/TVALUES) are normally primed by a character
+    # export, but a freshly restarted server can be asked to install before it
+    # ever exports (entering with an existing character) — prime them here too.
+    if not CREATE_CHARACTER_TABLE_SQL:
+        Initialize()
     _logf = open("/tmp/enterworld_debug.log", "a")
 
     if not os.path.exists("data/tmp"):

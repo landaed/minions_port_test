@@ -134,6 +134,13 @@ class CServerMind(pb.Root):
         d = CServerMind.themind.callRemote("getCharacterBuffer",publicName,characterName)
         d.addCallback(self.gotCharacterBuffer,publicName)
         return d
+
+
+    def remote_getPlayerBuffer(self,publicName):
+        # Lets a world restore a logged-out player's saved buffer directly
+        # (used by the direct-connect login flow; the official flow instead
+        # pushes the buffer through master -> installPlayer).
+        return CServerMind.themind.callRemote("getPlayerBuffer",publicName)
     
     
     def remote_recordActivePlayers(self, worldname, players):

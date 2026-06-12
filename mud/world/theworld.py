@@ -277,35 +277,63 @@ class World(Persistent):
     
     def commit(self, commitOnly=False):
         if self.tickTransaction:
-            self.tickTransaction.cancel()
+            # The pending tick may have already fired (and crashed) or been
+            # cancelled; an explicit commit must still go through.
+            try:
+                self.tickTransaction.cancel()
+            except Exception:
+                pass
+            self.tickTransaction = None
         self.transactionTick(commitOnly)
-    
-    
+
+
     def transactionTick(self, commitOnly=False):
+        # This is the world's only periodic durability point: it must commit,
+        # then ALWAYS re-arm itself.  Other code paths (character install /
+        # extract) run their own BEGIN/END on the same connection, so "END;"
+        # here can legitimately find no transaction active — that must not
+        # kill the commit loop (it previously did, so nothing was ever
+        # committed again and the whole world DB rolled back on shutdown).
         print("... Commit World Database ...")
-        
-        conn = Persistent._connection.getConnection()
-        cursor = conn.cursor()
-        
-        if self.transaction:
-            cursor.execute("END;")
-        
-        if self.dbFile and not commitOnly:
-            self.backupTick -= 1
-            if not self.backupTick:
-                print("Backing up world database")
-                self.backupTick = 30 #once every 30 minutes
+
+        try:
+            conn = Persistent._connection.getConnection()
+            cursor = conn.cursor()
+
+            if self.transaction:
                 try:
-                    BackupWorld(self.dbFile)
-                except:
+                    cursor.execute("END;")
+                except Exception as exc:
+                    if "no transaction is active" not in str(exc).lower():
+                        traceback.print_exc()
+
+            if self.dbFile and not commitOnly:
+                self.backupTick -= 1
+                if not self.backupTick:
+                    print("Backing up world database")
+                    self.backupTick = 30 #once every 30 minutes
+                    try:
+                        BackupWorld(self.dbFile)
+                    except:
+                        traceback.print_exc()
+
+            self.transaction = True
+
+            try:
+                cursor.execute("BEGIN;")
+            except Exception as exc:
+                if "within a transaction" not in str(exc).lower():
                     traceback.print_exc()
-        
-        self.transaction = True
-        
-        cursor.execute("BEGIN;")
-        cursor.close()
-        
-        self.tickTransaction = reactor.callLater(60,self.transactionTick)
+            cursor.close()
+        except:
+            traceback.print_exc()
+        finally:
+            if self.tickTransaction:
+                try:
+                    self.tickTransaction.cancel()
+                except Exception:
+                    pass
+            self.tickTransaction = reactor.callLater(60,self.transactionTick)
     
     
     def startup(self):
@@ -324,15 +352,21 @@ class World(Persistent):
     def shutdown(self):
         if self.running:  # else reentrant in single player worlds through player logout
             self.running = False
-            
+
             for p in self.activePlayers[:]:
-                p.logout()
-            
+                try:
+                    p.logout()
+                except:
+                    traceback.print_exc()
+
             self.shuttingDown = True
             if self.tickTransaction:
-                self.tickTransaction.cancel()
+                try:
+                    self.tickTransaction.cancel()
+                except Exception:
+                    pass
                 self.tickTransaction = None
-            
+
             conn = Persistent._connection.getConnection()
             cursor = conn.cursor()
             if self.transaction:
@@ -342,9 +376,29 @@ class World(Persistent):
                     pass
 
             cursor.close()
-            
+
             self.transaction = False
-        
+
+            # The logouts above hand each player's buffers to the character
+            # server asynchronously.  When running as the reactor's shutdown
+            # trigger, return a deferred so the process stays alive until
+            # those saves are delivered (or a short timeout passes) — without
+            # this, stopping the server while players are online could drop
+            # their final position/inventory save.
+            from mud.world import cserveravatar
+            pending = [d for d in cserveravatar.PENDING_SAVES if not d.called]
+            cserveravatar.PENDING_SAVES = []
+            if pending and not self.singlePlayer:
+                from twisted.internet import defer
+                dl = defer.DeferredList(pending, consumeErrors=True)
+                timeout = reactor.callLater(5, lambda: dl.called or dl.cancel())
+                def _clear_timeout(result):
+                    if timeout.active():
+                        timeout.cancel()
+                    return result
+                dl.addBoth(_clear_timeout)
+                return dl
+
         #move me
         
 

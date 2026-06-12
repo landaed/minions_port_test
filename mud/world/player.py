@@ -15,6 +15,7 @@ from datetime import datetime
 from math import ceil,degrees,sqrt
 from sqlobject import *
 from time import time as sysTime
+from twisted.spread import pb
 import traceback
 
 
@@ -762,7 +763,12 @@ class Player(Persistent):
                 muteTime = self.world.mutedPlayers[self.publicName]
             except KeyError:
                 muteTime = 0
-            self.mind.callRemote("setMuteTime",muteTime)
+            try:
+                self.mind.callRemote("setMuteTime",muteTime)
+            except pb.DeadReferenceError:
+                # Client connection already gone (logout is racing this tick) —
+                # don't let the stale broker abort the rest of the zone tick.
+                pass
             
             # Only update friends list every 5 seconds, same as tracking.
             #OPTIMIZE
@@ -888,13 +894,16 @@ class Player(Persistent):
                     self.logTransform = self.curChar.deathTransform
             if hasattr(self,"zone"):
                 if self.zone:
-                    self.endInteraction(False)
-                    
+                    try:
+                        self.endInteraction(False)
+                    except:
+                        traceback.print_exc()
+
                     if not allDead and self.simObject:
                         transform = list(self.simObject.position)
                         transform.extend(list(self.simObject.rotation))
                         transform[-1] = degrees(transform[-1])
-                        
+
                         if self.darkness:
                             self.darknessLogZone = self.zone.zone
                             self.darknessLogTransform = transform
@@ -904,14 +913,21 @@ class Player(Persistent):
                         else:
                             self.logZone = self.zone.zone
                             self.logTransform = transform
-                    
+
                     if self.zone.owningPlayer != self:
                         from mud.world.theworld import World
                         world = World.byName("TheWorld")
                         if not world.singlePlayer:
-                            self.zone.kickPlayer(self)
+                            # The kick talks to the (possibly already dead)
+                            # client connection — it must never prevent the
+                            # zone removal below, or the player is left
+                            # ticking in the zone forever.
+                            try:
+                                self.zone.kickPlayer(self)
+                            except:
+                                traceback.print_exc()
                         self.zone.removePlayer(self)
-                
+
                 self.zone = None
         except:
             traceback.print_exc()
