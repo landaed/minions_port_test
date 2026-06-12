@@ -311,6 +311,14 @@ class Character(Persistent):
     ## @brief (Persistent String) Transform storing the Character's most recent
     #         death position and rotation.
     deathTransformInternal = StringCol(default="0 0 0 1 0 0 0")
+    ## @brief (Persistent String) Zone name where this Character last logged
+    #         out. Empty until the character has been played once; a fresh
+    #         character then enters at the realm's bind point instead of
+    #         inheriting the account's last position.
+    logZoneInternal = StringCol(default="")
+    ## @brief (Persistent String) Transform where this Character last logged
+    #         out (same format as Player.logTransformInternal).
+    logTransformInternal = StringCol(default="")
 
     # Relationships.
     ## @brief (Persistent Player) The Player who owns the Character.

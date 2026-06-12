@@ -115,6 +115,47 @@ func default_fill_from_skills(abilities: Array, spells: Array = []) -> void:
 		_assignments[i] = fills[i] if i < fills.size() else null
 	_refresh_all()
 
+func prune_unknown(abilities: Array, spells_ready: bool, spells: Array) -> void:
+	# Saved bars are keyed by character name only, so a same-named character
+	# (e.g. recreated after a database reset) inherits the previous layout.
+	# Drop any entry the server says this character doesn't actually have.
+	# Skills are only validated once the (possibly empty-at-connect) ability
+	# list has content; spells once a spellbook message has arrived.
+	var known_skills := {}
+	for ab in abilities:
+		if ab is Dictionary:
+			known_skills[str(ab.get("name", ""))] = true
+	var known_spells := {}
+	for sp in spells:
+		if sp is Dictionary:
+			known_spells[str(sp.get("name", ""))] = true
+	var changed := false
+	for i in range(SLOT_COUNT):
+		var a = _assignments[i]
+		if not (a is Dictionary) or a.is_empty():
+			continue
+		var nm := str(a.get("name", ""))
+		var stale := false
+		if str(a.get("action", "skill")) == "skill":
+			stale = not abilities.is_empty() and not known_skills.has(nm)
+		else:
+			stale = spells_ready and not known_spells.has(nm)
+		if stale:
+			_assignments[i] = null
+			_refresh_slot(i)
+			changed = true
+	if changed:
+		var any_left := false
+		for a in _assignments:
+			if a is Dictionary and not a.is_empty():
+				any_left = true
+				break
+		if not any_left:
+			# Everything was stale (different character entirely): forget the
+			# saved layout so the default fill can rebuild a sensible bar.
+			_user_modified = false
+		_persist()
+
 func activate(i: int) -> void:
 	if i < 0 or i >= SLOT_COUNT:
 		return

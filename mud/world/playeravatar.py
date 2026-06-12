@@ -1194,6 +1194,45 @@ class PlayerAvatar(Avatar):
         return d
     
     
+    def _applyCharacterLogPosition(self, character):
+        from mud.world.zone import Zone
+
+        ltrans = getattr(character,"logTransformInternal","") or ""
+        lzname = getattr(character,"logZoneInternal","") or ""
+
+        lzone = None
+        if lzname:
+            try:
+                lzone = Zone.byName(lzname)
+            except:
+                lzone = None
+        if lzone is not None and self.world.staticZoneNames and \
+                lzname not in self.world.staticZoneNames:
+            lzone = None
+
+        player = self.player
+        if lzone is not None and ltrans:
+            if player.darkness:
+                player.darknessLogZone = lzone
+                player.darknessLogTransformInternal = ltrans
+            elif player.monster:
+                player.monsterLogZone = lzone
+                player.monsterLogTransformInternal = ltrans
+            else:
+                player.logZone = lzone
+                player.logTransformInternal = ltrans
+        else:
+            if player.darkness:
+                player.darknessLogZone = player.darknessBindZone
+                player.darknessLogTransformInternal = player.darknessBindTransformInternal
+            elif player.monster:
+                player.monsterLogZone = player.monsterBindZone
+                player.monsterLogTransformInternal = player.monsterBindTransformInternal
+            else:
+                player.logZone = player.bindZone
+                player.logTransformInternal = player.bindTransformInternal
+
+
     def perspective_jumpIntoWorld(self, cname):
         self.enterWorld([cname],None,None)
         #fill charInfos
@@ -1371,7 +1410,13 @@ class PlayerAvatar(Avatar):
             else:
                 self.player.logTransformInternal = self.player.bindTransformInternal
                 self.player.logZone = self.player.bindZone
-        
+        else:
+            # Position is per CHARACTER, not per account: resume where this
+            # character logged out; a character that was never played (or whose
+            # saved zone isn't hosted here) starts at the realm's bind point
+            # instead of inheriting the account's last position.
+            self._applyCharacterLogPosition(chars[0])
+
         zone = self.world.playerSelectZone(self,simPort,simPassword)
         _logf.write("####enterWorld: playerSelectZone returned %s (liveZones=%s waitingZones=%s)\n" % (zone, [z.name for z in self.world.liveZoneInstances], [z.name for z in self.world.waitingZoneInstances]))
         _logf.flush()

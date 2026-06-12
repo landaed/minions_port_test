@@ -172,6 +172,9 @@ class CharacterServerAvatar(pb.Root):
                 p = Player.byPublicName(extractTarget) #already in active chars
                 if p and p.party:
                     p.backupItems()
+                    # Keep the periodic safety-net buffer's position current
+                    # (the authoritative stamp normally happens at logout).
+                    p.saveCharacterPositions()
                     ExtractPlayer(p.publicName,p.id,p.party.members[0].id)
         except:
             traceback.print_exc()

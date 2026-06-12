@@ -224,22 +224,36 @@ try:
         print("Run 'python3 setup_databases.py' to create the database.")
         sys.exit(1)
 
-    def ensureCharacterAuctionColumn(database):
+    def ensureCharacterColumns(database):
         import sqlite3
 
+        # Idempotent runtime migrations so an existing world DB keeps working
+        # after a code update without re-running setup_databases.py.
+        wanted = [
+            ("auction_id_n", "INTEGER DEFAULT 0"),
+            # Per-character log position (zone name + transform), so each
+            # character resumes where IT logged out instead of inheriting the
+            # account-level position from whichever character played last.
+            ("log_zone_internal", "TEXT DEFAULT ''"),
+            ("log_transform_internal", "TEXT DEFAULT ''"),
+        ]
         conn = sqlite3.connect(database)
         try:
             cursor = conn.cursor()
             cursor.execute("PRAGMA table_info(character)")
             columns = {row[1] for row in cursor.fetchall()}
-            if "auction_id_n" not in columns:
-                cursor.execute("ALTER TABLE character ADD COLUMN auction_id_n INTEGER DEFAULT 0")
+            added = False
+            for name, decl in wanted:
+                if name not in columns:
+                    cursor.execute("ALTER TABLE character ADD COLUMN %s %s" % (name, decl))
+                    print("Added missing character.%s column to %s" % (name, os.path.abspath(database)))
+                    added = True
+            if added:
                 conn.commit()
-                print("Added missing character.auction_id_n column to %s" % os.path.abspath(database))
         finally:
             conn.close()
 
-    ensureCharacterAuctionColumn(DATABASE)
+    ensureCharacterColumns(DATABASE)
 
     from mud.utils import getSQLiteURL
     SetDBConnection(getSQLiteURL(DATABASE),True)

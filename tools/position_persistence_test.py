@@ -15,9 +15,12 @@ CREDS_FILE = "/tmp/pos_persist_creds.json"
 
 def log(*a): print("[POSTEST]", *a); sys.stdout.flush()
 
-async def drive(label, register, creds, move_seconds=5.0, settle_seconds=2.0):
+async def drive(label, register, creds, move_seconds=5.0, settle_seconds=2.0,
+                create_if_missing=None):
     """Run the full flow. If move_seconds > 0, hold forward input that long.
     Returns (first_self_pos, last_self_pos) observed while in world."""
+    if create_if_missing is None:
+        create_if_missing = register
     first_pos = None
     last_pos = None
     got_root = False
@@ -79,7 +82,7 @@ async def drive(label, register, creds, move_seconds=5.0, settle_seconds=2.0):
                 log(label, "characters:", names)
                 if creds["char"] in names:
                     await send(type="enter_world", character_name=creds["char"])
-                elif register:
+                elif create_if_missing:
                     await send(type="create_character", name=creds["char"], race="Human",
                                klass="Paladin", sex="Male", look=0, realm=1)
                 else:
@@ -159,4 +162,31 @@ async def main():
     else:
         log("RESULT: POSITION BUG REPRODUCED (respawned at original spawn, not logout position)")
 
-asyncio.run(main())
+# --- second-character mode ---------------------------------------------------
+# Usage: python3 tools/position_persistence_test.py --second-char
+# After a normal run (creds in /tmp/pos_persist_creds.json with a walked-out
+# position), log into the SAME account, create a NEW character, enter, and
+# verify it spawns at the start point rather than the first character's spot.
+async def second_char():
+    with open(CREDS_FILE) as f:
+        creds = json.load(f)
+    second = dict(creds)
+    second["char"] = "Newbie" + "".join(random.choice(string.ascii_lowercase) for _ in range(4))
+    log("SECOND CHAR: same account", second["user"], "new char", second["char"])
+    r = await drive("second", register=False, creds=second, move_seconds=0,
+                    create_if_missing=True)
+    if r is None:
+        log("RESULT: SECOND-CHAR FAILED (could not enter)")
+        return
+    first, _ = r
+    d_old = sum((a - b) ** 2 for a, b in zip(first, creds["expect"])) ** 0.5
+    log("new char spawn:", ["%.1f" % p for p in first],
+        "| distance from other char's logout pos: %.1f" % d_old)
+    log("RESULT:", "OK (fresh start point)" if d_old > 5 else "BUG (inherited other character's position)")
+
+
+if __name__ == "__main__":
+    if "--second-char" in sys.argv:
+        asyncio.run(second_char())
+    else:
+        asyncio.run(main())

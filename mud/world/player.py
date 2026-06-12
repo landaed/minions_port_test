@@ -914,6 +914,8 @@ class Player(Persistent):
                             self.logZone = self.zone.zone
                             self.logTransform = transform
 
+                        self.saveCharacterPositions(transform)
+
                     if self.zone.owningPlayer != self:
                         from mud.world.theworld import World
                         world = World.byName("TheWorld")
@@ -986,7 +988,7 @@ class Player(Persistent):
                     transform = list(self.simObject.position)
                     transform.extend(list(self.simObject.rotation))
                     transform[-1] = degrees(transform[-1])
-                    
+
                     if self.darkness:
                         self.darknessLogZone = self.zone.zone
                         self.darknessLogTransform = transform
@@ -996,8 +998,35 @@ class Player(Persistent):
                     else:
                         self.logZone = self.zone.zone
                         self.logTransform = transform
-    
-    
+
+                    self.saveCharacterPositions(transform)
+
+
+    def saveCharacterPositions(self, transform=None):
+        # Stamp the current position onto every party member's character row,
+        # so each character resumes where IT was (a different character on the
+        # same account starts at its own spot / bind point, not wherever the
+        # account played last).
+        try:
+            if not self.party or not self.party.members:
+                return
+            if not hasattr(self,"zone") or not self.zone:
+                return
+            if transform is None:
+                if not self.simObject:
+                    return
+                transform = list(self.simObject.position)
+                transform.extend(list(self.simObject.rotation))
+                transform[-1] = degrees(transform[-1])
+            t = ' '.join(map(str,transform))
+            zname = self.zone.zone.name
+            for c in self.party.members:
+                c.logZoneInternal = zname
+                c.logTransformInternal = t
+        except:
+            traceback.print_exc()
+
+
     def backupItems(self):
         # (Real loops: Py3's map() is lazy and ran nothing as a statement,
         # so bank items and party inventories were never backed up.)

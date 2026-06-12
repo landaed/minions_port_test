@@ -61,7 +61,7 @@ def GenerateInsertValues(table,valuesIn,playerID=None,characterID=None,spawnID=N
     valuesOut = []
     for valueIn in valuesIn:
         valueOut = []
-        
+
         for col,v in zip(TATTR[table],valueIn):
             if col == 'id':
                 valueOut.append(None)
@@ -77,9 +77,15 @@ def GenerateInsertValues(table,valuesIn,playerID=None,characterID=None,spawnID=N
                 valueOut.append(spawnID)
             else:
                 valueOut.append(v)
-        
+
+        # A buffer extracted before a schema migration has fewer columns than
+        # the live table; pad with NULLs so the INSERT placeholders still match
+        # (the new columns keep their defaults until the next extract).
+        while len(valueOut) < len(TATTR[table]):
+            valueOut.append(None)
+
         valuesOut.append(valueOut)
-    
+
     return valuesOut
 
 

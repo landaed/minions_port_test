@@ -17,6 +17,8 @@ const RECONCILE_MAX_SPEED := 10.0       # cap correction speed (units/sec)
 const CAMERA_ZOOM_MIN := 2.5
 const CAMERA_ZOOM_MAX := 14.0
 const CAMERA_ZOOM_STEP := 1.0
+const CAMERA_NEAR_HEIGHT := 0.45     # shoulder-level camera height at closest zoom
+const CAMERA_FP_OFFSET := Vector3(0.0, -0.45, 0.0)  # eye position (relative to the 1.4-high yaw pivot)
 const CAMERA_COLLISION_MASK := 1  # world geometry only; ignore entity markers on layer 2
 const CAMERA_COLLISION_PADDING := 0.35
 const CAMERA_COLLISION_MIN_DISTANCE := 1.2
@@ -92,6 +94,8 @@ var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
+var _first_person := false
+var _camera_base_rotation_x := 0.0
 var _pos_history: Array = []        # recent [{t, pos}] samples for latency-aware reconcile
 var _reconcile_error := Vector3.ZERO  # smoothed-out correction toward the server position
 var _camera_base_local_offset := Vector3.ZERO
@@ -178,6 +182,7 @@ func _ready():
 	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
 	player_body.add_child(_player_rig)
 	_camera_base_local_offset = camera.position
+	_camera_base_rotation_x = camera.rotation.x
 	_camera_zoom = _camera_base_local_offset.z
 	_apply_camera_zoom()
 	_setup_dynamic_dof()
@@ -629,6 +634,7 @@ func _apply_camera_zoom() -> void:
 	if camera == null:
 		return
 	_camera_zoom = clampf(_camera_zoom, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
+	_apply_player_visibility()
 	_update_camera_collision()
 
 
@@ -636,13 +642,44 @@ func _desired_camera_local_offset() -> Vector3:
 	var desired := _camera_base_local_offset
 	if desired == Vector3.ZERO and camera != null:
 		desired = camera.position
+	# Blend from the high "over the shoulder from above" framing at far zoom
+	# down to shoulder level up close, so zooming in keeps the character in
+	# frame instead of staring down at the top of their head.
+	var t := clampf((_camera_zoom - CAMERA_ZOOM_MIN) / (CAMERA_ZOOM_MAX - CAMERA_ZOOM_MIN), 0.0, 1.0)
+	desired.y = lerpf(CAMERA_NEAR_HEIGHT, desired.y, t)
 	desired.z = _camera_zoom
 	return desired
+
+
+func _set_first_person(on: bool) -> void:
+	if _first_person == on:
+		return
+	_first_person = on
+	if not on:
+		_camera_zoom = CAMERA_ZOOM_MIN
+	_apply_camera_zoom()
+
+
+func _apply_player_visibility() -> void:
+	# In first person the player's own model (and the capsule fallback) must
+	# not block the view.
+	if _player_rig and is_instance_valid(_player_rig):
+		_player_rig.visible = not _first_person
+	var capsule_mesh := player_body.get_node_or_null("PlayerMesh") if player_body else null
+	if capsule_mesh:
+		capsule_mesh.visible = (not _first_person) and _player_model_key == ""
 
 
 func _update_camera_collision() -> void:
 	if camera == null or camera_pitch == null or player_body == null:
 		return
+	if _first_person:
+		camera.position = CAMERA_FP_OFFSET
+		camera.rotation.x = 0.0
+		return
+	# Level the camera's fixed downward tilt out as the player zooms in.
+	var t := clampf((_camera_zoom - CAMERA_ZOOM_MIN) / (CAMERA_ZOOM_MAX - CAMERA_ZOOM_MIN), 0.0, 1.0)
+	camera.rotation.x = lerpf(0.0, _camera_base_rotation_x, t)
 	var desired_local := _desired_camera_local_offset()
 	var desired_len := desired_local.length()
 	if desired_len <= 0.001:
@@ -672,6 +709,17 @@ func _update_camera_collision() -> void:
 
 
 func _adjust_camera_zoom(direction: float) -> void:
+	# Zooming in past the closest third-person distance enters first person;
+	# the first zoom-out step leaves it again.
+	if direction < 0.0:
+		if _first_person:
+			return
+		if _camera_zoom <= CAMERA_ZOOM_MIN + 0.01:
+			_set_first_person(true)
+			return
+	elif _first_person:
+		_set_first_person(false)
+		return
 	_camera_zoom = clampf(_camera_zoom + direction * CAMERA_ZOOM_STEP, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
 	_apply_camera_zoom()
 
@@ -1447,6 +1495,7 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
 		if capsule_mesh:
 			capsule_mesh.visible = false
+		_apply_player_visibility()
 	if _player_rig and is_instance_valid(_player_rig):
 		_player_rig.apply_appearance(_appearance_for(entity))
 		_player_rig.apply_mounts(_mounts_for(entity))
@@ -1698,6 +1747,7 @@ func _rebuild_ability_bar():
 	last_abilities_signature = signature
 	var abilities := _abilities()
 	var spells: Array = _last_spellbook.get("spells", [])
+	hotbar.prune_unknown(abilities, _last_spellbook.has("spells"), spells)
 	hotbar.default_fill_from_skills(abilities, spells)
 	hotbar.update_cooldowns(abilities, spells)
 	if spellbook_window:
