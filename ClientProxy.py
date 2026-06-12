@@ -750,6 +750,7 @@ class GodotClientSession:
         self.last_gameplay_payload = None
         self.last_entity_payload = None
         self.interact_pane = None
+        self.world_login_retried = False
         self._closed = False
 
     def push_inventory(self):
@@ -1456,6 +1457,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         self._close_perspective("player_perspective")
         self.session.player_mind = None
         self.session.world_account_ready = False
+        self.session.world_login_retried = False
         self.session.cached_characters = []
         local_access_password = _local_world_access_password(world_name)
         self.session.current_world = {
@@ -1499,8 +1501,42 @@ class ProxyProtocol(WebSocketServerProtocol):
             "auto": True,
             "message": "Setting up your world character slot...",
         })
-        if has_account and self.session.master_perspective:
-            # Recover the saved world password from master, then auto-login.
+        # A logout extracts the player to the character server and removes the
+        # world-local copy, so "no local account" usually means "returning
+        # player" — restore the saved buffer (keeps log position, bank, guild)
+        # and only fall back to creating a brand-new world account when there
+        # is truly nothing saved.
+        self._restore_world_player(world_name)
+
+    def _restore_world_player(self, world_name):
+        perspective = self.session.new_world_perspective
+        if not perspective:
+            self.session.send({"type": "player_login_result", "success": False,
+                               "message": "Lost world connection before login."})
+            return
+        d = perspective.callRemote("NewPlayerAvatar", "restorePlayer", self.session.username)
+        d.addCallback(self._on_restore_player, world_name)
+        d.addErrback(self._on_restore_player_failed, world_name)
+
+    def _on_restore_player(self, result, world_name):
+        ok = (isinstance(result, (tuple, list)) and len(result) >= 3
+              and result[0] == 0 and result[2])
+        if ok:
+            print(f"[Proxy] Restored saved world player for {self.session.username} on {world_name}.")
+            self.session.world_account_ready = True
+            self.session.world_password = result[2]
+            self._do_world_login(result[2])
+            return
+        msg = result[1] if isinstance(result, (tuple, list)) and len(result) > 1 else result
+        print(f"[Proxy] No saved world player to restore ({msg}); creating a fresh world account.")
+        self._auto_create_world_account(world_name)
+
+    def _on_restore_player_failed(self, reason, world_name):
+        # Older world servers don't implement restorePlayer — keep the legacy
+        # auto-create path working.
+        msg = str(reason.value) if hasattr(reason, "value") else str(reason)
+        print(f"[Proxy] restorePlayer unavailable/failed ({msg}); falling back to world account setup.")
+        if self.session.world_account_ready and self.session.master_perspective:
             self._request_world_password(world_name)
         else:
             self._auto_create_world_account(world_name)
@@ -1672,6 +1708,7 @@ class ProxyProtocol(WebSocketServerProtocol):
 
     def _on_player_world_login(self, perspective, role):
         self.session.player_perspective = perspective
+        self.session.world_login_retried = False
         self.session.send(
             {
                 "type": "player_login_result",
@@ -1685,6 +1722,17 @@ class ProxyProtocol(WebSocketServerProtocol):
     def _on_player_world_login_failed(self, reason):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
         print(f"[Proxy] Player world login failed: {msg}")
+        # Reconnecting quickly can race the server-side teardown of the
+        # previous session (the kick extracts the player and recreates the
+        # account record).  One delayed retry through the restore path makes
+        # "quit and immediately relaunch" reliable.
+        if (not getattr(self.session, "world_login_retried", False)
+                and self.session.current_world and self.session.new_world_perspective):
+            self.session.world_login_retried = True
+            world_name = self.session.current_world["name"]
+            print(f"[Proxy] Retrying world login once via restore for {world_name}...")
+            reactor.callLater(1.5, self._restore_world_player, world_name)
+            return
         self.session.send(
             {"type": "player_login_result", "success": False, "message": msg}
         )

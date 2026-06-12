@@ -132,6 +132,8 @@ MISSING_TABLES = [
 SCHEMA_ADDITIONS = [
     ('character', 'auction_id_n', 'INTEGER', '0'),
     ('character', 'zone_id', 'INTEGER', 'NULL'),
+    ('character', 'log_zone_internal', 'TEXT', "''"),
+    ('character', 'log_transform_internal', 'TEXT', "''"),
     ('dialog', 'dialog_line_id', 'INTEGER', 'NULL'),
     ('dialog_action', 'give_xp', 'INTEGER', '0'),
     ('dialog_action', 'open_mail', 'BOOLEAN', '0'),

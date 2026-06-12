@@ -61,7 +61,7 @@ def GenerateInsertValues(table,valuesIn,playerID=None,characterID=None,spawnID=N
     valuesOut = []
     for valueIn in valuesIn:
         valueOut = []
-        
+
         for col,v in zip(TATTR[table],valueIn):
             if col == 'id':
                 valueOut.append(None)
@@ -77,9 +77,15 @@ def GenerateInsertValues(table,valuesIn,playerID=None,characterID=None,spawnID=N
                 valueOut.append(spawnID)
             else:
                 valueOut.append(v)
-        
+
+        # A buffer extracted before a schema migration has fewer columns than
+        # the live table; pad with NULLs so the INSERT placeholders still match
+        # (the new columns keep their defaults until the next extract).
+        while len(valueOut) < len(TATTR[table]):
+            valueOut.append(None)
+
         valuesOut.append(valueOut)
-    
+
     return valuesOut
 
 
@@ -219,6 +225,11 @@ def RemoveInstalledCharacter(dstCursor, cname):
 def InstallCharacterBuffer(playerID,cname,buffer):
     from mud.world.player import Player
     tm = time.time()
+    # The schema caches (TATTR/TVALUES) are normally primed by a character
+    # export, but a freshly restarted server can be asked to install before it
+    # ever exports (entering with an existing character) — prime them here too.
+    if not CREATE_CHARACTER_TABLE_SQL:
+        Initialize()
     _logf = open("/tmp/enterworld_debug.log", "a")
 
     if not os.path.exists("data/tmp"):

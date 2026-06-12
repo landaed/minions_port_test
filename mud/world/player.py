@@ -15,6 +15,7 @@ from datetime import datetime
 from math import ceil,degrees,sqrt
 from sqlobject import *
 from time import time as sysTime
+from twisted.spread import pb
 import traceback
 
 
@@ -762,7 +763,12 @@ class Player(Persistent):
                 muteTime = self.world.mutedPlayers[self.publicName]
             except KeyError:
                 muteTime = 0
-            self.mind.callRemote("setMuteTime",muteTime)
+            try:
+                self.mind.callRemote("setMuteTime",muteTime)
+            except pb.DeadReferenceError:
+                # Client connection already gone (logout is racing this tick) —
+                # don't let the stale broker abort the rest of the zone tick.
+                pass
             
             # Only update friends list every 5 seconds, same as tracking.
             #OPTIMIZE
@@ -888,13 +894,16 @@ class Player(Persistent):
                     self.logTransform = self.curChar.deathTransform
             if hasattr(self,"zone"):
                 if self.zone:
-                    self.endInteraction(False)
-                    
+                    try:
+                        self.endInteraction(False)
+                    except:
+                        traceback.print_exc()
+
                     if not allDead and self.simObject:
                         transform = list(self.simObject.position)
                         transform.extend(list(self.simObject.rotation))
                         transform[-1] = degrees(transform[-1])
-                        
+
                         if self.darkness:
                             self.darknessLogZone = self.zone.zone
                             self.darknessLogTransform = transform
@@ -904,14 +913,23 @@ class Player(Persistent):
                         else:
                             self.logZone = self.zone.zone
                             self.logTransform = transform
-                    
+
+                        self.saveCharacterPositions(transform)
+
                     if self.zone.owningPlayer != self:
                         from mud.world.theworld import World
                         world = World.byName("TheWorld")
                         if not world.singlePlayer:
-                            self.zone.kickPlayer(self)
+                            # The kick talks to the (possibly already dead)
+                            # client connection — it must never prevent the
+                            # zone removal below, or the player is left
+                            # ticking in the zone forever.
+                            try:
+                                self.zone.kickPlayer(self)
+                            except:
+                                traceback.print_exc()
                         self.zone.removePlayer(self)
-                
+
                 self.zone = None
         except:
             traceback.print_exc()
@@ -970,7 +988,7 @@ class Player(Persistent):
                     transform = list(self.simObject.position)
                     transform.extend(list(self.simObject.rotation))
                     transform[-1] = degrees(transform[-1])
-                    
+
                     if self.darkness:
                         self.darknessLogZone = self.zone.zone
                         self.darknessLogTransform = transform
@@ -980,8 +998,35 @@ class Player(Persistent):
                     else:
                         self.logZone = self.zone.zone
                         self.logTransform = transform
-    
-    
+
+                    self.saveCharacterPositions(transform)
+
+
+    def saveCharacterPositions(self, transform=None):
+        # Stamp the current position onto every party member's character row,
+        # so each character resumes where IT was (a different character on the
+        # same account starts at its own spot / bind point, not wherever the
+        # account played last).
+        try:
+            if not self.party or not self.party.members:
+                return
+            if not hasattr(self,"zone") or not self.zone:
+                return
+            if transform is None:
+                if not self.simObject:
+                    return
+                transform = list(self.simObject.position)
+                transform.extend(list(self.simObject.rotation))
+                transform[-1] = degrees(transform[-1])
+            t = ' '.join(map(str,transform))
+            zname = self.zone.zone.name
+            for c in self.party.members:
+                c.logZoneInternal = zname
+                c.logTransformInternal = t
+        except:
+            traceback.print_exc()
+
+
     def backupItems(self):
         # (Real loops: Py3's map() is lazy and ran nothing as a statement,
         # so bank items and party inventories were never backed up.)

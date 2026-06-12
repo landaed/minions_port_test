@@ -17,6 +17,8 @@ const RECONCILE_MAX_SPEED := 10.0       # cap correction speed (units/sec)
 const CAMERA_ZOOM_MIN := 2.5
 const CAMERA_ZOOM_MAX := 14.0
 const CAMERA_ZOOM_STEP := 1.0
+const CAMERA_NEAR_HEIGHT := 0.45     # shoulder-level camera height at closest zoom
+const CAMERA_FP_OFFSET := Vector3(0.0, -0.45, 0.0)  # eye position (relative to the 1.4-high yaw pivot)
 const CAMERA_COLLISION_MASK := 1  # world geometry only; ignore entity markers on layer 2
 const CAMERA_COLLISION_PADDING := 0.35
 const CAMERA_COLLISION_MIN_DISTANCE := 1.2
@@ -50,6 +52,8 @@ const ENTITY_FLOOR_PROBE_DOWN := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const TAB_TARGET_MAX_DISTANCE := 60.0
+const TAB_TARGET_CONE_DEG := 70.0  # half-angle of the Tab-targeting frontal cone
 const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
 const ZONE_SCENE_ROOT := "res://world/zones/"
@@ -92,12 +96,16 @@ var _player_rig: Node3D = null  # animated player avatar (CharacterRig)
 var _player_model_key := ""     # which glb the avatar currently uses
 var _player_attack_until := 0.0 # local attack-animation trigger (seconds)
 var _camera_zoom := 7.0
+var _first_person := false
+var _camera_base_rotation_x := 0.0
 var _pos_history: Array = []        # recent [{t, pos}] samples for latency-aware reconcile
 var _reconcile_error := Vector3.ZERO  # smoothed-out correction toward the server position
 var _camera_base_local_offset := Vector3.ZERO
 var _camera_attributes: CameraAttributesPractical = null
 var _dof_focus_distance := DOF_DEFAULT_FOCUS
 var _dead_entity_remove_at: Dictionary = {}
+var _tab_cycle_ids: Array = []
+var _tab_cycle_pos := -1
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -178,6 +186,7 @@ func _ready():
 	_player_rig.position = Vector3(0.0, -0.9, 0.0)  # feet at the capsule bottom
 	player_body.add_child(_player_rig)
 	_camera_base_local_offset = camera.position
+	_camera_base_rotation_x = camera.rotation.x
 	_camera_zoom = _camera_base_local_offset.z
 	_apply_camera_zoom()
 	_setup_dynamic_dof()
@@ -629,6 +638,7 @@ func _apply_camera_zoom() -> void:
 	if camera == null:
 		return
 	_camera_zoom = clampf(_camera_zoom, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
+	_apply_player_visibility()
 	_update_camera_collision()
 
 
@@ -636,13 +646,44 @@ func _desired_camera_local_offset() -> Vector3:
 	var desired := _camera_base_local_offset
 	if desired == Vector3.ZERO and camera != null:
 		desired = camera.position
+	# Blend from the high "over the shoulder from above" framing at far zoom
+	# down to shoulder level up close, so zooming in keeps the character in
+	# frame instead of staring down at the top of their head.
+	var t := clampf((_camera_zoom - CAMERA_ZOOM_MIN) / (CAMERA_ZOOM_MAX - CAMERA_ZOOM_MIN), 0.0, 1.0)
+	desired.y = lerpf(CAMERA_NEAR_HEIGHT, desired.y, t)
 	desired.z = _camera_zoom
 	return desired
+
+
+func _set_first_person(on: bool) -> void:
+	if _first_person == on:
+		return
+	_first_person = on
+	if not on:
+		_camera_zoom = CAMERA_ZOOM_MIN
+	_apply_camera_zoom()
+
+
+func _apply_player_visibility() -> void:
+	# In first person the player's own model (and the capsule fallback) must
+	# not block the view.
+	if _player_rig and is_instance_valid(_player_rig):
+		_player_rig.visible = not _first_person
+	var capsule_mesh := player_body.get_node_or_null("PlayerMesh") if player_body else null
+	if capsule_mesh:
+		capsule_mesh.visible = (not _first_person) and _player_model_key == ""
 
 
 func _update_camera_collision() -> void:
 	if camera == null or camera_pitch == null or player_body == null:
 		return
+	if _first_person:
+		camera.position = CAMERA_FP_OFFSET
+		camera.rotation.x = 0.0
+		return
+	# Level the camera's fixed downward tilt out as the player zooms in.
+	var t := clampf((_camera_zoom - CAMERA_ZOOM_MIN) / (CAMERA_ZOOM_MAX - CAMERA_ZOOM_MIN), 0.0, 1.0)
+	camera.rotation.x = lerpf(0.0, _camera_base_rotation_x, t)
 	var desired_local := _desired_camera_local_offset()
 	var desired_len := desired_local.length()
 	if desired_len <= 0.001:
@@ -672,6 +713,17 @@ func _update_camera_collision() -> void:
 
 
 func _adjust_camera_zoom(direction: float) -> void:
+	# Zooming in past the closest third-person distance enters first person;
+	# the first zoom-out step leaves it again.
+	if direction < 0.0:
+		if _first_person:
+			return
+		if _camera_zoom <= CAMERA_ZOOM_MIN + 0.01:
+			_set_first_person(true)
+			return
+	elif _first_person:
+		_set_first_person(false)
+		return
 	_camera_zoom = clampf(_camera_zoom + direction * CAMERA_ZOOM_STEP, CAMERA_ZOOM_MIN, CAMERA_ZOOM_MAX)
 	_apply_camera_zoom()
 
@@ -1127,6 +1179,7 @@ func _load_zone_art() -> void:
 		var n: Node = world_root.get_node_or_null(placeholder)
 		if n != null:
 			n.queue_free()
+	GameAudio.attach_zone_ambience(zone_node, zone)
 	print("[Godot] Loaded zone art '%s' from %s at offset %s" % [zone, authored_scene_path if ResourceLoader.exists(authored_scene_path) else "scene.json", str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:
@@ -1446,6 +1499,7 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		var capsule_mesh := player_body.get_node_or_null("PlayerMesh")
 		if capsule_mesh:
 			capsule_mesh.visible = false
+		_apply_player_visibility()
 	if _player_rig and is_instance_valid(_player_rig):
 		_player_rig.apply_appearance(_appearance_for(entity))
 		_player_rig.apply_mounts(_mounts_for(entity))
@@ -1697,10 +1751,27 @@ func _rebuild_ability_bar():
 	last_abilities_signature = signature
 	var abilities := _abilities()
 	var spells: Array = _last_spellbook.get("spells", [])
+	hotbar.prune_unknown(abilities, _last_spellbook.has("spells"), spells)
 	hotbar.default_fill_from_skills(abilities, spells)
 	hotbar.update_cooldowns(abilities, spells)
 	if spellbook_window:
 		spellbook_window.apply_skills(abilities)
+
+func _live_target_entity() -> Dictionary:
+	# Current snapshot data for the targeted entity (matched by sim id, then by
+	# name), so target UI reflects live health rather than acquire-time values.
+	var want_id := int(server_target_description.get("id", server_target_description.get("sim_id", 0)))
+	var want_name := str(server_target_description.get("name", ""))
+	var by_name: Dictionary = {}
+	for entity in replicated_entities:
+		if not (entity is Dictionary) or entity.get("is_self"):
+			continue
+		if want_id != 0 and int(entity.get("id", 0)) == want_id:
+			return entity
+		if not want_name.is_empty() and str(entity.get("name", "")) == want_name and by_name.is_empty():
+			by_name = entity
+	return by_name
+
 
 func _bridge_status_text() -> String:
 	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
@@ -1744,6 +1815,13 @@ func _update_labels():
 		var t_dead: bool = bool(server_target_description.get("dead", false))
 		var t_health: float = float(server_target_description.get("health", -1.0))
 		var t_max_health: float = float(server_target_description.get("max_health", server_target_description.get("maxhealth", 1.0)))
+		# The description is a one-shot copy from when the target was acquired;
+		# track the live replicated entity so the bar follows actual damage.
+		var live := _live_target_entity()
+		if not live.is_empty():
+			t_health = float(live.get("health", t_health))
+			t_max_health = float(live.get("max_health", t_max_health))
+			t_dead = bool(live.get("dead", t_dead)) or t_health <= 0.0
 		var standing_txt := (" (%s)" % t_standing) if not t_standing.is_empty() else ""
 		target_name_label.text = "%s   Lv%s %s%s%s" % [t_name, t_level, t_race, standing_txt, "  [DEAD]" if t_dead else ""]
 		if t_health >= 0.0:
@@ -1809,8 +1887,62 @@ func _send_interact_command():
 	_request_server_command("interact")
 
 func _cycle_target():
-	interaction_message = "Sent CYCLETARGET to the legacy world server."
-	_request_server_command("cycle_target")
+	# Tab targets what you're roughly looking at: rank the live entities inside
+	# a frontal cone by how close they are to the crosshair, and cycle through
+	# that ranking on repeated presses. The legacy CYCLETARGET command ignored
+	# facing entirely (it walked the server's mob list by distance).
+	var cands := _tab_target_candidates()
+	if cands.is_empty():
+		interaction_message = "No target in front of you."
+		return
+	var ids: Array = []
+	for c in cands:
+		ids.append(int(c["id"]))
+	if ids != _tab_cycle_ids:
+		_tab_cycle_ids = ids
+		_tab_cycle_pos = 0
+	else:
+		_tab_cycle_pos = (_tab_cycle_pos + 1) % ids.size()
+	var chosen: Dictionary = cands[_tab_cycle_pos]
+	interaction_message = "Targeted %s." % str(chosen.get("name", "entity"))
+	_request_server_command("target_entity", {"entity_id": int(chosen["id"])})
+
+func _tab_target_candidates() -> Array:
+	# Alive entities inside the frontal cone, ordered by angular distance from
+	# the crosshair (with a mild bias toward nearer mobs at similar angles).
+	var out: Array = []
+	if camera == null:
+		return out
+	var cam_pos := camera.global_position
+	var fwd := -camera.global_transform.basis.z
+	for entity in replicated_entities:
+		if not (entity is Dictionary) or entity.get("is_self"):
+			continue
+		if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
+			continue
+		var id := int(entity.get("id", 0))
+		if id <= 0:
+			continue
+		var pos: Vector3
+		var body: Variant = replicated_entity_nodes.get(_entity_key(entity))
+		if body is Node3D and is_instance_valid(body):
+			pos = (body as Node3D).global_position
+		else:
+			pos = _world_position_from_server(entity.get("position", [0.0, 0.0, 0.0]))
+		var rel := pos - cam_pos
+		var dist := rel.length()
+		if dist < 0.01 or dist > TAB_TARGET_MAX_DISTANCE:
+			continue
+		var ang := rad_to_deg(fwd.angle_to(rel / dist))
+		if ang > TAB_TARGET_CONE_DEG:
+			continue
+		out.append({
+			"id": id,
+			"name": entity.get("public_name", entity.get("name", "entity")),
+			"score": ang + dist * 0.5,
+		})
+	out.sort_custom(func(a, b): return float(a["score"]) < float(b["score"]))
+	return out
 
 func _toggle_autoattack():
 	interaction_message = "Sent ATTACK toggle to the legacy world server."

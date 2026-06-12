@@ -98,6 +98,84 @@ class NewPlayerAvatar(Avatar):
             return False
         else:
             return True
+
+
+    # The original logout flow extracts the player to the character server and
+    # destroys the world-local Player/User rows; the official servers then
+    # reinstalled the buffer through the master -> character-server transfer.
+    # Direct-connect clients (the Godot proxy) skipped that reinstall, so every
+    # re-login silently created a brand-new world account at the start zone
+    # (losing the saved log position).  This restores the saved player instead:
+    # returns (0, message, worldPassword) on success, (-1, message, None) when
+    # there is nothing to restore (caller should fall back to newPlayer).
+    def perspective_restorePlayer(self,publicName):
+        # Still installed (e.g. unclean shutdown or active session)?  The local
+        # row is at least as fresh as the last extracted buffer — reuse it.
+        try:
+            player = Player.byPublicName(publicName)
+        except:
+            player = None
+        if player:
+            password = player.password
+            self._ensureUser(publicName,password)
+            return (0,"Welcome back!",password)
+
+        from mud.world.cserveravatar import AVATAR
+        if not AVATAR or not AVATAR.mind:
+            return (-1,"No saved player and no character server.",None)
+
+        d = AVATAR.mind.callRemote("getPlayerBuffer",publicName)
+        d.addCallback(self._gotPlayerBuffer,publicName)
+        d.addErrback(self._restoreFailed)
+        return d
+
+    def _restoreFailed(self,reason):
+        traceback.print_exc()
+        return (-1,"Error restoring saved player: %s"%reason,None)
+
+    def _gotPlayerBuffer(self,buffer,publicName):
+        if not buffer:
+            return (-1,"No saved player on this world.",None)
+
+        from base64 import decodebytes
+        from pickle import loads
+        from mud.worldserver.charutil import InstallPlayerBuffer
+
+        try:
+            raw = loads(decodebytes(buffer))
+        except Exception:
+            raw = buffer
+
+        error = InstallPlayerBuffer(raw)
+        if error:
+            return (-1,"Error installing saved player buffer.",None)
+
+        try:
+            player = Player.byPublicName(publicName)
+        except Exception as exc:
+            traceback.print_exc()
+            return (-1,"Saved player buffer was missing the player: %s"%exc,None)
+
+        # Keep the password stored in the buffer so anything the player wrote
+        # down (or the master server cached from a world announce) stays valid.
+        password = player.password
+        self._ensureUser(publicName,password)
+        print("Restored saved player %s from character server buffer"%publicName)
+        return (0,"Welcome back!",password)
+
+    def _ensureUser(self,publicName,password):
+        try:
+            user = User.byName(publicName)
+            for r in user.roles:
+                r.removeUser(user)
+            user.destroySelf()
+        except:
+            pass
+        user = User(name=publicName,password=password)
+        user.addRole(Role.byName("Player"))
+        if publicName == NewPlayerAvatar.ownerPublicName:
+            user.addRole(Role.byName("Immortal"))
+            user.addRole(Role.byName("Guardian"))
         
         
         

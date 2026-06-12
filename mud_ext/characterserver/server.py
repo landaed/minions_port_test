@@ -90,6 +90,13 @@ class WorldConnection(pb.Root):
             return None
         buffer = encodebytes(dumps(bytes(b), 2))
         return buffer
+
+
+    def remote_getPlayerBuffer(self,publicName):
+        b = CHARDB.getPlayerBuffer(publicName)
+        if not b:
+            return None
+        return encodebytes(dumps(bytes(b), 2))
     
     
     def remote_savePlayerBuffer(self, publicName, pbuffer, cbuffer, cvalues, logout=False, save=True):
