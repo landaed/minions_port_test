@@ -103,6 +103,14 @@ func _spell_row(spell: Dictionary) -> HBoxContainer:
 	if recast_left > 0:
 		cast.disabled = true
 		cast.text = "Cast (%ds)" % recast_left
+	if not bool(spell.get("castable", true)):
+		# Scribed ahead of its class-level requirement: visible in the book
+		# but greyed until the character qualifies.
+		cast.disabled = true
+		cast.text = "Too low"
+		row.modulate = Color(1, 1, 1, 0.45)
+		slot.tooltip_text += "\nYou cannot cast this yet (class level too low)."
+		info.tooltip_text = slot.tooltip_text
 	cast.pressed.connect(func(): cast_spell.emit(int(spell.get("slot", 0))))
 	row.add_child(cast)
 	return row

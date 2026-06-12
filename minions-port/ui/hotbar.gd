@@ -105,6 +105,10 @@ func default_fill_from_skills(abilities: Array, spells: Array = []) -> void:
 			})
 	for sp in spells:
 		if sp is Dictionary:
+			# Scribed-but-not-yet-castable spells (class level too low) stay in
+			# the book until they qualify; don't put dead buttons on the bar.
+			if not bool(sp.get("castable", true)):
+				continue
 			fills.append({
 				"name": str(sp.get("name", "?")),
 				"action": "spell",

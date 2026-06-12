@@ -3884,6 +3884,13 @@ class Character(Persistent):
                 continue
             if spellProto in known:
                 continue
+            # Mirror onSpellSlot's qualify() gate. Some StartingGear scrolls
+            # are for higher class levels (the original kept them in inventory
+            # until the player levelled and scribed them manually); scribing
+            # those at creation put uncastable spells in the book and on the
+            # hotbar ("X does not know how to cast ...").
+            if not self._qualifiesAtCreation(spellProto):
+                continue
             while slot in used_slots:
                 slot += 1
             CharacterSpell(character=self, spellProto=spellProto, slot=slot, recast=0)
@@ -3893,6 +3900,24 @@ class Character(Persistent):
             if 0 >= item.stackCount:
                 item.destroySelf()
         self.spellsDirty = True
+
+
+    def _qualifiesAtCreation(self, spellProto):
+        """SpellProto.qualify() without a mob: a just-created character only
+        has its spawn's primary class at level 1."""
+        try:
+            classes = spellProto.classes
+            if not len(classes):
+                return True
+            cname = self.spawn.pclassInternal
+            plevel = int(self.spawn.plevel or 1)
+            for klass in classes:
+                if klass.classname == cname and plevel >= klass.level:
+                    return True
+            return False
+        except Exception:
+            traceback.print_exc()
+            return True
 
 
     ## @brief Checks if the Character has enough free carry slots.

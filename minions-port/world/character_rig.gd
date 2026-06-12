@@ -236,11 +236,13 @@ func apply_mounts(mounts: Dictionary) -> void:
 		attach.bone_name = "Mount" + key
 		_skeleton.add_child(attach)
 		var inst: Node3D = scene.instantiate()
-		if key == "3":
-			# The head mount bone's converted rest pose leaves headwear pitched
-			# 90° forward (hoods/helmets sat over the face like a tipped
-			# bucket); stand them back up. Hand/shield mounts are correct.
-			inst.rotate_x(PI / 2.0)
+		# The converted skeleton's MountN bone bases differ from the original
+		# Torque mount nodes by a uniform +90° X rotation (verified numerically
+		# against the DTS rest pose for Mount0..Mount3, and visually: helmets
+		# sat tipped over the face, swords hung 90° off through the leg).
+		# Standing every mounted item back up reproduces the original engine's
+		# mounting exactly.
+		inst.rotate_x(PI / 2.0)
 		MeshNormalRepairScript.invert_node_normals(inst)
 		if not material.is_empty():
 			_apply_equipment_material(inst, material)

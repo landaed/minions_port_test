@@ -1986,6 +1986,9 @@ class PlayerAvatar(Avatar):
                     "skill": str(getattr(proto, 'skillname', '') or ''),
                     "desc": str(getattr(proto, 'desc', '') or ''),
                     "icon": str(getattr(proto, 'spellbookPic', '') or ''),
+                    # Scribed but not currently castable (class level too low):
+                    # the client greys these and keeps them off the hotbar.
+                    "castable": bool(proto.qualify(mob)),
                 })
         except Exception:
             print_exc()

@@ -52,6 +52,8 @@ const ENTITY_FLOOR_PROBE_DOWN := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
 const ENTITY_CAPSULE_HALF_HEIGHT := 0.7
 const ENTITY_SELECTION_DISTANCE := 150.0
+const TAB_TARGET_MAX_DISTANCE := 60.0
+const TAB_TARGET_CONE_DEG := 70.0  # half-angle of the Tab-targeting frontal cone
 const TERRAIN_MASK := 4  # collision bit 3: terrain only (set by zone_loader), for ground-snap rays
 const ZoneLoaderScript := preload("res://world/zone_loader.gd")
 const ZONE_SCENE_ROOT := "res://world/zones/"
@@ -102,6 +104,8 @@ var _camera_base_local_offset := Vector3.ZERO
 var _camera_attributes: CameraAttributesPractical = null
 var _dof_focus_distance := DOF_DEFAULT_FOCUS
 var _dead_entity_remove_at: Dictionary = {}
+var _tab_cycle_ids: Array = []
+var _tab_cycle_pos := -1
 
 @onready var npc_root: Node3D = $SubViewportContainer/SubViewport/WorldRoot/NpcRoot
 @onready var sub_viewport: SubViewport = $SubViewportContainer/SubViewport
@@ -1753,6 +1757,22 @@ func _rebuild_ability_bar():
 	if spellbook_window:
 		spellbook_window.apply_skills(abilities)
 
+func _live_target_entity() -> Dictionary:
+	# Current snapshot data for the targeted entity (matched by sim id, then by
+	# name), so target UI reflects live health rather than acquire-time values.
+	var want_id := int(server_target_description.get("id", server_target_description.get("sim_id", 0)))
+	var want_name := str(server_target_description.get("name", ""))
+	var by_name: Dictionary = {}
+	for entity in replicated_entities:
+		if not (entity is Dictionary) or entity.get("is_self"):
+			continue
+		if want_id != 0 and int(entity.get("id", 0)) == want_id:
+			return entity
+		if not want_name.is_empty() and str(entity.get("name", "")) == want_name and by_name.is_empty():
+			by_name = entity
+	return by_name
+
+
 func _bridge_status_text() -> String:
 	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
 
@@ -1795,6 +1815,13 @@ func _update_labels():
 		var t_dead: bool = bool(server_target_description.get("dead", false))
 		var t_health: float = float(server_target_description.get("health", -1.0))
 		var t_max_health: float = float(server_target_description.get("max_health", server_target_description.get("maxhealth", 1.0)))
+		# The description is a one-shot copy from when the target was acquired;
+		# track the live replicated entity so the bar follows actual damage.
+		var live := _live_target_entity()
+		if not live.is_empty():
+			t_health = float(live.get("health", t_health))
+			t_max_health = float(live.get("max_health", t_max_health))
+			t_dead = bool(live.get("dead", t_dead)) or t_health <= 0.0
 		var standing_txt := (" (%s)" % t_standing) if not t_standing.is_empty() else ""
 		target_name_label.text = "%s   Lv%s %s%s%s" % [t_name, t_level, t_race, standing_txt, "  [DEAD]" if t_dead else ""]
 		if t_health >= 0.0:
@@ -1860,8 +1887,62 @@ func _send_interact_command():
 	_request_server_command("interact")
 
 func _cycle_target():
-	interaction_message = "Sent CYCLETARGET to the legacy world server."
-	_request_server_command("cycle_target")
+	# Tab targets what you're roughly looking at: rank the live entities inside
+	# a frontal cone by how close they are to the crosshair, and cycle through
+	# that ranking on repeated presses. The legacy CYCLETARGET command ignored
+	# facing entirely (it walked the server's mob list by distance).
+	var cands := _tab_target_candidates()
+	if cands.is_empty():
+		interaction_message = "No target in front of you."
+		return
+	var ids: Array = []
+	for c in cands:
+		ids.append(int(c["id"]))
+	if ids != _tab_cycle_ids:
+		_tab_cycle_ids = ids
+		_tab_cycle_pos = 0
+	else:
+		_tab_cycle_pos = (_tab_cycle_pos + 1) % ids.size()
+	var chosen: Dictionary = cands[_tab_cycle_pos]
+	interaction_message = "Targeted %s." % str(chosen.get("name", "entity"))
+	_request_server_command("target_entity", {"entity_id": int(chosen["id"])})
+
+func _tab_target_candidates() -> Array:
+	# Alive entities inside the frontal cone, ordered by angular distance from
+	# the crosshair (with a mild bias toward nearer mobs at similar angles).
+	var out: Array = []
+	if camera == null:
+		return out
+	var cam_pos := camera.global_position
+	var fwd := -camera.global_transform.basis.z
+	for entity in replicated_entities:
+		if not (entity is Dictionary) or entity.get("is_self"):
+			continue
+		if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
+			continue
+		var id := int(entity.get("id", 0))
+		if id <= 0:
+			continue
+		var pos: Vector3
+		var body: Variant = replicated_entity_nodes.get(_entity_key(entity))
+		if body is Node3D and is_instance_valid(body):
+			pos = (body as Node3D).global_position
+		else:
+			pos = _world_position_from_server(entity.get("position", [0.0, 0.0, 0.0]))
+		var rel := pos - cam_pos
+		var dist := rel.length()
+		if dist < 0.01 or dist > TAB_TARGET_MAX_DISTANCE:
+			continue
+		var ang := rad_to_deg(fwd.angle_to(rel / dist))
+		if ang > TAB_TARGET_CONE_DEG:
+			continue
+		out.append({
+			"id": id,
+			"name": entity.get("public_name", entity.get("name", "entity")),
+			"score": ang + dist * 0.5,
+		})
+	out.sort_custom(func(a, b): return float(a["score"]) < float(b["score"]))
+	return out
 
 func _toggle_autoattack():
 	interaction_message = "Sent ATTACK toggle to the legacy world server."
