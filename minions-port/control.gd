@@ -88,6 +88,7 @@ func _ready():
 	status_label.text = "Connecting to proxy..."
 	_setup_options()
 	_set_phase(PHASE_LOGIN)
+	GameAudio.start_menu_music()
 
 func _setup_options():
 	for race in ["Human", "Gnome", "Elf", "Halfling", "Dwarf", "Titan", "Drakken"]:
@@ -180,12 +181,14 @@ func _show_gameplay_view(payload: Dictionary):
 	view.visible = true
 	if view.has_method("apply_world_state"):
 		view.apply_world_state(payload, selected_world, world_time)
+	GameAudio.start_world_music()
 
 func _update_gameplay_clock():
 	if gameplay_view and gameplay_view.visible and gameplay_view.has_method("set_world_time"):
 		gameplay_view.set_world_time(world_time)
 
 func _on_login_button_pressed():
+	GameAudio.ui_accept()
 	var user = username_field.text.strip_edges()
 	var pw = password_field.text.strip_edges()
 	if user.is_empty() or pw.is_empty():
@@ -195,6 +198,7 @@ func _on_login_button_pressed():
 	_send({"type": "login", "username": user, "password": pw})
 
 func _on_register_button_pressed():
+	GameAudio.ui_accept()
 	var user = username_field.text.strip_edges()
 	var email = email_field.text.strip_edges()
 	var pw = password_field.text.strip_edges()
@@ -209,6 +213,7 @@ func _on_register_button_pressed():
 	_send({"type": "register", "username": user, "email": email, "password": pw})
 
 func _on_join_world_button_pressed():
+	GameAudio.ui_accept()
 	var selected_items = world_list.get_selected_items()
 	if selected_items.is_empty():
 		status_label.text = "Select a world first."
@@ -227,6 +232,7 @@ func _on_join_world_button_pressed():
 	})
 
 func _on_create_world_account_button_pressed():
+	GameAudio.ui_accept()
 	var fantasy_name = fantasy_name_field.text.strip_edges()
 	var access_pw = world_access_password_field.text.strip_edges()
 	if bool(selected_world.get("has_password", false)) and access_pw.is_empty():
@@ -241,6 +247,7 @@ func _on_create_world_account_button_pressed():
 	})
 
 func _on_login_world_button_pressed():
+	GameAudio.ui_accept()
 	var world_pw = world_password_field.text.strip_edges()
 	login_world_button.disabled = true
 	if world_pw.is_empty():
@@ -251,6 +258,7 @@ func _on_login_world_button_pressed():
 	_send({"type": "world_login", "world_password": world_pw, "role": "Player"})
 
 func _on_create_character_button_pressed():
+	GameAudio.ui_accept()
 	create_character_button.disabled = true
 	var char_name = character_name_field.text.strip_edges()
 	if char_name.is_empty():
@@ -269,6 +277,7 @@ func _on_create_character_button_pressed():
 	})
 
 func _on_enter_world_button_pressed():
+	GameAudio.ui_accept()
 	enter_world_button.disabled = true
 	var selected_name := _selected_character_name()
 	if selected_name.is_empty():

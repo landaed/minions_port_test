@@ -220,6 +220,7 @@ static func _index_sounds() -> void:
 	_index_sound_dir("sfx")
 	_index_sound_dir("character")
 	_index_sound_dir("vocalsets")
+	_index_sound_dir("environment")
 
 static func _index_sound_dir(rel: String) -> void:
 	var dir := DirAccess.open(SOUND_DIR + rel)
@@ -254,6 +255,8 @@ static func sound3d(parent: Node3D, pos: Vector3, sound: String, big: bool = fal
 	player.position = pos
 	player.unit_size = 22.0 if big else 11.0
 	player.max_distance = 80.0 if big else 45.0
+	if AudioServer.get_bus_index("SFX") != -1:
+		player.bus = "SFX"
 	parent.add_child(player)
 	player.play()
 	player.finished.connect(player.queue_free)
@@ -267,6 +270,8 @@ static func sound_ui(parent: Node, sound: String) -> void:
 		return
 	var player := AudioStreamPlayer.new()
 	player.stream = stream
+	if AudioServer.get_bus_index("SFX") != -1:
+		player.bus = "SFX"
 	parent.add_child(player)
 	player.play()
 	player.finished.connect(player.queue_free)

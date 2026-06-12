@@ -1127,6 +1127,7 @@ func _load_zone_art() -> void:
 		var n: Node = world_root.get_node_or_null(placeholder)
 		if n != null:
 			n.queue_free()
+	GameAudio.attach_zone_ambience(zone_node, zone)
 	print("[Godot] Loaded zone art '%s' from %s at offset %s" % [zone, authored_scene_path if ResourceLoader.exists(authored_scene_path) else "scene.json", str(_server_origin_offset)])
 
 func _ground_y(x: float, z: float, fallback: float) -> float:

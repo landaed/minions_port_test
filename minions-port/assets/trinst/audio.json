@@ -1,0 +1,421 @@
+{
+ "mission": "city",
+ "emitters": [
+  {
+   "pos": [
+    126.008,
+    128.778,
+    -186.386
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 10.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    -537.174,
+    167.903,
+    442.816
+   ],
+   "file": "environment/Fire_CampfireLoop2.ogg",
+   "volume": 1.0,
+   "reference_distance": 5.0,
+   "max_distance": 35.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    -36.7012,
+    134.147,
+    -161.83
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    -180.12,
+    163.436,
+    255.682
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 10.0,
+   "max_distance": 75.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    107.645,
+    130.045,
+    -178.875
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 10.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    38.1768,
+    159.696,
+    253.072
+   ],
+   "file": "environment/Amb_Eerie_WindVoicesLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 5.0,
+   "max_distance": 60.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    6.41142,
+    129.749,
+    -141.774
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    234.847,
+    129.201,
+    -220.11
+   ],
+   "file": "environment/Amb_Eerie_CaveLoop3.ogg",
+   "volume": 1.0,
+   "reference_distance": 5.0,
+   "max_distance": 35.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    107.282,
+    129.407,
+    -117.683
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 10.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    49.7931,
+    129.526,
+    -138.458
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    -250.602,
+    131.307,
+    93.1575
+   ],
+   "file": "environment/Fire_CampfireLoop2.ogg",
+   "volume": 1.0,
+   "reference_distance": 5.0,
+   "max_distance": 35.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    11.4008,
+    129.663,
+    -170.281
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    -511.137,
+    254.097,
+    -334.18
+   ],
+   "file": "environment/Wind_BlowingLoop2.ogg",
+   "volume": 1.0,
+   "reference_distance": 50.0,
+   "max_distance": 350.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    350.729,
+    172.375,
+    103.605
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 5.0,
+   "max_distance": 35.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    123.069,
+    163.935,
+    150.6
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 10.0,
+   "max_distance": 75.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    138.943,
+    159.91,
+    -258.726
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 10.0,
+   "max_distance": 75.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    124.392,
+    136.415,
+    -81.4611
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 10.0,
+   "max_distance": 75.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    387.678,
+    166.201,
+    80.0933
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    397.288,
+    164.667,
+    70.77
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    22.4181,
+    130.537,
+    -123.267
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    61.9679,
+    129.257,
+    -113.215
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    595.453,
+    173.474,
+    -199.493
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    526.015,
+    150.621,
+    -399.506
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    523.235,
+    151.168,
+    -415.969
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    516.093,
+    151.667,
+    -470.526
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 6.0,
+   "looping": true,
+   "outside": false
+  },
+  {
+   "pos": [
+    81.2988,
+    128.886,
+    -123.737
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 1.0,
+   "max_distance": 7.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    583.929,
+    162.759,
+    -539.241
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    595.525,
+    164.731,
+    -514.22
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    496.788,
+    155.308,
+    -599.971
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    507.823,
+    156.676,
+    -583.615
+   ],
+   "file": "environment/Fire_FireplaceLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    124.531,
+    129.905,
+    -96.0983
+   ],
+   "file": "environment/Water_FountainLoop08.ogg",
+   "volume": 1.0,
+   "reference_distance": 3.0,
+   "max_distance": 15.0,
+   "looping": true,
+   "outside": true
+  },
+  {
+   "pos": [
+    122.626,
+    154.592,
+    1.36055
+   ],
+   "file": "environment/Amb_TropicalForestLoop1.ogg",
+   "volume": 1.0,
+   "reference_distance": 10.0,
+   "max_distance": 75.0,
+   "looping": true,
+   "outside": true
+  }
+ ]
+}

@@ -48,10 +48,12 @@ func close_window() -> void:
 	if not visible:
 		return
 	visible = false
+	GameAudio.ui_cancel()
 	closed.emit()
 
 func open_window() -> void:
 	visible = true
+	GameAudio.ui_accept()
 	move_to_front()
 
 func toggle_window() -> void:
