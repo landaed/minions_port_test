@@ -24,3 +24,7 @@ minions-port/assets/characters/*.png
 
 # Godot editor/import cache
 minions-port/.godot/
+
+# Local test rig: downloaded Godot binary + generated test screenshots
+tools/godot_bin/
+test_shots/
