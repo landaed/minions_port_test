@@ -2020,15 +2020,25 @@ class ProxyProtocol(WebSocketServerProtocol):
 
 
 def main():
-    port = 9000
-    print(f"[Proxy] Starting WebSocket proxy on ws://localhost:{port}")
-    print(f"[Proxy] Will connect to MasterServer at {MASTERIP}:{MASTERPORT}")
+    # Port and bind interface are configurable so a host can expose the proxy to
+    # the internet (port-forward this port). Defaults: listen on ALL interfaces
+    # (0.0.0.0) so remote clients can reach it — not just localhost.
+    port = int(os.environ.get("MOM_PROXY_PORT", "9000"))
+    bind = os.environ.get("MOM_PROXY_BIND", "0.0.0.0")
 
-    factory = WebSocketServerFactory(f"ws://localhost:{port}")
+    print(f"[Proxy] Starting WebSocket proxy, listening on {bind}:{port} "
+          f"(clients connect to ws://<this-host>:{port})")
+    print(f"[Proxy] Will connect to MasterServer at {MASTERIP}:{MASTERPORT} "
+          f"(the proxy reaches the master/world locally; only port {port} needs "
+          f"to be reachable by remote players)")
+
+    # The factory url is informational (autobahn accepts any Host); the real
+    # bind is the listenTCP interface below.
+    factory = WebSocketServerFactory(f"ws://{bind}:{port}")
     factory.protocol = ProxyProtocol
 
-    reactor.listenTCP(port, factory)
-    print("[Proxy] Proxy is up. Waiting for Godot client connections...")
+    reactor.listenTCP(port, factory, interface=bind)
+    print(f"[Proxy] Proxy is up on {bind}:{port}. Waiting for client connections...")
     reactor.run()
 
 

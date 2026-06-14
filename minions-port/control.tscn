@@ -33,6 +33,14 @@ text = "Minions of Mirth"
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[node name="ServerField" type="LineEdit" parent="VBoxContainer" unique_id=591118801]
+layout_mode = 2
+placeholder_text = "Server address (host or host:port) — blank = localhost"
+
+[node name="ConnectButton" type="Button" parent="VBoxContainer" unique_id=591118802]
+layout_mode = 2
+text = "Connect"
+
 [node name="UsernameField" type="LineEdit" parent="VBoxContainer" unique_id=591118882]
 layout_mode = 2
 placeholder_text = "Username"
@@ -130,6 +138,7 @@ text = "Connecting..."
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[connection signal="pressed" from="VBoxContainer/ConnectButton" to="." method="_on_connect_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/RegisterButton" to="." method="_on_register_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/JoinWorldButton" to="." method="_on_join_world_button_pressed"]

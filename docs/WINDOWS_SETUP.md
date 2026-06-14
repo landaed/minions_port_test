@@ -105,20 +105,58 @@ The login screen walks you through 4 steps:
 
 ## 5. Playing with other people (multiplayer)
 
-Multiplayer works against one server stack: every Godot client that connects to
-the same `ClientProxy` enters the same world and **sees the others** (movement,
-combat, equipment and summoned pets are all replicated).
+Every Godot client that connects to the same `ClientProxy` enters the same world
+and **sees the others** (movement, combat, equipment, summoned pets and parties
+are all replicated). Only **one machine hosts** the servers; everyone else just
+runs the client and points it at the host.
 
-- **Same PC (for testing):** launch the Godot client several times — each
-  instance is an independent client. Register a separate account per instance.
-- **Other machines / over a network:** the client URL is hard-coded to
-  `ws://localhost:9000` in `minions-port/control.gd` (search for
-  `connect_to_url`). Change `localhost` to the host's LAN IP and rebuild/run the
-  client on each player's machine. Open port **9000** (and the world ports) on
-  the host firewall.
+### Architecture (why only one port matters)
 
-> ⚠️ Security: this is decade-old game-server code. Only expose it to people you
-> trust, ideally over a VPN. See the warning in the top-level `README.md`.
+```
+ your friend's PC                 the HOST PC (runs run_servers)
+ ┌──────────────┐  ws://HOST:9000 ┌─────────────────────────────────────┐
+ │ Godot client │ ───────────────▶│ ClientProxy :9000                   │
+ └──────────────┘   (internet)    │   └─ talks to Master/World on        │
+                                   │      127.0.0.1 (local to the host)   │
+                                   └─────────────────────────────────────┘
+```
+
+The client only ever talks to the **proxy (port 9000)**. The proxy reaches the
+Master (2002) and World (2008) servers locally on the host, so **only port 9000
+needs to be reachable from the internet** — you do *not* port-forward 2002/2008.
+
+### Host setup (the person running the servers)
+
+1. Run `run_servers.bat` (or `./run_servers.sh`). The proxy now binds to
+   **all interfaces** (`0.0.0.0:9000`) by default, so it accepts remote clients.
+   *(Override with `MOM_PROXY_PORT` / `MOM_PROXY_BIND` env vars if needed.)*
+2. **Same LAN (you + friends on the same router/Wi-Fi):** find the host's local
+   IP (`ipconfig` on Windows → e.g. `192.168.1.20`). Allow the app through
+   Windows Firewall (or open TCP **9000**). Friends connect to `192.168.1.20`.
+3. **Over the internet:** on the host's router, **port-forward external TCP 9000
+   → the host PC's local IP : 9000**. Friends connect to the host's **public IP**
+   (find it at e.g. whatismyip.com → `203.0.113.7`). A static IP / dynamic-DNS
+   name makes this stable. (No router access? A VPN like Tailscale/ZeroTier, or
+   an SSH/`ngrok tcp 9000` tunnel, also works — friends connect to the tunnel
+   address.)
+
+### Client setup (everyone, including remote players)
+
+1. Launch the Godot client. On the **Step 1 login screen** there is now a
+   **Server** field at the top and a **Connect** button.
+2. Type the host's address and click **Connect**:
+   - blank → `localhost` (you're hosting on this same PC)
+   - `192.168.1.20` → same-LAN host (defaults to port 9000)
+   - `203.0.113.7` or `203.0.113.7:9000` → internet host
+   - a hostname like `myserver.duckdns.org` also works
+   The status line shows "Connected to ws://…". The address is remembered
+   between sessions.
+3. Register your own account, pick the world, create a character, Enter World.
+   Walk up to your friends and party up (target them, press **G** to invite).
+
+> ⚠️ Security: this is decade-old game-server code with no transport encryption.
+> Only expose port 9000 to people you trust, and prefer a VPN/tunnel over a raw
+> public port-forward. See the warning in the top-level `README.md`.
 
 ## Three passwords (this confuses everyone)
 

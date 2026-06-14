@@ -10,6 +10,8 @@ var world_time := {"hour": 0, "minute": 0}
 @onready var login_panel := $VBoxContainer
 @onready var title_label := $VBoxContainer/TitleLabel
 @onready var hseparator := $VBoxContainer/HSeparator
+@onready var server_field := $VBoxContainer/ServerField
+@onready var connect_button := $VBoxContainer/ConnectButton
 @onready var username_field := $VBoxContainer/UsernameField
 @onready var password_field := $VBoxContainer/PasswordField
 @onready var login_button := $VBoxContainer/LoginButton
@@ -43,7 +45,7 @@ const PHASE_CHARACTER := "character"
 var _current_phase := ""
 
 func _phase_login_controls() -> Array:
-	return [username_field, password_field, email_field, login_button, register_button]
+	return [server_field, connect_button, username_field, password_field, email_field, login_button, register_button]
 
 func _phase_world_controls() -> Array:
 	return [world_list, join_button]
@@ -82,13 +84,62 @@ func _set_phase(phase: String):
 			title_label.text = "Step 4 of 4 — Pick or Create a Character"
 			_show_only(_phase_character_controls())
 
+const SERVER_CFG_PATH := "user://mom_client.cfg"
+const DEFAULT_SERVER := "localhost"
+const DEFAULT_PROXY_PORT := 9000
+var _current_server_url := ""
+
 func _ready():
-	socket.inbound_buffer_size = 1048576  # 1MB - entity snapshots can be large
-	socket.connect_to_url("ws://localhost:9000")
-	status_label.text = "Connecting to proxy..."
 	_setup_options()
 	_set_phase(PHASE_LOGIN)
+	# Remember the last server you connected to (host or host:port). Leave the
+	# field blank for localhost. To play with a friend, type the HOST's address
+	# (their public IP / hostname, e.g. 203.0.113.7 or 203.0.113.7:9000).
+	var saved := _load_server()
+	server_field.text = saved
+	_connect_to_server(saved)
 	GameAudio.start_menu_music()
+
+# Turn "host", "host:port", or "ws://host:port" into a WebSocket URL.
+func _server_url(addr: String) -> String:
+	addr = addr.strip_edges()
+	if addr.is_empty():
+		addr = DEFAULT_SERVER
+	if addr.begins_with("ws://") or addr.begins_with("wss://"):
+		return addr
+	if not (":" in addr):
+		addr += ":" + str(DEFAULT_PROXY_PORT)
+	return "ws://" + addr
+
+func _connect_to_server(addr: String) -> void:
+	var url := _server_url(addr)
+	# Fresh peer so a re-connect to a new address starts clean.
+	socket = WebSocketPeer.new()
+	socket.inbound_buffer_size = 1048576  # entity snapshots can be large
+	connected = false
+	_current_server_url = url
+	var err := socket.connect_to_url(url)
+	if err != OK:
+		status_label.text = "Could not start connection to %s (error %d)." % [url, err]
+	else:
+		status_label.text = "Connecting to %s ..." % url
+
+func _on_connect_button_pressed():
+	var addr: String = server_field.text.strip_edges()
+	_save_server(addr)
+	_connect_to_server(addr)
+
+func _load_server() -> String:
+	var cfg := ConfigFile.new()
+	if cfg.load(SERVER_CFG_PATH) == OK:
+		return str(cfg.get_value("connection", "server", DEFAULT_SERVER))
+	return DEFAULT_SERVER
+
+func _save_server(addr: String) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(SERVER_CFG_PATH)  # keep any other keys
+	cfg.set_value("connection", "server", addr)
+	cfg.save(SERVER_CFG_PATH)
 
 func _setup_options():
 	for race in ["Human", "Gnome", "Elf", "Halfling", "Dwarf", "Titan", "Drakken"]:
@@ -128,11 +179,15 @@ func _process(_delta):
 
 	if state == WebSocketPeer.STATE_OPEN and not connected:
 		connected = true
-		status_label.text = "Connected to proxy. Enter credentials."
+		status_label.text = "Connected to %s. Enter credentials." % _current_server_url
 
-	if state == WebSocketPeer.STATE_CLOSED and connected:
-		connected = false
-		status_label.text = "Disconnected from proxy."
+	if state == WebSocketPeer.STATE_CLOSED:
+		if connected:
+			connected = false
+			status_label.text = "Disconnected from %s." % _current_server_url
+		elif not _current_server_url.is_empty() and not status_label.text.begins_with("Could not reach"):
+			# Never opened — connection refused/unreachable.
+			status_label.text = "Could not reach %s. Check the address, that the host's servers are running, and that port 9000 is open." % _current_server_url
 
 	if state == WebSocketPeer.STATE_OPEN:
 		while socket.get_available_packet_count():

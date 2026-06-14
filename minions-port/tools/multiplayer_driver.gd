@@ -220,7 +220,17 @@ class MPDriver:
 			_goto("finish")
 		match state:
 			"connect":
-				if state_t > 2.0 and _once("register"):
+				# Optional: connect to a specific server address (host or host:port)
+				# via the new Server field, to exercise remote connectivity.
+				if _once("set_server"):
+					var srv := OS.get_environment("MOM_MP_SERVER")
+					if not srv.is_empty():
+						control.server_field.text = srv
+						control._on_connect_button_pressed()
+						print("[MP:%s] connecting to server '%s'" % [prefix, srv])
+						state_t = 0.0
+						return
+				if state_t > 2.0 and control.connected and _once("register"):
 					control.get_node("VBoxContainer/UsernameField").text = username
 					control.get_node("VBoxContainer/EmailField").text = username + "@example.com"
 					control.get_node("VBoxContainer/PasswordField").text = "testpass1"
