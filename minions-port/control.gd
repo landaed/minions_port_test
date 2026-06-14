@@ -455,7 +455,7 @@ func handle_response(data: Dictionary):
 
 		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
 		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook", \
-		"cheat_result", "begin_casting", "play_sound":
+		"cheat_result", "begin_casting", "play_sound", "alliance_info", "alliance_invite":
 			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
 				gameplay_view.handle_ui_message(data)
 

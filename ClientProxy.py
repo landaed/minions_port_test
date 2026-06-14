@@ -549,6 +549,13 @@ class ProxyPlayerMind(pb.Referenceable):
     def remote_checkEncounterSetting(self, *args):
         return True
 
+    def remote_checkIgnore(self, *args):
+        # The world asks a target's client whether it is ignoring the inviter
+        # before delivering an alliance invite. We don't model an ignore list,
+        # so always allow (False = not ignoring). Without this the invite path
+        # errbacks and silently drops, so party invites never arrive.
+        return False
+
     def remote_createServer(self, *args):
         return True
 
@@ -591,22 +598,74 @@ class ProxyPlayerMind(pb.Referenceable):
         print(f"[Proxy] stopSelectron")
         return True
 
+    def _forward_alliance_info(self, info):
+        # Flatten an AllianceInfo ghost (PNAMES / NAMES / HEALTHS / MOBIDS, keyed
+        # by member index) into a simple member list for the Godot client.
+        members = []
+        try:
+            if info is not None:
+                pnames = list(getattr(info, "PNAMES", []) or [])
+                names = getattr(info, "NAMES", {}) or {}
+                healths = getattr(info, "HEALTHS", {}) or {}
+                mobids = getattr(info, "MOBIDS", {}) or {}
+
+                def _first(d, i, default):
+                    v = d.get(i)
+                    if v is None:
+                        v = d.get(str(i))
+                    if isinstance(v, (list, tuple)) and v:
+                        return v[0]
+                    return default
+
+                for x, pname in enumerate(pnames):
+                    members.append({
+                        "public_name": str(pname),
+                        "name": str(_first(names, x, pname)),
+                        "health_ratio": float(_first(healths, x, 1.0)),
+                        "mob_id": int(_first(mobids, x, -1)),
+                    })
+        except Exception:
+            traceback.print_exc()
+        self.session.send({
+            "type": "alliance_info",
+            "members": members,
+            "size": len(members),
+        })
+
     def remote_setAllianceInfo(self, *args):
-        self.session.send(
-            {
-                "type": "alliance_info",
-                "message": "Received alliance info from world server.",
-            }
-        )
+        # The world sends an AllianceInfo cacheable. Its ghost is updated in place
+        # via observe_updateChanged when members/health change (e.g. someone joins
+        # AFTER you), but that is not a fresh remote_ call — so hook it once to
+        # re-forward, otherwise the alliance LEADER's panel never updates when a
+        # new member joins.
+        info = args[0] if args else None
+        if info is not None and not getattr(info, "_proxy_hooked", False):
+            try:
+                info._proxy_hooked = True
+                _orig = info.observe_updateChanged
+                _fwd = self._forward_alliance_info
+
+                def _hooked(changed, _orig=_orig, _info=info, _fwd=_fwd):
+                    try:
+                        _orig(changed)
+                    except Exception:
+                        pass
+                    _fwd(_info)
+
+                info.observe_updateChanged = _hooked
+            except Exception:
+                traceback.print_exc()
+        self._forward_alliance_info(info)
         return True
 
     def remote_setAllianceInvite(self, *args):
-        self.session.send(
-            {
-                "type": "alliance_invite",
-                "message": "Received alliance invite from world server.",
-            }
-        )
+        # arg is the leader's public name when invited, or None to clear.
+        leader = args[0] if args else None
+        self.session.send({
+            "type": "alliance_invite",
+            "from": str(leader) if leader else "",
+            "pending": bool(leader),
+        })
         return True
 
     def remote_setTracking(self, tracking):
@@ -1048,6 +1107,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             "pet_follow": ("PET", ["0", "FOLLOWME"]),
             "pet_back_off": ("PET", ["0", "STANDDOWN"]),
             "pet_dismiss": ("PET", ["0", "DISMISS"]),
+            # Party/alliance: invite your CURRENT TARGET (another player) to your
+            # alliance. Accept/decline/leave/disband are perspective calls below.
+            "invite": ("INVITE", ["0"]),
         }
 
         payload = command_map.get(command)
@@ -1066,6 +1128,26 @@ class ProxyProtocol(WebSocketServerProtocol):
             d = self.session.player_perspective.callRemote("PlayerAvatar", "targetEntity", entity_id, 0)
             d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Targeted replicated entity {entity_id} on legacy world server."))
             d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
+            return
+
+        # Party/alliance accept/decline/leave/disband map to PlayerAvatar
+        # perspective methods (no legacy COMMANDS entry). joinAlliance accepts a
+        # pending invite; leaveDecline declines a pending invite OR leaves the
+        # alliance you're in; disband breaks up an alliance you lead.
+        if payload is None and command in (
+                "accept_alliance", "join_alliance", "decline_alliance",
+                "leave_alliance", "disband_alliance"):
+            method = {
+                "accept_alliance": "joinAlliance",
+                "join_alliance": "joinAlliance",
+                "decline_alliance": "leaveDecline",
+                "leave_alliance": "leaveDecline",
+                "disband_alliance": "disband",
+            }[command]
+            d = self.session.player_perspective.callRemote("PlayerAvatar", method)
+            d.addCallback(lambda result: self._send_gameplay_command_result(
+                True, command, f"{method} sent to legacy world server."))
+            d.addErrback(self._on_gameplay_command_failed, command, method)
             return
 
         if payload is None and self._handle_ui_command(command, msg):

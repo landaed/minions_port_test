@@ -35,8 +35,8 @@ software renderer instead of a GPU).
 | Summoned pet follows the summoner | ✅ works | `proxy_pet_test`: pet stays at d≈2.5 as master moves; *"I will follow you master"* |
 | Combat (aggro, melee, abilities, death) | ✅ works | skeleton aggros + attacks; Kick lands ~20 dmg; HP bars track |
 | Cheats (level / items / spells / money / heal) | ✅ works | all cheat actions return success; gear auto-equips |
-| **Buff/heal another player** | ⚠️ see "Buff" below | `proxy_buff_test` |
-| **Form a party (alliance)** | ❌ not wired in the port | server has it; proxy + client UI don't expose it |
+| **Form a party (alliance)** | ✅ works (now wired) | invite → accept → 2-member party; both clients show a party panel |
+| **Buff another player** | ✅ works | A casts Blessed Armor on party member B → *"B is wrapped in a coat of pure light!"* |
 
 ## What "see each other / equipment replication" looks like
 
@@ -67,46 +67,60 @@ client polling it sees every other nearby player, their live position, and their
 current gear. Equip/unequip invalidates the cached `mob._godot_mounts`/`_godot_tex`,
 so a gear change shows up on everyone's next snapshot.
 
-## Party / alliance — not wired through the port
+## Party / alliance — now wired end to end
 
 MoM's multi-player grouping is the **alliance** (up to 6 players;
 `mob.player.party` is the *single* player's own 1–6 character party, a different
-thing). The legacy server fully implements it: `CmdInvite` →
-`PlayerAvatar.perspective_invite()` (invite your targeted player),
-`perspective_joinAlliance()`, and the proxy even *receives* `setAllianceInvite`
-and forwards an `alliance_invite` message to the client.
+thing). The legacy server always implemented it; this pass wired it through the
+proxy and built a Godot UI for it. Verified flow: A targets B → invites → B sees
+a prompt → accepts → both clients show a 2-member party panel
+(`tools/proxy_party_test.py` → `PARTY FORMED: PASS`, plus the screenshots).
 
-What's missing is the **outbound** path: the proxy's `gameplay_command` map has
-no `invite` / `accept_alliance` command, and the Godot client has no
-party/alliance UI (only debug labels that print the current party). So two
-players cannot currently form a group from the client. This is a port gap, not a
-server limitation — wiring it is a small, well-scoped task (add `INVITE` +
-accept to the proxy command map and a couple of buttons/inbox to the HUD).
+What was added / fixed:
 
-## Buff / heal another player
+- **Proxy outbound commands** (`ClientProxy.py`): `invite` (legacy `INVITE`,
+  invites your current target), and `accept_alliance` / `decline_alliance` /
+  `leave_alliance` / `disband_alliance` → `PlayerAvatar.joinAlliance` /
+  `leaveDecline` / `disband`.
+- **`remote_checkIgnore`** (`ClientProxy.py`): `perspective_invite` first calls
+  `target.mind.callRemote("checkIgnore", …)`; the proxy didn't implement it, so
+  the call errbacked and the invite was silently dropped. Now returns `False`
+  (not ignoring), so invites are delivered.
+- **Alliance info forwarding** (`ClientProxy.py`): `remote_setAllianceInfo`
+  flattens the `AllianceInfo` cacheable (PNAMES/NAMES/HEALTHS/MOBIDS) into a
+  member list, and hooks `observe_updateChanged` so the **leader's** panel also
+  updates when a new member joins (the join only pushes a fresh cacheable to the
+  joiner). `remote_setAllianceInvite` forwards the inviter name.
+- **Server bug fix** (`mud/world/alliance.py`): `Alliance.join` appended the
+  `Character` *object* (not its name) to `masterAllianceInfo`, which PB then
+  refused to jelly (*"Character deemed insecure"*), corrupting the member list.
+  Now appends `…members[0].name`.
+- **Godot UI** (`gameplay_view.gd`): a party panel (members + live health bars,
+  Leave button), an invite prompt (Accept **Y** / Decline **N**), **G** to
+  invite your target, and `alliance_info` / `alliance_invite` handling.
 
-**Partly verified — building blocks work, clean end-to-end not captured.**
+## Buff another player — verified
 
-- A Cleric does get a beneficial spell (`Minor Heal`) in its spellbook.
-- Spell casting works in general — the **summon** is a spell cast through the
-  same `spell_slot` → `onSpellSlot` path, and it succeeds.
-- Targeting another player works (A's target frame reads "Bravoofm Lv 14
-  Player").
+**Confirmed.** In a formed party, A (Cleric) targets B and casts **Blessed
+Armor** → the server reports *"`<B>` is wrapped in a coat of pure light!"*, i.e.
+the buff landed on the **other player** (`tools/proxy_party_test.py` →
+`cross_party_heal=True`).
 
-What I could **not** cleanly demonstrate was a heal *landing on another player
-and restoring their HP*: the headless harness couldn't reliably get the target
-damaged first (sending `attack` alone doesn't always pull the attacker into
-melee range to take return damage), and a heal on a full-HP target is a no-op
-with no log line, so there was nothing to measure. The mechanic almost
-certainly works (it's core original-game behaviour and every prerequisite is
-functional), but treat "buff/heal each other" as **likely-works /
-not-proven-here** rather than confirmed.
+Things learned while verifying:
 
-Note also that beneficial support between players may be gated by the same
-**missing alliance wiring** (below) — in the original game you typically buff
-your own party/alliance — so a fuller fix is: wire alliances, then re-test
-cross-player heals/buffs inside a group. `tools/proxy_buff_test.py` is the
-harness to finish this with.
+- **Spell target type matters.** Spells carry a `target` (SELF=0, PET=1,
+  OTHER=2, PARTY=3, ALLIANCE=4). The Cleric's auto-learned **Minor Heal is
+  self-target** — casting it heals the *caster* regardless of who's targeted, so
+  it's the wrong spell to prove cross-player support. Player-targetable
+  beneficial spells do exist (e.g. **Blessed Armor**, Light Heal, Words of
+  Blessing, the Party/Alliance heals) — the test cheats one in and casts it.
+- **The cast path is `spell_slot` → `onSpellSlot`**, using the spell's *grid
+  slot* (not its list index), with the spellbook's `char_id`. It needs mana
+  (cheat `full_heal` restores it) and you must wait out the spell's `cast_time`.
+- **Staging combat damage in the start town is unreliable** — the test
+  skeleton spawns next to powerful town **guards** that kill it (and kill any
+  tester who swings at a guard), so a "heal restores HP" demo is best done with
+  a buff (no damage needed) or in a quieter zone.
 
 ## Reproduce
 

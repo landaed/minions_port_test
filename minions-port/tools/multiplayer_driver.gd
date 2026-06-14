@@ -285,6 +285,10 @@ class MPDriver:
 				_role_summoner(delta)
 			"observer":
 				_role_observer(delta)
+			"party_lead":
+				_role_party_lead(delta)
+			"party_join":
+				_role_party_join(delta)
 			"finish":
 				if _once("finish"):
 					_busy = true
@@ -424,6 +428,70 @@ class MPDriver:
 			await _shot("pet_follow")
 			_busy = false
 			_goto("observer")  # then also observe other players
+
+	func _role_party_lead(delta: float) -> void:
+		# Target the other player and invite them; screenshot the formed party.
+		if _once("invite"):
+			var other := _nearest_other_player()
+			if other.is_empty():
+				if state_t < 25.0:
+					_did.erase("invite")   # keep waiting for the other client
+					return
+				_goto("finish")
+				return
+			_busy = true
+			view._camera_zoom = 3.6
+			view._apply_camera_zoom()
+			_face_towards(_entity_godot_pos(other))
+			_request("target_entity", {"entity_id": int(other.get("id", 0))})
+			await get_tree().create_timer(0.8).timeout
+			await _shot("targeted_player")
+			_request("invite")
+			print("[MP:%s] invited %s to party" % [prefix, other.get("name", "?")])
+			await get_tree().create_timer(2.0).timeout
+			await _shot("invite_sent")
+			_busy = false
+		if not _did.has("party_shot") and view._party_members.size() >= 2:
+			_did["party_shot"] = true
+			_busy = true
+			await get_tree().create_timer(1.0).timeout
+			print("[MP:%s] PARTY FORMED, members=%d" % [prefix, view._party_members.size()])
+			await _shot("party_formed")
+			_busy = false
+		var op := _nearest_other_player()
+		if not op.is_empty():
+			_face_towards(_entity_godot_pos(op))
+		if total_t > 72.0:
+			_goto("finish")
+
+	func _role_party_join(delta: float) -> void:
+		# Wait for the invite prompt, accept it, then screenshot the party panel.
+		if not _did.has("accepted"):
+			if view._party_invite_panel and view._party_invite_panel.visible:
+				_busy = true
+				view._camera_zoom = 3.6
+				view._apply_camera_zoom()
+				await _shot("invite_prompt")
+				_request("accept_alliance")
+				_did["accepted"] = true
+				print("[MP:%s] accepted party invite" % prefix)
+				await get_tree().create_timer(2.0).timeout
+				_busy = false
+			elif state_t > 40.0:
+				_goto("finish")
+				return
+		if not _did.has("party_shot") and view._party_members.size() >= 2:
+			_did["party_shot"] = true
+			_busy = true
+			await get_tree().create_timer(1.0).timeout
+			print("[MP:%s] PARTY FORMED, members=%d" % [prefix, view._party_members.size()])
+			await _shot("party_member")
+			_busy = false
+		var op := _nearest_other_player()
+		if not op.is_empty():
+			_face_towards(_entity_godot_pos(op))
+		if total_t > 76.0:
+			_goto("finish")
 
 	func _role_observer(delta: float) -> void:
 		# Stay put (the equip client walks out to a viewing distance); keep facing
