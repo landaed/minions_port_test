@@ -143,7 +143,9 @@ try:
     def SetupProcessors(cluster):
         if sys.platform != "win32":
             return
-        
+        if win32api is None or win32process is None:
+            return  # CPU-affinity pinning needs pywin32; skip it if unavailable
+
         handle = win32api.GetCurrentProcess()
         processMask,systemMask = win32process.GetProcessAffinityMask(handle)
         
