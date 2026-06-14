@@ -176,6 +176,15 @@ You only ever type the **master account password**.
   skipped `run_servers.bat`. Confirm `ws://localhost:9000` is listening.
 - **"no such table: user" / Master crashes** → the DB wasn't built; run
   `setup_windows.bat` (or `setup_databases.py`).
+- **`ModuleNotFoundError: No module named 'pywintypes'`** (Master/GM/Character
+  server) → fixed: the servers no longer force the Windows IOCP reactor; they
+  fall back to the default reactor. `git pull` to get the fix. *(Optional: for
+  IOCP performance install `pip install pywin32`.)*
+- **`WinError 123 ... syntax is incorrect: ''`** (WorldDaemon) or the World
+  server never spawns → fixed: Windows `chdir`/path and the world-server spawn
+  (no more `os.system('start …')`) are corrected. `git pull`.
+- **`Port could not be cast to integer`** during DB setup → fixed Windows SQLite
+  path; `git pull` then `setup_databases.py --reset`.
 - **Enter-world hangs / character missing after code or schema changes** →
   `venv\Scripts\python setup_databases.py --reset`.
 - **No terminal/headless box?** You can run the servers under WSL or Git-Bash

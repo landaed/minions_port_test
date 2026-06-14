@@ -45,8 +45,11 @@ try:
     USE_WX = "-wx" in sys.argv
     
     if sys.platform == 'win32' and not USE_WX:
-        from twisted.internet.iocpreactor import install
-        install()
+        try:
+            from twisted.internet.iocpreactor import install
+            install()
+        except Exception:
+            pass  # IOCP needs pywin32; fall back to the default reactor
     elif USE_WX:
         import wx
         from twisted.internet.wxreactor import install
@@ -162,7 +165,9 @@ try:
     
     
     if not main_is_frozen() and sys.platform == "win32":
-        os.chdir(os.path.dirname(sys.argv[0]))
+        _scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+        if _scriptdir:
+            os.chdir(_scriptdir)
     
     from mud.gamesettings import *
     from mud.world.core import CoreSettings

@@ -5,8 +5,11 @@ import sys,os
 sys.path.append(os.getcwd())
 
 if sys.platform == "win32":
-    from twisted.internet.iocpreactor import install
-    install()
+    try:
+        from twisted.internet.iocpreactor import install
+        install()
+    except Exception:
+        pass  # IOCP needs pywin32; fall back to the default reactor
 # else: use default reactor on Linux
 
 from twisted.internet import reactor

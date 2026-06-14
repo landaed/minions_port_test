@@ -90,15 +90,11 @@ class ImpMind(pb.Root):
             cmd  =  sys.executable
             args =  "%s/WorldServer.py %s"%(cwd,args)
         
-        if sys.platform == 'win32':
-            s = 'start "%s" %s %s'%(cwd,cmd,args)
-            s = os.path.normpath(s)
-            print(s)
-            os.system(s)
-        else:
-            full_args = [cmd] + args.split()
-            print("Spawning: %s" % ' '.join(full_args))
-            subprocess.Popen(full_args)
+        # Cross-platform spawn (the old win32 os.system(normpath('start ...'))
+        # corrupted the command string on Windows).
+        full_args = [cmd] + args.split()
+        print("Spawning: %s" % ' '.join(full_args))
+        subprocess.Popen(full_args)
     
     
     def killProcess(self,pid):

@@ -17,7 +17,12 @@ if main_is_frozen():
     sys.path.append(maindir)    
     
 elif sys.platform == "win32":
-    os.chdir(os.path.dirname(sys.argv[0]))
+    # sys.argv[0] may be just "WorldDaemon.py" (no directory) when launched from
+    # the repo root; os.chdir("") raises WinError 123. Only chdir when there's
+    # an actual directory component.
+    _scriptdir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    if _scriptdir:
+        os.chdir(_scriptdir)
 
 
 from mud_ext.worlddaemon.main import main

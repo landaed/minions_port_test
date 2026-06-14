@@ -105,14 +105,12 @@ class ZoneClusterAvatar(pb.Avatar):
         
         print("####Spawning World Server: " + str(args))
 		
-        if sys.platform == 'win32':
-            s = 'start "%s" %s %s'%(os.getcwd(),cmd,args)
-            s = os.path.normpath(s)
-            os.system(s)
-        else:
-            full_args = [cmd] + args.split()
-            print("Spawning: %s" % ' '.join(full_args))
-            subprocess.Popen(full_args)
+        # subprocess.Popen works on Windows and POSIX. The old win32 branch used
+        # os.system(os.path.normpath('start "..." cmd args')), and normpath
+        # mangled the whole command string on Windows.
+        full_args = [cmd] + args.split()
+        print("Spawning World Server: %s" % ' '.join(full_args))
+        subprocess.Popen(full_args)
     
 #remote
     

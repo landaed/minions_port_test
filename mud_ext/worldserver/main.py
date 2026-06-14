@@ -24,8 +24,11 @@ try:
     USE_WX = "-wx" in sys.argv
 
     if sys.platform == 'win32' and not USE_WX:
-        from twisted.internet.iocpreactor import install
-        install()
+        try:
+            from twisted.internet.iocpreactor import install
+            install()
+        except Exception:
+            pass  # IOCP needs pywin32; fall back to the default reactor
     elif USE_WX:
         import wx
         from twisted.internet.wxreactor import install
