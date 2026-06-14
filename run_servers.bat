@@ -17,6 +17,10 @@ if exist "venv\Scripts\python.exe" set "PY=venv\Scripts\python.exe"
 
 set "GC=gameconfig=mom.cfg"
 
+REM Show server output in real time (Windows block-buffers console stdout
+REM otherwise, which hides what each server is doing when something hangs).
+set "PYTHONUNBUFFERED=1"
+
 REM Enable the in-game testing cheats (F8 / backquote cheat window).
 REM Set to 0 to disable. Inherited by every server window below.
 set "MOM_ENABLE_CHEATS=1"

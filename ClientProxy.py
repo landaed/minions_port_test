@@ -999,6 +999,17 @@ class GodotClientSession:
 class ProxyProtocol(WebSocketServerProtocol):
     """WebSocket protocol handler - one per Godot client connection."""
 
+    def onConnect(self, request):
+        # Disable Nagle so the (tiny) WebSocket handshake + JSON frames flush
+        # immediately. Without this, small frames can sit in the TCP buffer on
+        # Windows and the client appears to "hang" connecting/logging in.
+        try:
+            self.transport.setTcpNoDelay(True)
+        except Exception:
+            pass
+        print(f"[Proxy] WebSocket handshake from {request.peer} (path={request.path})")
+        return None
+
     def onOpen(self):
         self.session = GodotClientSession(self)
         print(f"[Proxy] Godot client connected: {self.peer}")
@@ -2020,6 +2031,13 @@ class ProxyProtocol(WebSocketServerProtocol):
 
 
 def main():
+    # Real-time logs even when stdout is block-buffered (Windows consoles).
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+        sys.stderr.reconfigure(line_buffering=True)
+    except Exception:
+        pass
+
     # Port and bind interface are configurable so a host can expose the proxy to
     # the internet (port-forward this port). Defaults: listen on ALL interfaces
     # (0.0.0.0) so remote clients can reach it — not just localhost.
