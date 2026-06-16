@@ -163,6 +163,15 @@ var _self_prev_health := -1.0
 var _self_pain_cooldown := 0.0
 var _pet_bar: PanelContainer
 var _pet_label: Label
+# Party / alliance UI
+var _party_panel: PanelContainer
+var _party_box: VBoxContainer
+var _party_title: Label
+var _party_members: Array = []          # [{public_name, name, health_ratio, mob_id}]
+var _party_hp_bars: Array = []          # [{bar:ProgressBar, mob_id:int, fallback:float}]
+var _party_invite_panel: PanelContainer
+var _party_invite_label: Label
+var _party_invite_from := ""
 var _interaction_active := false
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
@@ -325,7 +334,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  U: unstuck  •  F3: debug  •  `: cheats"
+	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  G: invite to party  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  F3: debug  •  `: cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
@@ -355,6 +364,57 @@ func _build_hud():
 		var cmd: String = pet_cmd[1]
 		pb.pressed.connect(func(): _request_server_command(cmd))
 		pet_box.add_child(pb)
+
+	# Party / alliance panel (top-left, below the player frame; shown only while
+	# grouped). Members + live health, with a Leave button.
+	_party_panel = PanelContainer.new()
+	_party_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.55, 0.8, 0.55)))
+	_party_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	_party_panel.offset_left = 16
+	_party_panel.offset_top = 150
+	_party_panel.visible = false
+	_party_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_party_panel)
+	_party_box = VBoxContainer.new()
+	_party_box.add_theme_constant_override("separation", 3)
+	_party_panel.add_child(_party_box)
+	_party_title = Label.new()
+	_party_title.text = "Party"
+	_party_title.add_theme_font_size_override("font_size", 12)
+	_party_title.add_theme_color_override("font_color", Color(0.75, 0.97, 0.75))
+	_party_box.add_child(_party_title)
+
+	# Incoming party-invite prompt (center-top, below the target frame).
+	_party_invite_panel = PanelContainer.new()
+	_party_invite_panel.add_theme_stylebox_override("panel", _panel_style(Color(0.95, 0.85, 0.4)))
+	_party_invite_panel.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	_party_invite_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_party_invite_panel.offset_top = 70
+	_party_invite_panel.visible = false
+	add_child(_party_invite_panel)
+	var inv_box := VBoxContainer.new()
+	inv_box.add_theme_constant_override("separation", 4)
+	_party_invite_panel.add_child(inv_box)
+	_party_invite_label = Label.new()
+	_party_invite_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_party_invite_label.add_theme_font_size_override("font_size", 13)
+	inv_box.add_child(_party_invite_label)
+	var inv_btns := HBoxContainer.new()
+	inv_btns.alignment = BoxContainer.ALIGNMENT_CENTER
+	inv_btns.add_theme_constant_override("separation", 8)
+	inv_box.add_child(inv_btns)
+	var accept_btn := Button.new()
+	accept_btn.text = "Accept (Y)"
+	accept_btn.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(accept_btn)
+	accept_btn.pressed.connect(_accept_party_invite)
+	inv_btns.add_child(accept_btn)
+	var decline_btn := Button.new()
+	decline_btn.text = "Decline (N)"
+	decline_btn.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(decline_btn)
+	decline_btn.pressed.connect(_decline_party_invite)
+	inv_btns.add_child(decline_btn)
 
 	# Cast bar (bottom-center, above the hotbar; shown while casting).
 	_cast_bar = ProgressBar.new()
@@ -614,6 +674,23 @@ func handle_ui_message(data: Dictionary):
 			_begin_cast_bar(cast_time)
 		"play_sound":
 			VFX.sound_ui(self, str(data.get("sound", "")))
+		"alliance_info":
+			var members_val = data.get("members", [])
+			_party_members = members_val if members_val is Array else []
+			_refresh_party_panel()
+			# Once you're grouped there is no outstanding invite to answer.
+			if _party_members.size() >= 2 and _party_invite_panel:
+				_party_invite_panel.visible = false
+				_party_invite_from = ""
+		"alliance_invite":
+			if bool(data.get("pending", false)):
+				_party_invite_from = str(data.get("from", ""))
+				_party_invite_label.text = "Party invite from %s — Accept (Y) / Decline (N)" % (
+					_party_invite_from if not _party_invite_from.is_empty() else "another player")
+				_party_invite_panel.visible = true
+			else:
+				_party_invite_from = ""
+				_party_invite_panel.visible = false
 
 func _maybe_add_journal(journal) -> void:
 	if not (journal is Dictionary) or journal.is_empty():
@@ -625,6 +702,87 @@ func _maybe_add_journal(journal) -> void:
 		return
 	if journal_window.add_entry(topic, entry, text):
 		_push_log("Journal updated: %s — %s  (press J)" % [topic, entry])
+
+# ---------------------------------------------------------------------------
+# Party / alliance
+# ---------------------------------------------------------------------------
+func _refresh_party_panel() -> void:
+	if _party_panel == null:
+		return
+	for child in _party_box.get_children():
+		if child != _party_title:
+			child.queue_free()
+	_party_hp_bars.clear()
+	var grouped := _party_members.size() > 1
+	_party_panel.visible = grouped
+	if not grouped:
+		return
+	_party_title.text = "Party (%d/6)" % _party_members.size()
+	for m in _party_members:
+		if not (m is Dictionary):
+			continue
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		_party_box.add_child(row)
+		var name_lbl := Label.new()
+		name_lbl.text = str(m.get("name", "?"))
+		name_lbl.add_theme_font_size_override("font_size", 12)
+		name_lbl.custom_minimum_size = Vector2(120, 0)
+		row.add_child(name_lbl)
+		var hp := ProgressBar.new()
+		hp.custom_minimum_size = Vector2(96, 12)
+		hp.min_value = 0.0
+		hp.max_value = 1.0
+		hp.show_percentage = false
+		var fill := StyleBoxFlat.new()
+		fill.bg_color = Color(0.3, 0.85, 0.35)
+		fill.set_corner_radius_all(2)
+		hp.add_theme_stylebox_override("fill", fill)
+		hp.value = clampf(float(m.get("health_ratio", 1.0)), 0.0, 1.0)
+		row.add_child(hp)
+		_party_hp_bars.append({"bar": hp, "mob_id": int(m.get("mob_id", -1)),
+			"fallback": float(m.get("health_ratio", 1.0))})
+	var leave := Button.new()
+	leave.text = "Leave party"
+	leave.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(leave)
+	leave.pressed.connect(func(): _request_server_command("leave_alliance"))
+	_party_box.add_child(leave)
+
+func _update_party_health() -> void:
+	# Pull live member health from the entity snapshots each frame (matched by
+	# mob id); members in another zone keep their last alliance-info value.
+	if _party_hp_bars.is_empty():
+		return
+	for entry in _party_hp_bars:
+		var mob_id: int = int(entry.get("mob_id", -1))
+		var ratio: float = float(entry.get("fallback", 1.0))
+		if mob_id > 0:
+			for e in replicated_entities:
+				if e is Dictionary and int(e.get("id", 0)) == mob_id:
+					ratio = float(e.get("health_ratio", e.get("health", 1.0)))
+					break
+		var bar: ProgressBar = entry.get("bar")
+		if is_instance_valid(bar):
+			bar.value = clampf(ratio, 0.0, 1.0)
+
+func _invite_target() -> void:
+	var t := _live_target_entity()
+	if t.is_empty() or not bool(t.get("is_player", false)):
+		_push_log("Target a player first, then press G to invite them to your party.")
+		return
+	_request_server_command("invite")
+	_push_log("Invited %s to your party." % str(t.get("name", "player")))
+
+func _accept_party_invite() -> void:
+	_request_server_command("accept_alliance")
+	_party_invite_panel.visible = false
+	_party_invite_from = ""
+
+func _decline_party_invite() -> void:
+	_request_server_command("decline_alliance")
+	_party_invite_panel.visible = false
+	_party_invite_from = ""
 
 func _update_cursor_ghost(item) -> void:
 	if item is Dictionary and not item.is_empty():
@@ -1779,6 +1937,7 @@ func _bridge_status_text() -> String:
 func _update_labels():
 	if health_bar == null:
 		return  # HUD not built yet
+	_update_party_health()
 	var char_info := _player_char_info()
 	var rapid_info := _rapid_info()
 	var world_name: String = str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
@@ -2065,6 +2224,14 @@ func _input(event):
 				_send_interact_command()
 			KEY_U:
 				_unstuck()
+			KEY_G:
+				_invite_target()
+			KEY_Y:
+				if _party_invite_panel and _party_invite_panel.visible:
+					_accept_party_invite()
+			KEY_N:
+				if _party_invite_panel and _party_invite_panel.visible:
+					_decline_party_invite()
 			KEY_Q:
 				_toggle_autoattack()
 			KEY_TAB:

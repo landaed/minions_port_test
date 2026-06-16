@@ -1,5 +1,20 @@
-email==4.0.2
-pyasn1==0.4.8
-pycrypto==2.3
-Twisted==10.1.0
-zope.interface==5.2.0
+# Modern Python 3 dependencies for the Godot port / server stack.
+#
+# The old Python-2-era packages previously listed here (email, pycrypto,
+# Twisted==10.1.0, zope.interface, ...) do not install on Python 3. Use
+# Python 3.11+ and install this file for the supported Windows/Linux workflow.
+# (setup_windows.bat / run_servers.sh install these for you.)
+Twisted>=22,<24
+sqlobject
+pyopenssl
+service_identity
+bcrypt
+pyasn1
+
+# WebSocket bridge used by ClientProxy.py (the Godot client connects to it).
+autobahn
+txaio
+hyperlink
+
+# Headless proxy test clients in tools/ (proxy_*_test.py).
+websockets

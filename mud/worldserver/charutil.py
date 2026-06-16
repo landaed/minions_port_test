@@ -13,6 +13,7 @@ import traceback
 
 from sqlite3 import dbapi2 as sqlite
 import os,re,zlib
+from mud.utils import open_debug_log
 
 PLAYER_TABLES = ["player","player_monster_spawn","item","item_container_content","item_variant"]
 
@@ -34,9 +35,27 @@ PLAYER_BUFFERS = []
 
 def GetDBPath():
     uri = GetDBURI()
+    if not uri:
+        return uri
+    # Recover the filesystem path from the sqlite URI that getSQLiteURL built:
+    #   POSIX:   sqlite:///abs/path        -> /abs/path
+    #   Windows: sqlite:/C|/Users/...       -> C:/Users/...   (drive ':' -> '|')
+    # The old code only handled "sqlite://" + uri[9:], so on Windows it returned
+    # the whole URI and sqlite.connect() failed with "unable to open database
+    # file".
     if uri.startswith("sqlite://"):
-        return uri[9:]
-    return uri
+        path = uri[9:]
+    elif uri.startswith("sqlite:/"):
+        path = uri[8:]
+    else:
+        return uri
+    if len(path) > 1 and path[1] == '|':
+        # "C|/Users/..." -> "C:/Users/..."
+        path = path[0] + ':' + path[2:]
+    elif len(path) > 2 and path[0] == '/' and path[2] in ('|', ':'):
+        # "/C|/Users/..." or "/C:/Users/..." -> "C:/Users/..."
+        path = path[1] + ':' + path[3:]
+    return path
 
 
 def SafeEndTransaction(cursor, sql="END TRANSACTION;"):
@@ -230,7 +249,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     # ever exports (entering with an existing character) — prime them here too.
     if not CREATE_CHARACTER_TABLE_SQL:
         Initialize()
-    _logf = open("/tmp/enterworld_debug.log", "a")
+    _logf = open_debug_log()
 
     if not os.path.exists("data/tmp"):
         os.makedirs("data/tmp")

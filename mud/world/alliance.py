@@ -573,7 +573,10 @@ class Alliance:
         if self.world.daemonPerspective:
             self.world.daemonPerspective.callRemote("joinAlliance",self.remoteLeaderName,who.publicName,who.party.members[0].name)
             a = Alliance.masterAllianceInfo[self.remoteLeaderName]
-            a.append((who.publicName,who.party.members[0]))
+            # masterAllianceInfo holds (publicName, charName) string tuples; the
+            # original appended the Character object here, which PB then refused
+            # to jelly ("Character deemed insecure"), corrupting AllianceInfo.
+            a.append((who.publicName,who.party.members[0].name))
         
         self.members.append(who)
         
