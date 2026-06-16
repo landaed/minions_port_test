@@ -13,6 +13,7 @@ import traceback
 
 from sqlite3 import dbapi2 as sqlite
 import os,re,zlib
+from mud.utils import open_debug_log
 
 PLAYER_TABLES = ["player","player_monster_spawn","item","item_container_content","item_variant"]
 
@@ -248,7 +249,7 @@ def InstallCharacterBuffer(playerID,cname,buffer):
     # ever exports (entering with an existing character) — prime them here too.
     if not CREATE_CHARACTER_TABLE_SQL:
         Initialize()
-    _logf = open("/tmp/enterworld_debug.log", "a")
+    _logf = open_debug_log()
 
     if not os.path.exists("data/tmp"):
         os.makedirs("data/tmp")

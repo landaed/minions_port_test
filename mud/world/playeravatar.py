@@ -24,6 +24,7 @@ from time import time
 from pickle import dumps,loads
 from base64 import encodebytes,decodebytes
 from mud.worldserver.charutil import ExtractPlayer,InstallCharacterBuffer
+from mud.utils import open_debug_log
 from mud.gamesettings import GAMENAME
 from mud.world.race import GetRaceGraphics
 
@@ -1151,7 +1152,7 @@ class PlayerAvatar(Avatar):
             
             
     def gotCharacterBuffer(self,cbuffer,party,simPort,simPassword):
-        _lf = open("/tmp/enterworld_debug.log", "a")
+        _lf = open_debug_log()
         _lf.write("####gotCharacterBuffer: cbuffer=%s party=%s\n" % (bool(cbuffer), party))
         _lf.flush()
         if cbuffer:
@@ -1242,7 +1243,7 @@ class PlayerAvatar(Avatar):
     def perspective_enterWorld(self,party,simPort, simPassword):
         from mud.world.cserveravatar import AVATAR
         import traceback as _tb
-        _logf = open("/tmp/enterworld_debug.log", "a")
+        _logf = open_debug_log()
         _logf.write("####perspective_enterWorld: party=%s AVATAR=%s charInfos=%s\n" % (party, bool(AVATAR), [c.name for c in self.charInfos]))
         _logf.flush()
         if not AVATAR:
@@ -1308,13 +1309,13 @@ class PlayerAvatar(Avatar):
             _logf.write("####perspective_enterWorld: AVATAR.mind=%s\n" % AVATAR.mind)
             _logf.flush()
             def _gotBuffer(result):
-                _lf = open("/tmp/enterworld_debug.log", "a")
+                _lf = open_debug_log()
                 _lf.write("####getCharacterBuffer callback: result=%s\n" % (bool(result),))
                 _lf.flush()
                 _lf.close()
                 return self.gotCharacterBuffer(result, party, simPort, simPassword)
             def _bufferErr(failure):
-                _lf = open("/tmp/enterworld_debug.log", "a")
+                _lf = open_debug_log()
                 _lf.write("####getCharacterBuffer ERRBACK: %s\n" % failure)
                 _lf.flush()
                 _lf.close()
@@ -1337,7 +1338,7 @@ class PlayerAvatar(Avatar):
             
     def enterWorld(self,party,simPort,simPassword):
         from mud.world.cserveravatar import AVATAR
-        _logf = open("/tmp/enterworld_debug.log", "a")
+        _logf = open_debug_log()
         _logf.write("####enterWorld: party=%s simPort=%s simPassword=%s\n" % (party, simPort, simPassword))
         _logf.flush()
 

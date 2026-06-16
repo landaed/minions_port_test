@@ -108,6 +108,13 @@ func _server_url(addr: String) -> String:
 	addr = addr.strip_edges()
 	if addr.is_empty():
 		addr = DEFAULT_SERVER
+	# Force IPv4 for localhost: on Windows "localhost" often resolves to IPv6
+	# ::1 first, but the proxy listens on IPv4, so the client stalls for a while
+	# before falling back. 127.0.0.1 connects immediately.
+	if addr == "localhost":
+		addr = "127.0.0.1"
+	elif addr.begins_with("localhost:"):
+		addr = "127.0.0.1" + addr.substr("localhost".length())
 	if addr.begins_with("ws://") or addr.begins_with("wss://"):
 		return addr
 	if not (":" in addr):

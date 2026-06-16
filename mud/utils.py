@@ -24,3 +24,20 @@ def getSQLiteURL(path):
         # C:/Users/... -> sqlite:/C|/Users/...
         return "sqlite:/%s|%s" % (abs_path[0], abs_path[2:])
     return "sqlite://%s" % abs_path
+
+
+def open_debug_log(name="enterworld_debug.log"):
+    """Append-open a throwaway debug log in a portable temp dir, never raising.
+
+    The enter-world path logged to a hardcoded "/tmp/..." which doesn't exist on
+    Windows, so the open() threw and aborted entering the world. Use the OS temp
+    dir instead, and fall back to a black-hole buffer if even that fails (these
+    are debug logs; they must never break gameplay)."""
+    try:
+        import os
+        import tempfile
+        return open(os.path.join(tempfile.gettempdir(), name), "a")
+    except Exception:
+        import io
+        return io.StringIO()
+
