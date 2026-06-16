@@ -2523,7 +2523,26 @@ class Mob:
     def isFacing(self, otherMob, maxAngle=60.0):
         if not otherMob:
             return False
-        
+
+        # A player who has explicitly selected this mob as their target is always
+        # considered to be facing it. The legacy Torque client auto-faced the
+        # avatar at its target during combat; the Godot port instead replicates
+        # the player's real (mouse-look) view vector, which at melee range often
+        # disagrees with the exact 60-degree cone here. Trusting the explicit
+        # selection keeps melee/abilities from being silently inhibited without
+        # forcing the avatar to physically snap toward the target (which made
+        # remote clients see the player moonwalk). NPC attackers and incidental
+        # (non-selected) targets still use the geometric check below.
+        try:
+            so = self.simObject
+            if getattr(so, "isPlayer", False):
+                sel = getattr(so, "selectedTarget", None)
+                if sel is not None and (sel is otherMob.simObject or
+                        getattr(sel, "id", None) == getattr(otherMob.simObject, "id", None)):
+                    return True
+        except Exception:
+            pass
+
         pos = self.simObject.position
         rot = self.simObject.rotation
         

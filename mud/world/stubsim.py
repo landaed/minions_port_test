@@ -653,20 +653,24 @@ class StubSimAvatar:
         return True
 
     def _facePlayerTarget(self, so):
-        """Auto-face the player's selected target so melee isn't silently inhibited
-        by the combat facing check (camera facing alone often isn't aimed at the
-        target). Mirrors how NPCs auto-face their chase target. Runs every tick,
-        independent of client input, so a stationary auto-attacker still faces."""
-        tgt = getattr(so, "selectedTarget", None) or getattr(so, "moveTarget", None)
-        if tgt is None or getattr(tgt, "position", None) is None:
+        """Validate the player's selected target each tick (drop it if it
+        despawned or died).
+
+        NOTE: this used to also *override* the player's rotation to point at the
+        target every tick so the combat facing check (mob.isFacing) would pass at
+        melee range. That overridden rotation is what gets replicated to other
+        clients, so whenever a player walked away from a selected target the other
+        clients saw them facing the target -- i.e. moonwalking 180 degrees from
+        their movement. We no longer touch the rotation here: the avatar's facing
+        stays whatever the client's view vector reported (see _processPlayerInput),
+        and the combat facing check now trusts an explicit target selection
+        instead (see mob.Mob.isFacing). This keeps remote players oriented the way
+        they actually look while still letting melee land on the chosen target."""
+        tgt = getattr(so, "selectedTarget", None)
+        if tgt is None:
             return
-        if tgt not in self.simObjects:
+        if tgt not in self.simObjects or getattr(tgt, "position", None) is None:
             so.selectedTarget = None  # target despawned/died
-            return
-        dx = tgt.position[0] - so.position[0]
-        dy = tgt.position[1] - so.position[1]
-        if abs(dx) > 0.01 or abs(dy) > 0.01:
-            so.rotation = _yaw_toward(dx, dy)
 
     def _processPlayerInput(self, so, dt):
         """Process client movement inputs and update player simObject position.
