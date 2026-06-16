@@ -34,9 +34,27 @@ PLAYER_BUFFERS = []
 
 def GetDBPath():
     uri = GetDBURI()
+    if not uri:
+        return uri
+    # Recover the filesystem path from the sqlite URI that getSQLiteURL built:
+    #   POSIX:   sqlite:///abs/path        -> /abs/path
+    #   Windows: sqlite:/C|/Users/...       -> C:/Users/...   (drive ':' -> '|')
+    # The old code only handled "sqlite://" + uri[9:], so on Windows it returned
+    # the whole URI and sqlite.connect() failed with "unable to open database
+    # file".
     if uri.startswith("sqlite://"):
-        return uri[9:]
-    return uri
+        path = uri[9:]
+    elif uri.startswith("sqlite:/"):
+        path = uri[8:]
+    else:
+        return uri
+    if len(path) > 1 and path[1] == '|':
+        # "C|/Users/..." -> "C:/Users/..."
+        path = path[0] + ':' + path[2:]
+    elif len(path) > 2 and path[0] == '/' and path[2] in ('|', ':'):
+        # "/C|/Users/..." or "/C:/Users/..." -> "C:/Users/..."
+        path = path[1] + ':' + path[3:]
+    return path
 
 
 def SafeEndTransaction(cursor, sql="END TRANSACTION;"):

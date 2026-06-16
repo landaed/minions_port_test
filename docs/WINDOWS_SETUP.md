@@ -71,7 +71,9 @@ WorldDaemon and ClientProxy. Leave them running. Ports:
 `run_servers.bat` sets `MOM_ENABLE_CHEATS=1` so the in-game testing cheat window
 works. Set it to `0` in the script to play without cheats.
 
-To stop everything, close the five windows (or Ctrl+C in each).
+To stop everything, run **`stop_servers.bat`** — it closes all five server
+windows and kills the spawned World server process. (You can also just close the
+windows by hand, but the World server child won't always have its own window.)
 
 ## 3. Launch the game client
 
