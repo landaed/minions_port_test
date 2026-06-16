@@ -28,3 +28,7 @@ minions-port/.godot/
 # Local test rig: downloaded Godot binary + generated test screenshots
 tools/godot_bin/
 test_shots/
+
+# Exported game builds (the .exe is ~500MB; build it with build_windows.sh)
+build/
+*.tpz

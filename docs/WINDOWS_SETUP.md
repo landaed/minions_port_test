@@ -84,6 +84,33 @@ windows by hand, but the World server child won't always have its own window.)
 On Windows the renderer uses Direct3D 12 (`project.godot` →
 `rendering_device/driver.windows="d3d12"`), so you get full GPU rendering.
 
+### Or: build one standalone .exe (no editor needed on Windows)
+
+If you'd rather hand someone a single file than have them install Godot and
+import the project, build a self-contained Windows executable **from Linux**:
+
+```bash
+./build_windows.sh            # -> build/MinionsOfMirth.exe (one ~500MB file)
+```
+
+Then copy that one `.exe` to the Windows PC and double-click it — no Godot, no
+import, no asset setup. Notes:
+
+- **Build on the machine that has the full project.** The export bundles
+  whatever assets are present at build time, so locally-generated textures /
+  normal maps that are `.gitignore`d (e.g. the `assets/trinst/shapes/*_normal.png`
+  PBR maps) are baked in only if they exist on disk when you export. A fresh
+  `git clone` is missing them, which is exactly why the editor on a second
+  machine shows missing materials / an invisible tower. Building on your
+  original Linux box avoids that.
+- One-time: install the **Windows export template** for 4.6 (Godot →
+  *Editor → Manage Export Templates → Download and Install*). `build_windows.sh`
+  checks for it and tells you if it's absent.
+- The preset lives in `minions-port/export_presets.cfg` (Windows Desktop,
+  embedded PCK → single file).
+- The exe is still just the **client** — it needs the Python servers running
+  somewhere reachable; set the **Server** field on the login screen to that host.
+
 ## 4. Create an account and play
 
 The login screen walks you through 4 steps:
