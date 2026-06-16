@@ -9,6 +9,10 @@ extends RefCounted
 const PARTICLE_DIR := "res://assets/vfx/particles/"
 const ZODIAC_TEX := "res://assets/vfx/zodiacs/zode_symbols.png"
 const SOUND_DIR := "res://assets/sound/"
+# Optional editor-authored override prefabs. Drop a .tscn here to replace the
+# code preset for an effect with a scene you can edit visually (GPUParticles3D,
+# ShaderMaterial, sub-emitters, ...). See assets/vfx/emitters/README.md.
+const EMITTER_SCENE_DIR := "res://assets/vfx/emitters/"
 
 static var _tex_cache: Dictionary = {}
 static var _sound_index: Dictionary = {}  # lowercase rel path -> real res path
@@ -52,8 +56,44 @@ static func particle_texture(name: String) -> Texture2D:
 	return tex
 
 # ---------------------------------------------------------------- emitters --
+static func _emitter_override_path(emitter_name: String) -> String:
+	# An editor-authored prefab that replaces the code preset for this effect.
+	# Tried most- to least-specific so one "casting.tscn" can cover every
+	# *Casting* emitter while "castingemitter.tscn" can target just one:
+	#   assets/vfx/emitters/<emittername>.tscn   (exact, e.g. castingemitter.tscn)
+	#   assets/vfx/emitters/<keyword>.tscn        (casting / begin / smoke / fire)
+	if emitter_name.is_empty():
+		return ""
+	var lname := emitter_name.to_lower()
+	var exact := EMITTER_SCENE_DIR + lname + ".tscn"
+	if ResourceLoader.exists(exact):
+		return exact
+	for kw in ["casting", "begin", "smoke", "fire"]:
+		if kw in lname and ResourceLoader.exists(EMITTER_SCENE_DIR + kw + ".tscn"):
+			return EMITTER_SCENE_DIR + kw + ".tscn"
+	return ""
+
 static func emitter(parent: Node3D, offset: Vector3, emitter_name: String,
 		texture_name: String, duration: float) -> Node3D:
+	# If you've authored an override prefab for this effect, use it verbatim so
+	# you can iterate in the editor (and add shaders) without touching this file.
+	# A prefab may optionally implement `configure(texture_name, duration)` to
+	# react to the server-chosen texture/lifetime.
+	var override_path := _emitter_override_path(emitter_name)
+	if not override_path.is_empty():
+		var scene = load(override_path)
+		if scene != null:
+			var inst: Node3D = scene.instantiate()
+			inst.position = offset
+			if inst.has_method("configure"):
+				inst.call("configure", texture_name, duration)
+			parent.add_child(inst)
+			var ttl0 := maxf(duration, 0.1)
+			if ttl0 < 1800.0:
+				ttl0 = minf(ttl0, 30.0)
+			_free_later(inst, ttl0 + 1.0)
+			return inst
+
 	# Preset from the legacy emitter datablock name: ChimneyFire/DragonFire ->
 	# rising fire; *Smoke* -> slow gray billows; Casting -> tight inward swirl;
 	# SpellBegin -> burst on the target; anything else -> gentle sparkle.
