@@ -1609,6 +1609,15 @@ class PlayerAvatar(Avatar):
                         scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0)
                     except Exception:
                         scale_val = 1.0
+                # Whole-body "single" texture for monsters that share one base model
+                # but ship several recolours (elemental air/earth/fire/water, bear
+                # colours, golem types, ...). e.g. "single/elemental_fire". The client
+                # overrides the model's one embedded texture with this so every
+                # elemental no longer renders as the embedded air skin. Empty for
+                # players and for monsters that use the embedded texture as-is.
+                single_tex = ""
+                if spawn_row is not None:
+                    single_tex = str(getattr(spawn_row, 'textureSingle', '') or '')
                 # Per-part skin/armor texture indices for the client (cached on the
                 # mob; appearance rarely changes). Empty for monsters using an
                 # embedded single/multi texture.
@@ -1660,6 +1669,7 @@ class PlayerAvatar(Avatar):
                     "animation": animation_name,
                     "scale": scale_val,
                     "tex": tex,
+                    "tex_single": single_tex,
                     "mounts": mounts,
                     "level": int(getattr(other_mob, 'plevel', 0)),
                     "health": health,

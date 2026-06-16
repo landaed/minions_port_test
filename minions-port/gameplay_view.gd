@@ -126,6 +126,7 @@ var target_frame: PanelContainer
 var target_name_label: Label
 var target_health_bar: ProgressBar
 var target_health_value_label: Label
+var target_prompt_label: Label  # contextual "Press E/G..." hint under the target frame
 var hint_label: Label
 var combat_log_label: Label
 var crosshair: Control
@@ -308,6 +309,13 @@ func _build_hud():
 	target_health_bar = t_made[0]; target_health_value_label = t_made[1]
 	target_health_bar.custom_minimum_size = Vector2(230, 16)
 	tv.add_child(target_health_bar)
+	# Contextual interaction prompt (what E / G / Q do for this target type).
+	target_prompt_label = Label.new()
+	target_prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	target_prompt_label.add_theme_font_size_override("font_size", 11)
+	target_prompt_label.add_theme_color_override("font_color", Color(0.80, 0.92, 0.80))
+	target_prompt_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tv.add_child(target_prompt_label)
 
 	# Crosshair (screen center) — recolors when you look at an enemy.
 	crosshair = Control.new()
@@ -1632,6 +1640,11 @@ func _appearance_for(entity: Dictionary) -> Dictionary:
 	var tex = entity.get("tex", {})
 	return tex if tex is Dictionary else {}
 
+func _single_tex_for(entity: Dictionary) -> String:
+	# Whole-body monster texture (spawn.textureSingle) streamed by the server,
+	# e.g. "single/elemental_fire". Empty for players and embedded-texture mobs.
+	return str(entity.get("tex_single", ""))
+
 func _mounts_for(entity: Dictionary) -> Dictionary:
 	# Worn equipment models from the server: {"0": {model, material}, ...}
 	# (mount0 primary hand / 1 off hand / 2 shield / 3 head).
@@ -1660,6 +1673,7 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		_apply_player_visibility()
 	if _player_rig and is_instance_valid(_player_rig):
 		_player_rig.apply_appearance(_appearance_for(entity))
+		_player_rig.apply_single_texture(_single_tex_for(entity))
 		_player_rig.apply_mounts(_mounts_for(entity))
 
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
@@ -1690,6 +1704,7 @@ func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 		body.add_child(rig)
 		body.set_meta("rig", rig)
 		rig.apply_appearance(_appearance_for(entity))
+		rig.apply_single_texture(_single_tex_for(entity))
 		rig.apply_mounts(_mounts_for(entity))
 	else:
 		fallback_mesh = MeshInstance3D.new()
@@ -1746,6 +1761,7 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	var rig = body.get_meta("rig", null)
 	if rig and is_instance_valid(rig):
 		rig.apply_appearance(_appearance_for(entity))
+		rig.apply_single_texture(_single_tex_for(entity))
 		rig.apply_mounts(_mounts_for(entity))
 
 func _sync_entity_markers():
@@ -1931,6 +1947,22 @@ func _live_target_entity() -> Dictionary:
 	return by_name
 
 
+func _target_action_prompt() -> Dictionary:
+	# Contextual hint shown under the target frame, keyed off the current target's
+	# type. Prefer the live replicated entity (authoritative is_player/is_enemy/
+	# dead flags), falling back to the acquire-time description.
+	var live := _live_target_entity()
+	var src: Dictionary = live if not live.is_empty() else server_target_description
+	var is_dead := bool(src.get("dead", false)) or float(src.get("health", 1.0)) <= 0.0
+	if is_dead:
+		return {"text": "Press E to loot", "color": Color(0.95, 0.85, 0.45)}
+	if bool(src.get("is_player", false)):
+		return {"text": "Press G to invite to party", "color": Color(0.55, 0.80, 0.98)}
+	if bool(src.get("is_enemy", false)):
+		return {"text": "Press Q to attack", "color": Color(0.96, 0.55, 0.45)}
+	# Neutral NPC (vendor / trainer / quest giver).
+	return {"text": "Press E to talk", "color": Color(0.72, 0.92, 0.74)}
+
 func _bridge_status_text() -> String:
 	return "Bridge status: abilities, attack toggle, target cycling, interact, and click-to-target now go back to the legacy world server via PlayerAvatar.doCommand / targetEntity. Replicated entities are rendered from server snapshots and interpolated between updates for smoother motion."
 
@@ -1988,6 +2020,10 @@ func _update_labels():
 			target_health_bar.visible = true
 		else:
 			target_health_bar.visible = false
+		var prompt := _target_action_prompt()
+		target_prompt_label.text = str(prompt.get("text", ""))
+		target_prompt_label.add_theme_color_override("font_color", prompt.get("color", Color(0.80, 0.92, 0.80)))
+		target_prompt_label.visible = true
 		target_frame.visible = true
 	else:
 		var server_target_name: String = str(rapid_info.get("tgt", ""))
@@ -1999,6 +2035,10 @@ func _update_labels():
 				target_health_bar.visible = true
 			else:
 				target_health_bar.visible = false
+			# No type info on this lightweight path; show a generic interact hint.
+			target_prompt_label.text = "Press E to interact"
+			target_prompt_label.add_theme_color_override("font_color", Color(0.80, 0.92, 0.80))
+			target_prompt_label.visible = true
 			target_frame.visible = true
 		else:
 			target_frame.visible = false
