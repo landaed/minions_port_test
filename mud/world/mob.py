@@ -402,9 +402,13 @@ class Mob:
         self.petSpeedMod = 0.0
         
         self.worn = {}
-        
+
         self.autoAttack = False
-        
+        # Pets assist their master by default (attack what the master fights /
+        # what attacks the master). Stand Down / Stay turns this off until the
+        # pet is told to Attack or Follow again.
+        self.petAssist = True
+
         self.aiSkills = []
         self.aiSkillTimer = 72
         
@@ -1511,6 +1515,14 @@ class Mob:
                 #  master isn't feared either.
                 # Only warp player pets.
                 if self.master and self.master.player:
+                    # Pet auto-assist: by default engage whatever the master is
+                    # fighting (or whatever is attacking the master). Mirrors the
+                    # manual PetCmdAttack engagement (aggro + zone.setTarget).
+                    if self.petAssist and not self.isFeared and self.stun <= 0 and self.sleep <= 0:
+                        assist = self._pickAssistTarget()
+                        if assist is not None and self.target is not assist:
+                            self.addAggro(assist, (self.master.level + RPG_PLAYERPET_AGGROTHRESHOLD) * self.level, False)
+                            self.zone.setTarget(self, assist, True)
                     if not self.isFeared and self.stun <= 0 and self.move > 0 and self.sleep <= 0 and not self.master.isFeared:
                         # If pet isn't fighting make sure pet keeps up with master.
                         if not self.target and (GetRange(self,self.master) > 20 or self.simObject.id not in self.master.simObject.canSee) and (self.followTarget == self.master):
@@ -2366,6 +2378,27 @@ class Mob:
             self.mobInfo.refresh()
     
     
+    def _pickAssistTarget(self):
+        # For a player's pet: who should it help fight? Prefer the master's
+        # current target (only while the master is actually engaged, so the pet
+        # doesn't charge something the master merely selected), else whatever is
+        # attacking the master -- combat.py's defender.addAggro recurses the
+        # master's aggro onto the pet, so attackers show up in the pet's aggro.
+        m = self.master
+        if m is None:
+            return None
+        mt = m.target
+        if (mt is not None and mt is not self and mt is not m and not mt.detached
+                and (m.autoAttack or mt in m.aggro) and AllowHarmful(self, mt)):
+            return mt
+        best, best_amt = None, 0
+        for other, amt in list(self.aggro.items()):
+            if other is self or other is m or getattr(other, "detached", True):
+                continue
+            if amt > best_amt and AllowHarmful(self, other):
+                best, best_amt = other, amt
+        return best
+
     def addAggro(self, other, amount, recurse=True):
         if self.spawn.flags&RPG_SPAWN_RESOURCE:
             return 

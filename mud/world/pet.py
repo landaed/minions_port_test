@@ -13,6 +13,7 @@ PETMSG_ATTACK = ["Attacking master!!!","Food!!!","I will protect you master!!!"]
 def PetCmdAttack(pet,target):
     # reset pet aggro so it follows the command no matter what
     pet.aggro.clear()
+    pet.petAssist = True  # re-enable auto-assist after an explicit attack order
     player = pet.master.player
     
     if not target:
@@ -48,8 +49,9 @@ def PetCmdAttack(pet,target):
 
 def PetCmdStandDown(pet):
     player = pet.master.player
-    
+
     pet.aggro.clear()
+    pet.petAssist = False  # stop auto-assisting until told to attack/follow again
     pet.zone.setTarget(pet,None)
     
     if player:
@@ -59,6 +61,7 @@ def PetCmdStandDown(pet):
 def PetCmdStay(pet):
     # clear aggro, so target doesn't get reset immediately
     pet.aggro.clear()
+    pet.petAssist = False  # holding position -> don't auto-engage
     player = pet.master.player
     mind = pet.zone.simAvatar.mind
     so = pet.simObject
@@ -72,6 +75,7 @@ def PetCmdStay(pet):
 def PetCmdFollowMe(pet):
     # clear aggro, so target doesn't get reset immediately
     pet.aggro.clear()
+    pet.petAssist = True  # following the master also means assisting in combat
     player = pet.master.player
     if pet.followTarget != pet.master:
         pet.zone.setFollowTarget(pet,pet.master)
