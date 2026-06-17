@@ -1550,7 +1550,13 @@ class PlayerAvatar(Avatar):
             return []
 
         char = self.player.party.members[char_index]
-        if not char or char.dead or not char.mob or not char.mob.zone or not char.mob.simObject:
+        # A dead character has no live mob to stream. Return an explicit "dead"
+        # marker (not a bare empty list) so the proxy can tell the difference
+        # between "you died" and "nothing visible right now" and surface a death
+        # overlay + respawn option on the client.
+        if char and char.dead:
+            return {"entities": [], "events": [], "dead": True}
+        if not char or not char.mob or not char.mob.zone or not char.mob.simObject:
             return []
 
         mob = char.mob
@@ -1757,6 +1763,76 @@ class PlayerAvatar(Avatar):
             print_exc()
 
         return {"entities": entities, "events": events}
+
+    def perspective_respawn(self, char_index=0):
+        """Bring a dead player back to life at their bind point.
+
+        The Godot client calls this from its death overlay. Before this existed
+        the only way to recover from death was to log out and back in, because
+        enterWorld is the one place that resets a dead character (the "all
+        characters dead" branch). This mirrors that reset without a relog:
+        revive every dead party member, restore their stats to full, and
+        teleport the party to its bind point. zone.respawnPlayer's callback
+        (playerRespawned) reattaches the now-living mobs to the live zone, so
+        getVisibleEntities starts streaming again and the player can act.
+        """
+        player = self.player
+        if not player:
+            return False
+        zone = player.zone
+        if not zone:
+            return False
+        if not any(c.dead for c in player.party.members):
+            return False
+
+        # Bind transform for this realm (mirrors SimAvatar.respawnPlayer's
+        # default, which the headless stub does not apply when transform is
+        # None). If the bind point is in another zone, a full zone transfer
+        # would be needed; for now revive in place there (transform=None) so the
+        # player is at least playable again — the post-death invulnerability
+        # restored on reattach protects them from an immediate re-death.
+        try:
+            same_zone = (player.bindZone == zone.zone)
+        except Exception:
+            same_zone = True
+        transform = None
+        if same_zone:
+            if player.darkness:
+                transform = player.darknessBindTransformInternal
+            elif player.monster:
+                transform = player.monsterBindTransformInternal
+            else:
+                transform = player.bindTransformInternal
+
+        for c in player.party.members:
+            if not c.dead:
+                continue
+            c.dead = False
+            # The mob tick treats -999999 as "the mob owns its own stats", so set
+            # the persistent values to that sentinel and fill the live mob to full.
+            c.health = c.mana = c.stamina = -999999
+            mob = c.mob
+            if mob:
+                mob.health = mob.maxHealth
+                mob.mana = mob.maxMana
+                mob.stamina = mob.maxStamina
+                mob.autoAttack = False
+
+        living = [c for c in player.party.members if not c.dead]
+        if living:
+            player.curChar = living[0]
+            try:
+                idx = player.party.members.index(living[0])
+                player.mind.callRemote("setCurCharIndex", idx)
+            except Exception:
+                pass
+
+        try:
+            player.world.clearDeathMarker(player)
+        except Exception:
+            pass
+        zone.respawnPlayer(player, transform)
+        return True
 
     def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
         """Receive movement input from the Godot client for server-authoritative movement.

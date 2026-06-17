@@ -34,6 +34,31 @@ from hashlib import md5
 # MOM_ENTITY_STREAM_RADIUS=<units>.
 ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "120.0"))
 ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "50"))
+# How often each client polls the world for a fresh entity snapshot. The old
+# 0.03s (~33Hz) was the dominant cost with several clients: every poll the world
+# server rebuilds + PB-serializes up to ENTITY_STREAM_LIMIT full entities, and
+# the proxy re-serializes that to JSON and ships it. The Godot client
+# interpolates between snapshots (ENTITY_INTERPOLATION_SPEED), so ~13Hz looks
+# just as smooth while cutting server CPU and bandwidth ~2.5x. Tune with
+# MOM_ENTITY_SYNC_INTERVAL (seconds).
+ENTITY_SYNC_INTERVAL = float(os.environ.get("MOM_ENTITY_SYNC_INTERVAL", "0.075"))
+# Per-entity fields that almost never change (identity, model, appearance, worn
+# equipment, size). The proxy sends these only when they first appear or change
+# for a given entity, and streams just the small dynamic remainder (position,
+# rotation, health, combat flags) every snapshot. The Godot client merges each
+# partial update onto its cached copy. This is the single biggest payload win
+# for the proxy->client hop, which is the bandwidth-limited one on a VPS.
+ENTITY_STATIC_FIELDS = (
+    "name", "public_name", "race", "pclass", "sex", "model", "animation",
+    "scale", "tex", "tex_single", "mounts", "realm", "is_player", "level",
+    "max_health",
+)
+# Resend all static fields this often (seconds) so any client/proxy desync
+# self-heals quickly. Cheap insurance — one "full" snapshot every few seconds.
+ENTITY_STATIC_RESYNC = float(os.environ.get("MOM_ENTITY_STATIC_RESYNC", "4.0"))
+# Toggles for the bandwidth optimizations (mostly for A/B profiling; leave on).
+ENTITY_DELTA_ENABLED = os.environ.get("MOM_ENTITY_DELTA", "1") != "0"
+ENTITY_ROUND_ENABLED = os.environ.get("MOM_ENTITY_ROUND", "1") != "0"
 
 # Load game config to get master server IP/port
 from mud.gamesettings import LoadGameConfiguration
@@ -810,6 +835,9 @@ class GodotClientSession:
         self.last_entity_payload = None
         self.interact_pane = None
         self.world_login_retried = False
+        self.player_dead = False  # last known death state (for death/alive edges)
+        self.entity_static_sent = {}  # id -> signature of static block last sent
+        self._static_resync_at = 0.0
         self._closed = False
 
     def push_inventory(self):
@@ -884,9 +912,10 @@ class GodotClientSession:
     def start_entity_sync(self):
         if self.entity_sync_call and self.entity_sync_call.active():
             return
-        # Poll quickly; the effective rate is bounded by how long
-        # getVisibleEntities takes, but a short delay keeps replication snappy.
-        self.entity_sync_call = reactor.callLater(0.03, self._emit_entity_sync)
+        # Poll at ENTITY_SYNC_INTERVAL; the client interpolates between snapshots
+        # so a moderate rate stays smooth while keeping server CPU + bandwidth in
+        # check with multiple clients.
+        self.entity_sync_call = reactor.callLater(ENTITY_SYNC_INTERVAL, self._emit_entity_sync)
 
     def start_skill_sync(self):
         if self.skill_sync_call and self.skill_sync_call.active():
@@ -939,6 +968,16 @@ class GodotClientSession:
         events = []
         if isinstance(entities, dict):
             events = list(entities.get("events", []) or [])
+            # Death edge detection: getVisibleEntities returns {"dead": True} for a
+            # dead character. Tell the client on the death->alive and alive->death
+            # transitions so it can show / hide its death overlay.
+            is_dead = bool(entities.get("dead", False))
+            if is_dead and not self.player_dead:
+                self.player_dead = True
+                self.send({"type": "player_death"})
+            elif not is_dead and self.player_dead:
+                self.player_dead = False
+                self.send({"type": "player_alive"})
             entities = entities.get("entities", [])
         if not isinstance(entities, (list, tuple)):
             print(f"[Proxy] entity_snapshot: unexpected type {type(entities).__name__}: {entities!r}")
@@ -970,6 +1009,21 @@ class GodotClientSession:
         elif len(capped) != getattr(self, '_last_entity_count', -1):
             print(f"[Proxy] entity_snapshot: {len(entities)} total, sending {len(capped)}")
             self._last_entity_count = len(capped)
+        # Shorten the verbose float strings that dominate the dynamic payload
+        # (a raw position component serializes as ~18 chars). 1cm / ~0.06deg
+        # precision is far finer than the client's reconcile dead zone.
+        if ENTITY_ROUND_ENABLED:
+            for e in capped:
+                if isinstance(e, dict):
+                    pos = e.get("position")
+                    if isinstance(pos, (list, tuple)):
+                        e["position"] = [round(float(c), 2) for c in pos]
+                    rot = e.get("rotation")
+                    if isinstance(rot, (list, tuple)):
+                        e["rotation"] = [round(float(c), 4) for c in rot]
+        # Strip unchanged static fields (identity/model/appearance/equipment) so
+        # only the small dynamic remainder goes over the wire to the client.
+        capped = self._delta_compress_entities(capped)
         # Always send — dedup was suppressing position/rotation updates
         msg = {"type": "entity_snapshot", "entities": capped}
         if events:
@@ -980,13 +1034,59 @@ class GodotClientSession:
         import time as _t
         _now = _t.time()
         self._snap_n = getattr(self, "_snap_n", 0) + 1
+        self._snap_bytes = getattr(self, "_snap_bytes", 0) + sum(len(json.dumps(e, default=_json_fallback)) for e in capped)
         if not hasattr(self, "_snap_t0"):
             self._snap_t0 = _now
         if _now - self._snap_t0 >= 5.0:
-            print("[Proxy] entity replication rate: %.1f snapshots/sec" % (self._snap_n / (_now - self._snap_t0)))
+            dt = _now - self._snap_t0
+            print("[Proxy] entity replication: %.1f snapshots/sec, %.1f KB/sec to client"
+                  % (self._snap_n / dt, self._snap_bytes / 1024.0 / dt))
             self._snap_n = 0
+            self._snap_bytes = 0
             self._snap_t0 = _now
         self.start_entity_sync()
+
+    def _delta_compress_entities(self, entities):
+        """Drop static fields the client already has for each entity.
+
+        Static identity/model/appearance/equipment is sent in full only when an
+        entity first appears or when one of those fields changes; otherwise just
+        the dynamic remainder (position/rotation/health/combat flags) is sent.
+        Every ENTITY_STATIC_RESYNC seconds the whole static set is resent so any
+        client/proxy drift self-heals. The Godot client merges each partial
+        entity onto its cached copy (see gameplay_view.set_entities)."""
+        if not ENTITY_DELTA_ENABLED:
+            return entities
+        import time as _t
+        now = _t.time()
+        if now - self._static_resync_at >= ENTITY_STATIC_RESYNC:
+            self.entity_static_sent.clear()
+            self._static_resync_at = now
+        out = []
+        present = set()
+        for e in entities:
+            if not isinstance(e, dict):
+                out.append(e)
+                continue
+            key = e.get("id", e.get("sim_id"))
+            present.add(key)
+            static = {k: e[k] for k in ENTITY_STATIC_FIELDS if k in e}
+            try:
+                sig = json.dumps(static, sort_keys=True, default=_json_fallback)
+            except Exception:
+                sig = None
+            if sig is not None and self.entity_static_sent.get(key) == sig:
+                # Static unchanged: send only the non-static (dynamic) fields,
+                # plus id/sim_id so the client can match it to its cache.
+                slim = {k: v for k, v in e.items() if k not in ENTITY_STATIC_FIELDS}
+                out.append(slim)
+            else:
+                self.entity_static_sent[key] = sig
+                out.append(e)
+        # Forget entities no longer in range so they get a full block on return.
+        for key in [k for k in self.entity_static_sent if k not in present]:
+            del self.entity_static_sent[key]
+        return out
 
     def _on_entity_snapshot_failed(self, reason):
         self.send({
@@ -1159,6 +1259,16 @@ class ProxyProtocol(WebSocketServerProtocol):
             d.addCallback(lambda result: self._send_gameplay_command_result(
                 True, command, f"{method} sent to legacy world server."))
             d.addErrback(self._on_gameplay_command_failed, command, method)
+            return
+
+        # Respawn a dead player at their bind point (PlayerAvatar.respawn). The
+        # client sends this from its death overlay.
+        if payload is None and command == "respawn":
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "respawn", 0)
+            d.addCallback(lambda result: self._send_gameplay_command_result(
+                bool(result), command,
+                "Respawned at bind point." if result else "Nothing to respawn."))
+            d.addErrback(self._on_gameplay_command_failed, command, "RESPAWN")
             return
 
         if payload is None and self._handle_ui_command(command, msg):

@@ -244,6 +244,21 @@ def cheat_full_heal(player, params):
     return _result(True, "Party fully restored (health/mana/stamina, cooldowns cleared).")
 
 
+def cheat_suicide(player, params):
+    """Kill the current character outright (testing the death/respawn flow)."""
+    char, mob = _char_and_mob(player)
+    if not char or not mob:
+        return _result(False, "No active character.")
+    if char.dead:
+        return _result(False, "%s is already dead." % char.name)
+    mob.health = 0
+    # Mirror the tick's lethal-health path so the normal death machinery runs
+    # (detach, death marker, character.dead = True, sim "die" event).
+    mob.die(immortalOverride=True)
+    player.cinfoDirty = True
+    return _result(True, "%s has died. Release to respawn." % char.name)
+
+
 def cheat_list_items(player, params):
     from mud.world.item import ItemProto
     flt = str(params.get("filter", "")).strip().lower()
@@ -320,6 +335,7 @@ _ACTIONS = {
     "learn_class_spells": cheat_learn_class_spells,
     "raise_skills": cheat_raise_skills,
     "full_heal": cheat_full_heal,
+    "suicide": cheat_suicide,
     "list_items": cheat_list_items,
     "list_spells": cheat_list_spells,
     "set_time": cheat_set_time,

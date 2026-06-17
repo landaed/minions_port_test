@@ -35,6 +35,8 @@ const DOF_FAR_TRANSITION := 34.0
 const DOF_BLUR_AMOUNT := 0.025
 const INPUT_SYNC_INTERVAL := 0.05  # send movement inputs to server every 50ms
 const LOOK_SENSITIVITY := 0.003
+const GAMEPAD_LOOK_SENSITIVITY := 2.8    # right-stick yaw, radians/sec at full tilt
+const GAMEPAD_PITCH_SENSITIVITY := 2.0   # right-stick pitch, radians/sec at full tilt
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
 const PLAYER_FOOT_OFFSET := 0.9
@@ -80,6 +82,7 @@ var jump_requested := false
 var interaction_message := ""
 var placeholder_npcs: Array = []
 var replicated_entities: Array = []
+var _entity_cache: Dictionary = {}  # id -> merged full entity (proxy sends deltas)
 var replicated_entity_nodes: Dictionary = {}
 var last_abilities_signature := ""
 var server_target_description: Dictionary = {}
@@ -176,6 +179,10 @@ var _party_invite_panel: PanelContainer
 var _party_invite_label: Label
 var _party_invite_from := ""
 var _interaction_active := false
+# Death overlay (shown while the player's character is dead; respawns at bind).
+var _is_dead := false
+var _death_overlay: Control = null
+var _death_respawn_button: Button = null
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
 var _last_inventory: Dictionary = {}
@@ -184,6 +191,7 @@ var _ui_poll_timer := 0.0
 
 func _ready():
 	set_process_input(true)
+	_setup_input_actions()
 	# Walk terrain at constant horizontal speed (don't lose ground to slopes) and
 	# stay snapped to the surface, so client prediction tracks the server's flat
 	# movement model instead of falling behind and rubber-banding on hills.
@@ -204,6 +212,7 @@ func _ready():
 	_setup_dynamic_dof()
 	_build_hud()
 	_build_game_windows()
+	_build_death_overlay()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -344,7 +353,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  G: invite to party  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  Enter: chat (/time set day)  •  F3: debug  •  `: cheats"
+	hint_label.text = "Move WASD/L-stick • Look mouse/R-stick • Tab/B target • Q/RB attack • E/X talk-loot • 1-0/D-pad abilities • R/Y swap bar • Shift/LB hold = bar 2 • Space/A jump • I inventory • P spells • J journal • Enter chat • ` cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
@@ -561,6 +570,68 @@ func _build_game_windows():
 	UICommonScript.style_button(cursor_item_ghost)
 	add_child(cursor_item_ghost)
 
+# ---------------------------------------------------------------------------
+# Death overlay: shown while the player's character is dead. Releasing the
+# spirit (button / Enter / controller A) calls the server "respawn" command,
+# which revives the character at its bind point. Before this existed a dead
+# player was stuck at 1 HP with no entity stream until they relogged.
+# ---------------------------------------------------------------------------
+func _build_death_overlay() -> void:
+	_death_overlay = ColorRect.new()
+	_death_overlay.color = Color(0.05, 0.0, 0.0, 0.6)
+	_death_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_death_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	_death_overlay.visible = false
+	_death_overlay.z_index = 150
+	add_child(_death_overlay)
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	box.grow_vertical = Control.GROW_DIRECTION_BOTH
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 18)
+	_death_overlay.add_child(box)
+	var title := Label.new()
+	title.text = "You have died"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 44)
+	title.add_theme_color_override("font_color", Color(0.92, 0.22, 0.22))
+	box.add_child(title)
+	var sub := Label.new()
+	sub.text = "Release your spirit to respawn at your bind point."
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sub.add_theme_font_size_override("font_size", 16)
+	sub.add_theme_color_override("font_color", Color(0.85, 0.85, 0.9))
+	box.add_child(sub)
+	_death_respawn_button = Button.new()
+	_death_respawn_button.text = "Release / Respawn   (Enter)"
+	_death_respawn_button.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(_death_respawn_button)
+	_death_respawn_button.custom_minimum_size = Vector2(260, 46)
+	_death_respawn_button.pressed.connect(_do_respawn)
+	box.add_child(_death_respawn_button)
+
+func _show_death_overlay(on: bool) -> void:
+	_is_dead = on
+	if _death_overlay:
+		_death_overlay.visible = on
+	if on:
+		# Can't act, loot or shop while dead; drop into UI/mouse mode.
+		_close_all_windows()
+		_release_mouse()
+		if _death_respawn_button:
+			_death_respawn_button.text = "Release / Respawn   (Enter)"
+			_death_respawn_button.disabled = false
+	else:
+		_capture_mouse()
+
+func _do_respawn() -> void:
+	if _death_respawn_button:
+		_death_respawn_button.text = "Respawning..."
+		_death_respawn_button.disabled = true
+	_request_server_command("respawn")
+	_push_log("Releasing spirit — respawning at your bind point.")
+
 func _on_window_visibility_changed():
 	# Free the mouse while any window is up; back to mouselook when all close.
 	if not visible:
@@ -698,6 +769,10 @@ func handle_ui_message(data: Dictionary):
 			_begin_cast_bar(cast_time)
 		"play_sound":
 			VFX.sound_ui(self, str(data.get("sound", "")))
+		"player_death":
+			_show_death_overlay(true)
+		"player_alive":
+			_show_death_overlay(false)
 		"alliance_info":
 			var members_val = data.get("members", [])
 			_party_members = members_val if members_val is Array else []
@@ -1236,7 +1311,32 @@ func _rig_for_node(node: Node3D):
 	return null
 
 func set_entities(entities: Array):
-	replicated_entities = entities.duplicate(true)
+	# The proxy delta-compresses snapshots: after an entity's static identity /
+	# model / appearance / equipment has been sent once, later snapshots carry
+	# only its dynamic fields (position, rotation, health, combat flags). Merge
+	# each partial onto its cached full copy so the rest of the view always sees
+	# complete entities. Entities absent from a snapshot are dropped from the
+	# cache, so they get a fresh full block if they come back into range.
+	var merged: Array = []
+	var present: Dictionary = {}
+	for e in entities:
+		if not (e is Dictionary):
+			continue
+		var key = e.get("id", e.get("sim_id", 0))
+		present[key] = true
+		var full: Dictionary
+		if _entity_cache.has(key):
+			full = _entity_cache[key]
+			for k in e.keys():
+				full[k] = e[k]
+		else:
+			full = (e as Dictionary).duplicate(true)
+			_entity_cache[key] = full
+		merged.append(full)
+	for key in _entity_cache.keys():
+		if not present.has(key):
+			_entity_cache.erase(key)
+	replicated_entities = merged
 	_sync_entity_markers()
 	_update_pet_bar()
 	_update_labels()
@@ -1961,13 +2061,26 @@ func _sync_entity_markers():
 			replicated_entity_nodes[key] = body
 		else:
 			_update_entity_marker(body, entity_dict)
-		# Set interpolation target; only snap position on first appearance
-		body.set_meta("target_position", godot_pos)
-		if is_new:
-			body.position = godot_pos
-		# Apply rotation from server (yaw only)
-		var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
-		body.rotation.y = yaw
+		# A corpse must not move. The first frame an entity is dead we snap it to the
+		# death spot (ground-snapped) and mark it frozen; after that we ignore the
+		# server's position/rotation entirely, so rubber-banding or a mob that died
+		# mid-stride can't make the body slide or spin. Alive entities interpolate
+		# toward the latest server position as usual.
+		var entity_is_dead := bool(entity_dict.get("dead", false)) or float(entity_dict.get("health", 1.0)) <= 0.0
+		if entity_is_dead:
+			if not bool(body.get_meta("dead_frozen", false)):
+				body.position = godot_pos
+				body.set_meta("target_position", godot_pos)
+				body.set_meta("dead_frozen", true)
+		else:
+			body.set_meta("dead_frozen", false)
+			# Set interpolation target; only snap position on first appearance
+			body.set_meta("target_position", godot_pos)
+			if is_new:
+				body.position = godot_pos
+			# Apply rotation from server (yaw only)
+			var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
+			body.rotation.y = yaw
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
@@ -2342,8 +2455,113 @@ func _close_all_windows():
 		if w != null and w.visible:
 			w.close_window()
 
+# ---------------------------------------------------------------------------
+# Input map: gameplay actions bound to BOTH keyboard/mouse and a gamepad, so the
+# game plays like an action MMO on a controller (left stick move, right stick
+# camera, face/shoulder buttons + d-pad for actions and the two hotbars).
+# Defined in code (idempotent) so the bindings live with the gameplay logic and
+# can't drift from the handlers that use them.
+# ---------------------------------------------------------------------------
+func _setup_input_actions() -> void:
+	# axis pairs: left stick = move, right stick = look. value is the sign of the
+	# half-axis this action listens to.
+	var defs := {
+		"mom_move_left":   [{"key": KEY_A}, {"axis": JOY_AXIS_LEFT_X, "v": -1.0}],
+		"mom_move_right":  [{"key": KEY_D}, {"axis": JOY_AXIS_LEFT_X, "v": 1.0}],
+		"mom_move_forward":[{"key": KEY_W}, {"axis": JOY_AXIS_LEFT_Y, "v": -1.0}],
+		"mom_move_back":   [{"key": KEY_S}, {"axis": JOY_AXIS_LEFT_Y, "v": 1.0}],
+		"mom_look_left":   [{"key": KEY_LEFT}, {"axis": JOY_AXIS_RIGHT_X, "v": -1.0}],
+		"mom_look_right":  [{"key": KEY_RIGHT}, {"axis": JOY_AXIS_RIGHT_X, "v": 1.0}],
+		"mom_look_up":     [{"key": KEY_UP}, {"axis": JOY_AXIS_RIGHT_Y, "v": -1.0}],
+		"mom_look_down":   [{"key": KEY_DOWN}, {"axis": JOY_AXIS_RIGHT_Y, "v": 1.0}],
+		"mom_jump":        [{"key": KEY_SPACE}, {"button": JOY_BUTTON_A}],
+		"mom_interact":    [{"key": KEY_E}, {"button": JOY_BUTTON_X}],
+		"mom_attack":      [{"key": KEY_Q}, {"button": JOY_BUTTON_RIGHT_SHOULDER}],
+		"mom_target":      [{"key": KEY_TAB}, {"button": JOY_BUTTON_B}],
+		"mom_hotbar_page": [{"key": KEY_R}, {"button": JOY_BUTTON_Y}],
+		"mom_hotbar_secondary": [{"key": KEY_SHIFT}, {"button": JOY_BUTTON_LEFT_SHOULDER}],
+		"mom_inventory":   [{"key": KEY_I}, {"button": JOY_BUTTON_BACK}],
+		# Hotbar slots 1-4 reachable on the d-pad; 5-0 stay keyboard (or reached on
+		# the pad via page-cycle / secondary-hold).
+		"mom_hotbar_1": [{"key": KEY_1}, {"key": KEY_KP_1}, {"button": JOY_BUTTON_DPAD_UP}],
+		"mom_hotbar_2": [{"key": KEY_2}, {"key": KEY_KP_2}, {"button": JOY_BUTTON_DPAD_RIGHT}],
+		"mom_hotbar_3": [{"key": KEY_3}, {"key": KEY_KP_3}, {"button": JOY_BUTTON_DPAD_DOWN}],
+		"mom_hotbar_4": [{"key": KEY_4}, {"key": KEY_KP_4}, {"button": JOY_BUTTON_DPAD_LEFT}],
+		"mom_hotbar_5": [{"key": KEY_5}, {"key": KEY_KP_5}],
+		"mom_hotbar_6": [{"key": KEY_6}, {"key": KEY_KP_6}],
+		"mom_hotbar_7": [{"key": KEY_7}, {"key": KEY_KP_7}],
+		"mom_hotbar_8": [{"key": KEY_8}, {"key": KEY_KP_8}],
+		"mom_hotbar_9": [{"key": KEY_9}, {"key": KEY_KP_9}],
+		"mom_hotbar_10": [{"key": KEY_0}, {"key": KEY_KP_0}],
+	}
+	for action in defs:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action, 0.2)  # deadzone for stick-driven actions
+		else:
+			InputMap.action_erase_events(action)
+		for ev_def in defs[action]:
+			var ev: InputEvent
+			if ev_def.has("key"):
+				var k := InputEventKey.new()
+				k.keycode = ev_def["key"]
+				k.physical_keycode = ev_def["key"]
+				ev = k
+			elif ev_def.has("button"):
+				var b := InputEventJoypadButton.new()
+				b.button_index = ev_def["button"]
+				ev = b
+			else:
+				var m := InputEventJoypadMotion.new()
+				m.axis = ev_def["axis"]
+				m.axis_value = ev_def["v"]
+				ev = m
+			InputMap.action_add_event(action, ev)
+
+# Discrete gameplay actions (work from key OR gamepad). Returns true if handled.
+func _handle_action_event(event: InputEvent) -> bool:
+	if event.is_action_pressed("mom_jump"):
+		jump_requested = true
+		return true
+	if event.is_action_pressed("mom_interact"):
+		_send_interact_command()
+		return true
+	if event.is_action_pressed("mom_attack"):
+		_toggle_autoattack()
+		return true
+	if event.is_action_pressed("mom_target"):
+		_cycle_target()
+		return true
+	if event.is_action_pressed("mom_hotbar_page"):
+		if hotbar:
+			hotbar.cycle_page()
+		return true
+	if event.is_action_pressed("mom_inventory"):
+		_toggle_inventory()
+		return true
+	for i in range(10):
+		if event.is_action_pressed("mom_hotbar_%d" % (i + 1)):
+			if hotbar:
+				hotbar.activate(i)
+			return true
+	return false
+
 func _input(event):
 	if not visible:
+		return
+	if _is_dead:
+		# While dead the only interaction is releasing the spirit. Enter/Space
+		# respawn; the overlay button still receives mouse clicks (we don't
+		# accept_event for those), and movement keys are ignored in _physics_process.
+		if event is InputEventKey and event.pressed and not event.echo \
+				and event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
+			_do_respawn()
+			accept_event()
+		return
+	# Discrete gameplay actions (jump / interact / attack / target / abilities /
+	# hotbar page / inventory) from key OR gamepad. Skipped while a text field is
+	# focused so typing doesn't fire abilities.
+	if not _typing_in_ui() and _handle_action_event(event):
+		accept_event()
 		return
 	var ui_open := _ui_open()
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -2381,10 +2599,6 @@ func _input(event):
 				# standalone build, but when the game runs embedded in the Godot
 				# editor F8 is the editor's own Stop shortcut and kills the run.
 				_toggle_cheats()
-			KEY_SPACE:
-				jump_requested = true
-			KEY_E:
-				_send_interact_command()
 			KEY_U:
 				_unstuck()
 			KEY_G:
@@ -2395,36 +2609,10 @@ func _input(event):
 			KEY_N:
 				if _party_invite_panel and _party_invite_panel.visible:
 					_decline_party_invite()
-			KEY_Q:
-				_toggle_autoattack()
-			KEY_TAB:
-				_cycle_target()
-			KEY_I:
-				_toggle_inventory()
 			KEY_J:
 				_toggle_journal()
 			KEY_P, KEY_B:
 				_toggle_spellbook()
-			KEY_1, KEY_KP_1:
-				hotbar.activate(0)
-			KEY_2, KEY_KP_2:
-				hotbar.activate(1)
-			KEY_3, KEY_KP_3:
-				hotbar.activate(2)
-			KEY_4, KEY_KP_4:
-				hotbar.activate(3)
-			KEY_5, KEY_KP_5:
-				hotbar.activate(4)
-			KEY_6, KEY_KP_6:
-				hotbar.activate(5)
-			KEY_7, KEY_KP_7:
-				hotbar.activate(6)
-			KEY_8, KEY_KP_8:
-				hotbar.activate(7)
-			KEY_9, KEY_KP_9:
-				hotbar.activate(8)
-			KEY_0, KEY_KP_0:
-				hotbar.activate(9)
 			KEY_F3:
 				_debug_visible = not _debug_visible
 				if debug_panel:
@@ -2439,17 +2627,25 @@ func _input(event):
 func _physics_process(delta: float) -> void:
 	if not visible:
 		return
-	# Gather movement inputs (not while typing into a window text field)
+	# Gather movement inputs (not while typing into a window text field, and not
+	# while dead — a corpse shouldn't run around). WASD and the left stick both
+	# feed the mom_move_* actions, so this is one analog read for both.
 	var input_vec := Vector2.ZERO
-	if not _typing_in_ui():
-		if Input.is_key_pressed(KEY_A):
-			input_vec.x -= 1.0
-		if Input.is_key_pressed(KEY_D):
-			input_vec.x += 1.0
-		if Input.is_key_pressed(KEY_W):
-			input_vec.y += 1.0
-		if Input.is_key_pressed(KEY_S):
-			input_vec.y -= 1.0
+	if not _typing_in_ui() and not _is_dead:
+		input_vec = Input.get_vector("mom_move_left", "mom_move_right", "mom_move_back", "mom_move_forward")
+		# Right-stick (or arrow keys) camera look — the action-MMO feel. Mouse look
+		# stays in _input; this runs every frame for smooth analog turning.
+		var look := Input.get_vector("mom_look_left", "mom_look_right", "mom_look_up", "mom_look_down")
+		if look.length_squared() > 0.0004:
+			player_body.rotate_y(-look.x * GAMEPAD_LOOK_SENSITIVITY * delta)
+			camera_pitch.rotate_x(-look.y * GAMEPAD_PITCH_SENSITIVITY * delta)
+			camera_pitch.rotation.x = clamp(camera_pitch.rotation.x, deg_to_rad(-70), deg_to_rad(70))
+			_update_camera_collision()
+		# Hold the secondary-bar modifier (Shift / left bumper) to reveal + use bar 2.
+		if hotbar:
+			hotbar.set_secondary_peek(Input.is_action_pressed("mom_hotbar_secondary"))
+	elif hotbar:
+		hotbar.set_secondary_peek(false)
 
 	# Local prediction: move CharacterBody3D so movement feels responsive
 	var basis: Basis = player_body.global_transform.basis
@@ -2516,6 +2712,13 @@ func _physics_process(delta: float) -> void:
 		entity_space = entity_world.direct_space_state
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
+			continue
+		# Frozen corpse: never interpolate it (so it can't slide); just hold the
+		# death pose. Everything below only applies to living entities.
+		if bool(body.get_meta("dead_frozen", false)):
+			var dead_rig = body.get_meta("rig", null)
+			if dead_rig != null and is_instance_valid(dead_rig):
+				dead_rig.drive(0.0, false, true)
 			continue
 		var target_position: Vector3 = body.get_meta("target_position", body.position)
 		var prev_xz := Vector2(body.position.x, body.position.z)
