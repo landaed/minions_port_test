@@ -837,6 +837,7 @@ class GodotClientSession:
         self.world_login_retried = False
         self.player_dead = False  # last known death state (for death/alive edges)
         self.entity_static_sent = {}  # id -> signature of static block last sent
+        self.entity_dyn_sent = {}     # id -> signature of dynamic block last sent
         self._static_resync_at = 0.0
         self._closed = False
 
@@ -1054,12 +1055,27 @@ class GodotClientSession:
         the dynamic remainder (position/rotation/health/combat flags) is sent.
         Every ENTITY_STATIC_RESYNC seconds the whole static set is resent so any
         client/proxy drift self-heals. The Godot client merges each partial
-        entity onto its cached copy (see gameplay_view.set_entities)."""
+        entity onto its cached copy (see gameplay_view.set_entities).
+
+        Three tiers per entity:
+          - static changed / first seen -> full entity,
+          - only dynamic changed        -> dynamic fields only (no static),
+          - nothing changed             -> just {id, sim_id} heartbeat.
+        So an idle town NPC costs ~one field per snapshot instead of a full
+        record every cycle. Proxy-internal fields (distance / visibility_source /
+        _debug, used only for sorting + logging here) are never sent."""
+        # Drop proxy-internal fields the client never reads.
+        for e in entities:
+            if isinstance(e, dict):
+                e.pop("distance", None)
+                e.pop("visibility_source", None)
+                e.pop("_debug", None)
         if not ENTITY_DELTA_ENABLED:
             return entities
         import time as _t
         now = _t.time()
-        if now - self._static_resync_at >= ENTITY_STATIC_RESYNC:
+        full_resync = now - self._static_resync_at >= ENTITY_STATIC_RESYNC
+        if full_resync:
             self.entity_static_sent.clear()
             self._static_resync_at = now
         out = []
@@ -1071,21 +1087,33 @@ class GodotClientSession:
             key = e.get("id", e.get("sim_id"))
             present.add(key)
             static = {k: e[k] for k in ENTITY_STATIC_FIELDS if k in e}
+            dynamic = {k: v for k, v in e.items() if k not in ENTITY_STATIC_FIELDS}
             try:
-                sig = json.dumps(static, sort_keys=True, default=_json_fallback)
+                static_sig = json.dumps(static, sort_keys=True, default=_json_fallback)
+                dyn_sig = json.dumps(dynamic, sort_keys=True, default=_json_fallback)
             except Exception:
-                sig = None
-            if sig is not None and self.entity_static_sent.get(key) == sig:
-                # Static unchanged: send only the non-static (dynamic) fields,
-                # plus id/sim_id so the client can match it to its cache.
-                slim = {k: v for k, v in e.items() if k not in ENTITY_STATIC_FIELDS}
-                out.append(slim)
-            else:
-                self.entity_static_sent[key] = sig
+                # Can't hash it reliably; just send the whole thing.
                 out.append(e)
+                continue
+            if self.entity_static_sent.get(key) != static_sig:
+                # New / changed identity/model/appearance -> full record.
+                self.entity_static_sent[key] = static_sig
+                self.entity_dyn_sent[key] = dyn_sig
+                out.append(e)
+            elif self.entity_dyn_sent.get(key) != dyn_sig:
+                # Same identity, moved / took damage / flag flipped -> dynamic only.
+                self.entity_dyn_sent[key] = dyn_sig
+                out.append(dynamic)
+            else:
+                # Totally unchanged -> tiny heartbeat so the client keeps it.
+                hb = {"id": e["id"]} if "id" in e else {}
+                if "sim_id" in e:
+                    hb["sim_id"] = e["sim_id"]
+                out.append(hb if hb else dynamic)
         # Forget entities no longer in range so they get a full block on return.
         for key in [k for k in self.entity_static_sent if k not in present]:
             del self.entity_static_sent[key]
+            self.entity_dyn_sent.pop(key, None)
         return out
 
     def _on_entity_snapshot_failed(self, reason):

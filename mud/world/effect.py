@@ -288,7 +288,8 @@ def UndoIllusion(effect):
         
         if not ieffect:
             si = dst.spawn.getSpawnInfo()
-            si.refresh()
+            if si is not None:  # headless port has no Torque spawnInfo
+                si.refresh()
         else:
             DoIllusion(ieffect,ieffect.src,ieffect.dst)
 
@@ -392,36 +393,43 @@ def DoIllusion(effect,src,dst):
     if not proto.illusion:
         return
     
-    si = dst.spawn.spawnInfo
+    # spawnInfo (si) is the legacy Torque client's display record; the headless
+    # port has none and instead reads the illusion straight off the mob in
+    # PlayerAvatar.getVisibleEntities. Guard every si.* write so the illusion
+    # still REGISTERS (dst.illusionEffect) here instead of crashing on None.
+    si = getattr(dst.spawn, 'spawnInfo', None)
     gotone = False
     illusion = proto.illusion
     if illusion.illusionRace:
         gotone = True
-        si.race = illusion.illusionRace
-        si.modelname = ""
-        si.textureSingle = ""
-        si.textureBody = ""
-        si.textureHead = ""
-        si.textureLegs = ""
-        si.textureArms = ""
-        si.textureHands = ""
-        si.textureFeet = ""
-        si.textureExtra = illusion.illusionTextureExtra
-    
+        if si is not None:
+            si.race = illusion.illusionRace
+            si.modelname = ""
+            si.textureSingle = ""
+            si.textureBody = ""
+            si.textureHead = ""
+            si.textureLegs = ""
+            si.textureArms = ""
+            si.textureHands = ""
+            si.textureFeet = ""
+            si.textureExtra = illusion.illusionTextureExtra
+
     if illusion.illusionModel:
         gotone = True
-        si.modelname = illusion.illusionModel
-        si.race = "Illusion" #hack
-        si.textureSingle = illusion.illusionTextureSingle
-        si.textureExtra= illusion.illusionTextureExtra
-        si.textureBody = illusion.illusionTextureBody
-        si.textureHead = illusion.illusionTextureHead
-        si.animation = illusion.illusionAnimation
-    
+        if si is not None:
+            si.modelname = illusion.illusionModel
+            si.race = "Illusion" #hack
+            si.textureSingle = illusion.illusionTextureSingle
+            si.textureExtra= illusion.illusionTextureExtra
+            si.textureBody = illusion.illusionTextureBody
+            si.textureHead = illusion.illusionTextureHead
+            si.animation = illusion.illusionAnimation
+
     if gotone:
         dst.spawn.sndProfileOverride = illusion.illusionSndProfile
         dst.illusionEffect = effect
-        si.refresh()
+        if si is not None:
+            si.refresh()
 
 
 def DoPermanentStats(effect,src,dst):

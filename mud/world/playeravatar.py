@@ -1612,7 +1612,11 @@ class PlayerAvatar(Avatar):
                     model_name = str(getattr(spawn_row, 'model', '') or '')
                     animation_name = str(getattr(spawn_row, 'animation', '') or '')
                     try:
-                        scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0)
+                        # Live visual scale = base spawn scale * the mob's current
+                        # size multiplier, so Enlarge/Shrink (which change mob.size)
+                        # actually resize the model on the client. size defaults to 1.
+                        scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0) \
+                            * float(getattr(other_mob, 'size', 1.0) or 1.0)
                     except Exception:
                         scale_val = 1.0
                 # Whole-body "single" texture for monsters that share one base model
@@ -1624,6 +1628,41 @@ class PlayerAvatar(Avatar):
                 single_tex = ""
                 if spawn_row is not None:
                     single_tex = str(getattr(spawn_row, 'textureSingle', '') or '')
+                # Illusion / polymorph (Transmutation of Volsh -> blue dragon,
+                # Werewolf Form, Illusion <race>, ...): override the streamed model
+                # so the client swaps the rig. Model-based illusions name a monster
+                # model (client converts dragon/dragon_blue.dts -> dragon_dragon_blue.glb);
+                # race-based ones clear the model and pick by race+sex like a player.
+                # The swapped model carries its own baked textures, so we don't
+                # force the per-part skins here.
+                try:
+                    ie = getattr(other_mob, 'illusionEffect', None)
+                    illusion = ie.effectProto.illusion if ie is not None else None
+                except Exception:
+                    illusion = None
+                if illusion is not None:
+                    il_model = str(getattr(illusion, 'illusionModel', '') or '')
+                    il_race = str(getattr(illusion, 'illusionRace', '') or '')
+                    il_anim = str(getattr(illusion, 'illusionAnimation', '') or '')
+                    il_sex = str(getattr(illusion, 'illusionSex', '') or '')
+                    il_single = str(getattr(illusion, 'illusionTextureSingle', '') or '')
+                    if il_model:
+                        model_name = il_model
+                    if il_race:
+                        race_name = il_race
+                        model_name = ""  # pick by race+sex on the client
+                    if il_anim:
+                        animation_name = il_anim
+                    if il_sex:
+                        sex_name = il_sex
+                    if il_single:
+                        single_tex = il_single
+                    try:
+                        il_size = float(getattr(illusion, 'illusionSize', 0.0) or 0.0)
+                        if il_size > 0.0:
+                            scale_val = il_size
+                    except Exception:
+                        pass
                 # Per-part skin/armor texture indices for the client (cached on the
                 # mob; appearance rarely changes). Empty for monsters using an
                 # embedded single/multi texture.
@@ -1674,6 +1713,11 @@ class PlayerAvatar(Avatar):
                     "model": model_name,
                     "animation": animation_name,
                     "scale": scale_val,
+                    # Live buff state the client renders: visibility (Invisibility
+                    # spell lowers it toward 0 -> client fades the model) and
+                    # flying/levitate (>0 -> client lifts the model off the ground).
+                    "visibility": float(getattr(other_mob, 'visibility', 1.0) or 0.0),
+                    "flying": float(getattr(other_mob, 'flying', 0.0) or 0.0),
                     "tex": tex,
                     "tex_single": single_tex,
                     "mounts": mounts,

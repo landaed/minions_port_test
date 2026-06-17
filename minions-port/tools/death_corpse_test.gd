@@ -447,6 +447,37 @@ class DeathDriver:
 		print("[DEATHTEST] secondary peek: bar1 visible=%s bar2 visible=%s" % [
 			view.hotbar._row_boxes[0].visible, view.hotbar._row_boxes[1].visible])
 		_key(KEY_SHIFT, false)
+		# --- Buff replication. Apply via the test cheat and read the values the
+		# server now streams + the avatar's rendered state. Order matters for the
+		# screenshots: do the model/scale buffs (visible) before invisibility.
+		var base_scale := float(view._self_entity().get("scale", 1.0))
+		view._request_server_command("cheat", {"action": "apply_spell", "params": {"name": "Enlarge"}})
+		await get_tree().create_timer(1.5).timeout
+		await _shot("ability_enlarge")
+		var big_scale := float(view._self_entity().get("scale", 1.0))
+		print("[DEATHTEST] Enlarge: scale %.2f -> %.2f (rig scale %.2f) %s" % [
+			base_scale, big_scale, view._player_rig.scale.x,
+			"PASS" if big_scale > base_scale + 0.01 else "WARN"])
+		# Transmutation of Volsh -> blue dragon (illusion) + haste/str/offense.
+		view._request_server_command("cheat", {"action": "apply_spell", "params": {"name": "Transmutation of Volsh"}})
+		await get_tree().create_timer(2.0).timeout
+		await _shot("ability_volsh_dragon")
+		var model_now := str(view._self_entity().get("model", ""))
+		print("[DEATHTEST] Transmutation of Volsh: model='%s' rig='%s' %s" % [
+			model_now, view._player_model_key,
+			"PASS" if "dragon" in model_now.to_lower() or "dragon" in view._player_model_key.to_lower() else "WARN"])
+		view._request_server_command("cheat", {"action": "apply_spell", "params": {"name": "Urug's Sandals Fly"}})
+		await get_tree().create_timer(1.5).timeout
+		await _shot("ability_flying")
+		var fly := float(view._self_entity().get("flying", 0.0))
+		print("[DEATHTEST] Urug's Sandals Fly: flying=%.2f %s" % [
+			fly, "PASS" if fly > 0.0 else "WARN"])
+		view._request_server_command("cheat", {"action": "apply_spell", "params": {"name": "Erar Invisibility"}})
+		await get_tree().create_timer(1.5).timeout
+		await _shot("ability_invisible")
+		var vis := float(view._self_entity().get("visibility", 1.0))
+		print("[DEATHTEST] Erar Invisibility: visibility=%.2f (rig fade=%.2f) %s" % [
+			vis, view._player_rig._fade_signature, "PASS" if vis < 0.99 else "WARN"])
 		await _shot("final")
 		print("[DEATHTEST] done.")
 		await get_tree().create_timer(0.3).timeout

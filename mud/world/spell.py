@@ -581,21 +581,35 @@ def SpawnSpell(proto,src,dst,pos=(0,0,0),mod=1.0,skill=None,spellLevel=1,proc=Fa
             pass
     
     if proto.target == RPG_TARGET_OTHER:
-        
+
+        # Tab-target leniency (mirrors combat.py): a player acting on the mob they
+        # explicitly selected is trusted past the stale canSee gate and gets range
+        # leeway, so offensive skills/spells aren't rejected just because the
+        # replicated target lags the client's view by an interpolation interval.
+        player_selected = False
+        if src.player:
+            try:
+                _sel = getattr(src.simObject, "selectedTarget", None)
+                player_selected = _sel is not None and (
+                    _sel is dstSimObject or
+                    getattr(_sel, "id", None) == getattr(dstSimObject, "id", None))
+            except Exception:
+                player_selected = False
+
         # The spell will fail if all of the following conditions are true:
         # - The source is a Player.
         # - The destination's player is not the source's player.
         # - The source cannot see the destination.
-        if src.player and dst.player != src.player and dstSimObject.id not in src.simObject.canSee:
+        if src.player and dst.player != src.player and dstSimObject.id not in src.simObject.canSee and not player_selected:
                 if skill:
                     srcPlayer.sendGameText(RPG_MSG_GAME_DENIED,"<a:Skill%s>%s</a> failed, $src can't see the skill target!\\n"%(GetTWikiName(skill),skill),src)
                 else:
                     srcPlayer.sendGameText(RPG_MSG_GAME_DENIED,"<a:Spell%s>%s</a> failed, $src can't see the spell target!\\n"%(GetTWikiName(proto.name),proto.name),src)
                 return
-        
+
         # If the distance between the source and destination is greater than
         # the cast range, then a failure occurs.
-        if GetRangeMin(src,dst) > castRange:
+        if GetRangeMin(src,dst) > castRange + (PLAYER_SELECT_LEEWAY if player_selected else 0.0):
             if src.player:
                 if skill:
                     srcPlayer.sendGameText(RPG_MSG_GAME_DENIED,"$src's target is out of range for the <a:Skill%s>%s</a> skill!\\n"%(GetTWikiName(skill),skill),src)

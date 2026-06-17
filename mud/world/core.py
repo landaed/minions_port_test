@@ -15,7 +15,15 @@ from mud.world.defines import *
 
 from math import floor,sqrt
 from random import randint
+import os
 
+# Range leeway (server units) granted to a player acting on the mob they have
+# explicitly selected — melee swings, offensive skills, and offensive spells.
+# The Godot client interpolates replicated mob positions an update behind and
+# client/server player positions can differ slightly, so the bare engine ranges
+# (often only a couple units) reject attacks the player clearly sees connecting.
+# This is the standard tab-target "melee leeway" modern MMOs use. 0 disables it.
+PLAYER_SELECT_LEEWAY = float(os.environ.get("MOM_MELEE_LEEWAY", "3.5"))
 
 
 #is mob2 kos to mob1

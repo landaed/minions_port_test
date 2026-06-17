@@ -49,6 +49,7 @@ const PLAYER_STEP_FORWARD_SCALE := 0.9
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
 const ENTITY_DEATH_DESPAWN_DELAY := 2.75
+const ENTITY_FLYING_LIFT := 1.4  # how far Flying/Levitate raises a model off the ground
 const ENTITY_FLOOR_PROBE_UP := 4.0
 const ENTITY_FLOOR_PROBE_DOWN := 8.0
 const ENTITY_MAX_DISPLAY_DISTANCE := 20.0
@@ -102,6 +103,8 @@ var _camera_zoom := 7.0
 var _first_person := false
 var _camera_base_rotation_x := 0.0
 var _pos_history: Array = []        # recent [{t, pos}] samples for latency-aware reconcile
+var _last_server_pos := Vector3.ZERO  # previous snapshot's server position
+var _has_last_server_pos := false     # whether _last_server_pos is valid yet
 var _reconcile_error := Vector3.ZERO  # smoothed-out correction toward the server position
 var _camera_base_local_offset := Vector3.ZERO
 var _camera_attributes: CameraAttributesPractical = null
@@ -1644,6 +1647,16 @@ func _update_reconcile_error(server_pos: Vector3) -> void:
 	# residual against the closest history sample is real client/server divergence;
 	# the raw difference against the current position would also include snapshot
 	# latency and punish the player for simply moving.
+	# How far the SERVER position moved since the last snapshot. A real teleport
+	# (zone link, respawn, GM warp) is a single large jump; gradual divergence
+	# (e.g. holding into a wall — the headless server has no collision, so its
+	# copy of us keeps sliding forward) is many small steps.
+	var server_jump := 0.0
+	if _has_last_server_pos:
+		server_jump = Vector2(server_pos.x - _last_server_pos.x, server_pos.z - _last_server_pos.z).length()
+	_last_server_pos = server_pos
+	_has_last_server_pos = true
+
 	var current := player_body.global_position
 	var best := Vector2(server_pos.x - current.x, server_pos.z - current.z)
 	for sample in _pos_history:
@@ -1655,8 +1668,10 @@ func _update_reconcile_error(server_pos: Vector3) -> void:
 	if drift <= RECONCILE_DEAD_ZONE:
 		_reconcile_error = Vector3.ZERO
 		return
-	if drift >= SERVER_RECONCILE_SNAP_THRESHOLD:
-		# A real teleport (server moved the player), not drift: jump straight there.
+	# Hard-snap ONLY on a genuine server teleport (sudden jump). A large drift that
+	# built up gradually is corrected smoothly via move_and_slide below, so the
+	# player slides along geometry and is never teleported THROUGH a wall.
+	if server_jump >= SERVER_RECONCILE_SNAP_THRESHOLD:
 		player_body.global_position.x = server_pos.x
 		player_body.global_position.z = server_pos.z
 		_pos_history.clear()
@@ -1895,6 +1910,14 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		_player_rig.apply_appearance(_appearance_for(entity))
 		_player_rig.apply_single_texture(_single_tex_for(entity))
 		_player_rig.apply_mounts(_mounts_for(entity))
+		# Show our own buff state on the avatar: Enlarge/Shrink (scale),
+		# Invisibility (fade), Flying/Levitate (lift). Scale the visual rig only —
+		# the collision capsule stays normal so movement is unaffected.
+		var s := float(entity.get("scale", 1.0))
+		if s > 0.0:
+			_player_rig.scale = Vector3(s, s, s)
+		_player_rig.set_fade(float(entity.get("visibility", 1.0)))
+		_player_rig.position.y = -0.9 + (ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0)
 
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
@@ -1983,6 +2006,9 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 		rig.apply_appearance(_appearance_for(entity))
 		rig.apply_single_texture(_single_tex_for(entity))
 		rig.apply_mounts(_mounts_for(entity))
+		# Invisibility (visibility < 1) fades the model; Flying/Levitate lifts it.
+		rig.set_fade(float(entity.get("visibility", 1.0)))
+		rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
 
 func _sync_entity_markers():
 	if replicated_entities.is_empty():
@@ -2654,13 +2680,16 @@ func _physics_process(delta: float) -> void:
 		move_dir = move_dir.normalized()
 	velocity.x = move_dir.x * MOVE_SPEED
 	velocity.z = move_dir.z * MOVE_SPEED
+	# Flying / Levitate / Slow Fall: when the buff is active, descend gently
+	# (and jump floatier) instead of normal gravity, so the effect is felt.
+	var flying := float(_self_entity().get("flying", 0.0)) > 0.0
 	if player_body.is_on_floor():
 		if jump_requested:
 			velocity.y = JUMP_VELOCITY
 		else:
 			velocity.y = 0.0
 	else:
-		velocity.y -= GRAVITY * delta
+		velocity.y -= (GRAVITY * 0.18 if flying else GRAVITY) * delta
 	jump_requested = false
 	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
