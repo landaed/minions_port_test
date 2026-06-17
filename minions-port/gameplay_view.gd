@@ -933,6 +933,9 @@ func _make_effect_chip(e: Dictionary) -> Control:
 func _render_effect_row(container: HBoxContainer, effects: Array) -> void:
 	if container == null:
 		return
+	# Keep the bar tidy no matter how many effects are active.
+	if effects.size() > 10:
+		effects = effects.slice(0, 10)
 	# Rebuild only when the effect set / remaining-seconds actually change.
 	var sig := ""
 	for e in effects:
