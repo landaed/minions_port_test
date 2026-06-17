@@ -129,6 +129,8 @@ var target_health_value_label: Label
 var target_prompt_label: Label  # contextual "Press E/G..." hint under the target frame
 var hint_label: Label
 var combat_log_label: Label
+var chat_input: LineEdit          # slash-command / chat box (toggle with Enter)
+var _sky3d: Node = null           # Sky3D in the loaded zone, driven by server world_time
 var crosshair: Control
 var debug_panel: PanelContainer
 var debug_label: Label
@@ -342,7 +344,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  G: invite to party  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  F3: debug  •  `: cheats"
+	hint_label.text = "Tab: target  •  Q: auto-attack  •  E: talk/loot  •  G: invite to party  •  1-0: hotbar  •  I: inventory  •  P: spells  •  J: journal  •  Enter: chat (/time set day)  •  F3: debug  •  `: cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
@@ -456,6 +458,20 @@ func _build_hud():
 	combat_log_label.add_theme_font_size_override("font_size", 12)
 	combat_log_label.text = "Combat log:"
 	log_panel.add_child(combat_log_label)
+
+	# Chat / slash-command box (hidden until you press Enter). Sits at the very
+	# bottom-left under the combat log.
+	chat_input = LineEdit.new()
+	chat_input.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	chat_input.offset_left = 16
+	chat_input.offset_bottom = -16
+	chat_input.offset_top = -42
+	chat_input.custom_minimum_size = Vector2(420, 26)
+	chat_input.placeholder_text = "/time set day   (Enter to send, Esc to cancel)"
+	chat_input.visible = false
+	chat_input.text_submitted.connect(_on_chat_submitted)
+	chat_input.gui_input.connect(_on_chat_gui_input)
+	add_child(chat_input)
 
 	# Debug panel (top-right, hidden by default, toggle with F3).
 	debug_panel = PanelContainer.new()
@@ -1005,6 +1021,7 @@ func apply_world_state(payload: Dictionary, world: Dictionary, time_info: Dictio
 	current_payload = payload.duplicate(true)
 	selected_world = world.duplicate(true)
 	world_time = time_info.duplicate(true)
+	_apply_world_time_to_sky()
 	# Only reposition player on initial root_info, not on periodic updates.
 	if not _has_spawned:
 		# Don't compute offset from root_info — it may have stale/zero position.
@@ -1024,7 +1041,110 @@ func update_state(payload: Dictionary):
 
 func set_world_time(time_info: Dictionary):
 	world_time = time_info.duplicate(true)
+	_apply_world_time_to_sky()
 	_update_labels()
+
+# --- Server-authoritative time of day -> Sky3D ----------------------------------
+func _find_sky() -> Node:
+	if _sky3d != null and is_instance_valid(_sky3d):
+		return _sky3d
+	# The zone scene (e.g. trinst.tscn) carries a Sky3D under the world subviewport.
+	var found := find_children("*", "Sky3D", true, false)
+	if not found.is_empty():
+		_sky3d = found[0]
+		# Match the server clock (theworld.py: 1 game day = 1 real hour) so the sky
+		# advances smoothly between the server's syncTime snaps instead of drifting.
+		if "minutes_per_day" in _sky3d:
+			_sky3d.minutes_per_day = 60.0
+	return _sky3d
+
+func _apply_world_time_to_sky() -> void:
+	var sky := _find_sky()
+	if sky == null:
+		return
+	var h := float(int(world_time.get("hour", 12)))
+	var m := float(int(world_time.get("minute", 0)))
+	if "current_time" in sky:
+		sky.current_time = h + m / 60.0
+
+# --- Chat / slash commands ------------------------------------------------------
+func _open_chat() -> void:
+	if chat_input == null:
+		return
+	_release_mouse()
+	chat_input.text = ""
+	chat_input.visible = true
+	chat_input.grab_focus()
+
+func _close_chat() -> void:
+	if chat_input == null:
+		return
+	chat_input.release_focus()
+	chat_input.visible = false
+	_capture_mouse()
+
+func _on_chat_gui_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_close_chat()
+		accept_event()
+
+func _on_chat_submitted(text: String) -> void:
+	_close_chat()
+	text = text.strip_edges()
+	if text.is_empty():
+		return
+	if text.begins_with("/"):
+		_run_slash_command(text.substr(1))
+	else:
+		# Plain text: no chat channel wired yet, so just echo locally.
+		_push_log("%s: %s" % [str(current_payload.get("player_name", "You")), text])
+
+func _run_slash_command(cmd: String) -> void:
+	var parts := cmd.split(" ", false)
+	if parts.is_empty():
+		return
+	var name := String(parts[0]).to_lower()
+	var args: Array = parts.slice(1)
+	match name:
+		"time":
+			_cmd_time(args)
+		"help", "commands", "?":
+			_push_log("[cmd] /time set <day|night|dawn|dusk|noon|midnight|HH[:MM]>   •   /time (show)   •   /help")
+		_:
+			_push_log("[cmd] Unknown command: /%s   (try /help)" % name)
+
+func _cmd_time(args: Array) -> void:
+	if args.is_empty() or String(args[0]).to_lower() == "show":
+		_push_log("[time] World time is %02d:%02d" % [int(world_time.get("hour", 0)), int(world_time.get("minute", 0))])
+		return
+	# Accept "/time set day" and the shorthand "/time day".
+	var word := String(args[0]).to_lower()
+	if word == "set":
+		word = String(args[1]).to_lower() if args.size() > 1 else ""
+	var hm := _parse_timeword(word)
+	if hm.is_empty():
+		_push_log("[time] Usage: /time set <day|night|dawn|dusk|noon|midnight|HH[:MM]>")
+		return
+	# Server is authoritative: it sets world.time and syncTimes every client, so
+	# the change is shared by everyone (routed through the existing cheat channel).
+	_request_server_command("cheat", {"action": "set_time", "params": hm})
+	_push_log("[time] Requested %02d:%02d" % [int(hm.get("hour", 12)), int(hm.get("minute", 0))])
+
+func _parse_timeword(w: String) -> Dictionary:
+	w = w.strip_edges().to_lower()
+	match w:
+		"day", "noon", "midday": return {"hour": 12, "minute": 0}
+		"midnight": return {"hour": 0, "minute": 0}
+		"night": return {"hour": 22, "minute": 0}
+		"dawn", "sunrise", "morning": return {"hour": 6, "minute": 0}
+		"dusk", "sunset", "evening": return {"hour": 18, "minute": 0}
+	if w.contains(":"):
+		var p := w.split(":")
+		if p.size() == 2 and String(p[0]).is_valid_int() and String(p[1]).is_valid_int():
+			return {"hour": clampi(int(p[0]), 0, 23), "minute": clampi(int(p[1]), 0, 59)}
+	elif w.is_valid_int():
+		return {"hour": clampi(int(w), 0, 23), "minute": 0}
+	return {}
 
 func set_zone_transfer(payload: Dictionary):
 	current_payload["zone_transfer"] = payload.duplicate(true)
@@ -2253,6 +2373,9 @@ func _input(event):
 		if _typing_in_ui():
 			return  # a window text field owns the keyboard
 		match event.keycode:
+			KEY_ENTER, KEY_KP_ENTER:
+				_open_chat()
+				accept_event()
 			KEY_QUOTELEFT, KEY_F8:
 				# ` (backquote) is the primary cheat hotkey. F8 also works in a
 				# standalone build, but when the game runs embedded in the Godot

@@ -274,6 +274,42 @@ def cheat_list_spells(player, params):
     return _result(True, "%d spells." % len(rows), spells=[r[0] for r in rows])
 
 
+def cheat_set_time(player, params):
+    # Sets the world's authoritative time of day and syncs EVERY connected player,
+    # so the change is shared (the client /time command routes here). Mirrors the
+    # immortal CmdSetTime broadcast in mud/world/immortalcommand.py.
+    try:
+        hour = int(params.get("hour", 12))
+    except Exception:
+        hour = 12
+    try:
+        minute = int(params.get("minute", 0))
+    except Exception:
+        minute = 0
+    hour = max(0, min(hour, 23))
+    minute = max(0, min(minute, 59))
+    world = getattr(player, "world", None)
+    if world is None or getattr(world, "time", None) is None:
+        return _result(False, "World clock unavailable.")
+    # Propagate across zone clusters if this world runs more than one.
+    try:
+        if getattr(world, "daemonPerspective", None):
+            world.daemonPerspective.callRemote("propagateCmd", "setTime", hour, minute)
+    except Exception:
+        pass
+    world.time.hour = hour
+    world.time.minute = minute
+    sent = 0
+    for p in list(getattr(world, "activePlayers", []) or []):
+        try:
+            p.mind.callRemote("syncTime", world.time.hour, world.time.minute)
+            sent += 1
+        except Exception:
+            pass
+    return _result(True, "Time set to %02d:%02d (synced to %d player(s))." % (hour, minute, sent),
+                   hour=hour, minute=minute)
+
+
 _ACTIONS = {
     "status": cheat_status,
     "give_xp": cheat_give_xp,
@@ -286,4 +322,5 @@ _ACTIONS = {
     "full_heal": cheat_full_heal,
     "list_items": cheat_list_items,
     "list_spells": cheat_list_spells,
+    "set_time": cheat_set_time,
 }
