@@ -46,8 +46,18 @@ fi
 
 mkdir -p "$(dirname "$OUT")"
 
-# Make sure imports are current so the PCK includes every texture/mesh.
+# Force a filesystem re-scan so newly un-ignored folders (e.g. assets/ui after
+# its .gdignore was removed) are actually imported into the PCK. Godot caches the
+# scan in .godot/editor and won't re-import an un-ignored folder otherwise, which
+# is why item/spell icons can come out blank in the .exe. This keeps .godot/
+# imported, so already-imported assets aren't rebuilt.
+rm -rf "$PROJECT/.godot/editor" 2>/dev/null || true
+
+# Make sure imports are current so the PCK includes every texture/mesh. Two passes:
+# the first discovers + imports newly-visible assets, the second settles any
+# resources that depend on them.
 echo "[build] importing assets (first run can take a while)..."
+"$GODOT" --headless --path "$PROJECT" --import >/dev/null 2>&1 || true
 "$GODOT" --headless --path "$PROJECT" --import >/dev/null 2>&1 || true
 
 echo "[build] exporting single Windows .exe (embedded PCK) -> $OUT"
