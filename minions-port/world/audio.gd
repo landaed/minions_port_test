@@ -66,12 +66,15 @@ func _scan_tracks() -> void:
 	print("[GameAudio] %d music tracks available" % _all_tracks.size())
 
 func _load_stream(path: String, loop: bool = false) -> AudioStream:
-	var global := ProjectSettings.globalize_path(path)
-	if not FileAccess.file_exists(path) and not FileAccess.file_exists(global):
-		return null
-	var stream := AudioStreamOggVorbis.load_from_file(path)
-	if stream != null:
-		stream.loop = loop
+	# Export-safe (see UIC.load_audio): in the .exe the .ogg lives in the PCK, so
+	# the editor-only globalize_path()+load_from_file path silently returned null
+	# and music went missing. Duplicate before setting loop so we don't mutate the
+	# shared imported stream.
+	var stream := UIC.load_audio(path)
+	if stream is AudioStreamOggVorbis:
+		var ogg := stream.duplicate() as AudioStreamOggVorbis
+		ogg.loop = loop
+		return ogg
 	return stream
 
 # ------------------------------------------------------------------ music --

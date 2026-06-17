@@ -57,24 +57,60 @@ static func money_text(tin: int) -> String:
 	bits.append("%dt" % t)
 	return " ".join(bits)
 
-static func _composite(base_path: String, alpha_path: String) -> Texture2D:
-	if not FileAccess.file_exists(base_path):
+static func load_image(path: String) -> Image:
+	## Robust image load that works in EXPORTED builds, not just the editor.
+	## Prefer the imported resource (always packed) and take a mutable copy of its
+	## pixels; fall back to reading the raw file (bundled via the export
+	## include_filter). The old Image.load_from_file(globalize_path(...)) silently
+	## failed in exports because res:// lives inside the PCK there, not on the OS
+	## filesystem -- which is why icons/spell art were blank in the .exe.
+	if path.is_empty():
 		return null
-	var base_img := Image.load_from_file(ProjectSettings.globalize_path(base_path))
+	if ResourceLoader.exists(path):
+		var res = load(path)
+		if res is Texture2D:
+			var im: Image = (res as Texture2D).get_image()
+			if im != null:
+				im = im.duplicate() as Image
+				if im.is_compressed():
+					im.decompress()
+				return im
+		elif res is Image:
+			return (res as Image).duplicate() as Image
+	if FileAccess.file_exists(path):
+		return Image.load_from_file(path)
+	return null
+
+static func load_audio(path: String) -> AudioStream:
+	## Export-safe audio load (see load_image). Prefers the imported stream that is
+	## packed in the .exe; falls back to reading a raw .ogg bundled via the export
+	## include_filter. Caller should duplicate() before setting loop if it needs a
+	## per-use copy.
+	if path.is_empty():
+		return null
+	if ResourceLoader.exists(path):
+		var res = load(path)
+		if res is AudioStream:
+			return res
+	if FileAccess.file_exists(path):
+		return AudioStreamOggVorbis.load_from_file(path)
+	return null
+
+static func _composite(base_path: String, alpha_path: String) -> Texture2D:
+	var base_img := load_image(base_path)
 	if base_img == null:
 		return null
-	if FileAccess.file_exists(alpha_path):
-		var alpha_img := Image.load_from_file(ProjectSettings.globalize_path(alpha_path))
-		if alpha_img != null:
-			base_img.convert(Image.FORMAT_RGBA8)
-			alpha_img.convert(Image.FORMAT_RGBA8)
-			if alpha_img.get_size() != base_img.get_size():
-				alpha_img.resize(base_img.get_width(), base_img.get_height())
-			for y in range(base_img.get_height()):
-				for x in range(base_img.get_width()):
-					var px := base_img.get_pixel(x, y)
-					px.a = alpha_img.get_pixel(x, y).r
-					base_img.set_pixel(x, y, px)
+	var alpha_img := load_image(alpha_path)
+	if alpha_img != null:
+		base_img.convert(Image.FORMAT_RGBA8)
+		alpha_img.convert(Image.FORMAT_RGBA8)
+		if alpha_img.get_size() != base_img.get_size():
+			alpha_img.resize(base_img.get_width(), base_img.get_height())
+		for y in range(base_img.get_height()):
+			for x in range(base_img.get_width()):
+				var px := base_img.get_pixel(x, y)
+				px.a = alpha_img.get_pixel(x, y).r
+				base_img.set_pixel(x, y, px)
 	return ImageTexture.create_from_image(base_img)
 
 static func item_icon(bitmap: String) -> Texture2D:
@@ -99,9 +135,7 @@ static func _sheet_cell_icon(pic: String) -> Texture2D:
 	var sheet := int(parts[1])
 	var index := int(parts[2])
 	var sheet_path := "%sspells0%d.jpg" % [UI_ICON_ROOT, sheet]
-	if not FileAccess.file_exists(sheet_path):
-		return null
-	var img := Image.load_from_file(ProjectSettings.globalize_path(sheet_path))
+	var img := load_image(sheet_path)
 	if img == null:
 		return null
 	var cell := Image.create(SHEET_CELL, SHEET_CELL, false, img.get_format())
