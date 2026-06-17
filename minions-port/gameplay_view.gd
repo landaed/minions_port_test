@@ -135,6 +135,9 @@ var target_health_value_label: Label
 var target_prompt_label: Label  # contextual "Press E/G..." hint under the target frame
 var hint_label: Label
 var combat_log_label: Label
+var _buff_bar: HBoxContainer            # player's active buffs/debuffs (top-left)
+var _target_buff_bar: HBoxContainer     # current target's debuffs (under target frame)
+var _effect_row_sigs: Dictionary = {}   # container -> last rendered signature
 var chat_input: LineEdit          # slash-command / chat box (toggle with Enter)
 var _sky3d: Node = null           # Sky3D in the loaded zone, driven by server world_time
 var crosshair: Control
@@ -302,6 +305,11 @@ func _build_hud():
 	combat_status_label.custom_minimum_size = Vector2(230, 38)
 	combat_status_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pv.add_child(combat_status_label)
+	# Active buffs/debuffs row (under the resource bars).
+	_buff_bar = HBoxContainer.new()
+	_buff_bar.add_theme_constant_override("separation", 4)
+	_buff_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pv.add_child(_buff_bar)
 
 	# Target frame (top-center): only visible when a target is selected.
 	target_frame = PanelContainer.new()
@@ -330,6 +338,12 @@ func _build_hud():
 	target_prompt_label.add_theme_color_override("font_color", Color(0.80, 0.92, 0.80))
 	target_prompt_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tv.add_child(target_prompt_label)
+	# Target's active debuffs/buffs row.
+	_target_buff_bar = HBoxContainer.new()
+	_target_buff_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	_target_buff_bar.add_theme_constant_override("separation", 4)
+	_target_buff_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tv.add_child(_target_buff_bar)
 
 	# Crosshair (screen center) — recolors when you look at an enemy.
 	crosshair = Control.new()
@@ -867,6 +881,75 @@ func _update_party_health() -> void:
 		var bar: ProgressBar = entry.get("bar")
 		if is_instance_valid(bar):
 			bar.value = clampf(ratio, 0.0, 1.0)
+
+# ---------------------------------------------------------------------------
+# Buff / debuff bars (player's own effects + the current target's). Fed by the
+# per-entity "effects" list the server streams (timed spell processes).
+# ---------------------------------------------------------------------------
+func _fmt_secs(s: int) -> String:
+	return ("%dm" % int(s / 60.0)) if s >= 60 else ("%ds" % maxi(s, 0))
+
+func _make_effect_chip(e: Dictionary) -> Control:
+	var harmful := bool(e.get("harmful", false))
+	var accent := Color(0.9, 0.4, 0.4) if harmful else Color(0.4, 0.82, 0.5)
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.07, 0.09, 0.9)
+	sb.border_color = accent
+	sb.set_border_width_all(2)
+	sb.set_corner_radius_all(3)
+	sb.content_margin_left = 3; sb.content_margin_right = 3
+	sb.content_margin_top = 2; sb.content_margin_bottom = 2
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.tooltip_text = "%s (%s)" % [str(e.get("name", "")), "debuff" if harmful else "buff"]
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 0)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(box)
+	var icon := UICommonScript.spell_icon(str(e.get("icon", "")))
+	if icon != null:
+		var ti := TextureRect.new()
+		ti.texture = icon
+		ti.custom_minimum_size = Vector2(26, 26)
+		ti.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ti.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(ti)
+	else:
+		var nm := Label.new()
+		nm.text = str(e.get("name", "?")).left(6)
+		nm.add_theme_font_size_override("font_size", 10)
+		nm.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(nm)
+	var timer := Label.new()
+	timer.text = _fmt_secs(int(e.get("remaining", 0)))
+	timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	timer.add_theme_font_size_override("font_size", 9)
+	timer.add_theme_color_override("font_color", accent)
+	timer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(timer)
+	return panel
+
+func _render_effect_row(container: HBoxContainer, effects: Array) -> void:
+	if container == null:
+		return
+	# Rebuild only when the effect set / remaining-seconds actually change.
+	var sig := ""
+	for e in effects:
+		if e is Dictionary:
+			sig += "%s:%s:%s|" % [str(e.get("name", "")), e.get("remaining", 0), e.get("harmful", false)]
+	if _effect_row_sigs.get(container) == sig:
+		return
+	_effect_row_sigs[container] = sig
+	for c in container.get_children():
+		c.queue_free()
+	for e in effects:
+		if e is Dictionary:
+			container.add_child(_make_effect_chip(e))
+
+func _update_buff_bar() -> void:
+	var eff = _self_entity().get("effects", [])
+	_render_effect_row(_buff_bar, eff if eff is Array else [])
 
 func _invite_target() -> void:
 	var t := _live_target_entity()
@@ -2229,6 +2312,7 @@ func _update_labels():
 	if health_bar == null:
 		return  # HUD not built yet
 	_update_party_health()
+	_update_buff_bar()
 	var char_info := _player_char_info()
 	var rapid_info := _rapid_info()
 	var world_name: String = str(selected_world.get("name", current_payload.get("world_name", "Unknown World")))
@@ -2283,8 +2367,11 @@ func _update_labels():
 		target_prompt_label.text = str(prompt.get("text", ""))
 		target_prompt_label.add_theme_color_override("font_color", prompt.get("color", Color(0.80, 0.92, 0.80)))
 		target_prompt_label.visible = true
+		var t_eff = (live.get("effects", []) if not live.is_empty() else server_target_description.get("effects", []))
+		_render_effect_row(_target_buff_bar, t_eff if t_eff is Array else [])
 		target_frame.visible = true
 	else:
+		_render_effect_row(_target_buff_bar, [])
 		var server_target_name: String = str(rapid_info.get("tgt", ""))
 		if not server_target_name.is_empty():
 			target_name_label.text = server_target_name

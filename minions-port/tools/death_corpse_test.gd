@@ -478,6 +478,11 @@ class DeathDriver:
 		var vis := float(view._self_entity().get("visibility", 1.0))
 		print("[DEATHTEST] Erar Invisibility: visibility=%.2f (rig fade=%.2f) %s" % [
 			vis, view._player_rig._fade_signature, "PASS" if vis < 0.99 else "WARN"])
+		# Buff bar should now show the applied timed effects.
+		await get_tree().create_timer(0.6).timeout
+		var chips: int = view._buff_bar.get_child_count()
+		print("[DEATHTEST] buff bar chips=%d %s" % [chips, "PASS" if chips > 0 else "WARN"])
+		await _shot("buff_bar")
 		await _shot("final")
 		print("[DEATHTEST] done.")
 		await get_tree().create_timer(0.3).timeout

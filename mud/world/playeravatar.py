@@ -1691,6 +1691,39 @@ class PlayerAvatar(Avatar):
                         other_mob._godot_mounts = mounts
                     except Exception:
                         pass
+                # Active buffs/debuffs for the client's buff bar. Only built for the
+                # player themselves and their current target (cost control); other
+                # entities stream an empty list (cheap + the delta skips it). Each
+                # timed spell process on the mob becomes an icon + countdown.
+                effects_list = []
+                if other_mob is mob or (mob.target is not None and other_mob is mob.target):
+                    try:
+                        # Dedupe by spell name (a spell can apply several component
+                        # effects — show one chip, keeping the longest remaining).
+                        by_name = {}
+                        for p in list(other_mob.processesIn):
+                            ep = getattr(p, 'spellProto', None)
+                            if ep is None:
+                                continue
+                            dur = float(getattr(ep, 'duration', 0) or 0)
+                            if dur <= 0:
+                                continue  # instant / permanent — not a timed bar entry
+                            elapsed = float(getattr(p, 'time', 0) or 0)
+                            remaining = int(round((dur - elapsed) / 6.0))
+                            if remaining <= 0:
+                                continue
+                            nm = str(ep.name)
+                            prev = by_name.get(nm)
+                            if prev is None or remaining > prev["remaining"]:
+                                by_name[nm] = {
+                                    "name": nm,
+                                    "harmful": bool(ep.spellType & RPG_SPELL_HARMFUL),
+                                    "icon": str(getattr(ep, 'iconDst', '') or getattr(ep, 'iconSrc', '') or ''),
+                                    "remaining": remaining,
+                                }
+                        effects_list = sorted(by_name.values(), key=lambda e: e["name"])[:12]
+                    except Exception:
+                        effects_list = []
                 entities.append({
                     "id": int(other_mob.id),
                     "sim_id": int(other_mob.simObject.id),
@@ -1729,6 +1762,7 @@ class PlayerAvatar(Avatar):
                     "standing": "Hostile" if is_enemy else ("Player" if other_mob.player else "Neutral"),
                     "distance": range_to_player,
                     "visibility_source": visibility_source,
+                    "effects": effects_list,
                 })
             except Exception:
                 print("####getVisibleEntities: failed to build entity for mob %s (source=%s)" % (getattr(other_mob, 'name', '?'), visibility_source))
