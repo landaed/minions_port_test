@@ -261,6 +261,15 @@ static func _index_sounds() -> void:
 	_index_sound_dir("character")
 	_index_sound_dir("vocalsets")
 	_index_sound_dir("environment")
+	if _sound_index.is_empty():
+		# Exported builds can't DirAccess imported .ogg; use the committed manifest
+		# (see GameAudio.SOUND_MANIFEST) so combat/spell/vocal sounds still resolve.
+		var path := SOUND_DIR + "sound_manifest.json"
+		if FileAccess.file_exists(path):
+			var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+			if data is Array:
+				for rel in data:
+					_sound_index[String(rel).to_lower().replace("\\", "/")] = SOUND_DIR + String(rel)
 
 static func _index_sound_dir(rel: String) -> void:
 	var dir := DirAccess.open(SOUND_DIR + rel)
