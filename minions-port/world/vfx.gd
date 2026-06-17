@@ -9,6 +9,10 @@ extends RefCounted
 const PARTICLE_DIR := "res://assets/vfx/particles/"
 const ZODIAC_TEX := "res://assets/vfx/zodiacs/zode_symbols.png"
 const SOUND_DIR := "res://assets/sound/"
+# Optional editor-authored override prefabs. Drop a .tscn here to replace the
+# code preset for an effect with a scene you can edit visually (GPUParticles3D,
+# ShaderMaterial, sub-emitters, ...). See assets/vfx/emitters/README.md.
+const EMITTER_SCENE_DIR := "res://assets/vfx/emitters/"
 
 static var _tex_cache: Dictionary = {}
 static var _sound_index: Dictionary = {}  # lowercase rel path -> real res path
@@ -23,37 +27,74 @@ static func particle_texture(name: String) -> Texture2D:
 		return _tex_cache[key]
 	var base := PARTICLE_DIR + key
 	var tex: Texture2D = null
-	if FileAccess.file_exists(base + ".jpg"):
-		var img := Image.load_from_file(ProjectSettings.globalize_path(base + ".jpg"))
-		if img != null:
-			var alpha_path := base + ".alpha.jpg"
-			img.convert(Image.FORMAT_RGBA8)
-			if FileAccess.file_exists(alpha_path):
-				var aimg := Image.load_from_file(ProjectSettings.globalize_path(alpha_path))
-				if aimg != null:
-					aimg.convert(Image.FORMAT_RGBA8)
-					if aimg.get_size() != img.get_size():
-						aimg.resize(img.get_width(), img.get_height())
-					for y in range(img.get_height()):
-						for x in range(img.get_width()):
-							var px := img.get_pixel(x, y)
-							px.a = aimg.get_pixel(x, y).r
-							img.set_pixel(x, y, px)
-			else:
-				# No explicit mask: use luminance so black backgrounds vanish
-				# (legacy additive-blend particle art).
-				for y in range(img.get_height()):
-					for x in range(img.get_width()):
-						var px := img.get_pixel(x, y)
-						px.a = maxf(px.r, maxf(px.g, px.b))
-						img.set_pixel(x, y, px)
-			tex = ImageTexture.create_from_image(img)
+	# UIC.load_image works in exported builds (loads the packed/imported resource);
+	# the old Image.load_from_file(globalize_path(...)) only worked in the editor,
+	# which is why particles showed up as grey untextured squares in the .exe.
+	var img := UIC.load_image(base + ".jpg")
+	if img != null:
+		var alpha_path := base + ".alpha.jpg"
+		img.convert(Image.FORMAT_RGBA8)
+		var aimg := UIC.load_image(alpha_path)
+		if aimg != null:
+			aimg.convert(Image.FORMAT_RGBA8)
+			if aimg.get_size() != img.get_size():
+				aimg.resize(img.get_width(), img.get_height())
+			for y in range(img.get_height()):
+				for x in range(img.get_width()):
+					var px := img.get_pixel(x, y)
+					px.a = aimg.get_pixel(x, y).r
+					img.set_pixel(x, y, px)
+		else:
+			# No explicit mask: use luminance so black backgrounds vanish
+			# (legacy additive-blend particle art).
+			for y in range(img.get_height()):
+				for x in range(img.get_width()):
+					var px := img.get_pixel(x, y)
+					px.a = maxf(px.r, maxf(px.g, px.b))
+					img.set_pixel(x, y, px)
+		tex = ImageTexture.create_from_image(img)
 	_tex_cache[key] = tex
 	return tex
 
 # ---------------------------------------------------------------- emitters --
+static func _emitter_override_path(emitter_name: String) -> String:
+	# An editor-authored prefab that replaces the code preset for this effect.
+	# Tried most- to least-specific so one "casting.tscn" can cover every
+	# *Casting* emitter while "castingemitter.tscn" can target just one:
+	#   assets/vfx/emitters/<emittername>.tscn   (exact, e.g. castingemitter.tscn)
+	#   assets/vfx/emitters/<keyword>.tscn        (casting / begin / smoke / fire)
+	if emitter_name.is_empty():
+		return ""
+	var lname := emitter_name.to_lower()
+	var exact := EMITTER_SCENE_DIR + lname + ".tscn"
+	if ResourceLoader.exists(exact):
+		return exact
+	for kw in ["casting", "begin", "smoke", "fire"]:
+		if kw in lname and ResourceLoader.exists(EMITTER_SCENE_DIR + kw + ".tscn"):
+			return EMITTER_SCENE_DIR + kw + ".tscn"
+	return ""
+
 static func emitter(parent: Node3D, offset: Vector3, emitter_name: String,
 		texture_name: String, duration: float) -> Node3D:
+	# If you've authored an override prefab for this effect, use it verbatim so
+	# you can iterate in the editor (and add shaders) without touching this file.
+	# A prefab may optionally implement `configure(texture_name, duration)` to
+	# react to the server-chosen texture/lifetime.
+	var override_path := _emitter_override_path(emitter_name)
+	if not override_path.is_empty():
+		var scene = load(override_path)
+		if scene != null:
+			var inst: Node3D = scene.instantiate()
+			inst.position = offset
+			if inst.has_method("configure"):
+				inst.call("configure", texture_name, duration)
+			parent.add_child(inst)
+			var ttl0 := maxf(duration, 0.1)
+			if ttl0 < 1800.0:
+				ttl0 = minf(ttl0, 30.0)
+			_free_later(inst, ttl0 + 1.0)
+			return inst
+
 	# Preset from the legacy emitter datablock name: ChimneyFire/DragonFire ->
 	# rising fire; *Smoke* -> slow gray billows; Casting -> tight inward swirl;
 	# SpellBegin -> burst on the target; anything else -> gentle sparkle.
@@ -198,10 +239,9 @@ static func casting_ring(parent: Node3D, duration: float) -> Node3D:
 	mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
 	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	mat.albedo_color = Color(0.8, 0.85, 1.0, 0.85)
-	if ResourceLoader.exists(ZODIAC_TEX) or FileAccess.file_exists(ZODIAC_TEX):
-		var img := Image.load_from_file(ProjectSettings.globalize_path(ZODIAC_TEX))
-		if img != null:
-			mat.albedo_texture = ImageTexture.create_from_image(img)
+	var zimg := UIC.load_image(ZODIAC_TEX)
+	if zimg != null:
+		mat.albedo_texture = ImageTexture.create_from_image(zimg)
 	quad.material = mat
 	mi.mesh = quad
 	mi.rotation_degrees.x = -90.0
@@ -221,6 +261,15 @@ static func _index_sounds() -> void:
 	_index_sound_dir("character")
 	_index_sound_dir("vocalsets")
 	_index_sound_dir("environment")
+	if _sound_index.is_empty():
+		# Exported builds can't DirAccess imported .ogg; use the committed manifest
+		# (see GameAudio.SOUND_MANIFEST) so combat/spell/vocal sounds still resolve.
+		var path := SOUND_DIR + "sound_manifest.json"
+		if FileAccess.file_exists(path):
+			var data = JSON.parse_string(FileAccess.get_file_as_string(path))
+			if data is Array:
+				for rel in data:
+					_sound_index[String(rel).to_lower().replace("\\", "/")] = SOUND_DIR + String(rel)
 
 static func _index_sound_dir(rel: String) -> void:
 	var dir := DirAccess.open(SOUND_DIR + rel)
@@ -247,7 +296,7 @@ static func sound3d(parent: Node3D, pos: Vector3, sound: String, big: bool = fal
 	var path := resolve_sound(sound)
 	if path.is_empty():
 		return
-	var stream: AudioStream = AudioStreamOggVorbis.load_from_file(path)
+	var stream: AudioStream = UIC.load_audio(path)
 	if stream == null:
 		return
 	var player := AudioStreamPlayer3D.new()
@@ -265,7 +314,7 @@ static func sound_ui(parent: Node, sound: String) -> void:
 	var path := resolve_sound(sound)
 	if path.is_empty():
 		return
-	var stream: AudioStream = AudioStreamOggVorbis.load_from_file(path)
+	var stream: AudioStream = UIC.load_audio(path)
 	if stream == null:
 		return
 	var player := AudioStreamPlayer.new()

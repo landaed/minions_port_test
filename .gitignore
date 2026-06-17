@@ -28,3 +28,6 @@ minions-port/.godot/
 # Local test rig: downloaded Godot binary + generated test screenshots
 tools/godot_bin/
 test_shots/
+
+# Exported builds (e.g. the single Windows .exe from tools/build_windows_exe.sh)
+build/

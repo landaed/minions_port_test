@@ -14,6 +14,10 @@ extends Node
 
 const SOUND_DIR := "res://assets/sound/"
 const MUSIC_DIR := "res://assets/sound/music/"
+# Committed list of every .ogg under assets/sound (relative paths). Exported
+# builds can't DirAccess imported .ogg, so the music scan + VFX sound index fall
+# back to this. Regenerate with tools/gen_sound_manifest.py after adding sounds.
+const SOUND_MANIFEST := "res://assets/sound/sound_manifest.json"
 const TITLE_TRACK := "38 - Minions_of_Mirth_Title_Track.ogg"
 const MUSIC_GAP_MIN := 30.0
 const MUSIC_GAP_MAX := 180.0
@@ -49,29 +53,44 @@ func _ensure_buses() -> void:
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), MUSIC_DB)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Ambience"), AMBIENCE_DB)
 
+static func read_sound_manifest() -> Array:
+	# Shared by GameAudio (music) and VFX (sfx). Empty if the file is absent.
+	if not FileAccess.file_exists(SOUND_MANIFEST):
+		return []
+	var data = JSON.parse_string(FileAccess.get_file_as_string(SOUND_MANIFEST))
+	return data if data is Array else []
+
 func _scan_tracks() -> void:
 	_all_tracks.clear()
 	var dir := DirAccess.open(MUSIC_DIR)
-	if dir == null:
-		push_warning("GameAudio: no music directory at " + MUSIC_DIR)
-		return
-	dir.list_dir_begin()
-	var f := dir.get_next()
-	while f != "":
-		if not dir.current_is_dir() and f.to_lower().ends_with(".ogg"):
-			_all_tracks.append(f)
-		f = dir.get_next()
-	dir.list_dir_end()
+	if dir != null:
+		dir.list_dir_begin()
+		var f := dir.get_next()
+		while f != "":
+			if not dir.current_is_dir() and f.to_lower().ends_with(".ogg"):
+				_all_tracks.append(f)
+			f = dir.get_next()
+		dir.list_dir_end()
+	if _all_tracks.is_empty():
+		# Exported builds can't enumerate imported .ogg via DirAccess; use the
+		# committed manifest (a non-imported .json that IS packed).
+		for rel in read_sound_manifest():
+			var r := String(rel)
+			if r.begins_with("music/") and r.to_lower().ends_with(".ogg"):
+				_all_tracks.append(r.substr(6))
 	_all_tracks.sort()
 	print("[GameAudio] %d music tracks available" % _all_tracks.size())
 
 func _load_stream(path: String, loop: bool = false) -> AudioStream:
-	var global := ProjectSettings.globalize_path(path)
-	if not FileAccess.file_exists(path) and not FileAccess.file_exists(global):
-		return null
-	var stream := AudioStreamOggVorbis.load_from_file(path)
-	if stream != null:
-		stream.loop = loop
+	# Export-safe (see UIC.load_audio): in the .exe the .ogg lives in the PCK, so
+	# the editor-only globalize_path()+load_from_file path silently returned null
+	# and music went missing. Duplicate before setting loop so we don't mutate the
+	# shared imported stream.
+	var stream := UIC.load_audio(path)
+	if stream is AudioStreamOggVorbis:
+		var ogg := stream.duplicate() as AudioStreamOggVorbis
+		ogg.loop = loop
+		return ogg
 	return stream
 
 # ------------------------------------------------------------------ music --

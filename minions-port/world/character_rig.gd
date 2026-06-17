@@ -26,6 +26,7 @@ var _skeleton: Skeleton3D = null
 var _mount_attachments: Dictionary = {}  # mount key ("0".."3") -> BoneAttachment3D
 var _mounts_signature := ""
 var _appearance_signature := ""
+var _single_tex_signature := ""
 var loaded := false
 
 func setup(glb_path: String, face_offset_deg: float = 0.0) -> bool:
@@ -195,6 +196,40 @@ func apply_appearance(parts: Dictionary) -> void:
 				var sm := StandardMaterial3D.new()
 				sm.albedo_texture = load(tex_path)
 				nmat = sm
+			mi.set_surface_override_material(si, nmat)
+
+func apply_single_texture(tex_name: String) -> void:
+	# Whole-body recolour for monsters that share one base model but ship several
+	# "single/" body textures (elementals air/earth/fire/water, bear colours,
+	# golem/skeleton variants, ...). The server streams the spawn's textureSingle
+	# in entity["tex_single"]; we override EVERY surface's albedo with it instead
+	# of the GLB's one embedded texture. Accepts "single/elemental_fire",
+	# "elemental_fire", or a full res:// path. No-op when empty or unchanged, so
+	# it's cheap to call per snapshot and harmless for players/armored mobs.
+	if tex_name.is_empty() or tex_name == _single_tex_signature:
+		return
+	var path := tex_name
+	if not path.begins_with("res://"):
+		# get_file() drops any "single/" (or other) directory prefix.
+		path = TEX_DIR + "single/" + tex_name.get_file()
+		if path.get_extension().is_empty():
+			path += ".jpg"
+	if not ResourceLoader.exists(path):
+		return
+	_single_tex_signature = tex_name
+	var tex: Texture2D = load(path)
+	for mi in skinned_meshes:
+		if not is_instance_valid(mi) or mi.mesh == null:
+			continue
+		var m: Mesh = mi.mesh
+		for si in range(m.get_surface_count()):
+			var base_mat := m.surface_get_material(si)
+			var nmat: StandardMaterial3D
+			if base_mat is StandardMaterial3D:
+				nmat = base_mat.duplicate()
+			else:
+				nmat = StandardMaterial3D.new()
+			nmat.albedo_texture = tex
 			mi.set_surface_override_material(si, nmat)
 
 func apply_mounts(mounts: Dictionary) -> void:
