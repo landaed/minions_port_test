@@ -1,6 +1,7 @@
 extends Control
 
 signal command_requested(command_type: String, payload: Dictionary)
+signal menu_action_requested(action: String)  # Esc menu: character_select / logout / quit
 
 const MOVE_SPEED := 8.0
 # --- server reconciliation (see _update_reconcile_error) ---
@@ -189,6 +190,7 @@ var _interaction_active := false
 var _is_dead := false
 var _death_overlay: Control = null
 var _death_respawn_button: Button = null
+var _game_menu: Control = null          # Esc menu (resume/char-select/logout/quit)
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
 var _last_inventory: Dictionary = {}
@@ -219,6 +221,7 @@ func _ready():
 	_build_hud()
 	_build_game_windows()
 	_build_death_overlay()
+	_build_game_menu()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -627,6 +630,55 @@ func _build_death_overlay() -> void:
 	_death_respawn_button.custom_minimum_size = Vector2(260, 46)
 	_death_respawn_button.pressed.connect(_do_respawn)
 	box.add_child(_death_respawn_button)
+
+# Esc menu: Resume / Character Select / Logout / Quit.
+func _build_game_menu() -> void:
+	_game_menu = ColorRect.new()
+	_game_menu.color = Color(0.03, 0.04, 0.06, 0.72)
+	_game_menu.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_game_menu.mouse_filter = Control.MOUSE_FILTER_STOP
+	_game_menu.visible = false
+	_game_menu.z_index = 160
+	add_child(_game_menu)
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	box.grow_vertical = Control.GROW_DIRECTION_BOTH
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.add_theme_constant_override("separation", 12)
+	_game_menu.add_child(box)
+	var title := Label.new()
+	title.text = "Menu"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 30)
+	box.add_child(title)
+	for entry in [["Resume", "resume"], ["Character Select", "character_select"],
+			["Log Out", "logout"], ["Quit Game", "quit"]]:
+		var b := Button.new()
+		b.text = entry[0]
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(240, 40)
+		UICommonScript.style_button(b)
+		var action: String = entry[1]
+		b.pressed.connect(func(): _on_game_menu_action(action))
+		box.add_child(b)
+
+func _on_game_menu_action(action: String) -> void:
+	if action == "resume":
+		_toggle_game_menu(false)
+		return
+	# character_select / logout / quit are app-level; control handles them.
+	menu_action_requested.emit(action)
+
+func _toggle_game_menu(force_on = null) -> void:
+	if _game_menu == null:
+		return
+	var on: bool = (not _game_menu.visible) if force_on == null else bool(force_on)
+	_game_menu.visible = on
+	if on:
+		_release_mouse()
+	elif not _ui_open():
+		_capture_mouse()
 
 func _show_death_overlay(on: bool) -> void:
 	_is_dead = on
@@ -2434,6 +2486,26 @@ func _send_interact_command():
 	interaction_message = "Sent INTERACT to the legacy world server."
 	_request_server_command("interact")
 
+func _clear_target():
+	# Deselect: target nothing. entity_id 0 clears the server-side target.
+	if server_target_description.is_empty() and _pending_target_sim_id == 0 and _pending_target_mob_id == 0:
+		return
+	_request_server_command("target_entity", {"entity_id": 0})
+	server_target_description = {}
+	_pending_target_sim_id = 0
+	_pending_target_mob_id = 0
+	_highlight_entity("")
+	interaction_message = "Target cleared."
+	_update_labels()
+
+func _target_self():
+	# Target your own character (for self-cast beneficial spells / inspection).
+	var self_id := int(_self_entity().get("id", 0))
+	if self_id <= 0:
+		return
+	_request_server_command("target_entity", {"entity_id": self_id})
+	interaction_message = "Targeted yourself."
+
 func _cycle_target():
 	# Tab targets what you're roughly looking at: rank the live entities inside
 	# a frontal cone by how close they are to the crosshair, and cycle through
@@ -2561,13 +2633,13 @@ func _typing_in_ui() -> bool:
 	return focus is LineEdit or focus is TextEdit
 
 func _ui_open() -> bool:
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
 		if w != null and w.visible:
 			return true
 	return false
 
 func _close_all_windows():
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window]:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
 		if w != null and w.visible:
 			w.close_window()
 
@@ -2694,15 +2766,21 @@ func _input(event):
 		if ui_open:
 			return  # windows take the mouse; world clicks resume when they close
 		var selected := _target_entity_from_click(event.position)
+		if not selected:
+			_clear_target()  # clicking empty space deselects
 		_capture_mouse()
-		if selected:
-			_update_labels()
+		_update_labels()
 	elif event.is_action_pressed("ui_cancel"):
-		if ui_open:
+		# Esc: close menu -> close chat -> close windows -> open menu.
+		if _game_menu and _game_menu.visible:
+			_toggle_game_menu(false)
+		elif chat_input and chat_input.visible:
+			_close_chat()
+		elif ui_open:
 			_close_all_windows()
 			_capture_mouse()
 		else:
-			_release_mouse()
+			_toggle_game_menu(true)
 	elif event is InputEventKey and event.pressed and not event.echo:
 		if _typing_in_ui():
 			return  # a window text field owns the keyboard
@@ -2729,6 +2807,8 @@ func _input(event):
 				_toggle_journal()
 			KEY_P, KEY_B:
 				_toggle_spellbook()
+			KEY_F1:
+				_target_self()
 			KEY_F3:
 				_debug_visible = not _debug_visible
 				if debug_panel:

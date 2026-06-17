@@ -214,7 +214,51 @@ class StubSimAvatar:
         pass
 
     def launchProjectile(self, p):
-        pass
+        # The Torque engine used to fly the projectile and call back
+        # projectileCollision on hit. The headless stub has no such engine, so
+        # without this every projectile / ranged spell (Flying Cinder, Fire
+        # Shock, bows, ...) launched but never hit — it just vanished and did
+        # nothing. Resolve it against its target after an approximate travel
+        # time (distance / speed) so the spell/damage payload actually lands.
+        dst = getattr(p, "dst", None)
+        if dst is None or getattr(dst, "simObject", None) is None:
+            return
+        src = getattr(p, "src", None)
+        dist = 0.0
+        try:
+            if src is not None and getattr(src, "simObject", None) is not None:
+                sp = src.simObject.position
+                dp = dst.simObject.position
+                dist = sqrt((sp[0] - dp[0]) ** 2 + (sp[1] - dp[1]) ** 2 + (sp[2] - dp[2]) ** 2)
+        except Exception:
+            dist = 0.0
+        speed = 0.0
+        try:
+            speed = float(getattr(p, "speed", 0) or 0)
+        except Exception:
+            speed = 0.0
+        if speed <= 0.0:
+            speed = 15.0
+        delay = min(max(dist / speed, 0.05), 1.5)
+        pid = p.id
+
+        def _impact():
+            try:
+                proj = self.zone.projectiles.get(pid)
+                if proj is None:
+                    return  # already resolved / deleted
+                tgt = getattr(proj, "dst", None)
+                if tgt is None or getattr(tgt, "simObject", None) is None:
+                    self.zone.projectiles.pop(pid, None)
+                    return
+                # projectileCollision re-derives dst from the hit simObject and
+                # applies the projectile's spell/damage payload.
+                self.zone.projectileCollision(pid, tgt.simObject, tgt.simObject.position)
+                self.zone.projectiles.pop(pid, None)
+            except Exception:
+                traceback.print_exc()
+
+        reactor.callLater(delay, _impact)
 
     def respawnPlayer(self, player, transform=None):
         if player.simObject and transform:

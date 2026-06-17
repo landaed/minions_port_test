@@ -241,6 +241,8 @@ class DeathDriver:
 					_step_buff_up()
 			"corpse_combat":
 				_step_corpse_combat()
+			"projectile_check":
+				_step_projectile_check()
 			"walking":
 				_walk_tick()
 			"corpse_attack":
@@ -345,8 +347,47 @@ class DeathDriver:
 			_did["combat_mob"] = mob
 			view._request_server_command("target_entity", {"entity_id": int(mob.get("id", 0))})
 			_face_towards(_entity_godot_pos(mob))
+			_goto("projectile_check")
+
+	# Verify projectile spells (Flying Cinder etc.) actually damage the target —
+	# the headless stub used to drop launched projectiles, so they did nothing.
+	func _step_projectile_check() -> void:
+		var mob: Dictionary = _did.get("combat_mob", {})
+		var id := int(mob.get("id", 0))
+		if _once("proj_cast"):
+			_busy = true
+			view._request_server_command("target_entity", {"entity_id": id})
+			view._request_server_command("cheat", {"action": "full_heal", "params": {}})
+			await get_tree().create_timer(0.6).timeout
+			var before := float(_entity_by_id(id).get("health", 0.0))
+			view._request_server_command("cheat", {"action": "apply_spell", "params": {"name": "Flying Cinder", "at_target": true}})
+			print("[DEATHTEST] launched Flying Cinder at '%s' (hp before=%.0f)" % [mob.get("name", "?"), before])
+			# Projectile spells aren't instant: ~1s launch windup + flight time +
+			# a server tick to resolve the queued Spell + 2 replication hops. Poll
+			# (up to ~7s) for the health to drop rather than reading once, so the
+			# check doesn't race the in-flight damage.
+			var after := before
+			var dead := false
+			for _i in range(70):
+				await get_tree().create_timer(0.1).timeout
+				var fresh := _entity_by_id(id)
+				if fresh.is_empty():
+					dead = true
+					after = 0.0
+					break
+				after = float(fresh.get("health", before))
+				if bool(fresh.get("dead", false)) or after <= 0.0:
+					dead = true
+					break
+				if after < before:
+					break
+			print("[DEATHTEST] Flying Cinder (projectile): hp %.0f -> %.0f%s %s" % [
+				before, after, "  (dead)" if dead else "",
+				"PASS" if (after < before or dead) else "WARN"])
+			# Finish the kill with melee so the corpse-freeze test still runs.
 			view._request_server_command("attack_toggle")
 			_goto("corpse_attack")
+			_busy = false
 
 	func _step_corpse_attack() -> void:
 		var mob: Dictionary = _did.get("combat_mob", {})
@@ -483,6 +524,42 @@ class DeathDriver:
 		var chips: int = view._buff_bar.get_child_count()
 		print("[DEATHTEST] buff bar chips=%d %s" % [chips, "PASS" if chips > 0 else "WARN"])
 		await _shot("buff_bar")
+		# --- deselect: target self, then clear ---
+		# Each target change is a client->proxy->world round-trip, so poll for the
+		# selection to actually register/clear rather than reading once (a fixed
+		# wait races the in-flight setSelection reply).
+		view._target_self()
+		var had_target := false
+		for _i in range(30):
+			await get_tree().create_timer(0.1).timeout
+			if not view.server_target_description.is_empty():
+				had_target = true
+				break
+		view._clear_target()
+		var cleared := false
+		for _i in range(30):
+			await get_tree().create_timer(0.1).timeout
+			if view.server_target_description.is_empty():
+				cleared = true
+				break
+		print("[DEATHTEST] deselect: self-targeted=%s then cleared=%s %s" % [
+			had_target, cleared, "PASS" if (had_target and cleared) else "WARN"])
+		# --- cheat window must NOT capture the mouse ---
+		view._toggle_cheats()
+		await get_tree().create_timer(0.6).timeout
+		var mouse_ok: bool = Input.get_mouse_mode() == Input.MOUSE_MODE_VISIBLE
+		print("[DEATHTEST] cheat window mouse visible=%s %s" % [
+			mouse_ok, "PASS" if mouse_ok else "WARN"])
+		await _shot("cheat_window_mouse")
+		view._toggle_cheats()  # close
+		await get_tree().create_timer(0.3).timeout
+		# --- Esc game menu ---
+		view._toggle_game_menu(true)
+		await get_tree().create_timer(0.5).timeout
+		var menu_vis: bool = view._game_menu.visible
+		print("[DEATHTEST] Esc menu visible=%s %s" % [menu_vis, "PASS" if menu_vis else "WARN"])
+		await _shot("escape_menu")
+		view._toggle_game_menu(false)
 		await _shot("final")
 		print("[DEATHTEST] done.")
 		await get_tree().create_timer(0.3).timeout

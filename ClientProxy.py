@@ -1172,6 +1172,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             "query_characters": self.handle_query_characters,
             "create_character": self.handle_create_character,
             "enter_world": self.handle_enter_world,
+            "leave_world": self.handle_leave_world,
             "direct_connect": self.handle_direct_connect,
             "gameplay_command": self.handle_gameplay_command,
             "cheat": self.handle_cheat,
@@ -1260,12 +1261,15 @@ class ProxyProtocol(WebSocketServerProtocol):
             payload = ("SKILL", ["0", *ability_name.split()])
 
         if payload is None and command == "target_entity":
+            # entity_id 0 is a valid request: it clears the current target
+            # (PlayerAvatar.targetEntity(0) -> setTargetById(mob, 0) -> no target).
             entity_id = int(msg.get("entity_id", 0) or 0)
-            if entity_id <= 0:
-                self._send_gameplay_command_result(False, command, "Missing entity id.")
+            if entity_id < 0:
+                self._send_gameplay_command_result(False, command, "Bad entity id.")
                 return
             d = self.session.player_perspective.callRemote("PlayerAvatar", "targetEntity", entity_id, 0)
-            d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Targeted replicated entity {entity_id} on legacy world server."))
+            label = ("Cleared target" if entity_id == 0 else f"Targeted entity {entity_id}") + " on legacy world server."
+            d.addCallback(lambda result: self._send_gameplay_command_result(True, command, label))
             d.addErrback(self._on_gameplay_command_failed, command, "TARGET_ENTITY")
             return
 
@@ -2111,6 +2115,26 @@ class ProxyProtocol(WebSocketServerProtocol):
         )
         if success:
             self._do_query_characters()
+
+    def handle_leave_world(self, msg):
+        """Return to character select: stop streaming + clear gameplay caches but
+        keep the player/world perspective so the client can re-enter a character."""
+        session = self.session
+        for attr in ("gameplay_sync_call", "entity_sync_call", "skill_sync_call"):
+            call = getattr(session, attr, None)
+            try:
+                if call and call.active():
+                    call.cancel()
+            except Exception:
+                pass
+            setattr(session, attr, None)
+        session.root_info_cache = None
+        session.last_gameplay_payload = None
+        session.last_entity_payload = None
+        session.player_dead = False
+        session.entity_static_sent = {}
+        session.entity_dyn_sent = {}
+        session.send({"type": "left_world", "success": True})
 
     def handle_enter_world(self, msg):
         if not self._ensure_player_logged_in():

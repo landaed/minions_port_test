@@ -261,10 +261,23 @@ def cheat_apply_spell(player, params):
         proto = None
     if not proto:
         return _result(False, "No spell named %r." % name)
+    # Optionally cast at the current target instead of self.
+    dst = mob
+    if params.get("at_target") and getattr(mob, "target", None):
+        dst = mob.target
+    # A projectile spell at a target must go through the projectile path (so the
+    # stub's launchProjectile resolves it and applies damage on "impact"), not a
+    # direct SpawnSpell which would skip the flight.
+    if getattr(proto, "projectile", "") and dst is not mob:
+        from mud.world.projectile import Projectile
+        p = Projectile(mob, dst, 1)
+        p.spellProto = proto
+        p.launch()
+        return _result(True, "Launched %s at %s." % (name, getattr(dst, "name", "target")))
     # spellLevel is the spell RANK (1..N, indexes RPG_ROMAN), not the character
     # level — rank 1 is always valid.
-    SpawnSpell(proto, mob, mob, spellLevel=1)
-    return _result(True, "Applied %s to %s." % (name, char.name))
+    SpawnSpell(proto, mob, dst, spellLevel=1)
+    return _result(True, "Applied %s to %s." % (name, getattr(dst, "name", char.name)))
 
 
 def cheat_suicide(player, params):
