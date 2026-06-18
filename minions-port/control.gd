@@ -1,11 +1,34 @@
 extends Control
 
 const GAMEPLAY_VIEW_SCENE := preload("res://gameplay_view.tscn")
+const CharacterRigScript := preload("res://world/character_rig.gd")
+const CHAR_ASSET_DIR := "res://assets/characters/"
 
 var socket := WebSocketPeer.new()
 var connected := false
 var gameplay_view: Control = null
 var world_time := {"hour": 0, "minute": 0}
+
+# --- Menu visuals: a 3D character on a lit stage behind the login/creation form.
+var _stage_viewport: SubViewport = null
+var _stage_pivot: Node3D = null
+var _stage_rig: Node3D = null
+var _stage_model_key := ""
+var _stage_spin := 0.0
+var _form_panel: PanelContainer = null
+
+# --- Character creation: appearance + starting stats ----------------------
+var _build_option: OptionButton = null
+var _stats_section: VBoxContainer = null
+var _stat_points_label: Label = null
+const STAT_KEYS := ["str", "bdy", "agi", "dex", "ref", "mnd", "wis", "mys"]
+const STAT_NAMES := {
+	"str": "Strength", "bdy": "Body", "agi": "Agility", "dex": "Dexterity",
+	"ref": "Reflexes", "mnd": "Mind", "wis": "Wisdom", "mys": "Mysticism",
+}
+const STARTING_BONUS_POOL := 10
+var _stat_bonus := {}            # stat -> points allocated
+var _stat_value_labels := {}     # stat -> Label
 
 @onready var login_panel := $VBoxContainer
 @onready var title_label := $VBoxContainer/TitleLabel
@@ -54,7 +77,7 @@ func _phase_world_account_controls() -> Array:
 	return [fantasy_name_field, world_access_password_field, create_world_account_button, world_password_field, login_world_button]
 
 func _phase_character_controls() -> Array:
-	return [character_list, character_name_field, race_option, class_option, sex_option, create_character_button, enter_world_button]
+	return [character_list, character_name_field, race_option, class_option, sex_option, _build_option, _stats_section, create_character_button, enter_world_button]
 
 func _all_flow_controls() -> Array:
 	return _phase_login_controls() + _phase_world_controls() + _phase_world_account_controls() + _phase_character_controls()
@@ -93,7 +116,9 @@ const DEFAULT_PROXY_PORT := 9000
 var _current_server_url := ""
 
 func _ready():
+	_build_visuals()
 	_setup_options()
+	_build_creation_extras()
 	_set_phase(PHASE_LOGIN)
 	# Remember the last server you connected to (host or host:port). Leave the
 	# field blank for localhost. To play with a friend, type the HOST's address
@@ -102,6 +127,308 @@ func _ready():
 	server_field.text = saved
 	_connect_to_server(saved)
 	GameAudio.start_menu_music()
+
+# --- Menu visuals ----------------------------------------------------------
+func _build_visuals() -> void:
+	# Dark backdrop behind everything.
+	var bg := ColorRect.new()
+	bg.color = Color(0.03, 0.04, 0.06)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+	move_child(bg, 0)
+
+	# 3D stage: a lit, slowly rotating character in a SubViewport.
+	var svc := SubViewportContainer.new()
+	svc.set_anchors_preset(Control.PRESET_FULL_RECT)
+	svc.stretch = true
+	svc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(svc)
+	move_child(svc, 1)
+	_stage_viewport = SubViewport.new()
+	_stage_viewport.own_world_3d = true
+	_stage_viewport.msaa_3d = Viewport.MSAA_4X
+	svc.add_child(_stage_viewport)
+
+	var we := WorldEnvironment.new()
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0.05, 0.06, 0.10)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.30, 0.36, 0.50)
+	env.ambient_light_energy = 0.7
+	env.fog_enabled = true
+	env.fog_light_color = Color(0.06, 0.07, 0.12)
+	env.fog_density = 0.015
+	we.environment = env
+	_stage_viewport.add_child(we)
+
+	var key := DirectionalLight3D.new()
+	key.rotation_degrees = Vector3(-32, 40, 0)
+	key.light_energy = 1.6
+	key.light_color = Color(1.0, 0.92, 0.78)
+	_stage_viewport.add_child(key)
+	var fill := DirectionalLight3D.new()
+	fill.rotation_degrees = Vector3(-8, -130, 0)
+	fill.light_energy = 0.5
+	fill.light_color = Color(0.55, 0.68, 1.0)
+	_stage_viewport.add_child(fill)
+	var rim := OmniLight3D.new()
+	rim.position = Vector3(-1.5, 2.4, -2.2)
+	rim.light_energy = 4.0
+	rim.light_color = Color(0.75, 0.85, 1.0)
+	rim.omni_range = 9.0
+	_stage_viewport.add_child(rim)
+
+	# Pedestal the character stands on.
+	var ped := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 1.5
+	cyl.bottom_radius = 1.7
+	cyl.height = 0.2
+	ped.mesh = cyl
+	ped.position = Vector3(0, -0.1, 0)
+	var pmat := StandardMaterial3D.new()
+	pmat.albedo_color = Color(0.09, 0.10, 0.14)
+	pmat.metallic = 0.4
+	pmat.roughness = 0.55
+	ped.material_override = pmat
+	_stage_viewport.add_child(ped)
+
+	_stage_pivot = Node3D.new()
+	_stage_viewport.add_child(_stage_pivot)
+
+	var cam := Camera3D.new()
+	cam.fov = 38.0
+	cam.position = Vector3(0.0, 1.15, 4.3)
+	_stage_viewport.add_child(cam)
+	cam.look_at(Vector3(0.0, 1.0, 0.0), Vector3.UP)  # after entering the tree
+
+	_update_preview_model("Human", "Male", "")
+	_build_form_chrome()
+	set_process(true)
+
+func _build_form_chrome() -> void:
+	# Big game-title banner across the top.
+	var banner := Label.new()
+	banner.text = "MINIONS OF MIRTH"
+	banner.add_theme_font_size_override("font_size", 46)
+	banner.add_theme_color_override("font_color", Color(0.95, 0.84, 0.52))
+	banner.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.75))
+	banner.add_theme_constant_override("shadow_offset_x", 2)
+	banner.add_theme_constant_override("shadow_offset_y", 3)
+	banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	banner.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	banner.offset_top = 28.0
+	banner.offset_bottom = 96.0
+	banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(banner)
+
+	# Styled panel on the right; the character shows on the left.
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.06, 0.07, 0.10, 0.90)
+	sb.border_color = Color(0.5, 0.56, 0.72, 0.85)
+	sb.set_border_width_all(1)
+	sb.set_corner_radius_all(10)
+	sb.content_margin_left = 20
+	sb.content_margin_right = 20
+	sb.content_margin_top = 16
+	sb.content_margin_bottom = 16
+	sb.shadow_color = Color(0, 0, 0, 0.55)
+	sb.shadow_size = 16
+	panel.add_theme_stylebox_override("panel", sb)
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.anchor_top = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -520.0
+	panel.offset_right = -48.0
+	panel.offset_top = -330.0
+	panel.offset_bottom = 330.0
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	panel.theme = _menu_theme()
+	add_child(panel)
+	_form_panel = panel
+
+	# Move the existing form into the panel.
+	remove_child(login_panel)
+	panel.add_child(login_panel)
+	login_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+	login_panel.offset_left = 0
+	login_panel.offset_top = 0
+	login_panel.offset_right = 0
+	login_panel.offset_bottom = 0
+	login_panel.add_theme_constant_override("separation", 9)
+
+	title_label.add_theme_font_size_override("font_size", 21)
+	title_label.add_theme_color_override("font_color", Color(0.86, 0.89, 0.97))
+	status_label.add_theme_color_override("font_color", Color(0.68, 0.77, 0.9))
+
+func _menu_theme() -> Theme:
+	var th := Theme.new()
+	var btn := StyleBoxFlat.new()
+	btn.bg_color = Color(0.14, 0.17, 0.24)
+	btn.border_color = Color(0.42, 0.56, 0.82)
+	btn.set_border_width_all(1)
+	btn.set_corner_radius_all(5)
+	btn.content_margin_left = 10
+	btn.content_margin_right = 10
+	btn.content_margin_top = 8
+	btn.content_margin_bottom = 8
+	var btn_hover: StyleBoxFlat = btn.duplicate()
+	btn_hover.bg_color = Color(0.21, 0.27, 0.38)
+	btn_hover.border_color = Color(0.55, 0.7, 0.95)
+	var btn_press: StyleBoxFlat = btn.duplicate()
+	btn_press.bg_color = Color(0.11, 0.14, 0.2)
+	for cls in ["Button", "OptionButton"]:
+		th.set_stylebox("normal", cls, btn)
+		th.set_stylebox("hover", cls, btn_hover)
+		th.set_stylebox("pressed", cls, btn_press)
+		th.set_stylebox("focus", cls, btn_hover)
+		th.set_color("font_color", cls, Color(0.92, 0.94, 0.98))
+		th.set_font_size("font_size", cls, 15)
+	var le := StyleBoxFlat.new()
+	le.bg_color = Color(0.10, 0.12, 0.16)
+	le.border_color = Color(0.3, 0.35, 0.45)
+	le.set_border_width_all(1)
+	le.set_corner_radius_all(4)
+	le.content_margin_left = 8
+	le.content_margin_right = 8
+	le.content_margin_top = 7
+	le.content_margin_bottom = 7
+	var le_focus: StyleBoxFlat = le.duplicate()
+	le_focus.border_color = Color(0.5, 0.66, 0.92)
+	th.set_stylebox("normal", "LineEdit", le)
+	th.set_stylebox("focus", "LineEdit", le_focus)
+	th.set_font_size("font_size", "LineEdit", 14)
+	var list_bg := StyleBoxFlat.new()
+	list_bg.bg_color = Color(0.08, 0.09, 0.13)
+	list_bg.border_color = Color(0.3, 0.35, 0.45)
+	list_bg.set_border_width_all(1)
+	list_bg.set_corner_radius_all(4)
+	th.set_stylebox("panel", "ItemList", list_bg)
+	th.set_font_size("font_size", "ItemList", 14)
+	return th
+
+func _glb_for(race: String, sex: String, model: String) -> String:
+	if model != "":
+		var key := model.to_lower()
+		if key.ends_with(".dts"):
+			key = key.substr(0, key.length() - 4)
+		key = key.replace("/", "_").replace("\\", "_")
+		var mp := CHAR_ASSET_DIR + key + ".glb"
+		if ResourceLoader.exists(mp):
+			return mp
+	var s := "female" if sex.to_lower().begins_with("f") else "male"
+	var r := race.to_lower().replace(" ", "")
+	if r != "":
+		var rp := CHAR_ASSET_DIR + r + "_" + s + ".glb"
+		if ResourceLoader.exists(rp):
+			return rp
+	var hp := CHAR_ASSET_DIR + "human_male.glb"
+	return hp if ResourceLoader.exists(hp) else ""
+
+func _update_preview_model(race: String, sex: String, model: String) -> void:
+	if _stage_pivot == null:
+		return
+	var path := _glb_for(race, sex, model)
+	if path == "" or path == _stage_model_key:
+		return
+	_stage_model_key = path
+	if _stage_rig and is_instance_valid(_stage_rig):
+		_stage_rig.queue_free()
+	_stage_rig = CharacterRigScript.new()
+	_stage_pivot.add_child(_stage_rig)
+	_stage_rig.setup(path, 180.0)  # face the camera
+	_apply_preview_build()
+
+func _apply_preview_build() -> void:
+	# Approximate the chosen body build by scaling the preview (the port ships one
+	# mesh per race/sex, so Slender/Average/Burly nudge the silhouette).
+	if _stage_rig == null or not is_instance_valid(_stage_rig):
+		return
+	var look: int = _build_option.selected if _build_option else 1
+	var widths := [0.9, 1.0, 1.12]
+	var wide: float = widths[clampi(look, 0, 2)]
+	_stage_rig.scale = Vector3(wide, 1.0, wide)
+
+func _build_creation_extras() -> void:
+	# Body build (Slender/Average/Burly -> look 0/1/2).
+	_build_option = OptionButton.new()
+	for b in ["Slender build", "Average build", "Burly build"]:
+		_build_option.add_item(b)
+	_build_option.select(1)
+	_build_option.item_selected.connect(func(_i): _apply_preview_build())
+	login_panel.add_child(_build_option)
+	login_panel.move_child(_build_option, sex_option.get_index() + 1)
+
+	# Starting stat allocation.
+	_stats_section = VBoxContainer.new()
+	_stats_section.add_theme_constant_override("separation", 2)
+	_stat_points_label = Label.new()
+	_stat_points_label.add_theme_font_size_override("font_size", 12)
+	_stat_points_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	_stats_section.add_child(_stat_points_label)
+	var grid := GridContainer.new()
+	grid.columns = 8
+	grid.add_theme_constant_override("h_separation", 5)
+	grid.add_theme_constant_override("v_separation", 3)
+	_stats_section.add_child(grid)
+	# Two attributes per row (name, -, value, +).
+	for key in STAT_KEYS:
+		_stat_bonus[key] = 0
+		var name_l := Label.new()
+		name_l.text = STAT_NAMES[key]
+		name_l.add_theme_font_size_override("font_size", 11)
+		name_l.custom_minimum_size = Vector2(72, 0)
+		grid.add_child(name_l)
+		var minus := Button.new()
+		minus.text = "−"
+		minus.custom_minimum_size = Vector2(26, 22)
+		minus.focus_mode = Control.FOCUS_NONE
+		minus.pressed.connect(_on_stat_minus.bind(key))
+		grid.add_child(minus)
+		var val_l := Label.new()
+		val_l.text = "0"
+		val_l.custom_minimum_size = Vector2(20, 0)
+		val_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		grid.add_child(val_l)
+		_stat_value_labels[key] = val_l
+		var plus := Button.new()
+		plus.text = "+"
+		plus.custom_minimum_size = Vector2(26, 22)
+		plus.focus_mode = Control.FOCUS_NONE
+		plus.pressed.connect(_on_stat_plus.bind(key))
+		grid.add_child(plus)
+	login_panel.add_child(_stats_section)
+	login_panel.move_child(_stats_section, _build_option.get_index() + 1)
+	_update_stat_points_label()
+
+func _stat_points_spent() -> int:
+	var t := 0
+	for k in STAT_KEYS:
+		t += int(_stat_bonus[k])
+	return t
+
+func _update_stat_points_label() -> void:
+	if _stat_points_label:
+		_stat_points_label.text = "Bonus starting points: %d / %d remaining" % [
+			STARTING_BONUS_POOL - _stat_points_spent(), STARTING_BONUS_POOL]
+
+func _on_stat_plus(key: String) -> void:
+	if _stat_points_spent() >= STARTING_BONUS_POOL:
+		return
+	_stat_bonus[key] = int(_stat_bonus[key]) + 1
+	_stat_value_labels[key].text = str(_stat_bonus[key])
+	_update_stat_points_label()
+
+func _on_stat_minus(key: String) -> void:
+	if int(_stat_bonus[key]) <= 0:
+		return
+	_stat_bonus[key] = int(_stat_bonus[key]) - 1
+	_stat_value_labels[key].text = str(_stat_bonus[key])
+	_update_stat_points_label()
 
 # Turn "host", "host:port", or "ws://host:port" into a WebSocket URL.
 func _server_url(addr: String) -> String:
@@ -158,6 +485,7 @@ func _setup_options():
 		sex_option.add_item(sex)
 	race_option.select(0)
 	sex_option.select(0)
+	sex_option.item_selected.connect(func(_i): _update_creation_preview())
 	_refresh_class_options()
 
 func _refresh_class_options():
@@ -181,8 +509,19 @@ func _refresh_class_options():
 
 func _on_race_option_item_selected(_index):
 	_refresh_class_options()
+	_update_creation_preview()
 
-func _process(_delta):
+func _update_creation_preview() -> void:
+	var race: String = race_option.get_item_text(race_option.selected)
+	var sex: String = sex_option.get_item_text(sex_option.selected)
+	_update_preview_model(race, sex, "")
+
+func _process(delta):
+	# Slowly turn the menu character.
+	if _stage_pivot and is_instance_valid(_stage_pivot):
+		_stage_spin += delta * 0.45
+		_stage_pivot.rotation.y = _stage_spin
+
 	socket.poll()
 
 	var state := socket.get_ready_state()
@@ -364,7 +703,8 @@ func _on_create_character_button_pressed():
 		"race": race_option.get_item_text(race_option.selected),
 		"klass": class_option.get_item_text(class_option.selected),
 		"sex": sex_option.get_item_text(sex_option.selected),
-		"look": 0,
+		"look": _build_option.selected if _build_option else 0,
+		"bonus": _stat_bonus.duplicate(),
 		"realm": 1,
 	})
 

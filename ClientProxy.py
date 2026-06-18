@@ -2131,6 +2131,25 @@ class ProxyProtocol(WebSocketServerProtocol):
             for stat, value in zip(stats, default_stats[klass]):
                 newchar.adjs[stat] = value
 
+        # Player-allocated starting bonus points (from character creation): add to
+        # the class adjustments so they raise the starting base stats. Capped to
+        # the pool the client offers so it can't be abused by a crafted message.
+        bonus = msg.get("bonus", {})
+        if isinstance(bonus, dict):
+            bonus_cap = 10
+            spent = 0
+            for stat in stats:
+                try:
+                    amt = max(0, int(bonus.get(stat.lower(), 0) or 0))
+                except (TypeError, ValueError):
+                    amt = 0
+                if amt <= 0:
+                    continue
+                if spent + amt > bonus_cap:
+                    amt = max(0, bonus_cap - spent)
+                spent += amt
+                newchar.adjs[stat] = int(newchar.adjs.get(stat, 0)) + amt
+
         d = self.session.player_perspective.callRemote("PlayerAvatar", "newCharacter", newchar)
         d.addCallback(self._on_create_character_result, name)
         d.addErrback(self._on_character_op_failed, "create_character")
