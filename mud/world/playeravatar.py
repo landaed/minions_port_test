@@ -1550,7 +1550,13 @@ class PlayerAvatar(Avatar):
             return []
 
         char = self.player.party.members[char_index]
-        if not char or char.dead or not char.mob or not char.mob.zone or not char.mob.simObject:
+        # A dead character has no live mob to stream. Return an explicit "dead"
+        # marker (not a bare empty list) so the proxy can tell the difference
+        # between "you died" and "nothing visible right now" and surface a death
+        # overlay + respawn option on the client.
+        if char and char.dead:
+            return {"entities": [], "events": [], "dead": True}
+        if not char or not char.mob or not char.mob.zone or not char.mob.simObject:
             return []
 
         mob = char.mob
@@ -1606,7 +1612,11 @@ class PlayerAvatar(Avatar):
                     model_name = str(getattr(spawn_row, 'model', '') or '')
                     animation_name = str(getattr(spawn_row, 'animation', '') or '')
                     try:
-                        scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0)
+                        # Live visual scale = base spawn scale * the mob's current
+                        # size multiplier, so Enlarge/Shrink (which change mob.size)
+                        # actually resize the model on the client. size defaults to 1.
+                        scale_val = float(getattr(spawn_row, 'scale', 1.0) or 1.0) \
+                            * float(getattr(other_mob, 'size', 1.0) or 1.0)
                     except Exception:
                         scale_val = 1.0
                 # Whole-body "single" texture for monsters that share one base model
@@ -1618,6 +1628,41 @@ class PlayerAvatar(Avatar):
                 single_tex = ""
                 if spawn_row is not None:
                     single_tex = str(getattr(spawn_row, 'textureSingle', '') or '')
+                # Illusion / polymorph (Transmutation of Volsh -> blue dragon,
+                # Werewolf Form, Illusion <race>, ...): override the streamed model
+                # so the client swaps the rig. Model-based illusions name a monster
+                # model (client converts dragon/dragon_blue.dts -> dragon_dragon_blue.glb);
+                # race-based ones clear the model and pick by race+sex like a player.
+                # The swapped model carries its own baked textures, so we don't
+                # force the per-part skins here.
+                try:
+                    ie = getattr(other_mob, 'illusionEffect', None)
+                    illusion = ie.effectProto.illusion if ie is not None else None
+                except Exception:
+                    illusion = None
+                if illusion is not None:
+                    il_model = str(getattr(illusion, 'illusionModel', '') or '')
+                    il_race = str(getattr(illusion, 'illusionRace', '') or '')
+                    il_anim = str(getattr(illusion, 'illusionAnimation', '') or '')
+                    il_sex = str(getattr(illusion, 'illusionSex', '') or '')
+                    il_single = str(getattr(illusion, 'illusionTextureSingle', '') or '')
+                    if il_model:
+                        model_name = il_model
+                    if il_race:
+                        race_name = il_race
+                        model_name = ""  # pick by race+sex on the client
+                    if il_anim:
+                        animation_name = il_anim
+                    if il_sex:
+                        sex_name = il_sex
+                    if il_single:
+                        single_tex = il_single
+                    try:
+                        il_size = float(getattr(illusion, 'illusionSize', 0.0) or 0.0)
+                        if il_size > 0.0:
+                            scale_val = il_size
+                    except Exception:
+                        pass
                 # Per-part skin/armor texture indices for the client (cached on the
                 # mob; appearance rarely changes). Empty for monsters using an
                 # embedded single/multi texture.
@@ -1646,6 +1691,39 @@ class PlayerAvatar(Avatar):
                         other_mob._godot_mounts = mounts
                     except Exception:
                         pass
+                # Active buffs/debuffs for the client's buff bar. Only built for the
+                # player themselves and their current target (cost control); other
+                # entities stream an empty list (cheap + the delta skips it). Each
+                # timed spell process on the mob becomes an icon + countdown.
+                effects_list = []
+                if other_mob is mob or (mob.target is not None and other_mob is mob.target):
+                    try:
+                        # Dedupe by spell name (a spell can apply several component
+                        # effects — show one chip, keeping the longest remaining).
+                        by_name = {}
+                        for p in list(other_mob.processesIn):
+                            ep = getattr(p, 'spellProto', None)
+                            if ep is None:
+                                continue
+                            dur = float(getattr(ep, 'duration', 0) or 0)
+                            if dur <= 0:
+                                continue  # instant / permanent — not a timed bar entry
+                            elapsed = float(getattr(p, 'time', 0) or 0)
+                            remaining = int(round((dur - elapsed) / 6.0))
+                            if remaining <= 0:
+                                continue
+                            nm = str(ep.name)
+                            prev = by_name.get(nm)
+                            if prev is None or remaining > prev["remaining"]:
+                                by_name[nm] = {
+                                    "name": nm,
+                                    "harmful": bool(ep.spellType & RPG_SPELL_HARMFUL),
+                                    "icon": str(getattr(ep, 'iconDst', '') or getattr(ep, 'iconSrc', '') or ''),
+                                    "remaining": remaining,
+                                }
+                        effects_list = sorted(by_name.values(), key=lambda e: e["name"])[:12]
+                    except Exception:
+                        effects_list = []
                 entities.append({
                     "id": int(other_mob.id),
                     "sim_id": int(other_mob.simObject.id),
@@ -1668,6 +1746,11 @@ class PlayerAvatar(Avatar):
                     "model": model_name,
                     "animation": animation_name,
                     "scale": scale_val,
+                    # Live buff state the client renders: visibility (Invisibility
+                    # spell lowers it toward 0 -> client fades the model) and
+                    # flying/levitate (>0 -> client lifts the model off the ground).
+                    "visibility": float(getattr(other_mob, 'visibility', 1.0) or 0.0),
+                    "flying": float(getattr(other_mob, 'flying', 0.0) or 0.0),
                     "tex": tex,
                     "tex_single": single_tex,
                     "mounts": mounts,
@@ -1679,6 +1762,7 @@ class PlayerAvatar(Avatar):
                     "standing": "Hostile" if is_enemy else ("Player" if other_mob.player else "Neutral"),
                     "distance": range_to_player,
                     "visibility_source": visibility_source,
+                    "effects": effects_list,
                 })
             except Exception:
                 print("####getVisibleEntities: failed to build entity for mob %s (source=%s)" % (getattr(other_mob, 'name', '?'), visibility_source))
@@ -1757,6 +1841,76 @@ class PlayerAvatar(Avatar):
             print_exc()
 
         return {"entities": entities, "events": events}
+
+    def perspective_respawn(self, char_index=0):
+        """Bring a dead player back to life at their bind point.
+
+        The Godot client calls this from its death overlay. Before this existed
+        the only way to recover from death was to log out and back in, because
+        enterWorld is the one place that resets a dead character (the "all
+        characters dead" branch). This mirrors that reset without a relog:
+        revive every dead party member, restore their stats to full, and
+        teleport the party to its bind point. zone.respawnPlayer's callback
+        (playerRespawned) reattaches the now-living mobs to the live zone, so
+        getVisibleEntities starts streaming again and the player can act.
+        """
+        player = self.player
+        if not player:
+            return False
+        zone = player.zone
+        if not zone:
+            return False
+        if not any(c.dead for c in player.party.members):
+            return False
+
+        # Bind transform for this realm (mirrors SimAvatar.respawnPlayer's
+        # default, which the headless stub does not apply when transform is
+        # None). If the bind point is in another zone, a full zone transfer
+        # would be needed; for now revive in place there (transform=None) so the
+        # player is at least playable again — the post-death invulnerability
+        # restored on reattach protects them from an immediate re-death.
+        try:
+            same_zone = (player.bindZone == zone.zone)
+        except Exception:
+            same_zone = True
+        transform = None
+        if same_zone:
+            if player.darkness:
+                transform = player.darknessBindTransformInternal
+            elif player.monster:
+                transform = player.monsterBindTransformInternal
+            else:
+                transform = player.bindTransformInternal
+
+        for c in player.party.members:
+            if not c.dead:
+                continue
+            c.dead = False
+            # The mob tick treats -999999 as "the mob owns its own stats", so set
+            # the persistent values to that sentinel and fill the live mob to full.
+            c.health = c.mana = c.stamina = -999999
+            mob = c.mob
+            if mob:
+                mob.health = mob.maxHealth
+                mob.mana = mob.maxMana
+                mob.stamina = mob.maxStamina
+                mob.autoAttack = False
+
+        living = [c for c in player.party.members if not c.dead]
+        if living:
+            player.curChar = living[0]
+            try:
+                idx = player.party.members.index(living[0])
+                player.mind.callRemote("setCurCharIndex", idx)
+            except Exception:
+                pass
+
+        try:
+            player.world.clearDeathMarker(player)
+        except Exception:
+            pass
+        zone.respawnPlayer(player, transform)
+        return True
 
     def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
         """Receive movement input from the Godot client for server-authoritative movement.

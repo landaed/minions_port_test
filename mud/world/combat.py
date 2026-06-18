@@ -8,7 +8,7 @@
 #  @{
 
 
-from mud.world.core import AllowHarmful,CoreSettings,GetLevelSpread,GetRangeMin
+from mud.world.core import AllowHarmful,CoreSettings,GetLevelSpread,GetRangeMin,PLAYER_SELECT_LEEWAY
 from mud.world.damage import Damage
 from mud.world.defines import *
 from mud.world.process import Process
@@ -21,6 +21,9 @@ import os
 
 # Per-round combat tracing for the headless port (off unless MOM_DEBUG_COMBAT=1).
 _COMBAT_DEBUG = bool(os.environ.get("MOM_DEBUG_COMBAT"))
+
+# Melee leeway for a player attacking their selected target (see core.py).
+PLAYER_MELEE_LEEWAY = PLAYER_SELECT_LEEWAY
 
 
 
@@ -807,6 +810,24 @@ class CombatProcess(Process):
             inhibitPrimary = False
             inhibitSecondary = False
 
+            # Modern tab-target leniency: a player who explicitly selected this
+            # defender intends to fight it. The headless sim has no line-of-sight,
+            # only refreshes canSee ~once a second, and replicated mob positions
+            # lag the client by an interpolation interval — so the strict
+            # obstructed / range gates reject attacks the player can clearly see
+            # landing. Trust the selection: skip the canSee gate and grant melee
+            # leeway (see the range check below). Incidental / NPC attacks are
+            # unaffected.
+            player_selected = False
+            if player is not None:
+                try:
+                    _sel = getattr(attacker.simObject, "selectedTarget", None)
+                    player_selected = _sel is not None and (
+                        _sel is defender.simObject or
+                        getattr(_sel, "id", None) == getattr(defender.simObject, "id", None))
+                except Exception:
+                    player_selected = False
+
             # If either attack timer would be satisfied this combat round, then
             # check if the attack will be inhibited.
             if src.primaryAttackTimer <= 3 or src.secondaryAttackTimer <= 3:
@@ -814,7 +835,7 @@ class CombatProcess(Process):
                 # If the defender is not in the attacker's can see list, then
                 # there is an something obstructing the view.  This check is
                 # based on simulation data, and does not check visibility.
-                if defender.simObject.id not in attacker.simObject.canSee:
+                if defender.simObject.id not in attacker.simObject.canSee and not player_selected:
 
                     # Increase the attacker's combat inhibited count.
                     # TWS: This looks as if it could just be a true or false.
@@ -926,8 +947,9 @@ class CombatProcess(Process):
 
                 # If the distance between the attacker and defender is larger
                 # then the highest equipped weapon range, then combat is
-                # inhibited.
-                if crange > wpnRange:
+                # inhibited. Players attacking their selected target get melee
+                # leeway to absorb client/server position lag (see above).
+                if crange > wpnRange + (PLAYER_MELEE_LEEWAY if player_selected else 0.0):
 
                     # Increase the attacker's combat inhibited count.
                     # TWS: This looks as if it could just be a true or false.

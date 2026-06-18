@@ -221,14 +221,41 @@ func _selected_character_name() -> String:
 		return ""
 	return str(characters[idx].get("name", ""))
 
+var _returning_to_chars := false  # suppress gameplay view while in char-select
+
 func _ensure_gameplay_view() -> Control:
 	if gameplay_view == null:
 		gameplay_view = GAMEPLAY_VIEW_SCENE.instantiate()
 		gameplay_view.visible = false
 		if gameplay_view.has_signal("command_requested"):
 			gameplay_view.command_requested.connect(_on_gameplay_view_command_requested)
+		if gameplay_view.has_signal("menu_action_requested"):
+			gameplay_view.menu_action_requested.connect(_on_menu_action)
 		add_child(gameplay_view)
 	return gameplay_view
+
+func _on_menu_action(action: String) -> void:
+	match action:
+		"quit":
+			get_tree().quit()
+		"logout":
+			# Drop the connection and return to a fresh login screen.
+			if socket:
+				socket.close()
+			get_tree().reload_current_scene()
+		"character_select":
+			# Leave the world and return to the character list (re-entry attempts a
+			# fresh enter_world). Free the in-world view so a clean one is built.
+			_returning_to_chars = true
+			_send({"type": "leave_world"})
+			if gameplay_view:
+				gameplay_view.queue_free()
+				gameplay_view = null
+			login_panel.visible = true
+			_set_phase(PHASE_CHARACTER)
+			_populate_character_list()
+			GameAudio.start_menu_music()
+			status_label.text = "Pick a character to enter, or Log Out."
 
 func _on_gameplay_view_command_requested(command_type: String, payload: Dictionary = {}):
 	if command_type == "cheat":
@@ -349,11 +376,17 @@ func _on_enter_world_button_pressed():
 		enter_world_button.disabled = false
 		status_label.text = "Select a character first."
 		return
+	_returning_to_chars = false  # we're choosing to enter the world again
 	status_label.text = "Sending enter-world request for %s..." % selected_name
 	_send({"type": "enter_world", "character_name": selected_name})
 
 func handle_response(data: Dictionary):
 	var msg_type: String = data.get("type", "")
+	# While returning to character select, ignore in-world stream messages so the
+	# gameplay view doesn't pop back up before the player re-enters.
+	if _returning_to_chars and msg_type in ["root_info", "gameplay_state", \
+			"zone_transfer", "target_description", "entity_snapshot"]:
+		return
 
 	match msg_type:
 		"login_result":
@@ -520,7 +553,8 @@ func handle_response(data: Dictionary):
 
 		"inventory", "cursor_item", "loot", "npc_window", "npc_dialog_start", \
 		"npc_dialog", "npc_window_close", "vendor_stock", "journal_entry", "spellbook", \
-		"cheat_result", "begin_casting", "play_sound", "alliance_info", "alliance_invite":
+		"cheat_result", "begin_casting", "play_sound", "alliance_info", "alliance_invite", \
+		"player_death", "player_alive":
 			if gameplay_view and gameplay_view.has_method("handle_ui_message"):
 				gameplay_view.handle_ui_message(data)
 

@@ -111,7 +111,7 @@ class Projectile:
             
             # TWS: This import should be at global scope.
             from mud.world.spell import SpawnSpell
-            
+
             # Spawn the spell.
             SpawnSpell(self.spellProto,src,dst,hitPos,mod)
             

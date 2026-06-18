@@ -1,0 +1,7 @@
+{
+  "version": "0.0.0",
+  "url": "https://github.com/landaed/minions_port_test/releases/download/v0.0.0/MinionsOfMirth-windows.zip",
+  "sha256": "",
+  "exe": "Minions_port.exe",
+  "notes": "Template manifest. Run tools/publish_build.sh <build.zip> <version> to fill version/url/sha256, then commit dist/version.json (or host it anywhere the launcher can GET)."
+}

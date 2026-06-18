@@ -336,6 +336,22 @@ func _find_skeleton(n: Node) -> Skeleton3D:
 			return r
 	return null
 
+var _fade_signature := -1.0
+
+func set_fade(visibility: float) -> void:
+	# Render the Invisibility spell: visibility 1.0 = solid, lower = more
+	# transparent. Uses GeometryInstance3D.transparency so it doesn't fight the
+	# armor/skin material overrides. Floored so an invisible character is still a
+	# faint outline (a cue for the caster + anyone who can see-invisible) rather
+	# than completely gone.
+	var t := clampf(1.0 - visibility, 0.0, 0.8)
+	if absf(t - _fade_signature) < 0.01:
+		return
+	_fade_signature = t
+	for mi in skinned_meshes:
+		if is_instance_valid(mi):
+			mi.transparency = t
+
 func set_highlight(on: bool) -> void:
 	for mi in skinned_meshes:
 		if not is_instance_valid(mi):

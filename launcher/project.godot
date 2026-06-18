@@ -1,0 +1,19 @@
+; Minions of Mirth — auto-updating launcher.
+; A tiny standalone Godot app players run instead of the game directly. It reads
+; a version manifest from a URL, and if the published build is newer than the
+; installed one it downloads + verifies + extracts it, then launches the game.
+; This is the standard launcher pattern (manifest -> compare -> download ->
+; checksum -> apply -> launch), the same idea Steam / Electron auto-updaters use.
+
+config_version=5
+
+[application]
+
+config/name="Minions of Mirth Launcher"
+run/main_scene="res://launcher.tscn"
+config/features=PackedStringArray("4.6")
+
+[display]
+
+window/size/viewport_width=560
+window/size/viewport_height=380

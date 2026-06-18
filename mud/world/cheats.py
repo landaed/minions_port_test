@@ -244,6 +244,57 @@ def cheat_full_heal(player, params):
     return _result(True, "Party fully restored (health/mana/stamina, cooldowns cleared).")
 
 
+def cheat_apply_spell(player, params):
+    """Apply a named spell to the current character immediately (no mana / cast
+    time / spellbook). Handy for exercising buff effects — Enlarge, Shrink,
+    Erar Invisibility, Urug's Sandals Fly, Transmutation of Volsh, etc."""
+    from mud.world.spell import SpawnSpell, SpellProto
+    name = str(params.get("name", "")).strip()
+    if not name:
+        return _result(False, "apply_spell needs a spell name.")
+    char, mob = _char_and_mob(player)
+    if not char or not mob:
+        return _result(False, "No active character.")
+    try:
+        proto = SpellProto.byName(name)
+    except Exception:
+        proto = None
+    if not proto:
+        return _result(False, "No spell named %r." % name)
+    # Optionally cast at the current target instead of self.
+    dst = mob
+    if params.get("at_target") and getattr(mob, "target", None):
+        dst = mob.target
+    # A projectile spell at a target must go through the projectile path (so the
+    # stub's launchProjectile resolves it and applies damage on "impact"), not a
+    # direct SpawnSpell which would skip the flight.
+    if getattr(proto, "projectile", "") and dst is not mob:
+        from mud.world.projectile import Projectile
+        p = Projectile(mob, dst, 1)
+        p.spellProto = proto
+        p.launch()
+        return _result(True, "Launched %s at %s." % (name, getattr(dst, "name", "target")))
+    # spellLevel is the spell RANK (1..N, indexes RPG_ROMAN), not the character
+    # level — rank 1 is always valid.
+    SpawnSpell(proto, mob, dst, spellLevel=1)
+    return _result(True, "Applied %s to %s." % (name, getattr(dst, "name", char.name)))
+
+
+def cheat_suicide(player, params):
+    """Kill the current character outright (testing the death/respawn flow)."""
+    char, mob = _char_and_mob(player)
+    if not char or not mob:
+        return _result(False, "No active character.")
+    if char.dead:
+        return _result(False, "%s is already dead." % char.name)
+    mob.health = 0
+    # Mirror the tick's lethal-health path so the normal death machinery runs
+    # (detach, death marker, character.dead = True, sim "die" event).
+    mob.die(immortalOverride=True)
+    player.cinfoDirty = True
+    return _result(True, "%s has died. Release to respawn." % char.name)
+
+
 def cheat_list_items(player, params):
     from mud.world.item import ItemProto
     flt = str(params.get("filter", "")).strip().lower()
@@ -320,6 +371,8 @@ _ACTIONS = {
     "learn_class_spells": cheat_learn_class_spells,
     "raise_skills": cheat_raise_skills,
     "full_heal": cheat_full_heal,
+    "suicide": cheat_suicide,
+    "apply_spell": cheat_apply_spell,
     "list_items": cheat_list_items,
     "list_spells": cheat_list_spells,
     "set_time": cheat_set_time,
