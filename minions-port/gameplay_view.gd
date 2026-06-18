@@ -581,7 +581,7 @@ func _build_game_windows():
 	add_child(cheat_window)
 
 	character_window = CharacterWindowScript.new()
-	character_window.position = Vector2(120, 90)
+	character_window.position = Vector2(300, 110)  # clear of the top-left HUD
 	character_window.spend_stat.connect(func(stat): _request_server_command("spend_stat_point", {"stat": stat, "amount": 1}))
 	add_child(character_window)
 
