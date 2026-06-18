@@ -1663,12 +1663,6 @@ class PlayerAvatar(Avatar):
                             scale_val = il_size
                     except Exception:
                         pass
-                # Dragon Form (toggled via perspective_dragonForm): swap to a dragon
-                # model. Flight is forced on below so a dragon always flies.
-                dragon_form = bool(getattr(other_mob, 'dragonForm', False))
-                if dragon_form:
-                    model_name = str(getattr(other_mob, 'dragonModel', '') or 'dragon/dragon_green')
-                    animation_name = ""
                 # Per-part skin/armor texture indices for the client (cached on the
                 # mob; appearance rarely changes). Empty for monsters using an
                 # embedded single/multi texture.
@@ -1756,7 +1750,7 @@ class PlayerAvatar(Avatar):
                     # spell lowers it toward 0 -> client fades the model) and
                     # flying/levitate (>0 -> client lifts the model off the ground).
                     "visibility": float(getattr(other_mob, 'visibility', 1.0) or 0.0),
-                    "flying": 1.0 if dragon_form else float(getattr(other_mob, 'flying', 0.0) or 0.0),
+                    "flying": float(getattr(other_mob, 'flying', 0.0) or 0.0),
                     "tex": tex,
                     "tex_single": single_tex,
                     "mounts": mounts,
@@ -2031,9 +2025,10 @@ class PlayerAvatar(Avatar):
 
     def perspective_spendStatPoint(self, stat, amount=1):
         """Spend advancement points to permanently raise a core attribute.
-        One advancement point raises the chosen base stat by one. The character
-        sheet in the Godot client calls this; the updated stats + remaining
-        points stream back through the normal CharacterInfo refresh."""
+        One advancement point raises the attribute by one. The current value is
+        derived from the base only at spawn time (updateDerivedStats recomputes
+        health/offense/... but NOT the attributes themselves), so we raise both
+        the base and the live value, then refresh derived stats."""
         stat = str(stat).strip().lower()
         try:
             amount = max(1, int(amount))
@@ -2048,46 +2043,40 @@ class PlayerAvatar(Avatar):
         if avail < amount:
             return {"success": False, "message": "Not enough advancement points (have %d)." % avail}
         mob = char.mob
-        base_attr = stat + "Base"
-        # Persist on the spawn (saved to the character DB) and the live mob, then
-        # recompute derived stats (health/mana/offense/...).
         spawn = getattr(mob, "spawn", None)
+        base_attr = stat + "Base"
+        old_base = int(getattr(mob, base_attr, 0) or 0)
+        new_base = old_base + amount
+        # Presence is capped.
+        if stat == "pre":
+            try:
+                from mud.world.defines import RPG_MAX_PRESENCE
+                if new_base > RPG_MAX_PRESENCE:
+                    new_base = RPG_MAX_PRESENCE
+            except Exception:
+                pass
+        delta = new_base - old_base
+        if delta <= 0:
+            return {"success": False, "message": "%s is already at its maximum." % stat.upper()}
+        # Raise the base (persisted on the spawn + mob) AND the live attribute.
         if spawn is not None:
             try:
-                setattr(spawn, base_attr, int(getattr(spawn, base_attr, 0) or 0) + amount)
+                setattr(spawn, base_attr, int(getattr(spawn, base_attr, 0) or 0) + delta)
             except Exception:
                 pass
         try:
-            setattr(mob, base_attr, int(getattr(mob, base_attr, 0) or 0) + amount)
+            setattr(mob, base_attr, new_base)
+            setattr(mob, stat, int(getattr(mob, stat, 0) or 0) + delta)
         except Exception:
             return {"success": False, "message": "Could not raise '%s'." % stat}
-        char.advancementPoints = avail - amount
+        char.advancementPoints = avail - delta
         try:
             mob.updateDerivedStats()
         except Exception:
             pass
         self.player.cinfoDirty = True
-        return {"success": True, "message": "Raised %s by %d." % (stat.upper(), amount),
+        return {"success": True, "message": "Raised %s by %d." % (stat.upper(), delta),
                 "stat": stat, "advancement_points": int(char.advancementPoints)}
-
-    def perspective_dragonForm(self, enable=None):
-        """Toggle Dragon Form: swap the avatar to a dragon and grant flight.
-        Stored as a lightweight flag on the mob (no spell record needed); the
-        entity stream then sends the dragon model + flying so the client swaps
-        the rig and switches to free flight."""
-        char = self.player.curChar
-        if not char or not char.mob:
-            return {"success": False, "message": "No active character."}
-        mob = char.mob
-        cur = bool(getattr(mob, "dragonForm", False))
-        new = (not cur) if enable is None else bool(enable)
-        mob.dragonForm = new
-        # Blue/green by realm parity just for a little variety.
-        mob.dragonModel = "dragon/dragon_blue" if (int(getattr(mob, "realm", 0) or 0) % 2) else "dragon/dragon_green"
-        self.player.cinfoDirty = True
-        return {"success": True,
-                "message": "You take the form of a dragon and take flight!" if new else "You return to your normal form.",
-                "dragon": new}
 
     # ------------------------------------------------------------------
     # Plain-data getters for the Godot bridge (no PB cacheables involved).

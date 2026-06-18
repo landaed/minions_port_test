@@ -67,19 +67,21 @@ class CharacterInfo(pb.Copyable,pb.RemoteCopy):
         self.klasses = []
         self.levels = []
         self.race = ""
+        self.sex = "Male"
         self.realm = RPG_REALM_NEUTRAL
         self.rename = 0
         self.status = ""
-    
-        
+
+
         if char:
             if char.dead:
                 self.status = "Dead"
             else:
                 self.status = "Alive"
-                
+
             self.name = char.name
             self.race = char.spawn.race
+            self.sex = getattr(char.spawn, "sex", "Male") or "Male"
             self.realm = char.spawn.realm
             self.klasses.append(char.spawn.pclassInternal)
             self.levels.append(char.spawn.plevel)

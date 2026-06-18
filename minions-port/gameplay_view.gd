@@ -751,11 +751,6 @@ func _toggle_character():
 		character_window.apply_info(_player_char_info())
 		character_window.open_window()
 
-func _toggle_dragon_form():
-	# Shapeshift into a dragon (and take flight). Server toggles the form and
-	# streams the dragon model + flying back to us.
-	_request_server_command("dragon_form")
-
 func _on_inventory_slot_clicked(slot: int, alt: bool, ctrl: bool):
 	if ctrl:
 		_request_server_command("inv_use", {"char_id": _ui_char_id, "slot": slot})
@@ -2846,8 +2841,6 @@ func _input(event):
 				_toggle_journal()
 			KEY_C:
 				_toggle_character()
-			KEY_F6:
-				_toggle_dragon_form()
 			KEY_P, KEY_B:
 				_toggle_spellbook()
 			KEY_F1:

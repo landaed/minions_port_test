@@ -1331,16 +1331,6 @@ class ProxyProtocol(WebSocketServerProtocol):
             d.addErrback(self._on_gameplay_command_failed, command, "SPEND_STAT_POINT")
             return
 
-        # Toggle Dragon Form (shapeshift + flight).
-        if payload is None and command == "dragon_form":
-            enable = msg.get("enable", None)
-            d = self.session.player_perspective.callRemote("PlayerAvatar", "dragonForm", enable)
-            d.addCallback(lambda result: self._send_gameplay_command_result(
-                bool(result.get("success")) if isinstance(result, dict) else False,
-                command, result.get("message", "") if isinstance(result, dict) else ""))
-            d.addErrback(self._on_gameplay_command_failed, command, "DRAGON_FORM")
-            return
-
         if payload is None and self._handle_ui_command(command, msg):
             return
 
@@ -1497,6 +1487,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         return {
             "name": cinfo.name,
             "race": cinfo.race,
+            "sex": getattr(cinfo, "sex", "Male"),
             "realm": cinfo.realm,
             "realm_name": realm_labels.get(cinfo.realm, str(cinfo.realm)),
             "klass": klass,
