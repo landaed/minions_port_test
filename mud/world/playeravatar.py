@@ -1912,7 +1912,7 @@ class PlayerAvatar(Avatar):
         zone.respawnPlayer(player, transform)
         return True
 
-    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
+    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None, flying=False):
         """Receive movement input from the Godot client for server-authoritative movement.
 
         The server processes inputs and updates simObject.position directly.
@@ -1936,6 +1936,7 @@ class PlayerAvatar(Avatar):
             "move_y": float(move_y),
             "forward": tuple(float(v) for v in (forward or [0, 0, 0])[:3]),
             "jump": bool(jump),
+            "flying": bool(flying),
         }
         if position_z is not None:
             input_state["position_z"] = float(position_z)
@@ -2075,6 +2076,15 @@ class PlayerAvatar(Avatar):
         except Exception:
             pass
         self.player.cinfoDirty = True
+        # Event-driven push: refresh this character's CharacterInfo right now so the
+        # changed attributes (STR/.../OFFENSE/ADVANCE) are sent to the proxy's ghost
+        # immediately, instead of waiting up to ~2.5s for the next gated zone
+        # charInfo tick. The proxy then relays the fresh stats to the client.
+        try:
+            if getattr(char, "charInfo", None):
+                char.charInfo.refresh()
+        except Exception:
+            print_exc()
         return {"success": True, "message": "Raised %s by %d." % (stat.upper(), delta),
                 "stat": stat, "advancement_points": int(char.advancementPoints)}
 

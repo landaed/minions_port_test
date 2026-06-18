@@ -590,6 +590,7 @@ class StubSimAvatar:
     _WANDER_PAUSE_MAX = 5.0
 
     _PLAYER_MOVE_SPEED = 8.0  # units/sec, should match Godot client MOVE_SPEED
+    _PLAYER_FLY_SPEED = 11.0   # units/sec while a Flying buff is active (matches client FLY_SPEED)
 
     def _updateMovement(self):
         """Move NPCs toward their targets and process player input."""
@@ -731,9 +732,17 @@ class StubSimAvatar:
         f_len = sqrt(fx * fx + fy * fy)
         if f_len > 0.001:
             so.rotation = _yaw_toward(fx / f_len, fy / f_len)
+        # Always replicate the client's collider-resolved vertical, so the server
+        # stays aware of stairs, slopes, elevation and flight height even when the
+        # player is only moving vertically (e.g. flying straight up) or standing
+        # still on a slope. The headless server owns no Godot collision, so this is
+        # how it learns the true Z.
+        z = float(client_input.get("position_z", so.position[2]))
         move_x = client_input.get("move_x", 0.0)
         move_y = client_input.get("move_y", 0.0)
         if abs(move_x) < 0.01 and abs(move_y) < 0.01:
+            # No horizontal input: still commit the vertical update.
+            so.position = (so.position[0], so.position[1], z)
             return
         # fx, fy already normalized above; compute right vector for strafing
         nfx = fx / f_len if f_len > 0.001 else 0.0
@@ -747,16 +756,13 @@ class StubSimAvatar:
         if mag > 1.0:
             dx /= mag
             dy /= mag
-        speed = self._PLAYER_MOVE_SPEED
-        # The headless server does not own Godot collision, but it still needs to
-        # replicate vertical placement for stairs and multi-story interiors. Trust
-        # the client's collider-resolved Z when present; otherwise preserve the old
-        # vertical coordinate for compatibility with non-Godot callers/tests.
-        z = client_input.get("position_z", so.position[2])
+        # Match the client's horizontal speed (faster while flying) so the server
+        # copy keeps up and the client isn't rubber-banded back during flight.
+        speed = self._PLAYER_FLY_SPEED if client_input.get("flying") else self._PLAYER_MOVE_SPEED
         so.position = (
             so.position[0] + dx * speed * dt,
             so.position[1] + dy * speed * dt,
-            float(z),
+            z,
         )
 
 

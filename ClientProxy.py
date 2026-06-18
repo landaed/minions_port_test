@@ -968,6 +968,18 @@ class GodotClientSession:
             self.send({"type": "gameplay_state", **payload})
         self.start_gameplay_sync()
 
+    def _push_gameplay_state_now(self):
+        """Serialize + send the current root_info to the client immediately, without
+        disturbing the periodic gameplay-sync timer. Used for event-driven updates
+        (e.g. spending a stat point) so the character sheet reflects the change the
+        instant the world server confirms it, instead of waiting for the next poll."""
+        if not self.root_info_cache:
+            return
+        payload = _serialize_root_info(self.root_info_cache, self)
+        if payload != self.last_gameplay_payload:
+            self.last_gameplay_payload = payload.copy()
+            self.send({"type": "gameplay_state", **payload})
+
     def _emit_entity_sync(self):
         self.entity_sync_call = None
         if not self.player_perspective or not self.root_info_cache:
@@ -1325,9 +1337,7 @@ class ProxyProtocol(WebSocketServerProtocol):
             except (TypeError, ValueError):
                 amount = 1
             d = self.session.player_perspective.callRemote("PlayerAvatar", "spendStatPoint", stat, amount)
-            d.addCallback(lambda result: self._send_gameplay_command_result(
-                bool(result.get("success")) if isinstance(result, dict) else False,
-                command, result.get("message", "") if isinstance(result, dict) else ""))
+            d.addCallback(self._on_stat_spent, command)
             d.addErrback(self._on_gameplay_command_failed, command, "SPEND_STAT_POINT")
             return
 
@@ -1344,8 +1354,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             forward = msg.get("forward", [0, 0, 0])
             jump = bool(msg.get("jump", False))
             position_z = msg.get("position_z", None)
+            flying = bool(msg.get("flying", False))
             d = self.session.player_perspective.callRemote(
-                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0, position_z
+                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0, position_z, flying
             )
             d.addErrback(lambda f: None)  # silently ignore errors on high-frequency input
             return
@@ -1358,6 +1369,18 @@ class ProxyProtocol(WebSocketServerProtocol):
         d = self.session.player_perspective.callRemote("PlayerAvatar", "doCommand", world_command, args)
         d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Sent {world_command} to legacy world server."))
         d.addErrback(self._on_gameplay_command_failed, command, world_command)
+
+    def _on_stat_spent(self, result, command):
+        """Stat-point spend confirmed by the world server. Report the result, then —
+        on success — flush the gameplay state to the client right away. The world
+        server already refreshed the character's CharacterInfo before returning, so
+        the cached ghost holds the new attribute values by the time this fires (PB
+        preserves message order on the broker), making the sheet update immediate."""
+        success = bool(result.get("success")) if isinstance(result, dict) else False
+        message = result.get("message", "") if isinstance(result, dict) else ""
+        self._send_gameplay_command_result(success, command, message)
+        if success:
+            self.session._push_gameplay_state_now()
 
     def _on_gameplay_command_failed(self, reason, command, world_command):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)

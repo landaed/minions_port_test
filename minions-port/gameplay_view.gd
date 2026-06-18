@@ -2940,6 +2940,9 @@ func _physics_process(delta: float) -> void:
 			# Replicate the client-resolved floor height back to the headless server.
 			# The server stores positions as (x, y, z), where z is vertical.
 			"position_z": _godot_world_to_server(player_body.global_position)[2],
+			# Tell the server we're flying so it uses the (faster) flight speed for
+			# horizontal reconciliation instead of the ground walk speed.
+			"flying": flying,
 		}
 		if input_state != _last_sent_input:
 			_last_sent_input = input_state.duplicate()
