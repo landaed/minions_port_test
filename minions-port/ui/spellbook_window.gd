@@ -12,6 +12,29 @@ var skills_box: VBoxContainer
 var char_id := 0
 var _spells: Array = []
 var _skills: Array = []
+# The window is re-polled every couple of seconds while open (to refresh
+# cooldowns). Rebuilding every row each poll destroyed whatever the mouse was
+# hovering, so spell tooltips "disappeared really fast". We now only rebuild
+# when the spell/ability *set* actually changes; an unchanged poll is a no-op,
+# so the hovered row (and its tooltip) survives.
+var _spells_signature := ""
+var _skills_signature := ""
+
+func _spells_sig(spells: Array) -> String:
+	var parts: Array = []
+	for s in spells:
+		if s is Dictionary:
+			parts.append("%s|%d|%d|%d" % [
+				str(s.get("name", "")), int(s.get("slot", 0)),
+				int(s.get("power_level", 1)), 1 if bool(s.get("castable", true)) else 0])
+	return "\n".join(parts)
+
+func _skills_sig(abilities: Array) -> String:
+	var parts: Array = []
+	for a in abilities:
+		if a is Dictionary:
+			parts.append("%s|%s" % [str(a.get("name", "")), str(a.get("rank", 1))])
+	return "\n".join(parts)
 
 func _init():
 	super._init("Spellbook & Abilities", Color(0.35, 0.55, 0.9))
@@ -45,6 +68,12 @@ func _init():
 func apply_spellbook(data: Dictionary) -> void:
 	char_id = int(data.get("char_id", char_id))
 	_spells = data.get("spells", [])
+	# Skip the destructive rebuild when the spell set is unchanged (keeps a
+	# hovered tooltip alive across the periodic refresh).
+	var sig := _spells_sig(_spells)
+	if sig == _spells_signature and spells_box.get_child_count() > 0:
+		return
+	_spells_signature = sig
 	for c in spells_box.get_children():
 		c.queue_free()
 	if _spells.is_empty():
@@ -59,6 +88,10 @@ func apply_spellbook(data: Dictionary) -> void:
 
 func apply_skills(abilities: Array) -> void:
 	_skills = abilities
+	var sig := _skills_sig(abilities)
+	if sig == _skills_signature and skills_box.get_child_count() > 0:
+		return
+	_skills_signature = sig
 	for c in skills_box.get_children():
 		c.queue_free()
 	if _skills.is_empty():
@@ -84,7 +117,8 @@ func _spell_row(spell: Dictionary) -> HBoxContainer:
 		"icon": str(spell.get("icon", "")),
 	}
 	slot.drag_kind = "action"
-	slot.tooltip_text = _spell_tooltip(spell)
+	var tip := _spell_tooltip(spell)
+	slot.set_rich_tip(tip)
 	row.add_child(slot)
 	var info := Label.new()
 	info.text = "%s  (Lv %d)\nMana %d  •  Cast %.1fs  •  Recast %.1fs" % [
@@ -93,7 +127,7 @@ func _spell_row(spell: Dictionary) -> HBoxContainer:
 		float(spell.get("recast_time", 0))]
 	info.add_theme_font_size_override("font_size", 11)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info.tooltip_text = slot.tooltip_text
+	_wire_tip(info, tip)
 	row.add_child(info)
 	var cast := Button.new()
 	cast.text = "Cast"
@@ -109,8 +143,9 @@ func _spell_row(spell: Dictionary) -> HBoxContainer:
 		cast.disabled = true
 		cast.text = "Too low"
 		row.modulate = Color(1, 1, 1, 0.45)
-		slot.tooltip_text += "\nYou cannot cast this yet (class level too low)."
-		info.tooltip_text = slot.tooltip_text
+		var low_tip := tip + "\nYou cannot cast this yet (class level too low)."
+		slot.set_rich_tip(low_tip)
+		_wire_tip(info, low_tip)
 	cast.pressed.connect(func(): cast_spell.emit(int(spell.get("slot", 0))))
 	row.add_child(cast)
 	return row
@@ -127,12 +162,14 @@ func _skill_row(ability: Dictionary) -> HBoxContainer:
 		"icon": str(ability.get("icon", "")),
 	}
 	slot.drag_kind = "action"
-	slot.tooltip_text = "%s\nRank %s" % [str(ability.get("name", "?")), str(ability.get("rank", 1))]
+	var atip := "%s\nRank %s" % [str(ability.get("name", "?")), str(ability.get("rank", 1))]
+	slot.set_rich_tip(atip)
 	row.add_child(slot)
 	var info := Label.new()
 	info.text = "%s   (Rank %s)" % [str(ability.get("name", "?")), str(ability.get("rank", 1))]
 	info.add_theme_font_size_override("font_size", 11)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_wire_tip(info, atip)
 	row.add_child(info)
 	var use := Button.new()
 	use.text = "Use"
@@ -144,6 +181,14 @@ func _skill_row(ability: Dictionary) -> HBoxContainer:
 	use.pressed.connect(func(): use_skill.emit(str(ability.get("name", "?"))))
 	row.add_child(use)
 	return row
+
+func _wire_tip(c: Control, text: String) -> void:
+	# Make a non-SlotButton control (e.g. the info Label) drive the same custom
+	# hover tooltip, so hovering anywhere on the row shows the details.
+	c.mouse_filter = Control.MOUSE_FILTER_STOP
+	c.mouse_entered.connect(func(): UIC.show_tip(c, text))
+	c.mouse_exited.connect(UIC.hide_tip)
+	c.tree_exiting.connect(func(): UIC.hide_tip_if_owner(c))
 
 func _spell_tooltip(spell: Dictionary) -> String:
 	var lines: Array = [

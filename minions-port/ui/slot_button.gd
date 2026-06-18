@@ -13,6 +13,7 @@ var accept_kinds: Array = []      # drag kinds this slot accepts ([] = none)
 var drop_handler: Callable        # func(data: Dictionary) -> void
 var count_label: Label
 var corner_label: Label
+var _rich_tip := ""               # custom hover tooltip text (replaces flaky built-in)
 
 func _init(size_px: int = 44):
 	custom_minimum_size = Vector2(size_px, size_px)
@@ -38,6 +39,20 @@ func _init(size_px: int = 44):
 	corner_label.add_theme_color_override("font_color", Color(0.7, 0.74, 0.8))
 	corner_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(corner_label)
+	# Self-managed hover tooltip (the built-in one vanishes on the slightest
+	# jitter / when the spellbook rebuilds). Stays up until the mouse leaves.
+	mouse_entered.connect(_on_tip_enter)
+	mouse_exited.connect(UIC.hide_tip)
+	tree_exiting.connect(func(): UIC.hide_tip_if_owner(self))
+
+func set_rich_tip(text: String) -> void:
+	_rich_tip = text
+	# Suppress Godot's built-in tooltip so the two don't fight.
+	tooltip_text = ""
+
+func _on_tip_enter() -> void:
+	var text := _rich_tip if not _rich_tip.is_empty() else tooltip_text
+	UIC.show_tip(self, text)
 
 func set_slot(display_icon: Texture2D, fallback_text: String, count: int = 0, corner: String = "") -> void:
 	icon = display_icon

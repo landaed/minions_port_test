@@ -206,6 +206,20 @@ def _serialize_character_cache(char_info):
         ("dead", ("DEAD", "dead")),
         ("portraitpic", ("PORTRAITPIC", "portraitpic")),
         ("position", ("POSITION", "position")),
+        # Core attributes + derived stats for the in-game character sheet.
+        ("str", ("STR", "str")), ("dex", ("DEX", "dex")), ("ref", ("REF", "ref")),
+        ("agi", ("AGI", "agi")), ("wis", ("WIS", "wis")), ("bdy", ("BDY", "bdy")),
+        ("mnd", ("MND", "mnd")), ("mys", ("MYS", "mys")), ("pre", ("PRE", "pre")),
+        ("str_base", ("STRBASE", "strBase")), ("dex_base", ("DEXBASE", "dexBase")),
+        ("ref_base", ("REFBASE", "refBase")), ("agi_base", ("AGIBASE", "agiBase")),
+        ("wis_base", ("WISBASE", "wisBase")), ("bdy_base", ("BDYBASE", "bdyBase")),
+        ("mnd_base", ("MNDBASE", "mndBase")), ("mys_base", ("MYSBASE", "mysBase")),
+        ("offense", ("OFFENSE", "offense")), ("defense", ("DEFENSE", "defense")),
+        ("armor", ("ARMOR", "armor")),
+        ("advancement_points", ("ADVANCE", "advancementPoints")),
+        ("pxp_percent", ("PXPPERCENT", "pxpPercent")),
+        ("sxp_percent", ("SXPPERCENT", "sxpPercent")),
+        ("txp_percent", ("TXPPERCENT", "txpPercent")),
     )
     data = {}
     for output_name, attr_names in fields:
@@ -1301,6 +1315,30 @@ class ProxyProtocol(WebSocketServerProtocol):
                 bool(result), command,
                 "Respawned at bind point." if result else "Nothing to respawn."))
             d.addErrback(self._on_gameplay_command_failed, command, "RESPAWN")
+            return
+
+        # Spend an advancement point to raise a core attribute (character sheet).
+        if payload is None and command == "spend_stat_point":
+            stat = str(msg.get("stat", "")).strip().lower()
+            try:
+                amount = max(1, int(msg.get("amount", 1) or 1))
+            except (TypeError, ValueError):
+                amount = 1
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "spendStatPoint", stat, amount)
+            d.addCallback(lambda result: self._send_gameplay_command_result(
+                bool(result.get("success")) if isinstance(result, dict) else False,
+                command, result.get("message", "") if isinstance(result, dict) else ""))
+            d.addErrback(self._on_gameplay_command_failed, command, "SPEND_STAT_POINT")
+            return
+
+        # Toggle Dragon Form (shapeshift + flight).
+        if payload is None and command == "dragon_form":
+            enable = msg.get("enable", None)
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "dragonForm", enable)
+            d.addCallback(lambda result: self._send_gameplay_command_result(
+                bool(result.get("success")) if isinstance(result, dict) else False,
+                command, result.get("message", "") if isinstance(result, dict) else ""))
+            d.addErrback(self._on_gameplay_command_failed, command, "DRAGON_FORM")
             return
 
         if payload is None and self._handle_ui_command(command, msg):

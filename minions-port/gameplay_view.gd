@@ -40,6 +40,8 @@ const GAMEPAD_LOOK_SENSITIVITY := 2.8    # right-stick yaw, radians/sec at full 
 const GAMEPAD_PITCH_SENSITIVITY := 2.0   # right-stick pitch, radians/sec at full tilt
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
+const FLY_VERTICAL_SPEED := 8.0  # ascend/descend speed while a Flying buff is active
+const FLY_SPEED := 11.0          # horizontal speed while flying (a touch faster than running)
 const PLAYER_FOOT_OFFSET := 0.9
 # Torque's player datablock allowed ~1.0+ step heights and several MoM stair
 # meshes (and the 1.5x-scaled guard towers) have risers above 0.75, so the old
@@ -73,6 +75,7 @@ const NpcWindowScript := preload("res://ui/npc_window.gd")
 const JournalWindowScript := preload("res://ui/journal_window.gd")
 const SpellbookWindowScript := preload("res://ui/spellbook_window.gd")
 const CheatWindowScript := preload("res://ui/cheat_window.gd")
+const CharacterWindowScript := preload("res://ui/character_window.gd")
 const HotbarScript := preload("res://ui/hotbar.gd")
 
 var world_time := {"hour": 0, "minute": 0}
@@ -167,6 +170,7 @@ var npc_window: NpcWindow
 var journal_window: JournalWindow
 var spellbook_window: SpellbookWindow
 var cheat_window: CheatWindow
+var character_window: CharacterWindow
 var hotbar: Hotbar
 var cursor_item_ghost: Button   # follows the mouse while an item is on the cursor
 var _cast_bar: ProgressBar
@@ -373,7 +377,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Move WASD/L-stick • Look mouse/R-stick • Tab/B target • Q/RB attack • E/X talk-loot • 1-0/D-pad abilities • R/Y swap bar • Shift/LB hold = bar 2 • Space/A jump • I inventory • P spells • J journal • Enter chat • ` cheats"
+	hint_label.text = "Move WASD/L-stick • Look mouse/R-stick • Tab/B target • Q/RB attack • E/X talk-loot • 1-0/D-pad abilities • R/Y swap bar • Shift/LB hold = bar 2 • Space jump (fly: Space up / Ctrl down) • C character • I inventory • P spells • J journal • Enter chat • ` cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
@@ -576,7 +580,12 @@ func _build_game_windows():
 		_request_server_command("cheat", {"action": action, "params": params}))
 	add_child(cheat_window)
 
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	character_window = CharacterWindowScript.new()
+	character_window.position = Vector2(120, 90)
+	character_window.spend_stat.connect(func(stat): _request_server_command("spend_stat_point", {"stat": stat, "amount": 1}))
+	add_child(character_window)
+
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		w.visibility_changed.connect(_on_window_visibility_changed)
 
 	# Item-on-cursor ghost that follows the mouse while rearranging inventory.
@@ -734,6 +743,18 @@ func _toggle_cheats():
 	else:
 		_request_server_command("cheat", {"action": "status", "params": {}})
 		cheat_window.open_window()
+
+func _toggle_character():
+	if character_window.visible:
+		character_window.close_window()
+	else:
+		character_window.apply_info(_player_char_info())
+		character_window.open_window()
+
+func _toggle_dragon_form():
+	# Shapeshift into a dragon (and take flight). Server toggles the form and
+	# streams the dragon model + flying back to us.
+	_request_server_command("dragon_form")
 
 func _on_inventory_slot_clicked(slot: int, alt: bool, ctrl: bool):
 	if ctrl:
@@ -1184,6 +1205,17 @@ func _self_entity() -> Dictionary:
 			return entity
 	return {}
 
+func _is_flying() -> bool:
+	# True when a Flying/Levitate buff is active, or when transformed into a
+	# dragon (dragons always fly). Drives both the movement code and the avatar
+	# lift/animation.
+	var e := _self_entity()
+	if float(e.get("flying", 0.0)) > 0.0:
+		return true
+	if "dragon" in str(e.get("model", "")).to_lower():
+		return true
+	return false
+
 func _find_zone_glb_name(node: Node) -> String:
 	# Walk up to the interior/building node tagged with its source glb name.
 	var n: Node = node
@@ -1254,6 +1286,8 @@ func update_state(payload: Dictionary):
 	current_payload = payload.duplicate(true)
 	_rebuild_ability_bar()
 	_update_labels()
+	if character_window and character_window.visible:
+		character_window.apply_info(_player_char_info())
 
 func set_world_time(time_info: Dictionary):
 	world_time = time_info.duplicate(true)
@@ -2055,7 +2089,10 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		if s > 0.0:
 			_player_rig.scale = Vector3(s, s, s)
 		_player_rig.set_fade(float(entity.get("visibility", 1.0)))
-		_player_rig.position.y = -0.9 + (ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0)
+		# Real flight moves the whole body up/down, so don't also lift the rig
+		# (that would float the model above the camera/body). Keep feet at the
+		# capsule bottom.
+		_player_rig.position.y = -0.9
 
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
@@ -2633,13 +2670,13 @@ func _typing_in_ui() -> bool:
 	return focus is LineEdit or focus is TextEdit
 
 func _ui_open() -> bool:
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		if w != null and w.visible:
 			return true
 	return false
 
 func _close_all_windows():
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		if w != null and w.visible:
 			w.close_window()
 
@@ -2663,6 +2700,8 @@ func _setup_input_actions() -> void:
 		"mom_look_up":     [{"key": KEY_UP}, {"axis": JOY_AXIS_RIGHT_Y, "v": -1.0}],
 		"mom_look_down":   [{"key": KEY_DOWN}, {"axis": JOY_AXIS_RIGHT_Y, "v": 1.0}],
 		"mom_jump":        [{"key": KEY_SPACE}, {"button": JOY_BUTTON_A}],
+		# Descend while flying (hold). Space/A ascends, Ctrl/B descends.
+		"mom_descend":     [{"key": KEY_CTRL}, {"button": JOY_BUTTON_RIGHT_STICK}],
 		"mom_interact":    [{"key": KEY_E}, {"button": JOY_BUTTON_X}],
 		"mom_attack":      [{"key": KEY_Q}, {"button": JOY_BUTTON_RIGHT_SHOULDER}],
 		"mom_target":      [{"key": KEY_TAB}, {"button": JOY_BUTTON_B}],
@@ -2805,6 +2844,10 @@ func _input(event):
 					_decline_party_invite()
 			KEY_J:
 				_toggle_journal()
+			KEY_C:
+				_toggle_character()
+			KEY_F6:
+				_toggle_dragon_form()
 			KEY_P, KEY_B:
 				_toggle_spellbook()
 			KEY_F1:
@@ -2844,23 +2887,36 @@ func _physics_process(delta: float) -> void:
 		hotbar.set_secondary_peek(false)
 
 	# Local prediction: move CharacterBody3D so movement feels responsive
+	# A Flying buff (Tempest flight spell, dragon form, unstick, ...) grants real
+	# free flight: no gravity, hold Jump to climb and Descend to dive, and a small
+	# horizontal speed boost. Without it, normal ground movement + gravity.
+	var flying := _is_flying()
+	var horiz_speed := FLY_SPEED if flying else MOVE_SPEED
 	var basis: Basis = player_body.global_transform.basis
 	var move_dir: Vector3 = (basis.x * input_vec.x) + (-basis.z * input_vec.y)
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
-	velocity.x = move_dir.x * MOVE_SPEED
-	velocity.z = move_dir.z * MOVE_SPEED
-	# Flying / Levitate / Slow Fall: when the buff is active, descend gently
-	# (and jump floatier) instead of normal gravity, so the effect is felt.
-	var flying := float(_self_entity().get("flying", 0.0)) > 0.0
-	if player_body.is_on_floor():
+	velocity.x = move_dir.x * horiz_speed
+	velocity.z = move_dir.z * horiz_speed
+	if flying:
+		# Real flight: vertical is fully under player control, no gravity.
+		var vertical := 0.0
+		if not _typing_in_ui():
+			if Input.is_action_pressed("mom_jump"):
+				vertical += 1.0
+			if Input.is_action_pressed("mom_descend"):
+				vertical -= 1.0
+		velocity.y = vertical * FLY_VERTICAL_SPEED
+		jump_requested = false
+	elif player_body.is_on_floor():
 		if jump_requested:
 			velocity.y = JUMP_VELOCITY
 		else:
 			velocity.y = 0.0
+		jump_requested = false
 	else:
-		velocity.y -= (GRAVITY * 0.18 if flying else GRAVITY) * delta
-	jump_requested = false
+		velocity.y -= GRAVITY * delta
+		jump_requested = false
 	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
 	var pre_move_pos := player_body.global_position
