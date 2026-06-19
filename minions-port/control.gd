@@ -1009,7 +1009,12 @@ func handle_response(data: Dictionary):
 			if view.has_method("set_entities"):
 				var entities_val = data.get("entities", [])
 				if entities_val is Array:
-					view.set_entities(entities_val)
+					# Activity-driven replication: "full" snapshots are authoritative
+					# (erase absent); deltas carry an explicit "removed" id list and
+					# leave idle entities cached. Legacy servers omit both -> full=true.
+					var removed_val = data.get("removed", [])
+					var full_val: bool = bool(data.get("full", true))
+					view.set_entities(entities_val, removed_val if removed_val is Array else [], full_val)
 			if view.has_method("apply_vfx_events"):
 				var events_val = data.get("events", [])
 				if events_val is Array and not events_val.is_empty():

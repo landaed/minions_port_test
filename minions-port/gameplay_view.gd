@@ -1480,32 +1480,43 @@ func _rig_for_node(node: Node3D):
 			return rig
 	return null
 
-func set_entities(entities: Array):
+func set_entities(entities: Array, removed: Array = [], is_full := true):
 	# The proxy delta-compresses snapshots: after an entity's static identity /
 	# model / appearance / equipment has been sent once, later snapshots carry
 	# only its dynamic fields (position, rotation, health, combat flags). Merge
 	# each partial onto its cached full copy so the rest of the view always sees
-	# complete entities. Entities absent from a snapshot are dropped from the
-	# cache, so they get a fresh full block if they come back into range.
-	var merged: Array = []
+	# complete entities.
+	#
+	# Removal has two modes:
+	#   is_full = true  -> authoritative set (legacy poll or the periodic resync):
+	#                      anything absent has despawned, so erase it.
+	#   is_full = false -> activity delta: idle entities are intentionally omitted
+	#                      and must be kept; erase only the explicit "removed" ids.
 	var present: Dictionary = {}
 	for e in entities:
 		if not (e is Dictionary):
 			continue
 		var key = e.get("id", e.get("sim_id", 0))
 		present[key] = true
-		var full: Dictionary
 		if _entity_cache.has(key):
-			full = _entity_cache[key]
+			var full: Dictionary = _entity_cache[key]
 			for k in e.keys():
 				full[k] = e[k]
 		else:
-			full = (e as Dictionary).duplicate(true)
-			_entity_cache[key] = full
-		merged.append(full)
+			_entity_cache[key] = (e as Dictionary).duplicate(true)
+	if is_full:
+		for key in _entity_cache.keys():
+			if not present.has(key):
+				_entity_cache.erase(key)
+	else:
+		for rk in removed:
+			_entity_cache.erase(rk)
+			_entity_cache.erase(int(rk))  # tolerate float/int key from JSON
+	# Render the full current set (cached idle entities included), not just the
+	# entities carried by this (possibly delta) snapshot.
+	var merged: Array = []
 	for key in _entity_cache.keys():
-		if not present.has(key):
-			_entity_cache.erase(key)
+		merged.append(_entity_cache[key])
 	replicated_entities = merged
 	_sync_entity_markers()
 	_update_pet_bar()

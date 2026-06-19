@@ -993,8 +993,16 @@ class GodotClientSession:
         # skill/spell animations, particles, explosions, 3D sounds). The bare
         # list shape is kept for compatibility with an older world server.
         events = []
+        # Activity-driven replication: the world server sends only changed/new
+        # entities plus an explicit "removed" list and a "full" flag (true on the
+        # periodic resync). Legacy servers omit both, so full defaults True and the
+        # client falls back to presence-based removal -> behaviour is unchanged.
+        removed = []
+        full_snapshot = True
         if isinstance(entities, dict):
             events = list(entities.get("events", []) or [])
+            removed = list(entities.get("removed", []) or [])
+            full_snapshot = bool(entities.get("full", True))
             # Death edge detection: getVisibleEntities returns {"dead": True} for a
             # dead character. Tell the client on the death->alive and alive->death
             # transitions so it can show / hide its death overlay.
@@ -1050,9 +1058,13 @@ class GodotClientSession:
                         e["rotation"] = [round(float(c), 4) for c in rot]
         # Strip unchanged static fields (identity/model/appearance/equipment) so
         # only the small dynamic remainder goes over the wire to the client.
-        capped = self._delta_compress_entities(capped)
-        # Always send — dedup was suppressing position/rotation updates
-        msg = {"type": "entity_snapshot", "entities": capped}
+        capped = self._delta_compress_entities(capped, full=full_snapshot, removed=removed)
+        # Always send — dedup was suppressing position/rotation updates. "full"
+        # tells the client whether this is an authoritative set (erase absent) or
+        # an activity delta (erase only the explicit "removed" ids).
+        msg = {"type": "entity_snapshot", "entities": capped, "full": full_snapshot}
+        if removed:
+            msg["removed"] = removed
         if events:
             msg["events"] = events
         self.send(msg)
@@ -1073,7 +1085,7 @@ class GodotClientSession:
             self._snap_t0 = _now
         self.start_entity_sync()
 
-    def _delta_compress_entities(self, entities):
+    def _delta_compress_entities(self, entities, full=True, removed=None):
         """Drop static fields the client already has for each entity.
 
         Static identity/model/appearance/equipment is sent in full only when an
@@ -1136,10 +1148,19 @@ class GodotClientSession:
                 if "sim_id" in e:
                     hb["sim_id"] = e["sim_id"]
                 out.append(hb if hb else dynamic)
-        # Forget entities no longer in range so they get a full block on return.
-        for key in [k for k in self.entity_static_sent if k not in present]:
-            del self.entity_static_sent[key]
-            self.entity_dyn_sent.pop(key, None)
+        if full:
+            # Authoritative set (legacy poll or periodic resync): anything we had
+            # cached but isn't present has left range, so forget it -> it gets a
+            # fresh full block when it returns.
+            for key in [k for k in self.entity_static_sent if k not in present]:
+                del self.entity_static_sent[key]
+                self.entity_dyn_sent.pop(key, None)
+        elif removed:
+            # Activity delta: idle entities are intentionally absent and must be
+            # kept; only the explicitly-removed (despawned) ones are forgotten.
+            for key in removed:
+                self.entity_static_sent.pop(key, None)
+                self.entity_dyn_sent.pop(key, None)
         return out
 
     def _on_entity_snapshot_failed(self, reason):

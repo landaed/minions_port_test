@@ -32,6 +32,18 @@ from mud.world.race import GetRaceGraphics
 #for jelly
 from mud.world.shared.worlddata import CharacterInfo,ZoneConnectionInfo
 from mud.world.shared.playdata import RootInfo,ItemInfo
+import os as _os
+
+# Activity-driven entity replication. When enabled, getVisibleEntities returns
+# only the entities whose dynamic state changed since this avatar's last poll
+# (plus a periodic full resync), and reports despawns explicitly via "removed".
+# Idle stationary mobs then cost ~zero CPU/bandwidth no matter how close the
+# player stands. Set MOM_ENTITY_ACTIVITY_DRIVEN=0 to restore the legacy
+# "serialize every visible entity every poll" behaviour for A/B comparison.
+_ENTITY_ACTIVITY_DRIVEN = _os.environ.get("MOM_ENTITY_ACTIVITY_DRIVEN", "1") != "0"
+# How often (seconds) to force a full resync so static/appearance changes and any
+# proxy/client drift self-heal even for entities that never go "dirty".
+_ENTITY_RESYNC_SECS = float(_os.environ.get("MOM_ENTITY_RESYNC", "2.0"))
 
 
 def _compute_mounts(mob):
@@ -1578,6 +1590,27 @@ class PlayerAvatar(Avatar):
         # the snapshot at 50u, so 60u gives a small margin for interpolation.
         SNAPSHOT_MAX_RANGE = 60.0
 
+        # Activity-driven replication bookkeeping (per-avatar, see module top).
+        # present_keys: every entity id visible this poll (whether or not it was
+        # rebuilt). ev_sent: id -> last-sent dynamic signature, so an unchanged
+        # idle mob is skipped before the costly dict build. full_resync rebuilds
+        # everything periodically so static/appearance changes + drift self-heal.
+        activity = _ENTITY_ACTIVITY_DRIVEN
+        present_keys = set()
+        full_resync = True
+        if activity:
+            _now_ev = time()
+            if not hasattr(self, "_ev_sent"):
+                self._ev_sent = {}
+                self._ev_resync_at = 0.0
+            full_resync = (_now_ev - self._ev_resync_at) >= _ENTITY_RESYNC_SECS
+            if full_resync:
+                self._ev_sent.clear()
+                self._ev_resync_at = _now_ev
+            ev_sent = self._ev_sent
+        else:
+            ev_sent = {}
+
         def append_entity(other_mob, visibility_source="unknown", force=False):
             try:
                 if not other_mob or not other_mob.simObject or other_mob.simObject.id in seen_sim_ids:
@@ -1595,6 +1628,31 @@ class PlayerAvatar(Avatar):
                 rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
                 health = float(other_mob.health) if hasattr(other_mob, 'health') and other_mob.health is not None else 0.0
                 max_health = float(other_mob.maxHealth) if hasattr(other_mob, 'maxHealth') and other_mob.maxHealth is not None else 0.0
+                # Activity-driven skip: build a cheap dynamic signature from raw
+                # attributes (no IsKOS / name / model / appearance work yet) and, if
+                # it matches what we last sent this player, bail before the costly
+                # dict assembly. Idle stationary mobs hit this every poll. The
+                # player's explicit target (force) and the periodic full resync are
+                # never skipped. Static/appearance changes ride the resync.
+                ekey = int(other_mob.id)
+                present_keys.add(ekey)
+                if activity:
+                    _tgt = other_mob.target
+                    _sig = (
+                        round(position[0], 2), round(position[1], 2), round(position[2], 2),
+                        round(float(rotation[0]), 3), round(float(rotation[1]), 3),
+                        round(float(rotation[2]), 3), round(float(rotation[3]), 3),
+                        int(health), int(max_health),
+                        int(_tgt.id) if _tgt else 0,
+                        bool(getattr(other_mob, 'attacking', False)),
+                        bool(other_mob.detached),
+                        round(float(getattr(other_mob, 'visibility', 1.0) or 0.0), 2),
+                        round(float(getattr(other_mob, 'flying', 0.0) or 0.0), 2),
+                        round(float(getattr(other_mob, 'size', 1.0) or 1.0), 2),
+                    )
+                    if not full_resync and not force and ev_sent.get(ekey) == _sig:
+                        return  # unchanged since last poll — skip the expensive build
+                    ev_sent[ekey] = _sig
                 is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
                 if other_mob.player or (hasattr(other_mob, 'master') and other_mob.master and other_mob.master.player):
                     is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
@@ -1783,7 +1841,11 @@ class PlayerAvatar(Avatar):
         if mob.target:
             append_entity(mob.target, "target", force=True)
 
-        if len(entities) <= 1:
+        # Fallback when the visibility set itself is empty (canSee not populated) —
+        # base it on present_keys, not len(entities): in activity mode entities may
+        # be short simply because nothing moved, which is not the same as "nothing
+        # is visible" and must not trigger the expensive 500u activeMobs sweep.
+        if len(present_keys) <= 1:
             fallback_range = 500.0
             closest_name = None
             closest_dist = 999999
@@ -1840,6 +1902,15 @@ class PlayerAvatar(Avatar):
         except Exception:
             print_exc()
 
+        if activity:
+            # Anything we'd previously sent this player that is no longer visible
+            # (despawned, died, walked out of range) is reported once, explicitly,
+            # so the client removes it instead of inferring removal from absence.
+            removed = [k for k in list(ev_sent.keys()) if k not in present_keys]
+            for k in removed:
+                ev_sent.pop(k, None)
+            return {"entities": entities, "events": events,
+                    "removed": removed, "full": full_resync}
         return {"entities": entities, "events": events}
 
     def perspective_respawn(self, char_index=0):
