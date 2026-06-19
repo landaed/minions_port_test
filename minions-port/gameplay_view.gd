@@ -57,6 +57,7 @@ const ENTITY_SNAP_DISTANCE := 8.0
 # ~1.5 snapshot intervals — enough buffer to always have two samples to lerp.
 const ENTITY_INTERP_DELAY := 0.12
 const ENTITY_SAMPLE_MAX := 16    # per-entity snapshot history kept for interpolation
+const ENTITY_WALLCLAMP_DISTANCE := 28.0  # only wall-clamp markers within this range of the player
 const ENTITY_DEATH_DESPAWN_DELAY := 2.75
 const ENTITY_FLYING_LIFT := 1.4  # how far Flying/Levitate raises a model off the ground
 const ENTITY_FLOOR_PROBE_UP := 4.0
@@ -201,6 +202,8 @@ var _is_dead := false
 var _death_overlay: Control = null
 var _death_respawn_button: Button = null
 var _game_menu: Control = null          # Esc menu (resume/char-select/logout/quit)
+var _perf_overlay: Label = null         # F3 perf readout (fps / frame ms / entities / draw calls)
+var _perf_timer := 0.0
 # Options / control-remapping overlay (opened from the Esc menu).
 var _options_panel: Control = null
 var _options_rows: VBoxContainer = null
@@ -250,6 +253,7 @@ func _ready():
 	_build_game_windows()
 	_build_death_overlay()
 	_build_game_menu()
+	_build_perf_overlay()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -665,6 +669,22 @@ func _build_death_overlay() -> void:
 	box.add_child(_death_respawn_button)
 
 # Esc menu: Resume / Character Select / Logout / Quit.
+func _build_perf_overlay() -> void:
+	# Toggleable (F3) performance readout: fps / frame ms / visible entities /
+	# draw calls. Off by default; handy for diagnosing frame-rate issues.
+	_perf_overlay = Label.new()
+	_perf_overlay.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_perf_overlay.offset_left = -280
+	_perf_overlay.offset_right = -8
+	_perf_overlay.offset_top = 6
+	_perf_overlay.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_perf_overlay.add_theme_color_override("font_color", Color(0.55, 1.0, 0.55))
+	_perf_overlay.add_theme_font_size_override("font_size", 13)
+	_perf_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_perf_overlay.z_index = 200
+	_perf_overlay.visible = false
+	add_child(_perf_overlay)
+
 func _build_game_menu() -> void:
 	_game_menu = ColorRect.new()
 	_game_menu.color = Color(0.03, 0.04, 0.06, 0.72)
@@ -3153,6 +3173,9 @@ func _input(event):
 					_decline_party_invite()
 			KEY_J:
 				_toggle_journal()
+			KEY_F3:
+				if _perf_overlay:
+					_perf_overlay.visible = not _perf_overlay.visible
 			KEY_C:
 				_toggle_character()
 			KEY_P, KEY_B:
@@ -3302,7 +3325,11 @@ func _physics_process(delta: float) -> void:
 			var desired: Vector3 = target_position
 			var step_vec: Vector3 = desired - body.position
 			var step_h := Vector3(step_vec.x, 0.0, step_vec.z)
-			if entity_space != null and step_h.length() > 0.002:
+			# The wall-clamp raycast is the heaviest per-entity op; only do it for
+			# nearby entities (clipping through a wall isn't visible at distance), so
+			# a crowded zone doesn't fire dozens of physics queries every frame.
+			if entity_space != null and step_h.length() > 0.002 \
+					and body.position.distance_to(player_body.position) < ENTITY_WALLCLAMP_DISTANCE:
 				var ray_from: Vector3 = body.position + Vector3(0, 0.55, 0)
 				var rq := PhysicsRayQueryParameters3D.create(ray_from, ray_from + step_h)
 				rq.collide_with_areas = false
@@ -3330,6 +3357,16 @@ func _physics_process(delta: float) -> void:
 		cursor_item_ghost.position = get_local_mouse_position() + Vector2(14, 10)
 
 	_update_cast_bar()
+
+	# F3 perf overlay: refresh a few times a second while it's showing.
+	if _perf_overlay and _perf_overlay.visible:
+		_perf_timer += delta
+		if _perf_timer >= 0.4:
+			_perf_timer = 0.0
+			var fps := Engine.get_frames_per_second()
+			_perf_overlay.text = "%d fps  %.1f ms\n%d entities  %d draw calls" % [
+				fps, 1000.0 / maxf(fps, 1.0), replicated_entity_nodes.size(),
+				RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)]
 
 	# Periodically refresh open windows so cooldowns/charges stay current.
 	_ui_poll_timer += delta
