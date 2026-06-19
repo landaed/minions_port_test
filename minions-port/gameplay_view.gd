@@ -1509,12 +1509,12 @@ func _update_look_at():
 	var dead := false
 	if not result.is_empty():
 		var collider = result.get("collider")
-		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
+		if collider != null and collider is Node3D and collider.has_meta("entity_id") and int(collider.get_meta("entity_id")) > 0:
 			looking = true
-			var ent: Dictionary = collider.get_meta("entity", {})
+			var ent: Dictionary = collider.get_meta("entity") if collider.has_meta("entity") else {}
 			enemy = bool(ent.get("is_enemy", false))
 			dead = bool(ent.get("dead", false)) or float(ent.get("health", 1.0)) <= 0.0
-			_looked_entity_id = int(collider.get_meta("entity_id", 0))
+			_looked_entity_id = int(collider.get_meta("entity_id"))
 		elif collider != null and collider is Node:
 			# World geometry — report which building, to help identify e.g. the gate.
 			_looking_at_world = _find_zone_glb_name(collider)
@@ -1739,7 +1739,7 @@ func _node_for_sim_id(sim_id: int) -> Node3D:
 		return player_body
 	for body in replicated_entity_nodes.values():
 		if body is StaticBody3D and is_instance_valid(body):
-			var ent = body.get_meta("entity", {})
+			var ent = body.get_meta("entity") if body.has_meta("entity") else {}
 			if ent is Dictionary and int(ent.get("sim_id", -1)) == sim_id:
 				return body
 	return null
@@ -1837,11 +1837,11 @@ func on_server_selection_by_mob(target_id: int, _char_index: int):
 	_update_labels()
 
 func _set_marker_highlight(body: StaticBody3D, on: bool):
-	var rig = body.get_meta("rig", null)
+	var rig = body.get_meta("rig") if body.has_meta("rig") else null
 	if rig != null and is_instance_valid(rig):
 		rig.set_highlight(on)
 		return
-	var mesh: MeshInstance3D = body.get_meta("mesh", null)
+	var mesh: MeshInstance3D = body.get_meta("mesh") if body.has_meta("mesh") else null
 	if mesh == null:
 		return
 	if on:
@@ -1852,7 +1852,7 @@ func _set_marker_highlight(body: StaticBody3D, on: bool):
 		mat.emission_energy_multiplier = 0.5
 		mesh.material_override = mat
 	else:
-		var prev_entity: Dictionary = body.get_meta("entity", {})
+		var prev_entity: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 		var restore := StandardMaterial3D.new()
 		restore.albedo_color = _entity_color(prev_entity)
 		mesh.material_override = restore
@@ -2429,48 +2429,69 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	# Hit reaction: flinch when health drops (the original client did this
 	# locally on damage too). Rate-limited so sustained melee doesn't stunlock
 	# the animation; skipped while dead or mid-swing.
-	var prev: Dictionary = body.get_meta("entity", {})
+	var prev: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 	var prev_hp := float(prev.get("health", -1.0))
 	var new_hp := float(entity.get("health", -1.0))
 	if prev_hp > 0.0 and new_hp >= 0.0 and new_hp < prev_hp - 0.5 and not bool(entity.get("dead", false)):
 		var now := Time.get_ticks_msec() / 1000.0
-		if now >= float(body.get_meta("pain_cooldown", 0.0)) and not bool(entity.get("attacking", false)):
+		var pain_ready_at := float(body.get_meta("pain_cooldown")) if body.has_meta("pain_cooldown") else 0.0
+		if now >= pain_ready_at and not bool(entity.get("attacking", false)):
 			body.set_meta("pain_cooldown", now + 1.6)
-			var pain_rig = body.get_meta("rig", null)
+			var pain_rig = body.get_meta("rig") if body.has_meta("rig") else null
 			if pain_rig and is_instance_valid(pain_rig):
 				pain_rig.play_overlay("pain1" if randi() % 2 == 0 else "pain2")
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	var key := _entity_key(entity)
 	# Colour the fallback capsule when there's no model (highlight preserved).
-	var fb: MeshInstance3D = body.get_meta("mesh", null)
+	var fb: MeshInstance3D = body.get_meta("mesh") if body.has_meta("mesh") else null
 	if fb and key != _highlighted_entity_key:
-		var mesh_material := StandardMaterial3D.new()
-		mesh_material.albedo_color = _entity_color(entity)
-		fb.material_override = mesh_material
+		var fallback_color := _entity_color(entity)
+		if not body.has_meta("fallback_color") or (body.get_meta("fallback_color") as Color) != fallback_color:
+			body.set_meta("fallback_color", fallback_color)
+			var mesh_material := StandardMaterial3D.new()
+			mesh_material.albedo_color = fallback_color
+			fb.material_override = mesh_material
 	# Apply the server's per-spawn scale multiplier (anchored at the feet).
 	var scl := float(entity.get("scale", 1.0))
 	if scl > 0.0:
 		body.scale = Vector3(scl, scl, scl)
-	var label: Label3D = body.get_meta("label")
-	label.text = _entity_label_text(entity)
-	# Keep armor textures + mounted equipment in sync (rig dedupes by signature).
-	var rig = body.get_meta("rig", null)
+	var label: Label3D = body.get_meta("label") if body.has_meta("label") else null
+	if label:
+		var label_text := _entity_label_text(entity)
+		if label.text != label_text:
+			label.text = label_text
+	# Keep armor textures + mounted equipment in sync only when the streamed
+	# visual state changes.  Even though CharacterRig dedupes most work, building
+	# those dictionaries/JSON signatures for every NPC every snapshot was showing
+	# up in process time in crowded zones.
+	var rig = body.get_meta("rig") if body.has_meta("rig") else null
 	if rig and is_instance_valid(rig):
-		rig.apply_appearance(_appearance_for(entity))
-		rig.apply_single_texture(_single_tex_for(entity))
-		rig.apply_mounts(_mounts_for(entity))
-		# Invisibility (visibility < 1) fades the model; Flying/Levitate lifts it.
-		rig.set_fade(float(entity.get("visibility", 1.0)))
-		rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
+		var visual_signature := JSON.stringify({
+			"appearance": entity.get("appearance", {}),
+			"equipment": entity.get("equipment", {}),
+			"flying": float(entity.get("flying", 0.0)) > 0.0,
+			"mounts": entity.get("mounts", {}),
+			"tex_single": entity.get("tex_single", ""),
+			"visibility": snappedf(float(entity.get("visibility", 1.0)), 0.01),
+		})
+		var old_visual_signature := str(body.get_meta("visual_signature")) if body.has_meta("visual_signature") else ""
+		if old_visual_signature != visual_signature:
+			body.set_meta("visual_signature", visual_signature)
+			rig.apply_appearance(_appearance_for(entity))
+			rig.apply_single_texture(_single_tex_for(entity))
+			rig.apply_mounts(_mounts_for(entity))
+			# Invisibility (visibility < 1) fades the model; Flying/Levitate lifts it.
+			rig.set_fade(float(entity.get("visibility", 1.0)))
+			rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
 
 func _buffered_render_pos(body: Node, now: float) -> Dictionary:
 	# Return {pos, yaw} for an entity at (now - ENTITY_INTERP_DELAY), interpolated
 	# between the two buffered snapshots that bracket that render time. Falls back
 	# to the latest known target when there isn't enough history.
-	var samples: Array = body.get_meta("samples", [])
+	var samples: Array = body.get_meta("samples") if body.has_meta("samples") else []
 	if samples.is_empty():
-		var tp: Vector3 = body.get_meta("target_position", body.position)
+		var tp: Vector3 = body.get_meta("target_position") if body.has_meta("target_position") else body.position
 		return {"pos": tp, "yaw": body.rotation.y}
 	var rt := now - ENTITY_INTERP_DELAY
 	# Older than everything we have -> hold the oldest sample.
@@ -2576,7 +2597,8 @@ func _sync_entity_markers():
 		# toward the latest server position as usual.
 		var entity_is_dead := bool(entity_dict.get("dead", false)) or float(entity_dict.get("health", 1.0)) <= 0.0
 		if entity_is_dead:
-			if not bool(body.get_meta("dead_frozen", false)):
+			var was_dead_frozen := bool(body.get_meta("dead_frozen")) if body.has_meta("dead_frozen") else false
+			if not was_dead_frozen:
 				body.position = godot_pos
 				body.set_meta("target_position", godot_pos)
 				body.set_meta("dead_frozen", true)
@@ -2589,7 +2611,7 @@ func _sync_entity_markers():
 			# (now - ENTITY_INTERP_DELAY) by lerping between bracketing samples, so
 			# motion stays smooth even though snapshots arrive in ~13Hz steps.
 			var tnow := Time.get_ticks_msec() / 1000.0
-			var samples: Array = body.get_meta("samples", [])
+			var samples: Array = body.get_meta("samples") if body.has_meta("samples") else []
 			if is_new:
 				body.position = godot_pos
 				body.rotation.y = yaw
@@ -2605,7 +2627,7 @@ func _sync_entity_markers():
 			continue
 		var old_body: Node = replicated_entity_nodes[key]
 		if is_instance_valid(old_body):
-			var old_entity: Dictionary = old_body.get_meta("entity", {})
+			var old_entity: Dictionary = old_body.get_meta("entity") if old_body.has_meta("entity") else {}
 			var old_dead := bool(old_entity.get("dead", false)) or float(old_entity.get("health", 1.0)) <= 0.0
 			if old_dead:
 				if not _dead_entity_remove_at.has(key):
@@ -2952,10 +2974,12 @@ func _target_entity_from_click(screen_position: Vector2) -> bool:
 	var collider = result.get("collider")
 	if collider == null or not (collider is Node3D):
 		return false
-	var entity_id := int(collider.get_meta("entity_id", 0))
+	if not collider.has_meta("entity_id"):
+		return false
+	var entity_id := int(collider.get_meta("entity_id"))
 	if entity_id <= 0:
 		return false
-	var entity: Dictionary = collider.get_meta("entity", {})
+	var entity: Dictionary = collider.get_meta("entity") if collider.has_meta("entity") else {}
 	if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
 		interaction_message = "Looting %s." % str(entity.get("name", "corpse"))
 		_request_server_command("select_entity", {"entity_id": entity_id, "double_click": true})
@@ -3298,20 +3322,21 @@ func _physics_process(delta: float) -> void:
 	var entity_world := sub_viewport.find_world_3d() if sub_viewport else null
 	if entity_world != null:
 		entity_space = entity_world.direct_space_state
+	var now_t := Time.get_ticks_msec() / 1000.0
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
 		# Frozen corpse: never interpolate it (so it can't slide); just hold the
 		# death pose. Everything below only applies to living entities.
-		if bool(body.get_meta("dead_frozen", false)):
-			var dead_rig = body.get_meta("rig", null)
+		var is_dead_frozen := bool(body.get_meta("dead_frozen")) if body.has_meta("dead_frozen") else false
+		if is_dead_frozen:
+			var dead_rig = body.get_meta("rig") if body.has_meta("rig") else null
 			if dead_rig != null and is_instance_valid(dead_rig):
 				dead_rig.drive(0.0, false, true)
 			continue
 		# Render-behind interpolation: draw the entity where the server says it was
 		# ENTITY_INTERP_DELAY ago, lerped between the two bracketing snapshots, so
 		# motion is smooth despite ~13Hz stepped updates + network jitter.
-		var now_t := Time.get_ticks_msec() / 1000.0
 		var rp := _buffered_render_pos(body, now_t)
 		var target_position: Vector3 = rp["pos"]
 		var prev_xz := Vector2(body.position.x, body.position.z)
@@ -3345,11 +3370,12 @@ func _physics_process(delta: float) -> void:
 		body.rotation.y = lerp_angle(body.rotation.y, float(rp["yaw"]), clamp(delta * 12.0, 0.0, 1.0))
 		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
 		var inst_speed := moved / maxf(delta, 0.001)
-		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
+		var prev_speed := float(body.get_meta("speed")) if body.has_meta("speed") else 0.0
+		var smoothed := lerpf(prev_speed, inst_speed, 0.25)
 		body.set_meta("speed", smoothed)
-		var rig = body.get_meta("rig", null)
+		var rig = body.get_meta("rig") if body.has_meta("rig") else null
 		if rig != null and is_instance_valid(rig):
-			var ent: Dictionary = body.get_meta("entity", {})
+			var ent: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
 	# Cursor-item ghost follows the mouse while a window is open.
