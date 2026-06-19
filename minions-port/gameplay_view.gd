@@ -195,6 +195,24 @@ var _is_dead := false
 var _death_overlay: Control = null
 var _death_respawn_button: Button = null
 var _game_menu: Control = null          # Esc menu (resume/char-select/logout/quit)
+# Options / control-remapping overlay (opened from the Esc menu).
+var _options_panel: Control = null
+var _options_rows: VBoxContainer = null
+var _rebind_hint: Label = null
+var _rebinding_action := ""              # non-empty while listening for a new binding
+var _rebinding_kind := ""               # "key" or "pad"
+const BINDINGS_PATH := "user://input_bindings.cfg"
+# Actions the player can remap, with friendly labels (sticks stay fixed).
+const REBINDABLE_ACTIONS := [
+	["mom_move_forward", "Move Forward"], ["mom_move_back", "Move Back"],
+	["mom_move_left", "Strafe Left"], ["mom_move_right", "Strafe Right"],
+	["mom_jump", "Jump / Fly Up"], ["mom_descend", "Fly Down"],
+	["mom_attack", "Attack"], ["mom_target", "Target Nearest"],
+	["mom_interact", "Interact / Loot"], ["mom_hotbar_page", "Swap Hotbar"],
+	["mom_hotbar_secondary", "Bar 2 (hold)"], ["mom_inventory", "Inventory"],
+	["mom_hotbar_1", "Hotbar 1"], ["mom_hotbar_2", "Hotbar 2"],
+	["mom_hotbar_3", "Hotbar 3"], ["mom_hotbar_4", "Hotbar 4"],
+]
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
 var _last_inventory: Dictionary = {}
@@ -661,7 +679,7 @@ func _build_game_menu() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	box.add_child(title)
-	for entry in [["Resume", "resume"], ["Character Select", "character_select"],
+	for entry in [["Resume", "resume"], ["Options", "options"], ["Character Select", "character_select"],
 			["Log Out", "logout"], ["Quit Game", "quit"]]:
 		var b := Button.new()
 		b.text = entry[0]
@@ -671,10 +689,14 @@ func _build_game_menu() -> void:
 		var action: String = entry[1]
 		b.pressed.connect(func(): _on_game_menu_action(action))
 		box.add_child(b)
+	_build_options_panel()
 
 func _on_game_menu_action(action: String) -> void:
 	if action == "resume":
 		_toggle_game_menu(false)
+		return
+	if action == "options":
+		_open_options()
 		return
 	# character_select / logout / quit are app-level; control handles them.
 	menu_action_requested.emit(action)
@@ -688,6 +710,231 @@ func _toggle_game_menu(force_on = null) -> void:
 		_release_mouse()
 	elif not _ui_open():
 		_capture_mouse()
+
+# ---------------------------------------------------------------------------
+# Options / control remapping (opened from the Esc menu). Rebind the keyboard key
+# and/or the controller button for each gameplay action; movement/look sticks stay
+# fixed. Bindings persist to user://input_bindings.cfg and are re-applied over the
+# defaults at startup (see the _load_bindings() call at the end of
+# _setup_input_actions).
+# ---------------------------------------------------------------------------
+const PAD_BUTTON_NAMES := {
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
+	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
+	JOY_BUTTON_BACK: "Back", JOY_BUTTON_START: "Start",
+	JOY_BUTTON_LEFT_STICK: "L3", JOY_BUTTON_RIGHT_STICK: "R3",
+	JOY_BUTTON_DPAD_UP: "D-Up", JOY_BUTTON_DPAD_DOWN: "D-Down",
+	JOY_BUTTON_DPAD_LEFT: "D-Left", JOY_BUTTON_DPAD_RIGHT: "D-Right",
+}
+
+func _build_options_panel() -> void:
+	if _options_panel != null:
+		return
+	_options_panel = ColorRect.new()
+	_options_panel.color = Color(0.03, 0.04, 0.06, 0.94)
+	_options_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_options_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_options_panel.visible = false
+	_options_panel.z_index = 170
+	add_child(_options_panel)
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	box.grow_vertical = Control.GROW_DIRECTION_BOTH
+	box.add_theme_constant_override("separation", 8)
+	_options_panel.add_child(box)
+	var title := Label.new()
+	title.text = "Options — Controls"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 26)
+	box.add_child(title)
+	var hdr := Label.new()
+	hdr.text = "Action                         Keyboard            Controller     (click a binding to change)"
+	hdr.add_theme_font_size_override("font_size", 12)
+	box.add_child(hdr)
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(580, 420)
+	box.add_child(scroll)
+	_options_rows = VBoxContainer.new()
+	_options_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_options_rows.add_theme_constant_override("separation", 4)
+	scroll.add_child(_options_rows)
+	_rebind_hint = Label.new()
+	_rebind_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_rebind_hint.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
+	_rebind_hint.visible = false
+	box.add_child(_rebind_hint)
+	var btns := HBoxContainer.new()
+	btns.alignment = BoxContainer.ALIGNMENT_CENTER
+	btns.add_theme_constant_override("separation", 12)
+	box.add_child(btns)
+	var reset_b := Button.new()
+	reset_b.text = "Reset to Defaults"
+	reset_b.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(reset_b)
+	reset_b.pressed.connect(_reset_bindings)
+	btns.add_child(reset_b)
+	var back_b := Button.new()
+	back_b.text = "Back"
+	back_b.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(back_b)
+	back_b.pressed.connect(_close_options)
+	btns.add_child(back_b)
+
+func _open_options() -> void:
+	if _options_panel == null:
+		_build_options_panel()
+	_populate_options_rows()
+	_options_panel.visible = true
+	_release_mouse()
+
+func _close_options() -> void:
+	_cancel_rebind()
+	if _options_panel:
+		_options_panel.visible = false
+
+func _populate_options_rows() -> void:
+	if _options_rows == null:
+		return
+	for c in _options_rows.get_children():
+		c.queue_free()
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		var name_l := Label.new()
+		name_l.text = str(pair[1])
+		name_l.custom_minimum_size = Vector2(220, 0)
+		row.add_child(name_l)
+		var key_b := Button.new()
+		key_b.custom_minimum_size = Vector2(160, 30)
+		key_b.text = _binding_text(action, "key")
+		key_b.focus_mode = Control.FOCUS_NONE
+		UICommonScript.style_button(key_b)
+		key_b.pressed.connect(func(): _begin_rebind(action, "key"))
+		row.add_child(key_b)
+		var pad_b := Button.new()
+		pad_b.custom_minimum_size = Vector2(160, 30)
+		pad_b.text = _binding_text(action, "pad")
+		pad_b.focus_mode = Control.FOCUS_NONE
+		UICommonScript.style_button(pad_b)
+		pad_b.pressed.connect(func(): _begin_rebind(action, "pad"))
+		row.add_child(pad_b)
+		_options_rows.add_child(row)
+
+func _binding_of_kind(action: String, kind: String) -> InputEvent:
+	if not InputMap.has_action(action):
+		return null
+	for ev in InputMap.action_get_events(action):
+		if kind == "key" and ev is InputEventKey:
+			return ev
+		if kind == "pad" and ev is InputEventJoypadButton:
+			return ev
+	return null
+
+func _binding_text(action: String, kind: String) -> String:
+	var ev := _binding_of_kind(action, kind)
+	if ev == null:
+		return "—"
+	if ev is InputEventKey:
+		var kc: int = ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode
+		return OS.get_keycode_string(kc)
+	if ev is InputEventJoypadButton:
+		return str(PAD_BUTTON_NAMES.get(ev.button_index, "Btn %d" % ev.button_index))
+	return "?"
+
+func _set_binding(action: String, kind: String, new_ev: InputEvent, save := true) -> void:
+	if not InputMap.has_action(action):
+		return
+	var keep: Array = []
+	for ev in InputMap.action_get_events(action):
+		if kind == "key" and ev is InputEventKey:
+			continue
+		if kind == "pad" and ev is InputEventJoypadButton:
+			continue
+		keep.append(ev)
+	InputMap.action_erase_events(action)
+	for ev in keep:
+		InputMap.action_add_event(action, ev)
+	if new_ev != null:
+		InputMap.action_add_event(action, new_ev)
+	if save:
+		_save_bindings()
+
+func _begin_rebind(action: String, kind: String) -> void:
+	_rebinding_action = action
+	_rebinding_kind = kind
+	if _rebind_hint:
+		_rebind_hint.text = "Press a %s…  (Esc to cancel)" % ("key" if kind == "key" else "controller button")
+		_rebind_hint.visible = true
+
+func _cancel_rebind() -> void:
+	_rebinding_action = ""
+	_rebinding_kind = ""
+	if _rebind_hint:
+		_rebind_hint.visible = false
+
+func _finish_rebind() -> void:
+	_cancel_rebind()
+	_populate_options_rows()
+
+func _handle_rebind_capture(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_cancel_rebind()
+		accept_event()
+		return
+	if _rebinding_kind == "key" and event is InputEventKey and event.pressed and not event.echo:
+		var k := InputEventKey.new()
+		k.physical_keycode = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+		k.keycode = k.physical_keycode
+		_set_binding(_rebinding_action, "key", k)
+		_finish_rebind()
+		accept_event()
+		return
+	if _rebinding_kind == "pad" and event is InputEventJoypadButton and event.pressed:
+		var b := InputEventJoypadButton.new()
+		b.button_index = event.button_index
+		_set_binding(_rebinding_action, "pad", b)
+		_finish_rebind()
+		accept_event()
+		return
+
+func _save_bindings() -> void:
+	var cfg := ConfigFile.new()
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		var kev := _binding_of_kind(action, "key")
+		var pev := _binding_of_kind(action, "pad")
+		if kev is InputEventKey:
+			cfg.set_value("keys", action, int(kev.physical_keycode if kev.physical_keycode != 0 else kev.keycode))
+		if pev is InputEventJoypadButton:
+			cfg.set_value("pad", action, int(pev.button_index))
+	cfg.save(BINDINGS_PATH)
+
+func _load_bindings() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(BINDINGS_PATH) != OK:
+		return
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		if not InputMap.has_action(action):
+			continue
+		if cfg.has_section_key("keys", action):
+			var k := InputEventKey.new()
+			k.physical_keycode = int(cfg.get_value("keys", action))
+			k.keycode = k.physical_keycode
+			_set_binding(action, "key", k, false)
+		if cfg.has_section_key("pad", action):
+			var b := InputEventJoypadButton.new()
+			b.button_index = int(cfg.get_value("pad", action))
+			_set_binding(action, "pad", b, false)
+
+func _reset_bindings() -> void:
+	var dir := DirAccess.open("user://")
+	if dir and dir.file_exists("input_bindings.cfg"):
+		dir.remove("input_bindings.cfg")
+	_setup_input_actions()  # rebuild defaults (file gone, so _load_bindings is a no-op)
+	_populate_options_rows()
 
 func _show_death_overlay(on: bool) -> void:
 	_is_dead = on
@@ -2753,6 +3000,8 @@ func _setup_input_actions() -> void:
 				m.axis_value = ev_def["v"]
 				ev = m
 			InputMap.action_add_event(action, ev)
+	# Apply any saved key/button rebindings over the freshly-built defaults.
+	_load_bindings()
 
 # Discrete gameplay actions (work from key OR gamepad). Returns true if handled.
 func _handle_action_event(event: InputEvent) -> bool:
@@ -2784,6 +3033,16 @@ func _handle_action_event(event: InputEvent) -> bool:
 
 func _input(event):
 	if not visible:
+		return
+	# Listening for a new key/button while remapping — capture it and swallow.
+	if _rebinding_action != "":
+		_handle_rebind_capture(event)
+		return
+	# The options overlay is modal: it swallows gameplay input; Esc closes it.
+	if _options_panel != null and _options_panel.visible:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			_close_options()
+			accept_event()
 		return
 	if _is_dead:
 		# While dead the only interaction is releasing the spirit. Enter/Space
