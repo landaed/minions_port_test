@@ -1540,6 +1540,8 @@ class ProxyProtocol(WebSocketServerProtocol):
             "rename": bool(getattr(cinfo, "rename", 0)),
             "klasses": list(getattr(cinfo, "klasses", [])),
             "levels": list(getattr(cinfo, "levels", [])),
+            # Worn-gear models for the character-select rig (see control.gd).
+            "mounts": getattr(cinfo, "mounts", {}) or {},
         }
 
     # ------------------------------------------------------------------

@@ -71,6 +71,8 @@ class CharacterInfo(pb.Copyable,pb.RemoteCopy):
         self.realm = RPG_REALM_NEUTRAL
         self.rename = 0
         self.status = ""
+        # Worn-gear appearance for the character-select screen: {"0":{model,material},...}
+        self.mounts = {}
 
 
         if char:

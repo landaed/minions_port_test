@@ -158,6 +158,32 @@ class PlayerAvatar(Avatar):
             return False
         return True
 
+    def _pushAppearances(self):
+        """Send each party character's worn-gear appearance (sex + equipment model
+        "mounts") to the character server, so the character-SELECT screen can show
+        their gear. Best-effort, fire-and-forget — wrapped so it can never break
+        the login flow. The appearance is stored in a side table keyed by name and
+        read back by getCharacterInfos."""
+        try:
+            from mud.world.cserveravatar import AVATAR
+            if not AVATAR or not getattr(self.player, "party", None):
+                return
+            import json as _json
+            for c in getattr(self.player.party, "members", []) or []:
+                mob = getattr(c, "mob", None) if c else None
+                if mob is None:
+                    continue
+                try:
+                    mounts = _compute_mounts(mob)
+                    sex = str(getattr(getattr(mob, "spawn", None), "sex", "") or getattr(mob, "sex", "") or "")
+                    appearance = _json.dumps({"mounts": mounts, "sex": sex})
+                    AVATAR.mind.callRemote("setCharacterAppearance",
+                        self.player.publicName, c.name, appearance).addErrback(lambda f: None)
+                except Exception:
+                    print_exc()
+        except Exception:
+            print_exc()
+
 
     def logout(self):
         player = self.player
@@ -1109,7 +1135,10 @@ class PlayerAvatar(Avatar):
         names = []
         for cname,cvalues in result.items():
             names.append(cname)
-            name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename = cvalues
+            # getCharacterInfos now appends an appearance_json element; unpack the
+            # first 10 positionally so older/newer servers don't break each other.
+            name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename = cvalues[:10]
+            appearance_json = cvalues[10] if len(cvalues) > 10 else ""
             cinfo = CharacterInfo()
             cinfo.status = "Alive"
             cinfo.name = str(cname)
@@ -1119,6 +1148,17 @@ class PlayerAvatar(Avatar):
             cinfo.levels.append(plevel)
             cinfo.newCharacter = False
             cinfo.rename = rename
+            # Worn-gear appearance for the character-select screen (sex + mounts).
+            if appearance_json:
+                try:
+                    import json as _json
+                    ap = _json.loads(appearance_json)
+                    if isinstance(ap, dict):
+                        cinfo.mounts = ap.get("mounts", {}) or {}
+                        if ap.get("sex"):
+                            cinfo.sex = str(ap["sex"])
+                except Exception:
+                    print_exc()
             cinfos.append(cinfo)
             
         self.player.cserverInfos  = cinfos[:]
@@ -1503,6 +1543,9 @@ class PlayerAvatar(Avatar):
         _logf.flush()
         d = self.mind.callRemote("setRootInfo",self.player.rootInfo,time()-self.player.world.pauseTime)
         d.addErrback(lambda f: _logf.write("####enterWorld: setRootInfo FAILED: %s\n" % f) or _logf.flush())
+        # Record each character's worn-gear appearance for the character-select
+        # screen (fire-and-forget; must never affect the login flow).
+        self._pushAppearances()
         _logf.write("####enterWorld: completed successfully\n")
         _logf.flush()
         _logf.close()

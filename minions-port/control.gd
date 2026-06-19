@@ -1127,4 +1127,9 @@ func _rebuild_roster_pedestal() -> void:
 			continue
 		rig.position = Vector3((i - (n - 1) / 2.0) * spacing, 0, 0)
 		_select_pivot.add_child(rig)
+		# Dress each roster character in its worn gear (weapons/shield/head), the
+		# same mounts the in-world rig uses. Sent by the server in the char list.
+		var mounts = c.get("mounts", {})
+		if mounts is Dictionary and not mounts.is_empty() and rig.has_method("apply_mounts"):
+			rig.apply_mounts(mounts)
 		_select_rigs.append(rig)
