@@ -125,7 +125,11 @@ class CServerMind(pb.Root):
         
     def remote_getCharacterInfos(self,publicName):
         return CServerMind.themind.callRemote("getCharacterInfos",publicName)
-    
+
+    def remote_setCharacterAppearance(self,publicName,characterName,appearance_json):
+        # Forward the character-select appearance (worn gear) to the character server.
+        return CServerMind.themind.callRemote("setCharacterAppearance",publicName,characterName,appearance_json)
+
     def gotCharacterBuffer(self,cbuffer,publicName):
         CBUFFERS[publicName]=cbuffer
         return cbuffer
