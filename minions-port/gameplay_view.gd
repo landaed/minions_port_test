@@ -51,6 +51,12 @@ const PLAYER_STEP_UP_HEIGHT := 1.1
 const PLAYER_STEP_FORWARD_SCALE := 0.9
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
+# Render-behind entity interpolation: other players/NPCs are drawn this many
+# seconds in the past, interpolated between the two server snapshots that bracket
+# that time. Removes the jitter from chasing a ~13Hz stepping target. ~0.12s is
+# ~1.5 snapshot intervals — enough buffer to always have two samples to lerp.
+const ENTITY_INTERP_DELAY := 0.12
+const ENTITY_SAMPLE_MAX := 16    # per-entity snapshot history kept for interpolation
 const ENTITY_DEATH_DESPAWN_DELAY := 2.75
 const ENTITY_FLYING_LIFT := 1.4  # how far Flying/Levitate raises a model off the ground
 const ENTITY_FLOOR_PROBE_UP := 4.0
@@ -2438,6 +2444,30 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 		rig.set_fade(float(entity.get("visibility", 1.0)))
 		rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
 
+func _buffered_render_pos(body: Node, now: float) -> Dictionary:
+	# Return {pos, yaw} for an entity at (now - ENTITY_INTERP_DELAY), interpolated
+	# between the two buffered snapshots that bracket that render time. Falls back
+	# to the latest known target when there isn't enough history.
+	var samples: Array = body.get_meta("samples", [])
+	if samples.is_empty():
+		var tp: Vector3 = body.get_meta("target_position", body.position)
+		return {"pos": tp, "yaw": body.rotation.y}
+	var rt := now - ENTITY_INTERP_DELAY
+	# Older than everything we have -> hold the oldest sample.
+	if rt <= float(samples[0]["t"]):
+		return {"pos": samples[0]["pos"], "yaw": float(samples[0]["yaw"])}
+	for i in range(samples.size() - 1):
+		var a: Dictionary = samples[i]
+		var b: Dictionary = samples[i + 1]
+		if rt >= float(a["t"]) and rt <= float(b["t"]):
+			var span := float(b["t"]) - float(a["t"])
+			var f := 0.0 if span <= 0.0001 else clampf((rt - float(a["t"])) / span, 0.0, 1.0)
+			return {"pos": (a["pos"] as Vector3).lerp(b["pos"], f),
+					"yaw": lerp_angle(float(a["yaw"]), float(b["yaw"]), f)}
+	# Past the latest sample (entity stopped / went idle) -> hold the newest.
+	var last: Dictionary = samples[samples.size() - 1]
+	return {"pos": last["pos"], "yaw": float(last["yaw"])}
+
 func _sync_entity_markers():
 	if replicated_entities.is_empty():
 		return
@@ -2532,13 +2562,23 @@ func _sync_entity_markers():
 				body.set_meta("dead_frozen", true)
 		else:
 			body.set_meta("dead_frozen", false)
-			# Set interpolation target; only snap position on first appearance
-			body.set_meta("target_position", godot_pos)
+			body.set_meta("target_position", godot_pos)  # fallback if no buffer yet
+			var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
+			# Feed the render-behind interpolation buffer (see _buffered_render_pos).
+			# Each snapshot is timestamped; the per-frame loop draws the entity at
+			# (now - ENTITY_INTERP_DELAY) by lerping between bracketing samples, so
+			# motion stays smooth even though snapshots arrive in ~13Hz steps.
+			var tnow := Time.get_ticks_msec() / 1000.0
+			var samples: Array = body.get_meta("samples", [])
 			if is_new:
 				body.position = godot_pos
-			# Apply rotation from server (yaw only)
-			var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
-			body.rotation.y = yaw
+				body.rotation.y = yaw
+				# Seed one past sample so there's always a pair to interpolate.
+				samples = [{"t": tnow - ENTITY_INTERP_DELAY, "pos": godot_pos, "yaw": yaw}]
+			samples.append({"t": tnow, "pos": godot_pos, "yaw": yaw})
+			while samples.size() > ENTITY_SAMPLE_MAX:
+				samples.pop_front()
+			body.set_meta("samples", samples)
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
@@ -3245,18 +3285,21 @@ func _physics_process(delta: float) -> void:
 			if dead_rig != null and is_instance_valid(dead_rig):
 				dead_rig.drive(0.0, false, true)
 			continue
-		var target_position: Vector3 = body.get_meta("target_position", body.position)
+		# Render-behind interpolation: draw the entity where the server says it was
+		# ENTITY_INTERP_DELAY ago, lerped between the two bracketing snapshots, so
+		# motion is smooth despite ~13Hz stepped updates + network jitter.
+		var now_t := Time.get_ticks_msec() / 1000.0
+		var rp := _buffered_render_pos(body, now_t)
+		var target_position: Vector3 = rp["pos"]
 		var prev_xz := Vector2(body.position.x, body.position.z)
 		if body.position.distance_to(target_position) > ENTITY_SNAP_DISTANCE:
+			# Spawn / teleport / large correction: jump straight there.
 			body.position = target_position
-			body.set_meta("stuck_time", 0.0)
 		else:
-			var desired: Vector3 = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
-			# The headless server has no world collision, so a chasing/returning
-			# mob's straight-line path can cross walls. Clamp each interpolation
-			# step against world geometry at knee height; if the marker stays
-			# blocked while the server target keeps moving away, snap to the
-			# server position so the mob can't be left behind forever.
+			# Follow the already-smooth buffered path directly. The headless server
+			# has no world collision, so clamp the step against world geometry at
+			# knee height so a marker can't slide through walls.
+			var desired: Vector3 = target_position
 			var step_vec: Vector3 = desired - body.position
 			var step_h := Vector3(step_vec.x, 0.0, step_vec.z)
 			if entity_space != null and step_h.length() > 0.002:
@@ -3271,15 +3314,8 @@ func _physics_process(delta: float) -> void:
 					desired.x = body.position.x + dir.x * free
 					desired.z = body.position.z + dir.z * free
 			body.position = desired
-			var lag := Vector2(body.position.x - target_position.x, body.position.z - target_position.z).length()
-			if lag > 1.5:
-				var stuck := float(body.get_meta("stuck_time", 0.0)) + delta
-				if stuck >= 2.0:
-					body.position = target_position
-					stuck = 0.0
-				body.set_meta("stuck_time", stuck)
-			else:
-				body.set_meta("stuck_time", 0.0)
+		# Smoothly turn toward the buffered heading.
+		body.rotation.y = lerp_angle(body.rotation.y, float(rp["yaw"]), clamp(delta * 12.0, 0.0, 1.0))
 		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
 		var inst_speed := moved / maxf(delta, 0.001)
 		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
