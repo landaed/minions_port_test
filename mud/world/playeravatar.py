@@ -136,6 +136,29 @@ class PlayerAvatar(Avatar):
         self.logout()
 
 
+    def perspective_leaveWorld(self):
+        """Return to character select WITHOUT ending the account session.
+
+        Removes the player's party mobs from their current zone so other clients
+        see the avatar despawn (zone.removePlayer drops them from everyone's
+        canSee, which the activity-driven stream then reports as "removed"), but
+        keeps self.player and this perspective alive so the client can re-enter a
+        character immediately. Full logout (self.player = None) only happens on a
+        real disconnect."""
+        player = self.player
+        if not player:
+            return False
+        try:
+            zone = getattr(player, "zone", None)
+            if zone is not None:
+                zone.removePlayer(player)
+            player.zone = None
+        except Exception:
+            print_exc()
+            return False
+        return True
+
+
     def logout(self):
         player = self.player
 

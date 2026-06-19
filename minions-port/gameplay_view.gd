@@ -2258,8 +2258,12 @@ func _sync_entity_markers():
 		# Convert entity server position to absolute Godot world position, then drop
 		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		# Body origin is at the feet, so seat it right on the ground.
-		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
+		# Body origin is at the feet. A ground-bound entity is seated on the local
+		# terrain; a flying entity (Levitate / flight spell / dragon form) keeps the
+		# server's authoritative altitude (its replicated Z) so other clients
+		# actually see it take off instead of being snapped back to the ground.
+		if float(entity_dict.get("flying", 0.0)) <= 0.0:
+			godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:

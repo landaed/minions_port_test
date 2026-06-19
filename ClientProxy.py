@@ -2226,6 +2226,13 @@ class ProxyProtocol(WebSocketServerProtocol):
         session.player_dead = False
         session.entity_static_sent = {}
         session.entity_dyn_sent = {}
+        # Remove the player's avatar from the zone so OTHER clients see it
+        # despawn. Without this the mob lingers frozen in everyone else's world
+        # (the activity stream never reports a "removed" for a mob that's still in
+        # the zone). leaveWorld keeps the account session for immediate re-entry.
+        if session.player_perspective:
+            d = session.player_perspective.callRemote("PlayerAvatar", "leaveWorld")
+            d.addErrback(lambda f: None)
         session.send({"type": "left_world", "success": True})
 
     def handle_enter_world(self, msg):
