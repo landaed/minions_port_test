@@ -31,3 +31,4 @@ test_shots/
 
 # Exported builds (e.g. the single Windows .exe from tools/build_windows_exe.sh)
 build/
+launcher/.godot/
