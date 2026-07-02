@@ -3011,6 +3011,14 @@ func _typing_in_ui() -> bool:
 	return focus is LineEdit or focus is TextEdit
 
 func _ui_open() -> bool:
+	# The Esc menu and options overlay count as open UI: _input() runs BEFORE
+	# the GUI sees events, so without this a click on a menu button (e.g.
+	# "Character Select") first hits the world-click branch, re-captures the
+	# mouse, and the player returns to the menus with no cursor.
+	if _game_menu != null and _game_menu.visible:
+		return true
+	if _options_panel != null and _options_panel.visible:
+		return true
 	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		if w != null and w.visible:
 			return true

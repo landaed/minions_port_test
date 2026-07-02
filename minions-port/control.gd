@@ -728,7 +728,9 @@ func _on_menu_action(action: String) -> void:
 		"quit":
 			get_tree().quit()
 		"logout":
-			# Drop the connection and return to a fresh login screen.
+			# Drop the connection and return to a fresh login screen. Mouse mode is
+			# global and survives the scene reload, so free it explicitly.
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			if socket:
 				socket.close()
 			get_tree().reload_current_scene()
@@ -740,6 +742,8 @@ func _on_menu_action(action: String) -> void:
 			if gameplay_view:
 				gameplay_view.queue_free()
 				gameplay_view = null
+			# The in-world view may have captured the mouse; the menus need it back.
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 			login_panel.visible = true
 			_set_phase(PHASE_CHARACTER)
 			_populate_character_list()
@@ -1132,4 +1136,11 @@ func _rebuild_roster_pedestal() -> void:
 		var mounts = c.get("mounts", {})
 		if mounts is Dictionary and not mounts.is_empty() and rig.has_method("apply_mounts"):
 			rig.apply_mounts(mounts)
+		# And in its clothing/armor: per-part texture indices ("tex"), the same
+		# appearance dict the in-world entity stream uses. Overrides the racial
+		# default skin _make_rig applied. Empty for characters that have never
+		# entered the world (they keep the racial default).
+		var tex = c.get("tex", {})
+		if tex is Dictionary and not tex.is_empty() and rig.has_method("apply_appearance"):
+			rig.apply_appearance(tex)
 		_select_rigs.append(rig)

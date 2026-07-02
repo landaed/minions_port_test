@@ -73,6 +73,8 @@ class CharacterInfo(pb.Copyable,pb.RemoteCopy):
         self.status = ""
         # Worn-gear appearance for the character-select screen: {"0":{model,material},...}
         self.mounts = {}
+        # Per-part clothing/armor texture indices for character select: {"body":53,...}
+        self.tex = {}
 
 
         if char:

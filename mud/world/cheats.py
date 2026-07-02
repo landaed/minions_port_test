@@ -122,13 +122,19 @@ def cheat_give_item(player, params):
             equipped = True
         elif equip and not equipped:
             # giveItemInstance prefers free carry slots, so explicitly move the
-            # item into the first FREE worn slot it fits when asked to equip.
+            # item into the first worn slot it fits when asked to equip. If that
+            # slot is occupied (e.g. starting gear on the chest), vacate it via
+            # Character.unequipItem, which reslots the old item into a free
+            # carry slot — same as the player double-clicking to swap.
             for slot in item.itemProto.slots:
-                if RPG_SLOT_WORN_END > slot >= RPG_SLOT_WORN_BEGIN and slot not in mob.worn:
-                    item.slot = slot
-                    mob.equipItem(slot, item)
-                    equipped = True
-                    break
+                if not (RPG_SLOT_WORN_END > slot >= RPG_SLOT_WORN_BEGIN):
+                    continue
+                if slot in mob.worn and not char.unequipItem(slot):
+                    continue  # occupied and no carry space to vacate it
+                item.slot = slot
+                mob.equipItem(slot, item)
+                equipped = True
+                break
         given.append(item.name)
     if not given:
         return _result(False, "Could not give %r (unknown item or no inventory space)." % name)
