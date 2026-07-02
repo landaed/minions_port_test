@@ -29,11 +29,13 @@ from autobahn.exception import Disconnected
 
 from hashlib import md5
 
-# Stream enough nearby entities to make idle NPC wandering visible around town,
-# while still bounding payload size. Override for profiling with
-# MOM_ENTITY_STREAM_RADIUS=<units>.
-ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "120.0"))
-ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "50"))
+# Stream enough nearby entities that mobs/NPCs are visible well before you reach
+# them (zone fog starts at 500u; 250u fills the mid-ground without fighting it),
+# while still bounding payload size. The world server shares this env var for
+# its own build radius (playeravatar._SNAPSHOT_MAX_RANGE), so one knob moves
+# both. Override with MOM_ENTITY_STREAM_RADIUS=<units>.
+ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "250.0"))
+ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "64"))
 # How often each client polls the world for a fresh entity snapshot. The old
 # 0.03s (~33Hz) was the dominant cost with several clients: every poll the world
 # server rebuilds + PB-serializes up to ENTITY_STREAM_LIMIT full entities, and
@@ -206,6 +208,20 @@ def _serialize_character_cache(char_info):
         ("dead", ("DEAD", "dead")),
         ("portraitpic", ("PORTRAITPIC", "portraitpic")),
         ("position", ("POSITION", "position")),
+        # Core attributes + derived stats for the in-game character sheet.
+        ("str", ("STR", "str")), ("dex", ("DEX", "dex")), ("ref", ("REF", "ref")),
+        ("agi", ("AGI", "agi")), ("wis", ("WIS", "wis")), ("bdy", ("BDY", "bdy")),
+        ("mnd", ("MND", "mnd")), ("mys", ("MYS", "mys")), ("pre", ("PRE", "pre")),
+        ("str_base", ("STRBASE", "strBase")), ("dex_base", ("DEXBASE", "dexBase")),
+        ("ref_base", ("REFBASE", "refBase")), ("agi_base", ("AGIBASE", "agiBase")),
+        ("wis_base", ("WISBASE", "wisBase")), ("bdy_base", ("BDYBASE", "bdyBase")),
+        ("mnd_base", ("MNDBASE", "mndBase")), ("mys_base", ("MYSBASE", "mysBase")),
+        ("offense", ("OFFENSE", "offense")), ("defense", ("DEFENSE", "defense")),
+        ("armor", ("ARMOR", "armor")),
+        ("advancement_points", ("ADVANCE", "advancementPoints")),
+        ("pxp_percent", ("PXPPERCENT", "pxpPercent")),
+        ("sxp_percent", ("SXPPERCENT", "sxpPercent")),
+        ("txp_percent", ("TXPPERCENT", "txpPercent")),
     )
     data = {}
     for output_name, attr_names in fields:
@@ -866,12 +882,17 @@ class GodotClientSession:
         d.addErrback(lambda f: None)
 
     def send(self, msg_dict):
-        """Send a JSON message to the Godot client."""
+        """Send a JSON message to the Godot client.
+
+        Returns the encoded payload size in bytes (0 if nothing was sent), so
+        callers like the entity replication meter can account bandwidth without
+        re-serializing the message."""
         if self._closed:
-            return
+            return 0
         try:
             payload = json.dumps(msg_dict, default=_json_fallback)
             self.ws.sendMessage(payload.encode("utf-8"), isBinary=False)
+            return len(payload)
         except Disconnected:
             # Client went away (a sync callback can fire between close and
             # cleanup). Stop quietly instead of spewing a traceback.
@@ -879,6 +900,7 @@ class GodotClientSession:
             self.cleanup()
         except Exception:
             traceback.print_exc()
+        return 0
 
     def cleanup(self):
         """Disconnect any PB connections."""
@@ -954,6 +976,18 @@ class GodotClientSession:
             self.send({"type": "gameplay_state", **payload})
         self.start_gameplay_sync()
 
+    def _push_gameplay_state_now(self):
+        """Serialize + send the current root_info to the client immediately, without
+        disturbing the periodic gameplay-sync timer. Used for event-driven updates
+        (e.g. spending a stat point) so the character sheet reflects the change the
+        instant the world server confirms it, instead of waiting for the next poll."""
+        if not self.root_info_cache:
+            return
+        payload = _serialize_root_info(self.root_info_cache, self)
+        if payload != self.last_gameplay_payload:
+            self.last_gameplay_payload = payload.copy()
+            self.send({"type": "gameplay_state", **payload})
+
     def _emit_entity_sync(self):
         self.entity_sync_call = None
         if not self.player_perspective or not self.root_info_cache:
@@ -967,8 +1001,16 @@ class GodotClientSession:
         # skill/spell animations, particles, explosions, 3D sounds). The bare
         # list shape is kept for compatibility with an older world server.
         events = []
+        # Activity-driven replication: the world server sends only changed/new
+        # entities plus an explicit "removed" list and a "full" flag (true on the
+        # periodic resync). Legacy servers omit both, so full defaults True and the
+        # client falls back to presence-based removal -> behaviour is unchanged.
+        removed = []
+        full_snapshot = True
         if isinstance(entities, dict):
             events = list(entities.get("events", []) or [])
+            removed = list(entities.get("removed", []) or [])
+            full_snapshot = bool(entities.get("full", True))
             # Death edge detection: getVisibleEntities returns {"dead": True} for a
             # dead character. Tell the client on the death->alive and alive->death
             # transitions so it can show / hide its death overlay.
@@ -1024,18 +1066,24 @@ class GodotClientSession:
                         e["rotation"] = [round(float(c), 4) for c in rot]
         # Strip unchanged static fields (identity/model/appearance/equipment) so
         # only the small dynamic remainder goes over the wire to the client.
-        capped = self._delta_compress_entities(capped)
-        # Always send — dedup was suppressing position/rotation updates
-        msg = {"type": "entity_snapshot", "entities": capped}
+        capped = self._delta_compress_entities(capped, full=full_snapshot, removed=removed)
+        # Always send — dedup was suppressing position/rotation updates. "full"
+        # tells the client whether this is an authoritative set (erase absent) or
+        # an activity delta (erase only the explicit "removed" ids).
+        msg = {"type": "entity_snapshot", "entities": capped, "full": full_snapshot}
+        if removed:
+            msg["removed"] = removed
         if events:
             msg["events"] = events
-        self.send(msg)
+        sent_bytes = self.send(msg)
         # Lightweight send-rate meter (logs every 5s) so it's clear how fast
-        # entity replication is actually running.
+        # entity replication is actually running. Uses the byte count send()
+        # already produced — the old per-entity re-dump doubled the JSON
+        # serialization cost of every snapshot just to feed this meter.
         import time as _t
         _now = _t.time()
         self._snap_n = getattr(self, "_snap_n", 0) + 1
-        self._snap_bytes = getattr(self, "_snap_bytes", 0) + sum(len(json.dumps(e, default=_json_fallback)) for e in capped)
+        self._snap_bytes = getattr(self, "_snap_bytes", 0) + sent_bytes
         if not hasattr(self, "_snap_t0"):
             self._snap_t0 = _now
         if _now - self._snap_t0 >= 5.0:
@@ -1047,7 +1095,7 @@ class GodotClientSession:
             self._snap_t0 = _now
         self.start_entity_sync()
 
-    def _delta_compress_entities(self, entities):
+    def _delta_compress_entities(self, entities, full=True, removed=None):
         """Drop static fields the client already has for each entity.
 
         Static identity/model/appearance/equipment is sent in full only when an
@@ -1110,10 +1158,19 @@ class GodotClientSession:
                 if "sim_id" in e:
                     hb["sim_id"] = e["sim_id"]
                 out.append(hb if hb else dynamic)
-        # Forget entities no longer in range so they get a full block on return.
-        for key in [k for k in self.entity_static_sent if k not in present]:
-            del self.entity_static_sent[key]
-            self.entity_dyn_sent.pop(key, None)
+        if full:
+            # Authoritative set (legacy poll or periodic resync): anything we had
+            # cached but isn't present has left range, so forget it -> it gets a
+            # fresh full block when it returns.
+            for key in [k for k in self.entity_static_sent if k not in present]:
+                del self.entity_static_sent[key]
+                self.entity_dyn_sent.pop(key, None)
+        elif removed:
+            # Activity delta: idle entities are intentionally absent and must be
+            # kept; only the explicitly-removed (despawned) ones are forgotten.
+            for key in removed:
+                self.entity_static_sent.pop(key, None)
+                self.entity_dyn_sent.pop(key, None)
         return out
 
     def _on_entity_snapshot_failed(self, reason):
@@ -1303,6 +1360,18 @@ class ProxyProtocol(WebSocketServerProtocol):
             d.addErrback(self._on_gameplay_command_failed, command, "RESPAWN")
             return
 
+        # Spend an advancement point to raise a core attribute (character sheet).
+        if payload is None and command == "spend_stat_point":
+            stat = str(msg.get("stat", "")).strip().lower()
+            try:
+                amount = max(1, int(msg.get("amount", 1) or 1))
+            except (TypeError, ValueError):
+                amount = 1
+            d = self.session.player_perspective.callRemote("PlayerAvatar", "spendStatPoint", stat, amount)
+            d.addCallback(self._on_stat_spent, command)
+            d.addErrback(self._on_gameplay_command_failed, command, "SPEND_STAT_POINT")
+            return
+
         if payload is None and self._handle_ui_command(command, msg):
             return
 
@@ -1316,8 +1385,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             forward = msg.get("forward", [0, 0, 0])
             jump = bool(msg.get("jump", False))
             position_z = msg.get("position_z", None)
+            flying = bool(msg.get("flying", False))
             d = self.session.player_perspective.callRemote(
-                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0, position_z
+                "PlayerAvatar", "updateInput", move_x, move_y, forward, jump, 0, position_z, flying
             )
             d.addErrback(lambda f: None)  # silently ignore errors on high-frequency input
             return
@@ -1330,6 +1400,18 @@ class ProxyProtocol(WebSocketServerProtocol):
         d = self.session.player_perspective.callRemote("PlayerAvatar", "doCommand", world_command, args)
         d.addCallback(lambda result: self._send_gameplay_command_result(True, command, f"Sent {world_command} to legacy world server."))
         d.addErrback(self._on_gameplay_command_failed, command, world_command)
+
+    def _on_stat_spent(self, result, command):
+        """Stat-point spend confirmed by the world server. Report the result, then —
+        on success — flush the gameplay state to the client right away. The world
+        server already refreshed the character's CharacterInfo before returning, so
+        the cached ghost holds the new attribute values by the time this fires (PB
+        preserves message order on the broker), making the sheet update immediate."""
+        success = bool(result.get("success")) if isinstance(result, dict) else False
+        message = result.get("message", "") if isinstance(result, dict) else ""
+        self._send_gameplay_command_result(success, command, message)
+        if success:
+            self.session._push_gameplay_state_now()
 
     def _on_gameplay_command_failed(self, reason, command, world_command):
         msg = str(reason.value) if hasattr(reason, "value") else str(reason)
@@ -1459,6 +1541,7 @@ class ProxyProtocol(WebSocketServerProtocol):
         return {
             "name": cinfo.name,
             "race": cinfo.race,
+            "sex": getattr(cinfo, "sex", "Male"),
             "realm": cinfo.realm,
             "realm_name": realm_labels.get(cinfo.realm, str(cinfo.realm)),
             "klass": klass,
@@ -1467,6 +1550,11 @@ class ProxyProtocol(WebSocketServerProtocol):
             "rename": bool(getattr(cinfo, "rename", 0)),
             "klasses": list(getattr(cinfo, "klasses", [])),
             "levels": list(getattr(cinfo, "levels", [])),
+            # Worn-gear models for the character-select rig (see control.gd).
+            "mounts": getattr(cinfo, "mounts", {}) or {},
+            # Per-part clothing/armor texture indices ({"body": 53, ...}) so the
+            # character-select rig wears the same skin/armor as in the world.
+            "tex": getattr(cinfo, "tex", {}) or {},
         }
 
     # ------------------------------------------------------------------
@@ -2093,6 +2181,25 @@ class ProxyProtocol(WebSocketServerProtocol):
             for stat, value in zip(stats, default_stats[klass]):
                 newchar.adjs[stat] = value
 
+        # Player-allocated starting bonus points (from character creation): add to
+        # the class adjustments so they raise the starting base stats. Capped to
+        # the pool the client offers so it can't be abused by a crafted message.
+        bonus = msg.get("bonus", {})
+        if isinstance(bonus, dict):
+            bonus_cap = 10
+            spent = 0
+            for stat in stats:
+                try:
+                    amt = max(0, int(bonus.get(stat.lower(), 0) or 0))
+                except (TypeError, ValueError):
+                    amt = 0
+                if amt <= 0:
+                    continue
+                if spent + amt > bonus_cap:
+                    amt = max(0, bonus_cap - spent)
+                spent += amt
+                newchar.adjs[stat] = int(newchar.adjs.get(stat, 0)) + amt
+
         d = self.session.player_perspective.callRemote("PlayerAvatar", "newCharacter", newchar)
         d.addCallback(self._on_create_character_result, name)
         d.addErrback(self._on_character_op_failed, "create_character")
@@ -2134,6 +2241,17 @@ class ProxyProtocol(WebSocketServerProtocol):
         session.player_dead = False
         session.entity_static_sent = {}
         session.entity_dyn_sent = {}
+        # Remove the player's avatar from the zone so OTHER clients see it
+        # despawn. Without this the mob lingers frozen in everyone else's world
+        # (the activity stream never reports a "removed" for a mob that's still in
+        # the zone). leaveWorld keeps the account session for immediate re-entry.
+        if session.player_perspective:
+            d = session.player_perspective.callRemote("PlayerAvatar", "leaveWorld")
+            # leaveWorld pushes fresh worn-gear appearance to the character server;
+            # re-query the roster afterwards so character select shows the gear the
+            # player was wearing when they left (not the state from last login).
+            d.addCallback(lambda _r: self._do_query_characters())
+            d.addErrback(lambda f: None)
         session.send({"type": "left_world", "success": True})
 
     def handle_enter_world(self, msg):

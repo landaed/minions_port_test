@@ -81,7 +81,16 @@ class WorldConnection(pb.Root):
         
     def remote_getCharacterInfos(self,publicName):
         return CHARDB.getCharacterInfos(publicName)
-    
+
+    def remote_setCharacterAppearance(self,publicName,characterName,appearance_json):
+        # Store a character's worn-gear appearance for the character-select screen.
+        # Fire-and-forget from the world server; isolated from character saves.
+        try:
+            CHARDB.setCharacterAppearance(publicName,characterName,appearance_json)
+        except Exception:
+            import traceback; traceback.print_exc()
+        return True
+
     def remote_getCharacterBuffer(self,publicName,characterName):
         b = CHARDB.getCharacterBuffer(publicName,characterName)
         if not b:

@@ -112,7 +112,16 @@ class CharDB:
     def __init__(self,filename):
         self.conn = sqlite.connect(filename,isolation_level=None)
         self.conn.text_factory = lambda x: str(x, "utf-8", "ignore")
-        
+
+        # Side table for character-select appearance (worn-gear "mounts" + sex),
+        # kept separate from character_buffer so the critical character-save path
+        # and its schema are never touched. Idempotent migration.
+        try:
+            self.conn.execute("CREATE TABLE IF NOT EXISTS char_appearance "
+                              "(public_name TEXT, character_name TEXT UNIQUE, appearance_json TEXT);")
+        except Exception:
+            traceback.print_exc()
+
         cursor = self.conn.cursor()
         cursor.execute("SELECT genesis_time from world")
         self.genesisTime = cursor.fetchone()[0]    
@@ -187,21 +196,44 @@ class CharDB:
         
         
         
+    def setCharacterAppearance(self,publicName,characterName,appearance_json):
+        # Store the character-select appearance (worn gear + sex) for a character.
+        # Replace-on-write; isolated from the character buffer so it can never
+        # affect character saves.
+        cursor = self.conn.cursor()
+        try:
+            cursor.execute("DELETE FROM char_appearance WHERE character_name = ?;",(characterName,))
+            cursor.execute("INSERT INTO char_appearance (public_name,character_name,appearance_json) VALUES (?,?,?);",
+                           (publicName,characterName,appearance_json))
+        except:
+            traceback.print_exc()
+        cursor.close()
+
     def getCharacterInfos(self,publicName):
         cinfos = {}
-        
+
         cursor = self.conn.cursor()
+        # Pull each character's stored appearance (if any) first, keyed by name, so
+        # we can append it to the buffer-row tuple below.
+        appearances = {}
+        try:
+            for r in cursor.execute("SELECT character_name,appearance_json FROM char_appearance WHERE public_name = ?;",(publicName,)).fetchall():
+                appearances[r[0]] = r[1]
+        except:
+            traceback.print_exc()
         try:
             cursor.execute("SELECT character_name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename FROM character_buffer WHERE public_name = '%s';"%publicName)
             for v in cursor.fetchall():
-                cinfos[v[0]]=v
+                # Append appearance_json as an 11th element (gotCharacterInfos
+                # unpacks the first 10 positionally, so this stays back-compatible).
+                cinfos[v[0]] = tuple(v) + (appearances.get(v[0], ""),)
         except:
             traceback.print_exc()
             pass
         cursor.close()
-        
+
         return cinfos
-        
+
     def getCharacterBuffer(self,publicName,characterName):
         cursor = self.conn.cursor()
         buffer = None

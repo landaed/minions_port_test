@@ -219,6 +219,85 @@ static func item_tooltip(item: Dictionary) -> String:
 		lines.append(desc)
 	return "\n".join(lines)
 
+# --- Custom hover tooltip ----------------------------------------------------
+# Godot's built-in tooltip auto-hides on the slightest mouse jitter (and dies
+# whenever the control under it is rebuilt), which is why spell tooltips
+# "disappear really fast". This is a self-managed replacement: it shows on
+# mouse_entered and stays until mouse_exited (or the owning control leaves the
+# tree). It lives on a high CanvasLayer so it draws above every window.
+static var _tip_layer: CanvasLayer = null
+static var _tip_panel: PanelContainer = null
+static var _tip_label: RichTextLabel = null
+static var _tip_owner: Object = null
+
+static func _ensure_tip(tree: SceneTree) -> void:
+	if _tip_layer != null and is_instance_valid(_tip_layer):
+		return
+	_tip_layer = CanvasLayer.new()
+	_tip_layer.layer = 128  # above gameplay windows
+	tree.root.add_child(_tip_layer)
+	_tip_panel = PanelContainer.new()
+	_tip_panel.add_theme_stylebox_override("panel", panel_style(Color(0.55, 0.7, 0.95)))
+	_tip_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_panel.visible = false
+	_tip_panel.custom_minimum_size = Vector2(120, 0)
+	_tip_panel.z_index = 4096
+	_tip_layer.add_child(_tip_panel)
+	_tip_label = RichTextLabel.new()
+	_tip_label.bbcode_enabled = true
+	_tip_label.fit_content = true
+	_tip_label.scroll_active = false
+	_tip_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tip_label.custom_minimum_size = Vector2(260, 0)
+	_tip_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip_label.add_theme_font_size_override("normal_font_size", 12)
+	_tip_panel.add_child(_tip_label)
+
+static func show_tip(owner: Control, text: String) -> void:
+	if text.strip_edges().is_empty() or owner == null or not is_instance_valid(owner):
+		return
+	_ensure_tip(owner.get_tree())
+	_tip_owner = owner
+	# First line bold/gold as a title, the rest as body.
+	var lines := text.split("\n", false)
+	var bb := ""
+	if lines.size() > 0:
+		bb = "[b][color=#ffe9b0]%s[/color][/b]" % lines[0]
+		for i in range(1, lines.size()):
+			bb += "\n[color=#cdd4e0]%s[/color]" % lines[i]
+	_tip_label.text = bb
+	_tip_panel.visible = true
+	_tip_panel.reset_size()
+	_position_tip(owner)
+
+static func _position_tip(owner: Control) -> void:
+	if _tip_panel == null or not is_instance_valid(_tip_panel):
+		return
+	var vp := owner.get_viewport()
+	if vp == null:
+		return
+	var screen := vp.get_visible_rect().size
+	var size := _tip_panel.get_combined_minimum_size()
+	# Anchor to the slot's top-right, then clamp on screen.
+	var rect := owner.get_global_rect()
+	var pos := Vector2(rect.position.x + rect.size.x + 8.0, rect.position.y)
+	if pos.x + size.x > screen.x - 8.0:
+		pos.x = rect.position.x - size.x - 8.0  # flip to the left
+	pos.x = clampf(pos.x, 8.0, maxf(8.0, screen.x - size.x - 8.0))
+	pos.y = clampf(pos.y, 8.0, maxf(8.0, screen.y - size.y - 8.0))
+	_tip_panel.position = pos
+
+static func hide_tip() -> void:
+	if _tip_panel != null and is_instance_valid(_tip_panel):
+		_tip_panel.visible = false
+	_tip_owner = null
+
+static func hide_tip_if_owner(owner: Object) -> void:
+	# Called when a hovered control is freed (window rebuild) so a stale tip
+	# doesn't linger.
+	if _tip_owner == owner:
+		hide_tip()
+
 static func style_button(button: Button, filled: bool = true) -> void:
 	var normal := StyleBoxFlat.new()
 	normal.bg_color = Color(0.13, 0.15, 0.19, 0.92) if filled else Color(0.08, 0.09, 0.11, 0.8)

@@ -40,6 +40,8 @@ const GAMEPAD_LOOK_SENSITIVITY := 2.8    # right-stick yaw, radians/sec at full 
 const GAMEPAD_PITCH_SENSITIVITY := 2.0   # right-stick pitch, radians/sec at full tilt
 const JUMP_VELOCITY := 7.0
 const GRAVITY := 20.0
+const FLY_VERTICAL_SPEED := 8.0  # ascend/descend speed while a Flying buff is active
+const FLY_SPEED := 11.0          # horizontal speed while flying (a touch faster than running)
 const PLAYER_FOOT_OFFSET := 0.9
 # Torque's player datablock allowed ~1.0+ step heights and several MoM stair
 # meshes (and the 1.5x-scaled guard towers) have risers above 0.75, so the old
@@ -49,6 +51,13 @@ const PLAYER_STEP_UP_HEIGHT := 1.1
 const PLAYER_STEP_FORWARD_SCALE := 0.9
 const ENTITY_INTERPOLATION_SPEED := 14.0
 const ENTITY_SNAP_DISTANCE := 8.0
+# Render-behind entity interpolation: other players/NPCs are drawn this many
+# seconds in the past, interpolated between the two server snapshots that bracket
+# that time. Removes the jitter from chasing a ~13Hz stepping target. ~0.12s is
+# ~1.5 snapshot intervals — enough buffer to always have two samples to lerp.
+const ENTITY_INTERP_DELAY := 0.12
+const ENTITY_SAMPLE_MAX := 16    # per-entity snapshot history kept for interpolation
+const ENTITY_WALLCLAMP_DISTANCE := 28.0  # only wall-clamp markers within this range of the player
 const ENTITY_DEATH_DESPAWN_DELAY := 2.75
 const ENTITY_FLYING_LIFT := 1.4  # how far Flying/Levitate raises a model off the ground
 const ENTITY_FLOOR_PROBE_UP := 4.0
@@ -73,6 +82,7 @@ const NpcWindowScript := preload("res://ui/npc_window.gd")
 const JournalWindowScript := preload("res://ui/journal_window.gd")
 const SpellbookWindowScript := preload("res://ui/spellbook_window.gd")
 const CheatWindowScript := preload("res://ui/cheat_window.gd")
+const CharacterWindowScript := preload("res://ui/character_window.gd")
 const HotbarScript := preload("res://ui/hotbar.gd")
 
 var world_time := {"hour": 0, "minute": 0}
@@ -167,6 +177,7 @@ var npc_window: NpcWindow
 var journal_window: JournalWindow
 var spellbook_window: SpellbookWindow
 var cheat_window: CheatWindow
+var character_window: CharacterWindow
 var hotbar: Hotbar
 var cursor_item_ghost: Button   # follows the mouse while an item is on the cursor
 var _cast_bar: ProgressBar
@@ -191,6 +202,26 @@ var _is_dead := false
 var _death_overlay: Control = null
 var _death_respawn_button: Button = null
 var _game_menu: Control = null          # Esc menu (resume/char-select/logout/quit)
+var _perf_overlay: Label = null         # F3 perf readout (fps / frame ms / entities / draw calls)
+var _perf_timer := 0.0
+# Options / control-remapping overlay (opened from the Esc menu).
+var _options_panel: Control = null
+var _options_rows: VBoxContainer = null
+var _rebind_hint: Label = null
+var _rebinding_action := ""              # non-empty while listening for a new binding
+var _rebinding_kind := ""               # "key" or "pad"
+const BINDINGS_PATH := "user://input_bindings.cfg"
+# Actions the player can remap, with friendly labels (sticks stay fixed).
+const REBINDABLE_ACTIONS := [
+	["mom_move_forward", "Move Forward"], ["mom_move_back", "Move Back"],
+	["mom_move_left", "Strafe Left"], ["mom_move_right", "Strafe Right"],
+	["mom_jump", "Jump / Fly Up"], ["mom_descend", "Fly Down"],
+	["mom_attack", "Attack"], ["mom_target", "Target Nearest"],
+	["mom_interact", "Interact / Loot"], ["mom_hotbar_page", "Swap Hotbar"],
+	["mom_hotbar_secondary", "Bar 2 (hold)"], ["mom_inventory", "Inventory"],
+	["mom_hotbar_1", "Hotbar 1"], ["mom_hotbar_2", "Hotbar 2"],
+	["mom_hotbar_3", "Hotbar 3"], ["mom_hotbar_4", "Hotbar 4"],
+]
 var _ui_char_name := ""          # journal/hotbar persistence key
 var _ui_char_id := 0             # server character DB id for inventory/spell calls
 var _last_inventory: Dictionary = {}
@@ -222,6 +253,7 @@ func _ready():
 	_build_game_windows()
 	_build_death_overlay()
 	_build_game_menu()
+	_build_perf_overlay()
 	_rebuild_ability_bar()
 	_update_labels()
 
@@ -373,7 +405,7 @@ func _build_hud():
 	hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint_label.add_theme_font_size_override("font_size", 11)
 	hint_label.add_theme_color_override("font_color", Color(0.75, 0.78, 0.85))
-	hint_label.text = "Move WASD/L-stick • Look mouse/R-stick • Tab/B target • Q/RB attack • E/X talk-loot • 1-0/D-pad abilities • R/Y swap bar • Shift/LB hold = bar 2 • Space/A jump • I inventory • P spells • J journal • Enter chat • ` cheats"
+	hint_label.text = "Move WASD/L-stick • Look mouse/R-stick • Tab/B target • Q/RB attack • E/X talk-loot • 1-0/D-pad abilities • R/Y swap bar • Shift/LB hold = bar 2 • Space jump (fly: Space up / Ctrl down) • C character • I inventory • P spells • J journal • Enter chat • ` cheats"
 	bottom.add_child(hint_label)
 	hotbar = HotbarScript.new()
 	hotbar.action_triggered.connect(_on_hotbar_action)
@@ -576,7 +608,12 @@ func _build_game_windows():
 		_request_server_command("cheat", {"action": action, "params": params}))
 	add_child(cheat_window)
 
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	character_window = CharacterWindowScript.new()
+	character_window.position = Vector2(300, 110)  # clear of the top-left HUD
+	character_window.spend_stat.connect(func(stat): _request_server_command("spend_stat_point", {"stat": stat, "amount": 1}))
+	add_child(character_window)
+
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		w.visibility_changed.connect(_on_window_visibility_changed)
 
 	# Item-on-cursor ghost that follows the mouse while rearranging inventory.
@@ -632,6 +669,22 @@ func _build_death_overlay() -> void:
 	box.add_child(_death_respawn_button)
 
 # Esc menu: Resume / Character Select / Logout / Quit.
+func _build_perf_overlay() -> void:
+	# Toggleable (F3) performance readout: fps / frame ms / visible entities /
+	# draw calls. Off by default; handy for diagnosing frame-rate issues.
+	_perf_overlay = Label.new()
+	_perf_overlay.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	_perf_overlay.offset_left = -280
+	_perf_overlay.offset_right = -8
+	_perf_overlay.offset_top = 6
+	_perf_overlay.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_perf_overlay.add_theme_color_override("font_color", Color(0.55, 1.0, 0.55))
+	_perf_overlay.add_theme_font_size_override("font_size", 13)
+	_perf_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_perf_overlay.z_index = 200
+	_perf_overlay.visible = false
+	add_child(_perf_overlay)
+
 func _build_game_menu() -> void:
 	_game_menu = ColorRect.new()
 	_game_menu.color = Color(0.03, 0.04, 0.06, 0.72)
@@ -652,7 +705,7 @@ func _build_game_menu() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 30)
 	box.add_child(title)
-	for entry in [["Resume", "resume"], ["Character Select", "character_select"],
+	for entry in [["Resume", "resume"], ["Options", "options"], ["Character Select", "character_select"],
 			["Log Out", "logout"], ["Quit Game", "quit"]]:
 		var b := Button.new()
 		b.text = entry[0]
@@ -662,10 +715,14 @@ func _build_game_menu() -> void:
 		var action: String = entry[1]
 		b.pressed.connect(func(): _on_game_menu_action(action))
 		box.add_child(b)
+	_build_options_panel()
 
 func _on_game_menu_action(action: String) -> void:
 	if action == "resume":
 		_toggle_game_menu(false)
+		return
+	if action == "options":
+		_open_options()
 		return
 	# character_select / logout / quit are app-level; control handles them.
 	menu_action_requested.emit(action)
@@ -679,6 +736,231 @@ func _toggle_game_menu(force_on = null) -> void:
 		_release_mouse()
 	elif not _ui_open():
 		_capture_mouse()
+
+# ---------------------------------------------------------------------------
+# Options / control remapping (opened from the Esc menu). Rebind the keyboard key
+# and/or the controller button for each gameplay action; movement/look sticks stay
+# fixed. Bindings persist to user://input_bindings.cfg and are re-applied over the
+# defaults at startup (see the _load_bindings() call at the end of
+# _setup_input_actions).
+# ---------------------------------------------------------------------------
+const PAD_BUTTON_NAMES := {
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y",
+	JOY_BUTTON_LEFT_SHOULDER: "LB", JOY_BUTTON_RIGHT_SHOULDER: "RB",
+	JOY_BUTTON_BACK: "Back", JOY_BUTTON_START: "Start",
+	JOY_BUTTON_LEFT_STICK: "L3", JOY_BUTTON_RIGHT_STICK: "R3",
+	JOY_BUTTON_DPAD_UP: "D-Up", JOY_BUTTON_DPAD_DOWN: "D-Down",
+	JOY_BUTTON_DPAD_LEFT: "D-Left", JOY_BUTTON_DPAD_RIGHT: "D-Right",
+}
+
+func _build_options_panel() -> void:
+	if _options_panel != null:
+		return
+	_options_panel = ColorRect.new()
+	_options_panel.color = Color(0.03, 0.04, 0.06, 0.94)
+	_options_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_options_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_options_panel.visible = false
+	_options_panel.z_index = 170
+	add_child(_options_panel)
+	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	box.grow_vertical = Control.GROW_DIRECTION_BOTH
+	box.add_theme_constant_override("separation", 8)
+	_options_panel.add_child(box)
+	var title := Label.new()
+	title.text = "Options — Controls"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 26)
+	box.add_child(title)
+	var hdr := Label.new()
+	hdr.text = "Action                         Keyboard            Controller     (click a binding to change)"
+	hdr.add_theme_font_size_override("font_size", 12)
+	box.add_child(hdr)
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(580, 420)
+	box.add_child(scroll)
+	_options_rows = VBoxContainer.new()
+	_options_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_options_rows.add_theme_constant_override("separation", 4)
+	scroll.add_child(_options_rows)
+	_rebind_hint = Label.new()
+	_rebind_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_rebind_hint.add_theme_color_override("font_color", Color(1, 0.85, 0.4))
+	_rebind_hint.visible = false
+	box.add_child(_rebind_hint)
+	var btns := HBoxContainer.new()
+	btns.alignment = BoxContainer.ALIGNMENT_CENTER
+	btns.add_theme_constant_override("separation", 12)
+	box.add_child(btns)
+	var reset_b := Button.new()
+	reset_b.text = "Reset to Defaults"
+	reset_b.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(reset_b)
+	reset_b.pressed.connect(_reset_bindings)
+	btns.add_child(reset_b)
+	var back_b := Button.new()
+	back_b.text = "Back"
+	back_b.focus_mode = Control.FOCUS_NONE
+	UICommonScript.style_button(back_b)
+	back_b.pressed.connect(_close_options)
+	btns.add_child(back_b)
+
+func _open_options() -> void:
+	if _options_panel == null:
+		_build_options_panel()
+	_populate_options_rows()
+	_options_panel.visible = true
+	_release_mouse()
+
+func _close_options() -> void:
+	_cancel_rebind()
+	if _options_panel:
+		_options_panel.visible = false
+
+func _populate_options_rows() -> void:
+	if _options_rows == null:
+		return
+	for c in _options_rows.get_children():
+		c.queue_free()
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		var name_l := Label.new()
+		name_l.text = str(pair[1])
+		name_l.custom_minimum_size = Vector2(220, 0)
+		row.add_child(name_l)
+		var key_b := Button.new()
+		key_b.custom_minimum_size = Vector2(160, 30)
+		key_b.text = _binding_text(action, "key")
+		key_b.focus_mode = Control.FOCUS_NONE
+		UICommonScript.style_button(key_b)
+		key_b.pressed.connect(func(): _begin_rebind(action, "key"))
+		row.add_child(key_b)
+		var pad_b := Button.new()
+		pad_b.custom_minimum_size = Vector2(160, 30)
+		pad_b.text = _binding_text(action, "pad")
+		pad_b.focus_mode = Control.FOCUS_NONE
+		UICommonScript.style_button(pad_b)
+		pad_b.pressed.connect(func(): _begin_rebind(action, "pad"))
+		row.add_child(pad_b)
+		_options_rows.add_child(row)
+
+func _binding_of_kind(action: String, kind: String) -> InputEvent:
+	if not InputMap.has_action(action):
+		return null
+	for ev in InputMap.action_get_events(action):
+		if kind == "key" and ev is InputEventKey:
+			return ev
+		if kind == "pad" and ev is InputEventJoypadButton:
+			return ev
+	return null
+
+func _binding_text(action: String, kind: String) -> String:
+	var ev := _binding_of_kind(action, kind)
+	if ev == null:
+		return "—"
+	if ev is InputEventKey:
+		var kc: int = ev.physical_keycode if ev.physical_keycode != 0 else ev.keycode
+		return OS.get_keycode_string(kc)
+	if ev is InputEventJoypadButton:
+		return str(PAD_BUTTON_NAMES.get(ev.button_index, "Btn %d" % ev.button_index))
+	return "?"
+
+func _set_binding(action: String, kind: String, new_ev: InputEvent, save := true) -> void:
+	if not InputMap.has_action(action):
+		return
+	var keep: Array = []
+	for ev in InputMap.action_get_events(action):
+		if kind == "key" and ev is InputEventKey:
+			continue
+		if kind == "pad" and ev is InputEventJoypadButton:
+			continue
+		keep.append(ev)
+	InputMap.action_erase_events(action)
+	for ev in keep:
+		InputMap.action_add_event(action, ev)
+	if new_ev != null:
+		InputMap.action_add_event(action, new_ev)
+	if save:
+		_save_bindings()
+
+func _begin_rebind(action: String, kind: String) -> void:
+	_rebinding_action = action
+	_rebinding_kind = kind
+	if _rebind_hint:
+		_rebind_hint.text = "Press a %s…  (Esc to cancel)" % ("key" if kind == "key" else "controller button")
+		_rebind_hint.visible = true
+
+func _cancel_rebind() -> void:
+	_rebinding_action = ""
+	_rebinding_kind = ""
+	if _rebind_hint:
+		_rebind_hint.visible = false
+
+func _finish_rebind() -> void:
+	_cancel_rebind()
+	_populate_options_rows()
+
+func _handle_rebind_capture(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		_cancel_rebind()
+		accept_event()
+		return
+	if _rebinding_kind == "key" and event is InputEventKey and event.pressed and not event.echo:
+		var k := InputEventKey.new()
+		k.physical_keycode = event.physical_keycode if event.physical_keycode != 0 else event.keycode
+		k.keycode = k.physical_keycode
+		_set_binding(_rebinding_action, "key", k)
+		_finish_rebind()
+		accept_event()
+		return
+	if _rebinding_kind == "pad" and event is InputEventJoypadButton and event.pressed:
+		var b := InputEventJoypadButton.new()
+		b.button_index = event.button_index
+		_set_binding(_rebinding_action, "pad", b)
+		_finish_rebind()
+		accept_event()
+		return
+
+func _save_bindings() -> void:
+	var cfg := ConfigFile.new()
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		var kev := _binding_of_kind(action, "key")
+		var pev := _binding_of_kind(action, "pad")
+		if kev is InputEventKey:
+			cfg.set_value("keys", action, int(kev.physical_keycode if kev.physical_keycode != 0 else kev.keycode))
+		if pev is InputEventJoypadButton:
+			cfg.set_value("pad", action, int(pev.button_index))
+	cfg.save(BINDINGS_PATH)
+
+func _load_bindings() -> void:
+	var cfg := ConfigFile.new()
+	if cfg.load(BINDINGS_PATH) != OK:
+		return
+	for pair in REBINDABLE_ACTIONS:
+		var action: String = pair[0]
+		if not InputMap.has_action(action):
+			continue
+		if cfg.has_section_key("keys", action):
+			var k := InputEventKey.new()
+			k.physical_keycode = int(cfg.get_value("keys", action))
+			k.keycode = k.physical_keycode
+			_set_binding(action, "key", k, false)
+		if cfg.has_section_key("pad", action):
+			var b := InputEventJoypadButton.new()
+			b.button_index = int(cfg.get_value("pad", action))
+			_set_binding(action, "pad", b, false)
+
+func _reset_bindings() -> void:
+	var dir := DirAccess.open("user://")
+	if dir and dir.file_exists("input_bindings.cfg"):
+		dir.remove("input_bindings.cfg")
+	_setup_input_actions()  # rebuild defaults (file gone, so _load_bindings is a no-op)
+	_populate_options_rows()
 
 func _show_death_overlay(on: bool) -> void:
 	_is_dead = on
@@ -734,6 +1016,13 @@ func _toggle_cheats():
 	else:
 		_request_server_command("cheat", {"action": "status", "params": {}})
 		cheat_window.open_window()
+
+func _toggle_character():
+	if character_window.visible:
+		character_window.close_window()
+	else:
+		character_window.apply_info(_player_char_info())
+		character_window.open_window()
 
 func _on_inventory_slot_clicked(slot: int, alt: bool, ctrl: bool):
 	if ctrl:
@@ -1184,6 +1473,17 @@ func _self_entity() -> Dictionary:
 			return entity
 	return {}
 
+func _is_flying() -> bool:
+	# True when a Flying/Levitate buff is active, or when transformed into a
+	# dragon (dragons always fly). Drives both the movement code and the avatar
+	# lift/animation.
+	var e := _self_entity()
+	if float(e.get("flying", 0.0)) > 0.0:
+		return true
+	if "dragon" in str(e.get("model", "")).to_lower():
+		return true
+	return false
+
 func _find_zone_glb_name(node: Node) -> String:
 	# Walk up to the interior/building node tagged with its source glb name.
 	var n: Node = node
@@ -1209,12 +1509,12 @@ func _update_look_at():
 	var dead := false
 	if not result.is_empty():
 		var collider = result.get("collider")
-		if collider != null and collider is Node3D and int(collider.get_meta("entity_id", 0)) > 0:
+		if collider != null and collider is Node3D and collider.has_meta("entity_id") and int(collider.get_meta("entity_id")) > 0:
 			looking = true
-			var ent: Dictionary = collider.get_meta("entity", {})
+			var ent: Dictionary = collider.get_meta("entity") if collider.has_meta("entity") else {}
 			enemy = bool(ent.get("is_enemy", false))
 			dead = bool(ent.get("dead", false)) or float(ent.get("health", 1.0)) <= 0.0
-			_looked_entity_id = int(collider.get_meta("entity_id", 0))
+			_looked_entity_id = int(collider.get_meta("entity_id"))
 		elif collider != null and collider is Node:
 			# World geometry — report which building, to help identify e.g. the gate.
 			_looking_at_world = _find_zone_glb_name(collider)
@@ -1254,6 +1554,8 @@ func update_state(payload: Dictionary):
 	current_payload = payload.duplicate(true)
 	_rebuild_ability_bar()
 	_update_labels()
+	if character_window and character_window.visible:
+		character_window.apply_info(_player_char_info())
 
 func set_world_time(time_info: Dictionary):
 	world_time = time_info.duplicate(true)
@@ -1437,7 +1739,7 @@ func _node_for_sim_id(sim_id: int) -> Node3D:
 		return player_body
 	for body in replicated_entity_nodes.values():
 		if body is StaticBody3D and is_instance_valid(body):
-			var ent = body.get_meta("entity", {})
+			var ent = body.get_meta("entity") if body.has_meta("entity") else {}
 			if ent is Dictionary and int(ent.get("sim_id", -1)) == sim_id:
 				return body
 	return null
@@ -1451,32 +1753,43 @@ func _rig_for_node(node: Node3D):
 			return rig
 	return null
 
-func set_entities(entities: Array):
+func set_entities(entities: Array, removed: Array = [], is_full := true):
 	# The proxy delta-compresses snapshots: after an entity's static identity /
 	# model / appearance / equipment has been sent once, later snapshots carry
 	# only its dynamic fields (position, rotation, health, combat flags). Merge
 	# each partial onto its cached full copy so the rest of the view always sees
-	# complete entities. Entities absent from a snapshot are dropped from the
-	# cache, so they get a fresh full block if they come back into range.
-	var merged: Array = []
+	# complete entities.
+	#
+	# Removal has two modes:
+	#   is_full = true  -> authoritative set (legacy poll or the periodic resync):
+	#                      anything absent has despawned, so erase it.
+	#   is_full = false -> activity delta: idle entities are intentionally omitted
+	#                      and must be kept; erase only the explicit "removed" ids.
 	var present: Dictionary = {}
 	for e in entities:
 		if not (e is Dictionary):
 			continue
 		var key = e.get("id", e.get("sim_id", 0))
 		present[key] = true
-		var full: Dictionary
 		if _entity_cache.has(key):
-			full = _entity_cache[key]
+			var full: Dictionary = _entity_cache[key]
 			for k in e.keys():
 				full[k] = e[k]
 		else:
-			full = (e as Dictionary).duplicate(true)
-			_entity_cache[key] = full
-		merged.append(full)
+			_entity_cache[key] = (e as Dictionary).duplicate(true)
+	if is_full:
+		for key in _entity_cache.keys():
+			if not present.has(key):
+				_entity_cache.erase(key)
+	else:
+		for rk in removed:
+			_entity_cache.erase(rk)
+			_entity_cache.erase(int(rk))  # tolerate float/int key from JSON
+	# Render the full current set (cached idle entities included), not just the
+	# entities carried by this (possibly delta) snapshot.
+	var merged: Array = []
 	for key in _entity_cache.keys():
-		if not present.has(key):
-			_entity_cache.erase(key)
+		merged.append(_entity_cache[key])
 	replicated_entities = merged
 	_sync_entity_markers()
 	_update_pet_bar()
@@ -1524,11 +1837,11 @@ func on_server_selection_by_mob(target_id: int, _char_index: int):
 	_update_labels()
 
 func _set_marker_highlight(body: StaticBody3D, on: bool):
-	var rig = body.get_meta("rig", null)
+	var rig = body.get_meta("rig") if body.has_meta("rig") else null
 	if rig != null and is_instance_valid(rig):
 		rig.set_highlight(on)
 		return
-	var mesh: MeshInstance3D = body.get_meta("mesh", null)
+	var mesh: MeshInstance3D = body.get_meta("mesh") if body.has_meta("mesh") else null
 	if mesh == null:
 		return
 	if on:
@@ -1539,7 +1852,7 @@ func _set_marker_highlight(body: StaticBody3D, on: bool):
 		mat.emission_energy_multiplier = 0.5
 		mesh.material_override = mat
 	else:
-		var prev_entity: Dictionary = body.get_meta("entity", {})
+		var prev_entity: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 		var restore := StandardMaterial3D.new()
 		restore.albedo_color = _entity_color(prev_entity)
 		mesh.material_override = restore
@@ -2055,7 +2368,10 @@ func _ensure_player_model(entity: Dictionary) -> void:
 		if s > 0.0:
 			_player_rig.scale = Vector3(s, s, s)
 		_player_rig.set_fade(float(entity.get("visibility", 1.0)))
-		_player_rig.position.y = -0.9 + (ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0)
+		# Real flight moves the whole body up/down, so don't also lift the rig
+		# (that would float the model above the camera/body). Keep feet at the
+		# capsule bottom.
+		_player_rig.position.y = -0.9
 
 func _create_entity_marker(entity: Dictionary) -> StaticBody3D:
 	var body := StaticBody3D.new()
@@ -2113,40 +2429,85 @@ func _update_entity_marker(body: StaticBody3D, entity: Dictionary):
 	# Hit reaction: flinch when health drops (the original client did this
 	# locally on damage too). Rate-limited so sustained melee doesn't stunlock
 	# the animation; skipped while dead or mid-swing.
-	var prev: Dictionary = body.get_meta("entity", {})
+	var prev: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 	var prev_hp := float(prev.get("health", -1.0))
 	var new_hp := float(entity.get("health", -1.0))
 	if prev_hp > 0.0 and new_hp >= 0.0 and new_hp < prev_hp - 0.5 and not bool(entity.get("dead", false)):
 		var now := Time.get_ticks_msec() / 1000.0
-		if now >= float(body.get_meta("pain_cooldown", 0.0)) and not bool(entity.get("attacking", false)):
+		var pain_ready_at := float(body.get_meta("pain_cooldown")) if body.has_meta("pain_cooldown") else 0.0
+		if now >= pain_ready_at and not bool(entity.get("attacking", false)):
 			body.set_meta("pain_cooldown", now + 1.6)
-			var pain_rig = body.get_meta("rig", null)
+			var pain_rig = body.get_meta("rig") if body.has_meta("rig") else null
 			if pain_rig and is_instance_valid(pain_rig):
 				pain_rig.play_overlay("pain1" if randi() % 2 == 0 else "pain2")
 	body.set_meta("entity", entity.duplicate(true))
 	body.set_meta("entity_id", int(entity.get("id", 0)))
 	var key := _entity_key(entity)
 	# Colour the fallback capsule when there's no model (highlight preserved).
-	var fb: MeshInstance3D = body.get_meta("mesh", null)
+	var fb: MeshInstance3D = body.get_meta("mesh") if body.has_meta("mesh") else null
 	if fb and key != _highlighted_entity_key:
-		var mesh_material := StandardMaterial3D.new()
-		mesh_material.albedo_color = _entity_color(entity)
-		fb.material_override = mesh_material
+		var fallback_color := _entity_color(entity)
+		if not body.has_meta("fallback_color") or (body.get_meta("fallback_color") as Color) != fallback_color:
+			body.set_meta("fallback_color", fallback_color)
+			var mesh_material := StandardMaterial3D.new()
+			mesh_material.albedo_color = fallback_color
+			fb.material_override = mesh_material
 	# Apply the server's per-spawn scale multiplier (anchored at the feet).
 	var scl := float(entity.get("scale", 1.0))
 	if scl > 0.0:
 		body.scale = Vector3(scl, scl, scl)
-	var label: Label3D = body.get_meta("label")
-	label.text = _entity_label_text(entity)
-	# Keep armor textures + mounted equipment in sync (rig dedupes by signature).
-	var rig = body.get_meta("rig", null)
+	var label: Label3D = body.get_meta("label") if body.has_meta("label") else null
+	if label:
+		var label_text := _entity_label_text(entity)
+		if label.text != label_text:
+			label.text = label_text
+	# Keep armor textures + mounted equipment in sync only when the streamed
+	# visual state changes.  Even though CharacterRig dedupes most work, building
+	# those dictionaries/JSON signatures for every NPC every snapshot was showing
+	# up in process time in crowded zones.
+	var rig = body.get_meta("rig") if body.has_meta("rig") else null
 	if rig and is_instance_valid(rig):
-		rig.apply_appearance(_appearance_for(entity))
-		rig.apply_single_texture(_single_tex_for(entity))
-		rig.apply_mounts(_mounts_for(entity))
-		# Invisibility (visibility < 1) fades the model; Flying/Levitate lifts it.
-		rig.set_fade(float(entity.get("visibility", 1.0)))
-		rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
+		var visual_signature := JSON.stringify({
+			"appearance": entity.get("appearance", {}),
+			"equipment": entity.get("equipment", {}),
+			"flying": float(entity.get("flying", 0.0)) > 0.0,
+			"mounts": entity.get("mounts", {}),
+			"tex_single": entity.get("tex_single", ""),
+			"visibility": snappedf(float(entity.get("visibility", 1.0)), 0.01),
+		})
+		var old_visual_signature := str(body.get_meta("visual_signature")) if body.has_meta("visual_signature") else ""
+		if old_visual_signature != visual_signature:
+			body.set_meta("visual_signature", visual_signature)
+			rig.apply_appearance(_appearance_for(entity))
+			rig.apply_single_texture(_single_tex_for(entity))
+			rig.apply_mounts(_mounts_for(entity))
+			# Invisibility (visibility < 1) fades the model; Flying/Levitate lifts it.
+			rig.set_fade(float(entity.get("visibility", 1.0)))
+			rig.position.y = ENTITY_FLYING_LIFT if float(entity.get("flying", 0.0)) > 0.0 else 0.0
+
+func _buffered_render_pos(body: Node, now: float) -> Dictionary:
+	# Return {pos, yaw} for an entity at (now - ENTITY_INTERP_DELAY), interpolated
+	# between the two buffered snapshots that bracket that render time. Falls back
+	# to the latest known target when there isn't enough history.
+	var samples: Array = body.get_meta("samples") if body.has_meta("samples") else []
+	if samples.is_empty():
+		var tp: Vector3 = body.get_meta("target_position") if body.has_meta("target_position") else body.position
+		return {"pos": tp, "yaw": body.rotation.y}
+	var rt := now - ENTITY_INTERP_DELAY
+	# Older than everything we have -> hold the oldest sample.
+	if rt <= float(samples[0]["t"]):
+		return {"pos": samples[0]["pos"], "yaw": float(samples[0]["yaw"])}
+	for i in range(samples.size() - 1):
+		var a: Dictionary = samples[i]
+		var b: Dictionary = samples[i + 1]
+		if rt >= float(a["t"]) and rt <= float(b["t"]):
+			var span := float(b["t"]) - float(a["t"])
+			var f := 0.0 if span <= 0.0001 else clampf((rt - float(a["t"])) / span, 0.0, 1.0)
+			return {"pos": (a["pos"] as Vector3).lerp(b["pos"], f),
+					"yaw": lerp_angle(float(a["yaw"]), float(b["yaw"]), f)}
+	# Past the latest sample (entity stopped / went idle) -> hold the newest.
+	var last: Dictionary = samples[samples.size() - 1]
+	return {"pos": last["pos"], "yaw": float(last["yaw"])}
 
 func _sync_entity_markers():
 	if replicated_entities.is_empty():
@@ -2215,8 +2576,12 @@ func _sync_entity_markers():
 		# Convert entity server position to absolute Godot world position, then drop
 		# it onto the terrain/world collision so NPCs stand on the ground.
 		var godot_pos := _server_to_godot(entity_dict.get("position", []))
-		# Body origin is at the feet, so seat it right on the ground.
-		godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
+		# Body origin is at the feet. A ground-bound entity is seated on the local
+		# terrain; a flying entity (Levitate / flight spell / dragon form) keeps the
+		# server's authoritative altitude (its replicated Z) so other clients
+		# actually see it take off instead of being snapped back to the ground.
+		if float(entity_dict.get("flying", 0.0)) <= 0.0:
+			godot_pos.y = _ground_y(godot_pos.x, godot_pos.z, godot_pos.y) + 0.05
 		var is_new := false
 		var body: StaticBody3D = replicated_entity_nodes.get(key)
 		if body == null:
@@ -2232,26 +2597,37 @@ func _sync_entity_markers():
 		# toward the latest server position as usual.
 		var entity_is_dead := bool(entity_dict.get("dead", false)) or float(entity_dict.get("health", 1.0)) <= 0.0
 		if entity_is_dead:
-			if not bool(body.get_meta("dead_frozen", false)):
+			var was_dead_frozen := bool(body.get_meta("dead_frozen")) if body.has_meta("dead_frozen") else false
+			if not was_dead_frozen:
 				body.position = godot_pos
 				body.set_meta("target_position", godot_pos)
 				body.set_meta("dead_frozen", true)
 		else:
 			body.set_meta("dead_frozen", false)
-			# Set interpolation target; only snap position on first appearance
-			body.set_meta("target_position", godot_pos)
+			body.set_meta("target_position", godot_pos)  # fallback if no buffer yet
+			var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
+			# Feed the render-behind interpolation buffer (see _buffered_render_pos).
+			# Each snapshot is timestamped; the per-frame loop draws the entity at
+			# (now - ENTITY_INTERP_DELAY) by lerping between bracketing samples, so
+			# motion stays smooth even though snapshots arrive in ~13Hz steps.
+			var tnow := Time.get_ticks_msec() / 1000.0
+			var samples: Array = body.get_meta("samples") if body.has_meta("samples") else []
 			if is_new:
 				body.position = godot_pos
-			# Apply rotation from server (yaw only)
-			var yaw := _server_rotation_to_godot_y(entity_dict.get("rotation", []))
-			body.rotation.y = yaw
+				body.rotation.y = yaw
+				# Seed one past sample so there's always a pair to interpolate.
+				samples = [{"t": tnow - ENTITY_INTERP_DELAY, "pos": godot_pos, "yaw": yaw}]
+			samples.append({"t": tnow, "pos": godot_pos, "yaw": yaw})
+			while samples.size() > ENTITY_SAMPLE_MAX:
+				samples.pop_front()
+			body.set_meta("samples", samples)
 
 	for key in replicated_entity_nodes.keys():
 		if incoming_keys.has(key):
 			continue
 		var old_body: Node = replicated_entity_nodes[key]
 		if is_instance_valid(old_body):
-			var old_entity: Dictionary = old_body.get_meta("entity", {})
+			var old_entity: Dictionary = old_body.get_meta("entity") if old_body.has_meta("entity") else {}
 			var old_dead := bool(old_entity.get("dead", false)) or float(old_entity.get("health", 1.0)) <= 0.0
 			if old_dead:
 				if not _dead_entity_remove_at.has(key):
@@ -2598,10 +2974,12 @@ func _target_entity_from_click(screen_position: Vector2) -> bool:
 	var collider = result.get("collider")
 	if collider == null or not (collider is Node3D):
 		return false
-	var entity_id := int(collider.get_meta("entity_id", 0))
+	if not collider.has_meta("entity_id"):
+		return false
+	var entity_id := int(collider.get_meta("entity_id"))
 	if entity_id <= 0:
 		return false
-	var entity: Dictionary = collider.get_meta("entity", {})
+	var entity: Dictionary = collider.get_meta("entity") if collider.has_meta("entity") else {}
 	if bool(entity.get("dead", false)) or float(entity.get("health", 1.0)) <= 0.0:
 		interaction_message = "Looting %s." % str(entity.get("name", "corpse"))
 		_request_server_command("select_entity", {"entity_id": entity_id, "double_click": true})
@@ -2633,13 +3011,21 @@ func _typing_in_ui() -> bool:
 	return focus is LineEdit or focus is TextEdit
 
 func _ui_open() -> bool:
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	# The Esc menu and options overlay count as open UI: _input() runs BEFORE
+	# the GUI sees events, so without this a click on a menu button (e.g.
+	# "Character Select") first hits the world-click branch, re-captures the
+	# mouse, and the player returns to the menus with no cursor.
+	if _game_menu != null and _game_menu.visible:
+		return true
+	if _options_panel != null and _options_panel.visible:
+		return true
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		if w != null and w.visible:
 			return true
 	return false
 
 func _close_all_windows():
-	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window]:
+	for w in [inventory_window, loot_window, npc_window, journal_window, spellbook_window, cheat_window, character_window]:
 		if w != null and w.visible:
 			w.close_window()
 
@@ -2663,6 +3049,8 @@ func _setup_input_actions() -> void:
 		"mom_look_up":     [{"key": KEY_UP}, {"axis": JOY_AXIS_RIGHT_Y, "v": -1.0}],
 		"mom_look_down":   [{"key": KEY_DOWN}, {"axis": JOY_AXIS_RIGHT_Y, "v": 1.0}],
 		"mom_jump":        [{"key": KEY_SPACE}, {"button": JOY_BUTTON_A}],
+		# Descend while flying (hold). Space/A ascends, Ctrl/B descends.
+		"mom_descend":     [{"key": KEY_CTRL}, {"button": JOY_BUTTON_RIGHT_STICK}],
 		"mom_interact":    [{"key": KEY_E}, {"button": JOY_BUTTON_X}],
 		"mom_attack":      [{"key": KEY_Q}, {"button": JOY_BUTTON_RIGHT_SHOULDER}],
 		"mom_target":      [{"key": KEY_TAB}, {"button": JOY_BUTTON_B}],
@@ -2704,6 +3092,8 @@ func _setup_input_actions() -> void:
 				m.axis_value = ev_def["v"]
 				ev = m
 			InputMap.action_add_event(action, ev)
+	# Apply any saved key/button rebindings over the freshly-built defaults.
+	_load_bindings()
 
 # Discrete gameplay actions (work from key OR gamepad). Returns true if handled.
 func _handle_action_event(event: InputEvent) -> bool:
@@ -2735,6 +3125,16 @@ func _handle_action_event(event: InputEvent) -> bool:
 
 func _input(event):
 	if not visible:
+		return
+	# Listening for a new key/button while remapping — capture it and swallow.
+	if _rebinding_action != "":
+		_handle_rebind_capture(event)
+		return
+	# The options overlay is modal: it swallows gameplay input; Esc closes it.
+	if _options_panel != null and _options_panel.visible:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			_close_options()
+			accept_event()
 		return
 	if _is_dead:
 		# While dead the only interaction is releasing the spirit. Enter/Space
@@ -2805,6 +3205,11 @@ func _input(event):
 					_decline_party_invite()
 			KEY_J:
 				_toggle_journal()
+			KEY_F3:
+				if _perf_overlay:
+					_perf_overlay.visible = not _perf_overlay.visible
+			KEY_C:
+				_toggle_character()
 			KEY_P, KEY_B:
 				_toggle_spellbook()
 			KEY_F1:
@@ -2844,23 +3249,36 @@ func _physics_process(delta: float) -> void:
 		hotbar.set_secondary_peek(false)
 
 	# Local prediction: move CharacterBody3D so movement feels responsive
+	# A Flying buff (Tempest flight spell, dragon form, unstick, ...) grants real
+	# free flight: no gravity, hold Jump to climb and Descend to dive, and a small
+	# horizontal speed boost. Without it, normal ground movement + gravity.
+	var flying := _is_flying()
+	var horiz_speed := FLY_SPEED if flying else MOVE_SPEED
 	var basis: Basis = player_body.global_transform.basis
 	var move_dir: Vector3 = (basis.x * input_vec.x) + (-basis.z * input_vec.y)
 	if move_dir.length() > 1.0:
 		move_dir = move_dir.normalized()
-	velocity.x = move_dir.x * MOVE_SPEED
-	velocity.z = move_dir.z * MOVE_SPEED
-	# Flying / Levitate / Slow Fall: when the buff is active, descend gently
-	# (and jump floatier) instead of normal gravity, so the effect is felt.
-	var flying := float(_self_entity().get("flying", 0.0)) > 0.0
-	if player_body.is_on_floor():
+	velocity.x = move_dir.x * horiz_speed
+	velocity.z = move_dir.z * horiz_speed
+	if flying:
+		# Real flight: vertical is fully under player control, no gravity.
+		var vertical := 0.0
+		if not _typing_in_ui():
+			if Input.is_action_pressed("mom_jump"):
+				vertical += 1.0
+			if Input.is_action_pressed("mom_descend"):
+				vertical -= 1.0
+		velocity.y = vertical * FLY_VERTICAL_SPEED
+		jump_requested = false
+	elif player_body.is_on_floor():
 		if jump_requested:
 			velocity.y = JUMP_VELOCITY
 		else:
 			velocity.y = 0.0
+		jump_requested = false
 	else:
-		velocity.y -= (GRAVITY * 0.18 if flying else GRAVITY) * delta
-	jump_requested = false
+		velocity.y -= GRAVITY * delta
+		jump_requested = false
 	var horizontal_motion: Vector3 = Vector3(velocity.x, 0.0, velocity.z) * delta
 	var was_on_floor := player_body.is_on_floor()
 	var pre_move_pos := player_body.global_position
@@ -2891,6 +3309,9 @@ func _physics_process(delta: float) -> void:
 			# Replicate the client-resolved floor height back to the headless server.
 			# The server stores positions as (x, y, z), where z is vertical.
 			"position_z": _godot_world_to_server(player_body.global_position)[2],
+			# Tell the server we're flying so it uses the (faster) flight speed for
+			# horizontal reconciliation instead of the ground walk speed.
+			"flying": flying,
 		}
 		if input_state != _last_sent_input:
 			_last_sent_input = input_state.duplicate()
@@ -2909,31 +3330,39 @@ func _physics_process(delta: float) -> void:
 	var entity_world := sub_viewport.find_world_3d() if sub_viewport else null
 	if entity_world != null:
 		entity_space = entity_world.direct_space_state
+	var now_t := Time.get_ticks_msec() / 1000.0
 	for body in replicated_entity_nodes.values():
 		if body == null or not is_instance_valid(body):
 			continue
 		# Frozen corpse: never interpolate it (so it can't slide); just hold the
 		# death pose. Everything below only applies to living entities.
-		if bool(body.get_meta("dead_frozen", false)):
-			var dead_rig = body.get_meta("rig", null)
+		var is_dead_frozen := bool(body.get_meta("dead_frozen")) if body.has_meta("dead_frozen") else false
+		if is_dead_frozen:
+			var dead_rig = body.get_meta("rig") if body.has_meta("rig") else null
 			if dead_rig != null and is_instance_valid(dead_rig):
 				dead_rig.drive(0.0, false, true)
 			continue
-		var target_position: Vector3 = body.get_meta("target_position", body.position)
+		# Render-behind interpolation: draw the entity where the server says it was
+		# ENTITY_INTERP_DELAY ago, lerped between the two bracketing snapshots, so
+		# motion is smooth despite ~13Hz stepped updates + network jitter.
+		var rp := _buffered_render_pos(body, now_t)
+		var target_position: Vector3 = rp["pos"]
 		var prev_xz := Vector2(body.position.x, body.position.z)
 		if body.position.distance_to(target_position) > ENTITY_SNAP_DISTANCE:
+			# Spawn / teleport / large correction: jump straight there.
 			body.position = target_position
-			body.set_meta("stuck_time", 0.0)
 		else:
-			var desired: Vector3 = body.position.lerp(target_position, clamp(delta * ENTITY_INTERPOLATION_SPEED, 0.0, 1.0))
-			# The headless server has no world collision, so a chasing/returning
-			# mob's straight-line path can cross walls. Clamp each interpolation
-			# step against world geometry at knee height; if the marker stays
-			# blocked while the server target keeps moving away, snap to the
-			# server position so the mob can't be left behind forever.
+			# Follow the already-smooth buffered path directly. The headless server
+			# has no world collision, so clamp the step against world geometry at
+			# knee height so a marker can't slide through walls.
+			var desired: Vector3 = target_position
 			var step_vec: Vector3 = desired - body.position
 			var step_h := Vector3(step_vec.x, 0.0, step_vec.z)
-			if entity_space != null and step_h.length() > 0.002:
+			# The wall-clamp raycast is the heaviest per-entity op; only do it for
+			# nearby entities (clipping through a wall isn't visible at distance), so
+			# a crowded zone doesn't fire dozens of physics queries every frame.
+			if entity_space != null and step_h.length() > 0.002 \
+					and body.position.distance_to(player_body.position) < ENTITY_WALLCLAMP_DISTANCE:
 				var ray_from: Vector3 = body.position + Vector3(0, 0.55, 0)
 				var rq := PhysicsRayQueryParameters3D.create(ray_from, ray_from + step_h)
 				rq.collide_with_areas = false
@@ -2945,22 +3374,16 @@ func _physics_process(delta: float) -> void:
 					desired.x = body.position.x + dir.x * free
 					desired.z = body.position.z + dir.z * free
 			body.position = desired
-			var lag := Vector2(body.position.x - target_position.x, body.position.z - target_position.z).length()
-			if lag > 1.5:
-				var stuck := float(body.get_meta("stuck_time", 0.0)) + delta
-				if stuck >= 2.0:
-					body.position = target_position
-					stuck = 0.0
-				body.set_meta("stuck_time", stuck)
-			else:
-				body.set_meta("stuck_time", 0.0)
+		# Smoothly turn toward the buffered heading.
+		body.rotation.y = lerp_angle(body.rotation.y, float(rp["yaw"]), clamp(delta * 12.0, 0.0, 1.0))
 		var moved := Vector2(body.position.x, body.position.z).distance_to(prev_xz)
 		var inst_speed := moved / maxf(delta, 0.001)
-		var smoothed := lerpf(float(body.get_meta("speed", 0.0)), inst_speed, 0.25)
+		var prev_speed := float(body.get_meta("speed")) if body.has_meta("speed") else 0.0
+		var smoothed := lerpf(prev_speed, inst_speed, 0.25)
 		body.set_meta("speed", smoothed)
-		var rig = body.get_meta("rig", null)
+		var rig = body.get_meta("rig") if body.has_meta("rig") else null
 		if rig != null and is_instance_valid(rig):
-			var ent: Dictionary = body.get_meta("entity", {})
+			var ent: Dictionary = body.get_meta("entity") if body.has_meta("entity") else {}
 			rig.drive(smoothed, bool(ent.get("attacking", false)), bool(ent.get("dead", false)))
 
 	# Cursor-item ghost follows the mouse while a window is open.
@@ -2968,6 +3391,16 @@ func _physics_process(delta: float) -> void:
 		cursor_item_ghost.position = get_local_mouse_position() + Vector2(14, 10)
 
 	_update_cast_bar()
+
+	# F3 perf overlay: refresh a few times a second while it's showing.
+	if _perf_overlay and _perf_overlay.visible:
+		_perf_timer += delta
+		if _perf_timer >= 0.4:
+			_perf_timer = 0.0
+			var fps := Engine.get_frames_per_second()
+			_perf_overlay.text = "%d fps  %.1f ms\n%d entities  %d draw calls" % [
+				fps, 1000.0 / maxf(fps, 1.0), replicated_entity_nodes.size(),
+				RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)]
 
 	# Periodically refresh open windows so cooldowns/charges stay current.
 	_ui_poll_timer += delta

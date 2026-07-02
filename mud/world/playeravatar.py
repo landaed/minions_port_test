@@ -32,6 +32,24 @@ from mud.world.race import GetRaceGraphics
 #for jelly
 from mud.world.shared.worlddata import CharacterInfo,ZoneConnectionInfo
 from mud.world.shared.playdata import RootInfo,ItemInfo
+import os as _os
+
+# Activity-driven entity replication. When enabled, getVisibleEntities returns
+# only the entities whose dynamic state changed since this avatar's last poll
+# (plus a periodic full resync), and reports despawns explicitly via "removed".
+# Idle stationary mobs then cost ~zero CPU/bandwidth no matter how close the
+# player stands. Set MOM_ENTITY_ACTIVITY_DRIVEN=0 to restore the legacy
+# "serialize every visible entity every poll" behaviour for A/B comparison.
+_ENTITY_ACTIVITY_DRIVEN = _os.environ.get("MOM_ENTITY_ACTIVITY_DRIVEN", "1") != "0"
+# How often (seconds) to force a full resync so static/appearance changes and any
+# proxy/client drift self-heal even for entities that never go "dirty".
+_ENTITY_RESYNC_SECS = float(_os.environ.get("MOM_ENTITY_RESYNC", "2.0"))
+# How far (units) around the player entities are built for the snapshot. Shares
+# MOM_ENTITY_STREAM_RADIUS with the proxy (which distance-filters what it
+# forwards) so the two stay in lockstep; +10 gives the proxy's filter a margin.
+# Activity-driven replication keeps the extra radius cheap: idle mobs beyond the
+# old bubble cost one full record when first seen, then ~nothing until they move.
+_SNAPSHOT_MAX_RANGE = float(_os.environ.get("MOM_ENTITY_STREAM_RADIUS", "250.0")) + 10.0
 
 
 def _compute_mounts(mob):
@@ -122,6 +140,67 @@ class PlayerAvatar(Avatar):
 
     def perspective_logout(self):
         self.logout()
+
+
+    def perspective_leaveWorld(self):
+        """Return to character select WITHOUT ending the account session.
+
+        Removes the player's party mobs from their current zone so other clients
+        see the avatar despawn (zone.removePlayer drops them from everyone's
+        canSee, which the activity-driven stream then reports as "removed"), but
+        keeps self.player and this perspective alive so the client can re-enter a
+        character immediately. Full logout (self.player = None) only happens on a
+        real disconnect."""
+        player = self.player
+        if not player:
+            return False
+        # Snapshot worn-gear/skin appearance BEFORE detaching from the zone (the
+        # mobs are still alive here), so the character-select roster shows the
+        # gear you were wearing when you left, not the gear from last login.
+        self._pushAppearances()
+        try:
+            zone = getattr(player, "zone", None)
+            if zone is not None:
+                zone.removePlayer(player)
+            player.zone = None
+        except Exception:
+            print_exc()
+            return False
+        return True
+
+    def _pushAppearances(self):
+        """Send each party character's worn-gear appearance (sex + equipment model
+        "mounts" + per-part skin/armor texture indices "tex") to the character
+        server, so the character-SELECT screen can show their gear AND clothing.
+        Best-effort, fire-and-forget — wrapped so it can never break
+        the login flow. The appearance is stored in a side table keyed by name and
+        read back by getCharacterInfos."""
+        try:
+            from mud.world.cserveravatar import AVATAR
+            if not AVATAR or not getattr(self.player, "party", None):
+                return
+            import json as _json
+            for c in getattr(self.player.party, "members", []) or []:
+                mob = getattr(c, "mob", None) if c else None
+                if mob is None:
+                    continue
+                try:
+                    mounts = _compute_mounts(mob)
+                    sex = str(getattr(getattr(mob, "spawn", None), "sex", "") or getattr(mob, "sex", "") or "")
+                    # Same per-part {part: texture_index} dict the in-world entity
+                    # stream sends ("tex"): base racial skin + worn armor overrides.
+                    try:
+                        from mud.world.appearance import compute_appearance
+                        tex = compute_appearance(mob)
+                    except Exception:
+                        tex = {}
+                    appearance = _json.dumps({"mounts": mounts, "sex": sex, "tex": tex})
+                    AVATAR.mind.callRemote("setCharacterAppearance",
+                        self.player.publicName, c.name, appearance).addErrback(lambda f: None)
+                except Exception:
+                    print_exc()
+        except Exception:
+            print_exc()
 
 
     def logout(self):
@@ -1074,7 +1153,10 @@ class PlayerAvatar(Avatar):
         names = []
         for cname,cvalues in result.items():
             names.append(cname)
-            name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename = cvalues
+            # getCharacterInfos now appends an appearance_json element; unpack the
+            # first 10 positionally so older/newer servers don't break each other.
+            name,race,pclass,sclass,tclass,plevel,slevel,tlevel,realm,rename = cvalues[:10]
+            appearance_json = cvalues[10] if len(cvalues) > 10 else ""
             cinfo = CharacterInfo()
             cinfo.status = "Alive"
             cinfo.name = str(cname)
@@ -1084,6 +1166,19 @@ class PlayerAvatar(Avatar):
             cinfo.levels.append(plevel)
             cinfo.newCharacter = False
             cinfo.rename = rename
+            # Worn-gear appearance for the character-select screen (sex + mounts
+            # + per-part clothing/armor texture indices).
+            if appearance_json:
+                try:
+                    import json as _json
+                    ap = _json.loads(appearance_json)
+                    if isinstance(ap, dict):
+                        cinfo.mounts = ap.get("mounts", {}) or {}
+                        cinfo.tex = ap.get("tex", {}) or {}
+                        if ap.get("sex"):
+                            cinfo.sex = str(ap["sex"])
+                except Exception:
+                    print_exc()
             cinfos.append(cinfo)
             
         self.player.cserverInfos  = cinfos[:]
@@ -1468,6 +1563,9 @@ class PlayerAvatar(Avatar):
         _logf.flush()
         d = self.mind.callRemote("setRootInfo",self.player.rootInfo,time()-self.player.world.pauseTime)
         d.addErrback(lambda f: _logf.write("####enterWorld: setRootInfo FAILED: %s\n" % f) or _logf.flush())
+        # Record each character's worn-gear appearance for the character-select
+        # screen (fire-and-forget; must never affect the login flow).
+        self._pushAppearances()
         _logf.write("####enterWorld: completed successfully\n")
         _logf.flush()
         _logf.close()
@@ -1574,9 +1672,32 @@ class PlayerAvatar(Avatar):
 
         entities = []
         seen_sim_ids = set()
-        # Only build full entity dicts for mobs near the player; the proxy caps
-        # the snapshot at 50u, so 60u gives a small margin for interpolation.
-        SNAPSHOT_MAX_RANGE = 60.0
+        # Only build entity dicts for mobs within the stream radius (shared with
+        # the proxy via MOM_ENTITY_STREAM_RADIUS — see module top). This used to
+        # be a hard 60u while the proxy already forwarded 120u, so nothing past
+        # 60u ever reached the client and mobs popped in "super close".
+        SNAPSHOT_MAX_RANGE = _SNAPSHOT_MAX_RANGE
+
+        # Activity-driven replication bookkeeping (per-avatar, see module top).
+        # present_keys: every entity id visible this poll (whether or not it was
+        # rebuilt). ev_sent: id -> last-sent dynamic signature, so an unchanged
+        # idle mob is skipped before the costly dict build. full_resync rebuilds
+        # everything periodically so static/appearance changes + drift self-heal.
+        activity = _ENTITY_ACTIVITY_DRIVEN
+        present_keys = set()
+        full_resync = True
+        if activity:
+            _now_ev = time()
+            if not hasattr(self, "_ev_sent"):
+                self._ev_sent = {}
+                self._ev_resync_at = 0.0
+            full_resync = (_now_ev - self._ev_resync_at) >= _ENTITY_RESYNC_SECS
+            if full_resync:
+                self._ev_sent.clear()
+                self._ev_resync_at = _now_ev
+            ev_sent = self._ev_sent
+        else:
+            ev_sent = {}
 
         def append_entity(other_mob, visibility_source="unknown", force=False):
             try:
@@ -1595,6 +1716,31 @@ class PlayerAvatar(Avatar):
                 rotation = list(other_mob.simObject.rotation) if other_mob.simObject.rotation else [0.0, 0.0, 0.0, 1.0]
                 health = float(other_mob.health) if hasattr(other_mob, 'health') and other_mob.health is not None else 0.0
                 max_health = float(other_mob.maxHealth) if hasattr(other_mob, 'maxHealth') and other_mob.maxHealth is not None else 0.0
+                # Activity-driven skip: build a cheap dynamic signature from raw
+                # attributes (no IsKOS / name / model / appearance work yet) and, if
+                # it matches what we last sent this player, bail before the costly
+                # dict assembly. Idle stationary mobs hit this every poll. The
+                # player's explicit target (force) and the periodic full resync are
+                # never skipped. Static/appearance changes ride the resync.
+                ekey = int(other_mob.id)
+                present_keys.add(ekey)
+                if activity:
+                    _tgt = other_mob.target
+                    _sig = (
+                        round(position[0], 2), round(position[1], 2), round(position[2], 2),
+                        round(float(rotation[0]), 3), round(float(rotation[1]), 3),
+                        round(float(rotation[2]), 3), round(float(rotation[3]), 3),
+                        int(health), int(max_health),
+                        int(_tgt.id) if _tgt else 0,
+                        bool(getattr(other_mob, 'attacking', False)),
+                        bool(other_mob.detached),
+                        round(float(getattr(other_mob, 'visibility', 1.0) or 0.0), 2),
+                        round(float(getattr(other_mob, 'flying', 0.0) or 0.0), 2),
+                        round(float(getattr(other_mob, 'size', 1.0) or 1.0), 2),
+                    )
+                    if not full_resync and not force and ev_sent.get(ekey) == _sig:
+                        return  # unchanged since last poll — skip the expensive build
+                    ev_sent[ekey] = _sig
                 is_enemy = bool(IsKOS(other_mob, mob)) if other_mob != mob else False
                 if other_mob.player or (hasattr(other_mob, 'master') and other_mob.master and other_mob.master.player):
                     is_enemy = is_enemy or bool(AllowHarmful(mob, other_mob))
@@ -1783,7 +1929,11 @@ class PlayerAvatar(Avatar):
         if mob.target:
             append_entity(mob.target, "target", force=True)
 
-        if len(entities) <= 1:
+        # Fallback when the visibility set itself is empty (canSee not populated) —
+        # base it on present_keys, not len(entities): in activity mode entities may
+        # be short simply because nothing moved, which is not the same as "nothing
+        # is visible" and must not trigger the expensive 500u activeMobs sweep.
+        if len(present_keys) <= 1:
             fallback_range = 500.0
             closest_name = None
             closest_dist = 999999
@@ -1840,6 +1990,15 @@ class PlayerAvatar(Avatar):
         except Exception:
             print_exc()
 
+        if activity:
+            # Anything we'd previously sent this player that is no longer visible
+            # (despawned, died, walked out of range) is reported once, explicitly,
+            # so the client removes it instead of inferring removal from absence.
+            removed = [k for k in list(ev_sent.keys()) if k not in present_keys]
+            for k in removed:
+                ev_sent.pop(k, None)
+            return {"entities": entities, "events": events,
+                    "removed": removed, "full": full_resync}
         return {"entities": entities, "events": events}
 
     def perspective_respawn(self, char_index=0):
@@ -1912,7 +2071,7 @@ class PlayerAvatar(Avatar):
         zone.respawnPlayer(player, transform)
         return True
 
-    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None):
+    def perspective_updateInput(self, move_x, move_y, forward, jump, char_index=0, position_z=None, flying=False):
         """Receive movement input from the Godot client for server-authoritative movement.
 
         The server processes inputs and updates simObject.position directly.
@@ -1936,6 +2095,7 @@ class PlayerAvatar(Avatar):
             "move_y": float(move_y),
             "forward": tuple(float(v) for v in (forward or [0, 0, 0])[:3]),
             "jump": bool(jump),
+            "flying": bool(flying),
         }
         if position_z is not None:
             input_state["position_z"] = float(position_z)
@@ -2019,6 +2179,73 @@ class PlayerAvatar(Avatar):
         Only active when the world server runs with MOM_ENABLE_CHEATS=1."""
         from mud.world.cheats import DoCheat
         return DoCheat(self.player, action, params)
+
+    # Core attributes a player can raise by spending advancement points.
+    STAT_ATTRS = ("str", "dex", "ref", "agi", "wis", "bdy", "mnd", "mys", "pre")
+
+    def perspective_spendStatPoint(self, stat, amount=1):
+        """Spend advancement points to permanently raise a core attribute.
+        One advancement point raises the attribute by one. The current value is
+        derived from the base only at spawn time (updateDerivedStats recomputes
+        health/offense/... but NOT the attributes themselves), so we raise both
+        the base and the live value, then refresh derived stats."""
+        stat = str(stat).strip().lower()
+        try:
+            amount = max(1, int(amount))
+        except (TypeError, ValueError):
+            amount = 1
+        char = self.player.curChar
+        if not char or not char.mob:
+            return {"success": False, "message": "No active character."}
+        if stat not in PlayerAvatar.STAT_ATTRS:
+            return {"success": False, "message": "Unknown attribute '%s'." % stat}
+        avail = int(getattr(char, "advancementPoints", 0) or 0)
+        if avail < amount:
+            return {"success": False, "message": "Not enough advancement points (have %d)." % avail}
+        mob = char.mob
+        spawn = getattr(mob, "spawn", None)
+        base_attr = stat + "Base"
+        old_base = int(getattr(mob, base_attr, 0) or 0)
+        new_base = old_base + amount
+        # Presence is capped.
+        if stat == "pre":
+            try:
+                from mud.world.defines import RPG_MAX_PRESENCE
+                if new_base > RPG_MAX_PRESENCE:
+                    new_base = RPG_MAX_PRESENCE
+            except Exception:
+                pass
+        delta = new_base - old_base
+        if delta <= 0:
+            return {"success": False, "message": "%s is already at its maximum." % stat.upper()}
+        # Raise the base (persisted on the spawn + mob) AND the live attribute.
+        if spawn is not None:
+            try:
+                setattr(spawn, base_attr, int(getattr(spawn, base_attr, 0) or 0) + delta)
+            except Exception:
+                pass
+        try:
+            setattr(mob, base_attr, new_base)
+            setattr(mob, stat, int(getattr(mob, stat, 0) or 0) + delta)
+        except Exception:
+            return {"success": False, "message": "Could not raise '%s'." % stat}
+        char.advancementPoints = avail - delta
+        try:
+            mob.updateDerivedStats()
+        except Exception:
+            pass
+        self.player.cinfoDirty = True
+        # Event-driven push: refresh this character's CharacterInfo right now so the
+        # changed attributes (STR/.../OFFENSE/ADVANCE) are sent to the proxy's ghost
+        # immediately, instead of waiting up to ~2.5s for the next gated zone
+        # charInfo tick. The proxy then relays the fresh stats to the client.
+        try:
+            if getattr(char, "charInfo", None):
+                char.charInfo.refresh()
+        except Exception:
+            print_exc()
+        return {"success": True, "message": "Raised %s by %d." % (stat.upper(), delta),
+                "stat": stat, "advancement_points": int(char.advancementPoints)}
 
     # ------------------------------------------------------------------
     # Plain-data getters for the Godot bridge (no PB cacheables involved).
