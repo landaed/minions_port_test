@@ -44,6 +44,12 @@ _ENTITY_ACTIVITY_DRIVEN = _os.environ.get("MOM_ENTITY_ACTIVITY_DRIVEN", "1") != 
 # How often (seconds) to force a full resync so static/appearance changes and any
 # proxy/client drift self-heal even for entities that never go "dirty".
 _ENTITY_RESYNC_SECS = float(_os.environ.get("MOM_ENTITY_RESYNC", "2.0"))
+# How far (units) around the player entities are built for the snapshot. Shares
+# MOM_ENTITY_STREAM_RADIUS with the proxy (which distance-filters what it
+# forwards) so the two stay in lockstep; +10 gives the proxy's filter a margin.
+# Activity-driven replication keeps the extra radius cheap: idle mobs beyond the
+# old bubble cost one full record when first seen, then ~nothing until they move.
+_SNAPSHOT_MAX_RANGE = float(_os.environ.get("MOM_ENTITY_STREAM_RADIUS", "250.0")) + 10.0
 
 
 def _compute_mounts(mob):
@@ -148,6 +154,10 @@ class PlayerAvatar(Avatar):
         player = self.player
         if not player:
             return False
+        # Snapshot worn-gear/skin appearance BEFORE detaching from the zone (the
+        # mobs are still alive here), so the character-select roster shows the
+        # gear you were wearing when you left, not the gear from last login.
+        self._pushAppearances()
         try:
             zone = getattr(player, "zone", None)
             if zone is not None:
@@ -160,8 +170,9 @@ class PlayerAvatar(Avatar):
 
     def _pushAppearances(self):
         """Send each party character's worn-gear appearance (sex + equipment model
-        "mounts") to the character server, so the character-SELECT screen can show
-        their gear. Best-effort, fire-and-forget — wrapped so it can never break
+        "mounts" + per-part skin/armor texture indices "tex") to the character
+        server, so the character-SELECT screen can show their gear AND clothing.
+        Best-effort, fire-and-forget — wrapped so it can never break
         the login flow. The appearance is stored in a side table keyed by name and
         read back by getCharacterInfos."""
         try:
@@ -176,7 +187,14 @@ class PlayerAvatar(Avatar):
                 try:
                     mounts = _compute_mounts(mob)
                     sex = str(getattr(getattr(mob, "spawn", None), "sex", "") or getattr(mob, "sex", "") or "")
-                    appearance = _json.dumps({"mounts": mounts, "sex": sex})
+                    # Same per-part {part: texture_index} dict the in-world entity
+                    # stream sends ("tex"): base racial skin + worn armor overrides.
+                    try:
+                        from mud.world.appearance import compute_appearance
+                        tex = compute_appearance(mob)
+                    except Exception:
+                        tex = {}
+                    appearance = _json.dumps({"mounts": mounts, "sex": sex, "tex": tex})
                     AVATAR.mind.callRemote("setCharacterAppearance",
                         self.player.publicName, c.name, appearance).addErrback(lambda f: None)
                 except Exception:
@@ -1148,13 +1166,15 @@ class PlayerAvatar(Avatar):
             cinfo.levels.append(plevel)
             cinfo.newCharacter = False
             cinfo.rename = rename
-            # Worn-gear appearance for the character-select screen (sex + mounts).
+            # Worn-gear appearance for the character-select screen (sex + mounts
+            # + per-part clothing/armor texture indices).
             if appearance_json:
                 try:
                     import json as _json
                     ap = _json.loads(appearance_json)
                     if isinstance(ap, dict):
                         cinfo.mounts = ap.get("mounts", {}) or {}
+                        cinfo.tex = ap.get("tex", {}) or {}
                         if ap.get("sex"):
                             cinfo.sex = str(ap["sex"])
                 except Exception:
@@ -1652,9 +1672,11 @@ class PlayerAvatar(Avatar):
 
         entities = []
         seen_sim_ids = set()
-        # Only build full entity dicts for mobs near the player; the proxy caps
-        # the snapshot at 50u, so 60u gives a small margin for interpolation.
-        SNAPSHOT_MAX_RANGE = 60.0
+        # Only build entity dicts for mobs within the stream radius (shared with
+        # the proxy via MOM_ENTITY_STREAM_RADIUS — see module top). This used to
+        # be a hard 60u while the proxy already forwarded 120u, so nothing past
+        # 60u ever reached the client and mobs popped in "super close".
+        SNAPSHOT_MAX_RANGE = _SNAPSHOT_MAX_RANGE
 
         # Activity-driven replication bookkeeping (per-avatar, see module top).
         # present_keys: every entity id visible this poll (whether or not it was

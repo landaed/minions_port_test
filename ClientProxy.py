@@ -29,11 +29,13 @@ from autobahn.exception import Disconnected
 
 from hashlib import md5
 
-# Stream enough nearby entities to make idle NPC wandering visible around town,
-# while still bounding payload size. Override for profiling with
-# MOM_ENTITY_STREAM_RADIUS=<units>.
-ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "120.0"))
-ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "50"))
+# Stream enough nearby entities that mobs/NPCs are visible well before you reach
+# them (zone fog starts at 500u; 250u fills the mid-ground without fighting it),
+# while still bounding payload size. The world server shares this env var for
+# its own build radius (playeravatar._SNAPSHOT_MAX_RANGE), so one knob moves
+# both. Override with MOM_ENTITY_STREAM_RADIUS=<units>.
+ENTITY_STREAM_RADIUS = float(os.environ.get("MOM_ENTITY_STREAM_RADIUS", "250.0"))
+ENTITY_STREAM_LIMIT = int(os.environ.get("MOM_ENTITY_STREAM_LIMIT", "64"))
 # How often each client polls the world for a fresh entity snapshot. The old
 # 0.03s (~33Hz) was the dominant cost with several clients: every poll the world
 # server rebuilds + PB-serializes up to ENTITY_STREAM_LIMIT full entities, and
@@ -880,12 +882,17 @@ class GodotClientSession:
         d.addErrback(lambda f: None)
 
     def send(self, msg_dict):
-        """Send a JSON message to the Godot client."""
+        """Send a JSON message to the Godot client.
+
+        Returns the encoded payload size in bytes (0 if nothing was sent), so
+        callers like the entity replication meter can account bandwidth without
+        re-serializing the message."""
         if self._closed:
-            return
+            return 0
         try:
             payload = json.dumps(msg_dict, default=_json_fallback)
             self.ws.sendMessage(payload.encode("utf-8"), isBinary=False)
+            return len(payload)
         except Disconnected:
             # Client went away (a sync callback can fire between close and
             # cleanup). Stop quietly instead of spewing a traceback.
@@ -893,6 +900,7 @@ class GodotClientSession:
             self.cleanup()
         except Exception:
             traceback.print_exc()
+        return 0
 
     def cleanup(self):
         """Disconnect any PB connections."""
@@ -1067,13 +1075,15 @@ class GodotClientSession:
             msg["removed"] = removed
         if events:
             msg["events"] = events
-        self.send(msg)
+        sent_bytes = self.send(msg)
         # Lightweight send-rate meter (logs every 5s) so it's clear how fast
-        # entity replication is actually running.
+        # entity replication is actually running. Uses the byte count send()
+        # already produced — the old per-entity re-dump doubled the JSON
+        # serialization cost of every snapshot just to feed this meter.
         import time as _t
         _now = _t.time()
         self._snap_n = getattr(self, "_snap_n", 0) + 1
-        self._snap_bytes = getattr(self, "_snap_bytes", 0) + sum(len(json.dumps(e, default=_json_fallback)) for e in capped)
+        self._snap_bytes = getattr(self, "_snap_bytes", 0) + sent_bytes
         if not hasattr(self, "_snap_t0"):
             self._snap_t0 = _now
         if _now - self._snap_t0 >= 5.0:
@@ -1542,6 +1552,9 @@ class ProxyProtocol(WebSocketServerProtocol):
             "levels": list(getattr(cinfo, "levels", [])),
             # Worn-gear models for the character-select rig (see control.gd).
             "mounts": getattr(cinfo, "mounts", {}) or {},
+            # Per-part clothing/armor texture indices ({"body": 53, ...}) so the
+            # character-select rig wears the same skin/armor as in the world.
+            "tex": getattr(cinfo, "tex", {}) or {},
         }
 
     # ------------------------------------------------------------------
@@ -2234,6 +2247,10 @@ class ProxyProtocol(WebSocketServerProtocol):
         # the zone). leaveWorld keeps the account session for immediate re-entry.
         if session.player_perspective:
             d = session.player_perspective.callRemote("PlayerAvatar", "leaveWorld")
+            # leaveWorld pushes fresh worn-gear appearance to the character server;
+            # re-query the roster afterwards so character select shows the gear the
+            # player was wearing when they left (not the state from last login).
+            d.addCallback(lambda _r: self._do_query_characters())
             d.addErrback(lambda f: None)
         session.send({"type": "left_world", "success": True})
 
