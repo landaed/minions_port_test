@@ -39,12 +39,13 @@ func _ready() -> void:
 			_manifest_url = str(cfg.get_value("launcher", "manifest_url", DEFAULT_MANIFEST_URL))
 		else:
 			_manifest_url = DEFAULT_MANIFEST_URL
+	if _manifest_url == DEFAULT_MANIFEST_URL:
+		_manifest_url = _platform_manifest_url(_manifest_url)
 	_install_dir = OS.get_environment("MOM_LAUNCHER_INSTALL")
 	if _install_dir.is_empty():
 		# Default: a "game" folder next to the launcher executable (a user-writable
 		# install). In the editor/headless this falls back to user://game.
-		var exe_dir := OS.get_executable_path().get_base_dir()
-		_install_dir = (exe_dir + "/game") if not exe_dir.is_empty() else ProjectSettings.globalize_path("user://game")
+		_install_dir = ProjectSettings.globalize_path("user://game")
 	_tmp_zip = ProjectSettings.globalize_path("user://_download.zip")
 	_autotest = OS.get_environment("MOM_LAUNCHER_AUTOTEST") == "1"
 
@@ -93,6 +94,19 @@ func _build_ui() -> void:
 	_button.pressed.connect(_on_button)
 	box.add_child(_button)
 
+func _platform_manifest_url(base_url: String) -> String:
+	match OS.get_name():
+		"Windows": return base_url.replace("version.json", "version-windows.json")
+		"macOS": return base_url.replace("version.json", "version-macos.json")
+		_: return base_url.replace("version.json", "version-linux.json")
+
+func _installed_data() -> Dictionary:
+	if not FileAccess.file_exists(INSTALLED_PATH): return {}
+	var file := FileAccess.open(INSTALLED_PATH, FileAccess.READ)
+	if file == null: return {}
+	var data = JSON.parse_string(file.get_as_text())
+	return data if data is Dictionary else {}
+
 func _installed_version() -> String:
 	if not FileAccess.file_exists(INSTALLED_PATH):
 		return ""
@@ -114,12 +128,17 @@ func _check_for_updates() -> void:
 	_http.download_file = ""  # manifest comes back in-memory
 	var err := _http.request(_manifest_url)
 	if err != OK:
-		_fail("Could not reach the update server (error %d). Check your connection." % err)
+		if not _installed_version().is_empty():
+			_manifest = _installed_data()
+			_offer_play("Offline — could not check for updates. Playing the installed version.")
+		else:
+			_fail("Could not reach the update server (error %d). Check your connection." % err)
 
 func _on_manifest_received(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if result != HTTPRequest.RESULT_SUCCESS or code != 200:
 		# Offline but already installed? Let the player play what they have.
 		if not _installed_version().is_empty():
+			_manifest = _installed_data()
 			_offer_play("Offline — couldn't check for updates. You can still play the installed version.")
 		else:
 			_fail("Update check failed (HTTP %d). Game not installed yet." % code)
@@ -138,10 +157,9 @@ func _on_manifest_received(result: int, code: int, _headers: PackedStringArray, 
 	else:
 		var label := "Update available: %s" % latest if not installed.is_empty() else "Install %s" % latest
 		_set_state("update", label)
-		_button.text = ("Update & Play" if not installed.is_empty() else "Install & Play")
-		_button.disabled = false
-		if _autotest:
-			_begin_download()
+		_button.text = "Updating…"
+		_button.disabled = true
+		_begin_download()
 
 func _game_exe_exists() -> bool:
 	var exe := str(_manifest.get("exe", ""))
@@ -156,7 +174,14 @@ func _on_button() -> void:
 		"ready", "up_to_date":
 			_launch_game()
 		"error":
+			_prepare_manifest_request()
 			_check_for_updates()
+
+func _prepare_manifest_request() -> void:
+	if _http.request_completed.is_connected(_on_download_complete):
+		_http.request_completed.disconnect(_on_download_complete)
+	if not _http.request_completed.is_connected(_on_manifest_received):
+		_http.request_completed.connect(_on_manifest_received)
 
 # --- download + verify + extract ------------------------------------------
 func _begin_download() -> void:
@@ -201,6 +226,8 @@ func _on_download_complete(result: int, code: int, _headers: PackedStringArray, 
 		_fail("Could not unpack the update.")
 		return
 	DirAccess.remove_absolute(_tmp_zip)
+	if OS.get_name() != "Windows":
+		FileAccess.set_unix_permissions(_install_dir.path_join(str(_manifest.get("exe", ""))), 493)
 	_write_installed(str(_manifest.get("version", "")))
 	_offer_play("Updated to %s." % str(_manifest.get("version", "")))
 	if _autotest:
@@ -223,7 +250,11 @@ func _extract_zip(zip_path: String, dest_dir: String) -> bool:
 		return false
 	DirAccess.make_dir_recursive_absolute(dest_dir)
 	for name in reader.get_files():
-		var out_path := dest_dir.path_join(name)
+		var clean_name := name.replace("\\", "/").simplify_path()
+		if clean_name.is_absolute_path() or clean_name == ".." or clean_name.begins_with("../"):
+			reader.close()
+			return false
+		var out_path := dest_dir.path_join(clean_name)
 		if name.ends_with("/"):
 			DirAccess.make_dir_recursive_absolute(out_path)
 			continue
@@ -241,7 +272,7 @@ func _extract_zip(zip_path: String, dest_dir: String) -> bool:
 func _write_installed(version: String) -> void:
 	var f := FileAccess.open(INSTALLED_PATH, FileAccess.WRITE)
 	if f:
-		f.store_string(JSON.stringify({"version": version, "install_dir": _install_dir}))
+		f.store_string(JSON.stringify({"version": version, "install_dir": _install_dir, "exe": str(_manifest.get("exe", ""))}))
 
 func _offer_play(msg: String) -> void:
 	_set_state("ready", msg)
@@ -259,5 +290,8 @@ func _launch_game() -> void:
 	if exe.is_empty() or not FileAccess.file_exists(path):
 		_fail("Game executable not found — try Update again.")
 		return
-	OS.create_process(path, [])
+	var pid := OS.create_process(path, [])
+	if pid <= 0:
+		_fail("The game could not be started.")
+		return
 	get_tree().quit()

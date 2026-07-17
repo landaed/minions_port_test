@@ -29,4 +29,6 @@ enabled=PackedStringArray("res://addons/sky_3d/plugin.cfg")
 
 [rendering]
 
+textures/vram_compression/import_etc2_astc=true
+
 rendering_device/driver.windows="d3d12"
