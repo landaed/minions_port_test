@@ -32,3 +32,6 @@ test_shots/
 # Exported builds (e.g. the single Windows .exe from tools/build_windows_exe.sh)
 build/
 launcher/.godot/
+
+# Local platform exports; publish compiled builds as GitHub Release assets
+minions-port/linux_build/

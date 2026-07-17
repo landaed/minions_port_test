@@ -13,7 +13,14 @@ config/name="Minions of Mirth Launcher"
 run/main_scene="res://launcher.tscn"
 config/features=PackedStringArray("4.6")
 
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true
+
 [display]
 
-window/size/viewport_width=560
-window/size/viewport_height=380
+window/size/viewport_width=640
+window/size/viewport_height=420
+window/size/window_width_override=640
+window/size/window_height_override=420
+window/stretch/mode="canvas_items"

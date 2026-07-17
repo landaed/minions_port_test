@@ -129,3 +129,21 @@ To bypass the `master.minionsofmirth.net` issue, you can edit `C:\Windows\System
 * Documentation for the TMMOKit: https://web.archive.org/web/20111210231923/http://www.mmoworkshop.com/trac/mom/wiki/Documentation
 * Server Architecture Version 2: https://web.archive.org/web/20111211020107/http://www.mmoworkshop.com/trac/mom/wiki/ServerArchitecture# minions_port_test
 # minions_port_test
+
+## Cross-platform game launcher
+
+The `launcher/` project is a small native Godot launcher for Windows, Ubuntu/Linux, and macOS. On startup it checks the matching `dist/version-<platform>.json` file on GitHub. If the installed game is missing or out of date, it automatically downloads the correct release archive, verifies its SHA-256 checksum, installs it in the user's writable Godot data folder, and only then enables **Play**. If GitHub is temporarily unavailable, an already-installed game can still be launched offline.
+
+### Build a release
+
+Install Godot 4.6 and its export templates, plus `zip`, then run:
+
+```bash
+GODOT=/path/to/godot tools/build_release.sh 1.0.0
+```
+
+This produces the three player launchers under `build/<platform>/launcher/`, three game archives named `MinionsOfMirth-<platform>.zip`, and refreshes the checksummed manifests in `dist/`.
+
+Create a GitHub Release tagged `v1.0.0` and attach the three game archives. Commit and push `dist/version-windows.json`, `dist/version-linux.json`, and `dist/version-macos.json` to `main`. Distribute the launcher binary for each OS once; subsequent game releases are installed automatically. Windows players run `MinionsLauncher.exe`, Linux players mark `MinionsLauncher.x86_64` executable, and macOS players unzip and open `MinionsLauncher.app` (unsigned builds may require the usual first-open confirmation).
+
+The launcher itself is deliberately separate from the downloaded game, so a game update cannot overwrite the updater while it is running. Production macOS distribution should additionally use Apple code signing/notarization, and Windows distribution should use Authenticode signing to avoid operating-system trust warnings.
