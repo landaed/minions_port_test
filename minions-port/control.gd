@@ -192,10 +192,9 @@ func _focus_select_character(index: int) -> void:
 			r.set_fade(1.0 if i == index else 0.55)
 
 const SERVER_CFG_PATH := "user://mom_client.cfg"
-# Use the IPv4 loopback, not "localhost": on Windows "localhost" often resolves
-# to IPv6 ::1 first, but the proxy listens on IPv4 0.0.0.0, so a "localhost"
-# client can stall. 127.0.0.1 forces IPv4.
-const DEFAULT_SERVER := "127.0.0.1"
+# Public default for fresh installs. The login screen still allows an override,
+# which is saved in user://mom_client.cfg.
+const DEFAULT_SERVER := "82.180.131.18"
 const DEFAULT_PROXY_PORT := 9000
 var _current_server_url := ""
 
