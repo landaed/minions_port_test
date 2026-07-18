@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "url": "https://github.com/landaed/minions_port_test/releases/download/v0.1.0/MinionsOfMirth-macos.zip",
+  "url": "http://82.180.131.18/minions/releases/v0.1.0/MinionsOfMirth-macos.zip",
   "sha256": "ae54e38f9d8f02419b10da5e95f70eb8d7b739fe6b1fd32ed53773f9a113fb7c",
   "exe": "Minions_port.app/Contents/MacOS/Minions_port",
   "notes": "Build 0.1.0"

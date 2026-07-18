@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "url": "https://github.com/landaed/minions_port_test/releases/download/v0.1.0/MinionsOfMirth-windows.zip",
+  "url": "http://82.180.131.18/minions/releases/v0.1.0/MinionsOfMirth-windows.zip",
   "sha256": "c6f0a68c44b8a2a638e7d83cdd149938122834c896a73b63c449222ca04eacce",
   "exe": "MinionsOfMirth.exe",
   "notes": "Build 0.1.0"
