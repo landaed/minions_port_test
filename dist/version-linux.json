@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "url": "https://github.com/landaed/minions_port_test/releases/download/v0.1.0/MinionsOfMirth-linux.zip",
-  "sha256": "084808e62acba921ebc28c3e4fc4b6c64d8a11622009349477ffc2242f00879f",
+  "sha256": "402f6cc95b7300727612df79bf54db2d69236c4b7c50cca4d227fdb1021b5932",
   "exe": "MinionsOfMirth.x86_64",
   "notes": "Build 0.1.0"
 }
